@@ -5,7 +5,9 @@ from supervisely.app.widgets import (
     Button,
     Flexbox,
     NodesFlow,
+    Text,
 )
+from supervisely.app import show_dialog
 
 from src.ui.dtl import actions_list, actions, Layer
 
@@ -35,7 +37,11 @@ nodes_flow = NodesFlow()
 get_dtl_json_btn = Button("Get DTL json")
 
 layout = Container(
-    widgets=[Flexbox(widgets=[select_action_name, add_layer_btn]), nodes_flow, get_dtl_json_btn]
+    widgets=[
+        Flexbox(widgets=[select_action_name, add_layer_btn]),
+        nodes_flow,
+        get_dtl_json_btn,
+    ]
 )
 
 
@@ -43,6 +49,7 @@ def create_node(layer_id: str, layer: Layer):
     node = NodesFlow.Node(
         id=layer_id,
         name=layer.action.title,
+        width=layer.action.width,
         options=layer.action.create_options(),
         inputs=layer.action.create_inputs(),
         outputs=layer.action.create_outputs(),
@@ -70,4 +77,19 @@ def add_layer_btn_cb():
 
 @get_dtl_json_btn.click
 def get_dtl_json_btn_cb():
-    print(json.dumps(nodes_flow.get_nodes_state_json(), indent=4))
+    nodes = nodes_flow.get_nodes_json()
+    nodes_state = nodes_flow.get_nodes_state_json()
+    nodes_state = json.loads(json.dumps(nodes_state, indent=4))
+    for node_id, node_options in nodes_state.items():
+        layer = layers[node_id]
+        try:
+            parsed_options = layer.action.parse_options(node_options)
+            print(parsed_options)
+            print(json.dumps(parsed_options, indent=4))
+        except Exception as e:
+            show_dialog(
+                title="Error parsing settings",
+                description=f"Layer: {layer.action.title}. Error: {type(e).__name__}: {str(e)}",
+                status="error",
+            )
+            return
