@@ -1,1 +1,4 @@
-supervisely==6.72.85
+supervisely==6.72.103
+jsonschema
+networkx
+scikit-image>=0.17.1, <1.0.0
