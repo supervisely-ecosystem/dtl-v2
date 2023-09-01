@@ -192,7 +192,7 @@ class Net:
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
-                layer.dataset_name == "*" or img_ds_name in layer.dataset_names
+                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
                 start_layer_indxs.append(idx)
         if len(start_layer_indxs) == 0:
@@ -207,21 +207,21 @@ class Net:
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indx = None
+        start_layer_indxs = []
         for idx, layer in enumerate(self.layers):
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
-                layer.dataset_name == "*" or layer.dataset_name == img_ds_name
+                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
-                start_layer_indx = idx
-                break
-        if start_layer_indx is None:
+                start_layer_indxs.append(idx)
+        if len(start_layer_indxs) == 0:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
-        output_generator = self.process_iterate(start_layer_indx, data_el)
-        for output in output_generator:
-            yield output
+        for start_layer_indx in start_layer_indxs:
+            output_generator = self.process_iterate(start_layer_indx, data_el)
+            for output in output_generator:
+                yield output
 
     def push(self, indx, data_el, branch):
         next_layer_indxs = self.get_next_layer_indxs(indx, branch=branch)
