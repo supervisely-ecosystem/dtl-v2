@@ -384,6 +384,7 @@ def run():
         total=len([p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]),
         message="Uploading result projects...",
     ) as pbar:
+        logger.debug("\n".join([str(p) for p in Path(g.RESULTS_DIR).iterdir()]))
         for pr_dir in Path(g.RESULTS_DIR).iterdir():
             if pr_dir.is_dir():
                 try:
@@ -406,12 +407,16 @@ def run():
                 finally:
                     pbar.update()
     try:
+        logger.debug(
+            "Creating results widget",
+            extra={"file_infos": file_infos, "file_infos_length": len(file_infos)},
+        )
         supervisely_layers = [l for l in net.layers if isinstance(l, SuperviselyLayer)]
         results.set_content(utils.create_results_widget(file_infos, supervisely_layers))
         results.reload()
         results.show()
     except:
-        pass
+        logger.debug("Error creating results widget", exc_info=traceback.format_exc())
     finally:
         progress.hide()
         run_btn.show()
