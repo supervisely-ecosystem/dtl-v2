@@ -187,14 +187,14 @@ class Net:
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indxs = []
+        start_layer_indxs = set()
         for idx, layer in enumerate(self.layers):
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
                 "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
-                start_layer_indxs.append(idx)
+                start_layer_indxs.add(idx)
         if len(start_layer_indxs) == 0:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
@@ -207,14 +207,14 @@ class Net:
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indxs = []
+        start_layer_indxs = set()
         for idx, layer in enumerate(self.layers):
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
                 "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
-                start_layer_indxs.append(idx)
+                start_layer_indxs.add(idx)
         if len(start_layer_indxs) == 0:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
