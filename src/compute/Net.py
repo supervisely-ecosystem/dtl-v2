@@ -187,41 +187,41 @@ class Net:
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indx = None
+        start_layer_indxs = set()
         for idx, layer in enumerate(self.layers):
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
-                layer.dataset_name == "*" or layer.dataset_name == img_ds_name
+                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
-                start_layer_indx = idx
-                break
-        if start_layer_indx is None:
+                start_layer_indxs.add(idx)
+        if len(start_layer_indxs) == 0:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
-        output_generator = self.process(start_layer_indx, data_el)
-        for output in output_generator:
-            yield output
+        for start_layer_indx in start_layer_indxs:
+            output_generator = self.process(start_layer_indx, data_el)
+            for output in output_generator:
+                yield output
 
     def start_iterate(self, data_el):
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indx = None
+        start_layer_indxs = set()
         for idx, layer in enumerate(self.layers):
             if layer.type != "data":
                 continue
             if layer.project_name == img_pr_name and (
-                layer.dataset_name == "*" or layer.dataset_name == img_ds_name
+                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
             ):
-                start_layer_indx = idx
-                break
-        if start_layer_indx is None:
+                start_layer_indxs.add(idx)
+        if len(start_layer_indxs) == 0:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
-        output_generator = self.process_iterate(start_layer_indx, data_el)
-        for output in output_generator:
-            yield output
+        for start_layer_indx in start_layer_indxs:
+            output_generator = self.process_iterate(start_layer_indx, data_el)
+            for output in output_generator:
+                yield output
 
     def push(self, indx, data_el, branch):
         next_layer_indxs = self.get_next_layer_indxs(indx, branch=branch)
@@ -290,27 +290,25 @@ class Net:
     def get_total_elements(self):
         total = 0
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
-        project_datasets = {}
+        datasets = []
+        added = set()
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
-            added = set()
             for src in data_layer.srcs:
                 project_name, dataset_name = src.split("/")
                 project = get_project_by_name(project_name)
                 if dataset_name == "*":
-                    project_datasets.setdefault(project.id, [])
                     for dataset in get_all_datasets(project.id):
                         if dataset.id not in added:
-                            project_datasets[project.id].append(dataset.id)
+                            datasets.append(dataset)
                             added.add(dataset.id)
                 else:
                     dataset = get_dataset_by_name(dataset_name, project.id)
                     if dataset.id not in added:
-                        project_datasets.setdefault(project.id, []).append(dataset.id)
-        for _, dataset_ids in project_datasets.items():
-            for dataset_id in dataset_ids:
-                dataset = get_dataset_by_id(dataset_id)
-                total += dataset.items_count
+                        datasets.append(dataset)
+                        added.add(dataset.id)
+        for dataset in datasets:
+            total += dataset.items_count
         return total
 
     def get_elements_generator(self):
@@ -333,6 +331,7 @@ class Net:
                     dataset = get_dataset_by_name(dataset_name, project.id)
                     if dataset.id not in added:
                         project_datasets.setdefault(project.id, []).append(dataset.id)
+                        added.add(dataset.id)
         for project_id, dataset_ids in project_datasets.items():
             project_meta = get_project_meta(project_id)
             project_info = get_project_by_id(project_id)
