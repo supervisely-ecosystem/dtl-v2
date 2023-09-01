@@ -59,12 +59,15 @@ class DataLayer(Layer):
 
     def _define_layer_project(self):
         self.project_name = None
+        dataset_names = set()
         for src in self.srcs:
-            project_name, _ = self._split_data_src(src)
+            project_name, dataset_name = self._split_data_src(src)
             if self.project_name is None:
                 self.project_name = project_name
             elif self.project_name != project_name:
                 raise ValueError("Data Layer can only work with one project")
+            dataset_names.add(dataset_name)
+        self.dataset_names = list(dataset_names)
 
     def define_classes_mapping(self):
         if self.settings.get("classes_mapping", "default") != "default":
