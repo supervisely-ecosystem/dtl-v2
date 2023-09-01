@@ -3,3 +3,4 @@
 *.pyc
 local.env
 supervisely
+sly_task_data

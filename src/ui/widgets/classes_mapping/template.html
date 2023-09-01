@@ -1,0 +1,63 @@
+<div>
+    <link rel="stylesheet" href="./sly/css/app/widgets/object_class_view/style.css" />
+    <table>
+        <tr
+            v-for="(obj_class, idx) in data.{{{widget.widget_id}}}.classes"
+        >
+            <td class="icon-text-line" style="display: table-cell; vertical-align: middle; padding: 3px 20px;">
+                <i
+                    class="zmdi zmdi-circle"
+                    style="margin-right: 5px"
+                    :style="{color: obj_class.color}"
+                ></i>
+                <b style="font-size: 16;">{{obj_class.title}}</b>
+                <span 
+                    style="margin-left: 5px; font-size: 12px; color: #8492A6; line-height: initial;"
+                >
+                    {{obj_class.shape_text}}
+                </span>
+            </td>
+            <td style="display: table-cell; vertical-align: middle; padding: 3px 20px;">
+                <el-input 
+                    v-model="state.{{{widget.widget_id}}}.classes_values[idx].value" 
+                    size="small" 
+                    maxlength=32 
+                    style="width: 200px"
+                    @change="
+                        state.{{{widget.widget_id}}}.classes_values[idx].default = $event == obj_class.default_value;
+                        state.{{{widget.widget_id}}}.classes_values[idx].ignore = $event == '';"
+                >
+                </el-input>
+            </td>
+            <td>
+                <el-checkbox 
+                    v-model="state.{{{widget.widget_id}}}.classes_values[idx].default"
+                    style="padding: 3px;"
+                    @change="if ($event.target.checked) {
+                        state.{{{widget.widget_id}}}.classes_values[idx].value = obj_class.default_value;
+                        state.{{{widget.widget_id}}}.classes_values[idx].ignore = false;
+                    } else if (state.{{{widget.widget_id}}}.classes_values[idx].value == obj_class.default_value) {
+                        state.{{{widget.widget_id}}}.classes_values[idx].default = true;
+                    }
+                    "
+                >
+                    default
+                </el-checkbox>
+            </td>
+            <td>
+                <el-checkbox 
+                    v-model="state.{{{widget.widget_id}}}.classes_values[idx].ignore" 
+                    style="padding: 3px 10px;"
+                    @change="if ($event.target.checked) {
+                        state.{{{widget.widget_id}}}.classes_values[idx].value = '';
+                        state.{{{widget.widget_id}}}.classes_values[idx].default = false;
+                    } else if (state.{{{widget.widget_id}}}.classes_values[idx].value == '') {
+                        state.{{{widget.widget_id}}}.classes_values[idx].ignore = true;
+                    }"
+                >
+                    ignore
+                </el-checkbox>
+            </td>
+        </tr>
+    </table>
+</div>

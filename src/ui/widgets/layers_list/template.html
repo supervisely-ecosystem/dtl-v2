@@ -1,0 +1,26 @@
+<div
+    style="display: flex; gap: 5px;"
+>
+    <el-button-group
+        v-for="(layer_name, idx) in data.{{{widget.widget_id}}}.layers"
+    >
+        <el-button
+            type="warning"
+            {% if widget._click_handled %}
+            @click="post('/{{{widget.widget_id}}}/button_clicked_cb/'+idx)"
+            {% endif %}
+            style="padding: 13px 10px;"
+        >
+            {{layer_name}}
+        </el-button>
+        <el-button
+            type="danger"
+            {% if widget._remove_click_handled %}
+            @click.stop.prevent="post('/{{{widget.widget_id}}}/remove_button_clicked_cb/'+idx)"
+            {% endif %}
+            style="padding: 13px 10px;"
+        >
+            <i class="zmdi zmdi-close"></i>
+        </el-button>
+    </el-button-group>
+</div>

@@ -1,0 +1,35 @@
+<div>
+    <link rel="stylesheet" href="./sly/css/app/widgets/object_class_view/style.css" />
+    {% if widget._multiple %}
+    <div style="margin-bottom: 10px;">
+        <span style="margin-right: 10px">{{{widget._select_all_btn}}}</span>
+        <span style="margin-right: 10px">{{{widget._deselect_all_btn}}}</span>
+    </div>
+    {% endif %}
+    <div v-for="(obj_class, idx) in data.{{{widget.widget_id}}}.classes">
+        <el-checkbox
+            v-model="state.{{{widget.widget_id}}}.selected[idx]"
+            style="margin-right: 10px;"
+            {% if not widget._multiple %}
+            @change="if ($event.target.checked) {state.{{{widget.widget_id}}}.selected = state.{{{widget.widget_id}}}.selected.map((_, i) => i == idx);}"
+            {% endif %}
+        >
+        </el-checkbox>
+        <span class="icon-text-line">
+            <i
+                class="zmdi zmdi-circle"
+                style="margin-right: 5px"
+                :style="{color: obj_class.color}"
+            ></i>
+            <b style="font-size: 16;">{{obj_class.title}}</b>
+            <span 
+                v-if="obj_class.shape_text"
+                style="margin-left: 5px; font-size: 12px; color: #8492A6; line-height: initial;"
+            >
+                {{obj_class.shape_text}}
+            </span>
+        </span>
+    </div>
+</div>
+
+  
