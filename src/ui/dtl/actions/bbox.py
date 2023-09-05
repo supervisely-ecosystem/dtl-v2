@@ -21,10 +21,10 @@ class BBoxAction(Action):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        classes_mapping = ClassesMapping()
+        classes_mapping_widget = ClassesMapping()
 
         def _get_classes_mapping_value():
-            mapping = classes_mapping.get_mapping()
+            mapping = classes_mapping_widget.get_mapping()
             values = {
                 name: values["value"]
                 for name, values in mapping.items()
@@ -40,23 +40,35 @@ class BBoxAction(Action):
 
         def set_settings_from_json(json_data: dict, node_state: dict):
             """This function is used to set options from settings we get from dlt json input"""
+            classes_mapping_widget.loading = True
             settings = json_data["settings"]
-            classes_mapping.loading = True
-            classes_mapping.set_mapping(settings["classes_mapping"])
-            classes_mapping.loading = False
+            classes_mapping = {}
+            other_default = settings["classes_mapping"].get("__other__", None) == "__default__"
+            for cls in classes_mapping_widget.get_classes():
+                if cls.name in settings["classes_mapping"]:
+                    value = settings["classes_mapping"][cls.name]
+                    if value == "__default__":
+                        value = cls.name
+                    if value == "__ignore__":
+                        value = ""
+                    classes_mapping[cls.name] = value
+                elif other_default:
+                    classes_mapping[cls.name] = cls.name
+                else:
+                    classes_mapping[cls.name] = ""
+            classes_mapping_widget.set_mapping(classes_mapping)
+            classes_mapping_widget.loading = False
             return node_state
 
         def meta_changed_cb(project_meta: ProjectMeta):
-            classes_mapping.loading = True
-            classes_mapping.set(project_meta.obj_classes)
-            classes_mapping.loading = False
+            classes_mapping_widget.loading = True
+            classes_mapping_widget.set(project_meta.obj_classes)
+            classes_mapping_widget.loading = False
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="settings_text",
@@ -65,7 +77,7 @@ class BBoxAction(Action):
             NodesFlow.Node.Option(
                 name="Set Classes Mapping",
                 option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(classes_mapping)
+                    sidebar_component=NodesFlow.WidgetOptionComponent(classes_mapping_widget)
                 ),
             ),
         ]

@@ -1,4 +1,3 @@
-import copy
 from typing import Optional
 from supervisely.app.widgets import NodesFlow
 from supervisely import ProjectMeta, Rectangle, AnyGeometry
@@ -54,7 +53,8 @@ class BboxToPolyAction(Action):
 
         def set_settings_from_json(json_data: dict, node_state: dict):
             """This function is used to set options from settings we get from dlt json input"""
-            settings = copy.deepcopy(json_data["settings"])
+            classes_mapping_widget.loading = True
+            settings = json_data["settings"]
             classes_mapping = {}
             other_default = settings["classes_mapping"].get("__other__", None) == "__default__"
             for cls in classes_mapping_widget.get_classes():
@@ -70,14 +70,13 @@ class BboxToPolyAction(Action):
                 else:
                     classes_mapping[cls.name] = ""
             classes_mapping_widget.set_mapping(classes_mapping)
+            classes_mapping_widget.loading = False
             return node_state
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="class_text",

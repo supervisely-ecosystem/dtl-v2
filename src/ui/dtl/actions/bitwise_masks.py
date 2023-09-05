@@ -64,14 +64,12 @@ class BitwiseMasksAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="type_text",
-                option_component=NodesFlow.TextOptionComponent("Type"),
+                option_component=NodesFlow.TextOptionComponent("Operation type"),
             ),
             NodesFlow.Node.Option(
                 name="type",
@@ -81,7 +79,9 @@ class BitwiseMasksAction(Action):
             ),
             NodesFlow.Node.Option(
                 name="class_mask_text",
-                option_component=NodesFlow.TextOptionComponent("Class Mask"),
+                option_component=NodesFlow.TextOptionComponent(
+                    "Class Mask. First element of bitwise operation"
+                ),
             ),
             NodesFlow.Node.Option(
                 name="Select Class Mask",

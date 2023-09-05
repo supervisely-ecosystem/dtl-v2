@@ -173,12 +173,6 @@ class DataAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
-            NodesFlow.Node.Option(
                 name="source_text",
                 option_component=NodesFlow.TextOptionComponent("Source"),
             ),
@@ -187,6 +181,10 @@ class DataAction(Action):
                 option_component=NodesFlow.ButtonOptionComponent(
                     sidebar_component=NodesFlow.WidgetOptionComponent(select_datasets)
                 ),
+            ),
+            NodesFlow.Node.Option(
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="classes_mapping_text",

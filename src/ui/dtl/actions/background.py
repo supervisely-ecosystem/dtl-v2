@@ -22,14 +22,12 @@ class BackgroundAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="class_text",
-                option_component=NodesFlow.TextOptionComponent("Class"),
+                option_component=NodesFlow.TextOptionComponent("Background Class name"),
             ),
             NodesFlow.Node.Option(name="class", option_component=NodesFlow.InputOptionComponent()),
         ]

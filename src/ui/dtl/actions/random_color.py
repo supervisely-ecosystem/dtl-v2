@@ -29,10 +29,8 @@ class RandomColorsAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="strength_text",
@@ -40,7 +38,7 @@ class RandomColorsAction(Action):
             ),
             NodesFlow.Node.Option(
                 name="strength",
-                option_component=NodesFlow.NumberOptionComponent(min=0, max=1, default_value=0.25),
+                option_component=NodesFlow.SliderOptionComponent(min=0, max=1, default_value=0.25),
             ),
         ]
         return Layer(

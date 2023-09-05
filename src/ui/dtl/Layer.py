@@ -45,6 +45,35 @@ class Layer:
         self._preview_img_url = f"static/{self._id}.jpg"
         self._ann = None
 
+        self._add_info_option()
+        self._add_preview_option()
+
+    def _add_info_option(self):
+        self._options = [
+            NodesFlow.Node.Option(
+                name="Info",
+                option_component=NodesFlow.ButtonOptionComponent(
+                    sidebar_component=NodesFlow.WidgetOptionComponent(
+                        self.action.create_info_widget()
+                    )
+                ),
+            ),
+            *self._options,
+        ]
+
+    def _add_preview_option(self):
+        self._preview_widget = LabeledImage(enable_zoom=True)
+        self._options = [
+            *self._options,
+            NodesFlow.Node.Option(
+                name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
+            ),
+            NodesFlow.Node.Option(
+                name="preview",
+                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
+            ),
+        ]
+
     def to_json(self) -> dict:
         return {
             "action": self.action.name,
@@ -71,17 +100,6 @@ class Layer:
     def create_node(self) -> NodesFlow.Node:
         self._inputs = self.action.create_inputs()
         self._outputs = self.action.create_outputs()
-        self._preview_widget = LabeledImage(enable_zoom=True)
-        self._options = [
-            *self._options,
-            NodesFlow.Node.Option(
-                name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-            ),
-            NodesFlow.Node.Option(
-                name="preview",
-                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
-            ),
-        ]
         return NodesFlow.Node(
             id=self._id,
             name=self.action.title,

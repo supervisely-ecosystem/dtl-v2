@@ -24,7 +24,13 @@ class ObjectsFilterAction(Action):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         classes = ClassesList(multiple=True)
+        classes_field = Field(title="Select Classes", content=classes)
         percent_input = InputNumber(min=0, max=100, value=5)
+        percent_input_field = Field(
+            title="Input %",
+            description="Filter annotations that have area (in percentage of image area) less/more than specified value",
+            content=percent_input,
+        )
         width_input = InputNumber(min=0, value=100)
         height_input = InputNumber(min=0, value=100)
         size_input = Container(
@@ -33,22 +39,43 @@ class ObjectsFilterAction(Action):
                 Field(title="Height", content=height_input),
             ]
         )
+        size_input_field = Field(
+            title="Input size",
+            description="Filter annotations that have some side (determined by the annotation bounding box) less/more than specified value of width or height correspondingly.",
+            content=size_input,
+        )
         comparator_select = Select(
             items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")]
         )
+        comparator_select_field = Field(title="Comparator", content=comparator_select)
         action_select = Select(items=[Select.Item("delete", "Delete")])
+        action_select_field = Field(title="Action", content=action_select)
         action_select.disable()
         filter_items = [
             Select.Item("names", "Names", classes),
             Select.Item(
                 "area_percent",
                 "Area percent",
-                Container(widgets=[classes, percent_input, comparator_select, action_select]),
+                Container(
+                    widgets=[
+                        classes_field,
+                        percent_input_field,
+                        comparator_select_field,
+                        action_select_field,
+                    ]
+                ),
             ),
             Select.Item(
                 "bbox_size",
                 "Bounding box size",
-                Container(widgets=[classes, size_input, comparator_select, action_select]),
+                Container(
+                    widgets=[
+                        classes_field,
+                        size_input_field,
+                        comparator_select_field,
+                        action_select_field,
+                    ]
+                ),
             ),
         ]
         filter_by_select = Select(filter_items)
@@ -132,10 +159,8 @@ class ObjectsFilterAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="filter_by_text",
@@ -145,7 +170,12 @@ class ObjectsFilterAction(Action):
                 name="Set Filter",
                 option_component=NodesFlow.ButtonOptionComponent(
                     sidebar_component=NodesFlow.WidgetOptionComponent(
-                        Container(widgets=[filter_by_select, filter_by_inputs])
+                        Container(
+                            widgets=[
+                                Field(title="Filter by", content=filter_by_select),
+                                filter_by_inputs,
+                            ]
+                        )
                     )
                 ),
             ),

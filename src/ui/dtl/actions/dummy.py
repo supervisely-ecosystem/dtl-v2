@@ -21,14 +21,7 @@ class DummyAction(Action):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {}
 
-        options = [
-            NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
-        ]
+        options = []
         return Layer(
             action=cls,
             options=options,

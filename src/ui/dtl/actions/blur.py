@@ -1,5 +1,14 @@
 from typing import Optional
-from supervisely.app.widgets import NodesFlow, Container, Select, InputNumber, OneOf
+from supervisely.app.widgets import (
+    NodesFlow,
+    Container,
+    Select,
+    InputNumber,
+    OneOf,
+    Field,
+    Flexbox,
+    Text,
+)
 from src.ui.dtl import Action
 from src.ui.dtl.Layer import Layer
 
@@ -26,13 +35,31 @@ class BlurAction(Action):
         sigma_max_input = InputNumber(value=50, min=0.01, step=0.01)
         select_name = Select(
             items=[
-                Select.Item("median", "Median", kernel_input),
                 Select.Item(
-                    "gaussian", "Gaussian", Container(widgets=[sigma_min_input, sigma_max_input])
+                    "median",
+                    "Median",
+                    Field(
+                        title="Kernel", description="Set kernel to odd number", content=kernel_input
+                    ),
+                ),
+                Select.Item(
+                    "gaussian",
+                    "Gaussian",
+                    Field(
+                        title="Sigma",
+                        content=Container(
+                            widgets=[
+                                Flexbox(widgets=[Text("Min", color="white"), sigma_min_input]),
+                                Flexbox(widgets=[Text("Max", color="white"), sigma_max_input]),
+                            ]
+                        ),
+                    ),
                 ),
             ]
         )
-        settings_widget = Container(widgets=[select_name, OneOf(select_name)])
+        settings_widget = Container(
+            widgets=[Field(title="Blur type", content=select_name), OneOf(select_name)]
+        )
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -62,12 +89,6 @@ class BlurAction(Action):
             return node_state
 
         options = [
-            NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
             NodesFlow.Node.Option(
                 name="settings_text",
                 option_component=NodesFlow.TextOptionComponent("Settings"),

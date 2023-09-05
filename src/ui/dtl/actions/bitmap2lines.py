@@ -76,18 +76,8 @@ class Bitmap2LinesAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
-            NodesFlow.Node.Option(
-                name="min_points_cnt_text",
-                option_component=NodesFlow.TextOptionComponent("Min Points Count"),
-            ),
-            NodesFlow.Node.Option(
-                name="min_points_cnt",
-                option_component=NodesFlow.IntegerOptionComponent(min=2, default_value=2),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="classes_mapping_text",
@@ -98,6 +88,20 @@ class Bitmap2LinesAction(Action):
                 option_component=NodesFlow.ButtonOptionComponent(
                     sidebar_component=NodesFlow.WidgetOptionComponent(classes_mapping_widget)
                 ),
+            ),
+            NodesFlow.Node.Option(
+                name="min_points_cnt_text",
+                option_component=NodesFlow.TextOptionComponent("Min Points Count."),
+            ),
+            NodesFlow.Node.Option(
+                name="min_points_cnt_description",
+                option_component=NodesFlow.TextOptionComponent(
+                    "Min number of vertices for each output line. Other lines will be dropped."
+                ),
+            ),
+            NodesFlow.Node.Option(
+                name="min_points_cnt",
+                option_component=NodesFlow.IntegerOptionComponent(min=2, default_value=2),
             ),
         ]
 

@@ -26,7 +26,7 @@ class TagAction(Action):
         prev_project_meta = ProjectMeta()
 
         select_tag_meta = SelectTagMeta(project_meta=prev_project_meta)
-        input_tag = InputTag(TagMeta(name="placeholder", value_type=TagValueType.NONE))
+        input_tag = InputTag(TagMeta(name="", value_type=TagValueType.NONE))
 
         last_tag_meta = None
 
@@ -94,10 +94,8 @@ class TagAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="input_tag_text",

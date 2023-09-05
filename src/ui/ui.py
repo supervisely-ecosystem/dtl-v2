@@ -18,10 +18,12 @@ from supervisely.app.widgets import (
     Text,
     ReloadableArea,
     TaskLogs,
+    Empty,
 )
 from supervisely.app import show_dialog
 from supervisely import ProjectMeta
 from supervisely import logger
+from supervisely.io.fs import get_file_size
 import supervisely as sly
 
 from src.ui.dtl import actions_list, actions, Action
@@ -49,7 +51,7 @@ select_action_name = Select(
     size="large",
 )
 add_layer_btn = Button("Add Layer")
-nodes_flow = NodesFlow(height="1000px")
+nodes_flow = NodesFlow(height="70vh")
 run_btn = Button("Run", icon="zmdi zmdi-play")
 json_editor = Editor(height_lines=100)
 update_previews_btn = Button("Update previews")
@@ -67,7 +69,7 @@ add_layer_card = Card(
     title="Add new layer", content=Flexbox(widgets=[select_action_name, add_layer_btn])
 )
 download_archives_urls = Text("")
-results = ReloadableArea()
+results = ReloadableArea(Empty())
 results.hide()
 nodes_flow_card = Card(
     title="DTL Graph",
@@ -380,32 +382,38 @@ def run():
     except:
         logger.debug("Error computing dtls", exc_info=traceback.format_exc())
     file_infos = []
-    with progress(
-        total=len([p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]),
-        message="Uploading result projects...",
-    ) as pbar:
-        logger.debug("\n".join([str(p) for p in Path(g.RESULTS_DIR).iterdir()]))
-        for pr_dir in Path(g.RESULTS_DIR).iterdir():
-            if pr_dir.is_dir():
-                try:
-                    tar_path = str(pr_dir) + ".tar"
-                    sly.fs.archive_directory(pr_dir, tar_path)
-                    file_info = g.api.file.upload(
-                        g.TEAM_ID,
-                        src=tar_path,
-                        dst=f"/dtl/{utils.get_task()}/{Path(tar_path).name}",
-                        # progress_cb=progress(),
-                    )
-                    file_infos.append(file_info)
-                    if not sly.is_development():
-                        g.api.task.set_output_archive(
-                            sly.env.task_id(), file_info.id, file_info.name
-                        )
-                except Exception as e:
-                    logger.debug("Error uploading results", exc_info=traceback.format_exc())
-                    show_dialog(title="Error uploading results", description=str(e), status="error")
-                finally:
-                    pbar.update()
+    # with progress(
+    #     total=len([p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]),
+    #     message="Uploading result projects...",
+    # ) as pbar:
+    pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
+    for i, pr_dir in enumerate(pr_dirs):
+        try:
+            with progress(
+                message=[f'[{i+1}/{len(pr_dirs)}] Archivating result project "{pr_dir.name}"'],
+                total=1,
+            ) as pbar:
+                tar_path = str(pr_dir) + ".tar"
+                sly.fs.archive_directory(pr_dir, tar_path)
+                pbar.update(1)
+            with progress(
+                message=f'[{i+1}/{len(pr_dirs)}] Uploading result project "{pr_dir.name}"',
+                unit="B",
+                unit_scale=True,
+                total=get_file_size(tar_path),
+            ) as pbar:
+                file_info = g.api.file.upload(
+                    g.TEAM_ID,
+                    src=tar_path,
+                    dst=f"/dtl/{utils.get_task()}/{Path(tar_path).name}",
+                    progress_cb=pbar,
+                )
+            file_infos.append(file_info)
+            if not sly.is_development():
+                g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)
+        except Exception as e:
+            logger.debug("Error uploading results", exc_info=traceback.format_exc())
+            show_dialog(title="Error uploading results", description=str(e), status="error")
     try:
         logger.debug(
             "Creating results widget",

@@ -10,10 +10,8 @@ from supervisely.app.widgets import (
     OneOf,
     Checkbox,
 )
-from supervisely import ProjectMeta
 from src.ui.dtl import Action
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesMapping
 
 
 class CropAction(Action):
@@ -233,12 +231,6 @@ class CropAction(Action):
             return node_state
 
         options = [
-            NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
             NodesFlow.Node.Option(
                 name="settings_text",
                 option_component=NodesFlow.TextOptionComponent("Crop settings"),

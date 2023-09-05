@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from supervisely.app.widgets import NodesFlow
 from supervisely import ProjectMeta
 from supervisely import Polygon, Polyline, AnyGeometry
@@ -56,10 +56,8 @@ class ApproxVectorAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="classes_text",

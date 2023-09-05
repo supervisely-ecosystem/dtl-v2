@@ -67,10 +67,8 @@ class ContrastBrightnessAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
             ),
             NodesFlow.Node.Option(
                 name="Contrast",
@@ -78,15 +76,21 @@ class ContrastBrightnessAction(Action):
             ),
             NodesFlow.Node.Option(
                 name="Contrast Min",
-                option_component=NodesFlow.NumberOptionComponent(min=0, max=10, default_value=1),
+                option_component=NodesFlow.SliderOptionComponent(min=0, max=10, default_value=1),
             ),
             NodesFlow.Node.Option(
                 name="Contrast Max",
-                option_component=NodesFlow.NumberOptionComponent(min=0, max=10, default_value=2),
+                option_component=NodesFlow.SliderOptionComponent(min=0, max=10, default_value=2),
             ),
             NodesFlow.Node.Option(
                 name="Center grey",
                 option_component=NodesFlow.CheckboxOptionComponent(default_value=False),
+            ),
+            NodesFlow.Node.Option(
+                name="center_grey_text",
+                option_component=NodesFlow.TextOptionComponent(
+                    '*To center colors of images (subtract 128) first, set "Center grey" to true'
+                ),
             ),
             NodesFlow.Node.Option(
                 name="Brightness",
@@ -94,13 +98,13 @@ class ContrastBrightnessAction(Action):
             ),
             NodesFlow.Node.Option(
                 name="Brightness Min",
-                option_component=NodesFlow.NumberOptionComponent(
+                option_component=NodesFlow.SliderOptionComponent(
                     min=-255, max=255, default_value=-50
                 ),
             ),
             NodesFlow.Node.Option(
                 name="Brightness Max",
-                option_component=NodesFlow.NumberOptionComponent(
+                option_component=NodesFlow.SliderOptionComponent(
                     min=-255, max=255, default_value=50
                 ),
             ),

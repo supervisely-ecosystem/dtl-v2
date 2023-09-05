@@ -95,16 +95,14 @@ class SaveMasksAction(Action):
 
         options = [
             NodesFlow.Node.Option(
-                name="Info",
-                option_component=NodesFlow.ButtonOptionComponent(
-                    sidebar_component=NodesFlow.WidgetOptionComponent(cls.create_info_widget())
-                ),
-            ),
-            NodesFlow.Node.Option(
                 name="destination_text",
                 option_component=NodesFlow.TextOptionComponent("Destination"),
             ),
             NodesFlow.Node.Option(name="dst", option_component=NodesFlow.InputOptionComponent()),
+            NodesFlow.Node.Option(
+                name="settings_text",
+                option_component=NodesFlow.TextOptionComponent("Settings"),
+            ),
             NodesFlow.Node.Option(
                 name="gt_human_color_text",
                 option_component=NodesFlow.TextOptionComponent("Human masks colors"),
