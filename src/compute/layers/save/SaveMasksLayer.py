@@ -1,17 +1,17 @@
 # coding: utf-8
 
+from typing import Tuple
 import json
 import os
 import os.path as osp
-from typing import Tuple
-
 import cv2
 import numpy as np
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-
-from src.compute.Layer import Layer
 
 import supervisely as sly
+
+from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.Layer import Layer
+from src.exceptions import GraphError
 
 
 # save to archive, with GTs and checks
@@ -86,6 +86,7 @@ class SaveMasksLayer(Layer):
         pass
 
     def validate(self):
+        super().validate()
         if "gt_machine_color" in self.settings:
             for cls in self.settings["gt_machine_color"]:
                 col = self.settings["gt_machine_color"][cls]
@@ -111,6 +112,12 @@ class SaveMasksLayer(Layer):
             )
 
     def preprocess(self):
+        if self.net.preview_mode:
+            return
+        if self.output_meta is None:
+            raise GraphError(
+                "Output meta is not set. Check that node is connected", extra={"layer": self.action}
+            )
         dst = self.dsts[0]
         self.out_project = sly.Project(
             directory=f"{self.output_folder}/{dst}", mode=sly.OpenMode.CREATE
@@ -127,55 +134,58 @@ class SaveMasksLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
         img_desc, ann = data_el
-        free_name = self.net.get_free_name(img_desc, self.out_project.name)
-        new_dataset_name = img_desc.get_res_ds_name()
+        if not self.net.preview_mode:
+            free_name = self.net.get_free_name(img_desc, self.out_project.name)
+            new_dataset_name = img_desc.get_res_ds_name()
 
-        for out_dir, flag_name, mapping_name in self.odir_flag_mapping:
-            if not self.settings[flag_name]:
-                continue
-            cls_mapping = self.settings[mapping_name]
+            for out_dir, flag_name, mapping_name in self.odir_flag_mapping:
+                if not self.settings[flag_name]:
+                    continue
+                cls_mapping = self.settings[mapping_name]
 
-            # hack to draw 'black' regions
-            if flag_name == "masks_human":
-                cls_mapping = {k: (1, 1, 1) if max(v) == 0 else v for k, v in cls_mapping.items()}
+                # hack to draw 'black' regions
+                if flag_name == "masks_human":
+                    cls_mapping = {
+                        k: (1, 1, 1) if max(v) == 0 else v for k, v in cls_mapping.items()
+                    }
 
-            img = self.draw_colored_mask(ann, cls_mapping)
+                img = self.draw_colored_mask(ann, cls_mapping)
 
-            if flag_name == "masks_human":
-                orig_img = img_desc.read_image()
-                comb_img = self.overlay_images(orig_img, img, 0.5)
+                if flag_name == "masks_human":
+                    orig_img = img_desc.read_image()
+                    comb_img = self.overlay_images(orig_img, img, 0.5)
 
-                sep = np.array([[[0, 255, 0]]] * orig_img.shape[0], dtype=np.uint8)
-                img = np.hstack((orig_img, sep, comb_img))
+                    sep = np.array([[[0, 255, 0]]] * orig_img.shape[0], dtype=np.uint8)
+                    img = np.hstack((orig_img, sep, comb_img))
 
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            output_img_path = osp.join(
-                self.out_project.directory, new_dataset_name, out_dir, free_name + ".png"
-            )
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                output_img_path = osp.join(
+                    self.out_project.directory, new_dataset_name, out_dir, free_name + ".png"
+                )
 
-            dst_dir = osp.split(output_img_path)[0]
+                dst_dir = osp.split(output_img_path)[0]
 
-            def ensure_dir(dst_dir):
-                if not osp.exists(dst_dir):
-                    parent, _ = osp.split(dst_dir)
-                    ensure_dir(parent)
-                    os.mkdir(dst_dir)
+                def ensure_dir(dst_dir):
+                    if not osp.exists(dst_dir):
+                        parent, _ = osp.split(dst_dir)
+                        ensure_dir(parent)
+                        os.mkdir(dst_dir)
 
-            ensure_dir(dst_dir)
+                ensure_dir(dst_dir)
 
-            cv2.imwrite(output_img_path, img)
+                cv2.imwrite(output_img_path, img)
 
-        dataset_name = img_desc.get_res_ds_name()
-        if not self.out_project.datasets.has_key(dataset_name):
-            self.out_project.create_dataset(dataset_name)
-        out_dataset = self.out_project.datasets.get(dataset_name)
+            dataset_name = img_desc.get_res_ds_name()
+            if not self.out_project.datasets.has_key(dataset_name):
+                self.out_project.create_dataset(dataset_name)
+            out_dataset = self.out_project.datasets.get(dataset_name)
 
-        out_item_name = free_name + img_desc.get_image_ext()
+            out_item_name = free_name + img_desc.get_image_ext()
 
-        # net _always_ downloads images
-        if img_desc.need_write():
-            out_dataset.add_item_np(out_item_name, img_desc.image_data, ann=ann)
-        else:
-            out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
+            # net _always_ downloads images
+            if img_desc.need_write():
+                out_dataset.add_item_np(out_item_name, img_desc.image_data, ann=ann)
+            else:
+                out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
 
         yield ([img_desc, ann],)

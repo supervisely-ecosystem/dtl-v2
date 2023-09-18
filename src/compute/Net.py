@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, rand_str, ProjectMeta, DatasetInfo
+from supervisely import Annotation, rand_str, ProjectMeta
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -20,11 +20,19 @@ from src.utils import (
 )
 import src.globals as g
 from src.utils import LegacyProjectItem
+from src.exceptions import (
+    ActionNotFoundError,
+    BadSettingsError,
+    CreateMetaError,
+    GraphError,
+    CustomException,
+)
 
 
 class Net:
     def __init__(self, graph_desc, output_folder):
         self.layers = []
+        self.preview_mode = False
 
         if type(graph_desc) is str:
             graph_path = graph_desc
@@ -32,16 +40,18 @@ class Net:
             if not os.path.exists(graph_path):
                 raise RuntimeError('No such config file "%s"' % graph_path)
             else:
-                graph = json.load(open(graph_path, "r"))
+                self.graph = json.load(open(graph_path, "r"))
         else:
-            graph = graph_desc
+            self.graph = graph_desc
 
-        for layer_config in graph:
+        for layer_config in self.graph:
             if "action" not in layer_config:
-                raise RuntimeError('No "action" field in layer "{}".'.format(layer_config))
+                raise BadSettingsError(
+                    'Missing "action" field in layer config', extra={"layer_config": layer_config}
+                )
             action = layer_config["action"]
             if action not in Layer.actions_mapping:
-                raise RuntimeError('Unrecognized action "{}".'.format(action))
+                raise ActionNotFoundError(action)
             layer_cls = Layer.actions_mapping[action]
             if layer_cls.type == "data":
                 layer = layer_cls(layer_config)
@@ -63,7 +73,13 @@ class Net:
         graph_has_savel = False
         for layer in self.layers:
             layer: Layer
-            layer.validate()
+            try:
+                layer.validate()
+            except CustomException as e:
+                e.extra["layer_config"] = layer.config
+                raise e
+            except:
+                raise
 
             if type(layer).type == "data":
                 graph_has_datal = True
@@ -73,11 +89,11 @@ class Net:
                 graph_has_savel = True
 
         if graph_has_datal is False:
-            raise RuntimeError("Graph error: missing data layer.")
+            raise GraphError("Missing data layer")
         if graph_has_savel is False:
-            raise RuntimeError("Graph error: missing save layer.")
+            raise GraphError("Missing save layer")
         if len(self.layers) < 2:
-            raise RuntimeError("Graph error: less than two layers.")
+            raise GraphError("Less than two layers")
         self.check_connections()
 
     def get_input_project_metas(self):
@@ -127,7 +143,7 @@ class Net:
         else:
             color = self.layers[indx].color
             if color == "visiting":
-                raise RuntimeError("Loop in layers structure.")
+                raise GraphError("Loop in layers structure.")
             if color == "visited":
                 return
             self.layers[indx].color = "visiting"
@@ -203,20 +219,23 @@ class Net:
             for output in output_generator:
                 yield output
 
-    def start_iterate(self, data_el):
+    def start_iterate(self, data_el, layer_idx: int = None, skip_save_layers=False):
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
-        start_layer_indxs = set()
-        for idx, layer in enumerate(self.layers):
-            if layer.type != "data":
-                continue
-            if layer.project_name == img_pr_name and (
-                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
-            ):
-                start_layer_indxs.add(idx)
-        if len(start_layer_indxs) == 0:
-            raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
+        if layer_idx is not None:
+            start_layer_indxs = [layer_idx]
+        else:
+            start_layer_indxs = set()
+            for idx, layer in enumerate(self.layers):
+                if layer.type != "data":
+                    continue
+                if layer.project_name == img_pr_name and (
+                    "*" in layer.dataset_names or img_ds_name in layer.dataset_names
+                ):
+                    start_layer_indxs.add(idx)
+            if len(start_layer_indxs) == 0:
+                raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
         for start_layer_indx in start_layer_indxs:
             output_generator = self.process_iterate(start_layer_indx, data_el)
@@ -261,6 +280,13 @@ class Net:
 
     def process_iterate(self, indx, data_el):
         layer = self.layers[indx]
+        try:
+            layer.validate()
+        except CustomException as e:
+            e.extra["layer_config"] = layer.config
+            raise e
+        except:
+            raise
         for layer_output in layer.process_timed(data_el):
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
@@ -400,7 +426,11 @@ class Net:
                 processed_layers.add(cur_layer)
                 # TODO no need for dict here?
                 cur_layer_input_metas = {src: datalevel_metas[src] for src in cur_layer.srcs}
-                cur_layer_res_meta = cur_layer.make_output_meta(cur_layer_input_metas)
+                try:
+                    cur_layer_res_meta = cur_layer.make_output_meta(cur_layer_input_metas)
+                except CreateMetaError as e:
+                    e.extra["layer_config"] = cur_layer.config
+                    raise e
 
                 for dst in cur_layer.dsts:
                     datalevel_metas[dst] = cur_layer_res_meta

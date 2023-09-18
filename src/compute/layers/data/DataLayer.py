@@ -1,8 +1,6 @@
 # coding: utf-8
 from typing import Tuple
 
-from copy import deepcopy
-
 from supervisely import Annotation, Label, ProjectMeta
 
 from src.compute.Layer import Layer
@@ -10,6 +8,7 @@ from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
 from src.utils import get_project_by_name, get_project_meta
+from src.exceptions import BadSettingsError
 
 
 class DataLayer(Layer):
@@ -48,9 +47,9 @@ class DataLayer(Layer):
         src_components = src.strip("/").split("/")
         if src_components == [""] or len(src_components) > 2:
             # Empty name or too many components.
-            raise ValueError(
-                'Wrong "data" layer source path "{}", use "project_name/dataset_name" or "project_name/*" '
-                "format of the path:".format(src)
+            raise BadSettingsError(
+                'Wrong "data" layer source path. Use "project_name/dataset_name" or "project_name/*"',
+                extra={"layer_config": cls.config},
             )
         if len(src_components) == 1:
             # Only the project is specified, append '*' for the datasets.
@@ -65,7 +64,9 @@ class DataLayer(Layer):
             if self.project_name is None:
                 self.project_name = project_name
             elif self.project_name != project_name:
-                raise ValueError("Data Layer can only work with one project")
+                raise BadSettingsError(
+                    "Data Layer can only work with one project", extra={"layer_config": self.config}
+                )
             dataset_names.add(dataset_name)
         self.dataset_names = list(dataset_names)
 
@@ -81,7 +82,7 @@ class DataLayer(Layer):
         if curr_class in self.cls_mapping:
             new_class = self.cls_mapping[curr_class]
         else:
-            raise RuntimeError("Can not find mapping for class: {}".format(curr_class))
+            raise BadSettingsError("Can not find mapping for class", extra={"class": curr_class})
 
         if new_class == ClassConstants.IGNORE:
             return []  # drop the figure

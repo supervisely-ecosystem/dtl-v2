@@ -1,86 +1,106 @@
-from .Action import Action
-from .actions.data import DataAction
-from .actions.approx_vector import ApproxVectorAction
-from .actions.background import BackgroundAction
-from .actions.bbox import BBoxAction
-from .actions.bbox2poly import BboxToPolyAction
-from .actions.bitwise_masks import BitwiseMasksAction
-from .actions.blur import BlurAction
-from .actions.bitmap2lines import Bitmap2LinesAction
-from .actions.color_class import ColorClassAction
-from .actions.contrast_brightness import ContrastBrightnessAction
-from .actions.crop import CropAction
-from .actions.dataset import DatasetAction
-from .actions.drop_obj_by_class import DropByClassAction
-from .actions.drop_lines_by_length import DropLinesByLengthAction
-from .actions.drop_noise import DropNoiseAction
-from .actions.dummy import DummyAction
-from .actions.duplicate_objects import DuplicateObjectsAction
-from .actions.find_contours import FindContoursAction
-from .actions.flip import FlipAction
-from .actions.if_action import IfAction
-from .actions.instances_crop import InstancesCropAction
-from .actions.line2bitmap import LineToBitmapAction
-from .actions.merge_bitmaps import MergeBitmapsAction
-from .actions.multiply import MultiplyAction
-from .actions.noise import NoiseAction
-from .actions.objects_filter import ObjectsFilterAction
-from .actions.poly2bitmap import PolygonToBitmapAction
-from .actions.random_color import RandomColorsAction
-from .actions.rename import RenameAction
-from .actions.rasterize import RasterizeAction
-from .actions.resize import ResizeAction
-from .actions.skeletonize import SkeletonizeAction
-from .actions.sliding_window import SlidingWindowAction
-from .actions.split_masks import SplitMasksAction
-from .actions.tag import TagAction
-from .actions.save import SaveAction
-from .actions.save_masks import SaveMasksAction
-from .actions.supervisely import SuperviselyAction
+from .Action import (
+    Action,
+    SourceAction,
+    PixelLevelAction,
+    SpatialLevelAction,
+    AnnotationAction,
+    OtherAction,
+    OutputAction,
+)
+from .actions.data.data import DataAction
+from .actions.approx_vector.approx_vector import ApproxVectorAction
+from .actions.background.background import BackgroundAction
+from .actions.bbox.bbox import BBoxAction
+from .actions.bbox2poly.bbox2poly import BboxToPolyAction
+from .actions.bitwise_masks.bitwise_masks import BitwiseMasksAction
+from .actions.blur.blur import BlurAction
+from .actions.bitmap2lines.bitmap2lines import Bitmap2LinesAction
+from .actions.color_class.color_class import ColorClassAction
+from .actions.contrast_brightness.contrast_brightness import ContrastBrightnessAction
+from .actions.crop.crop import CropAction
+from .actions.dataset.dataset import DatasetAction
+from .actions.drop_obj_by_class.drop_obj_by_class import DropByClassAction
+from .actions.drop_lines_by_length.drop_lines_by_length import DropLinesByLengthAction
+from .actions.drop_noise.drop_noise import DropNoiseAction
+from .actions.dummy.dummy import DummyAction
+from .actions.duplicate_objects.duplicate_objects import DuplicateObjectsAction
+from .actions.find_contours.find_contours import FindContoursAction
+from .actions.flip.flip import FlipAction
+from .actions.if_action.if_action import IfAction
+from .actions.instances_crop.instances_crop import InstancesCropAction
+from .actions.line2bitmap.line2bitmap import LineToBitmapAction
+from .actions.merge_bitmaps.merge_bitmaps import MergeBitmapsAction
+from .actions.multiply.multiply import MultiplyAction
+from .actions.noise.noise import NoiseAction
+from .actions.objects_filter.objects_filter import ObjectsFilterAction
+from .actions.poly2bitmap.poly2bitmap import PolygonToBitmapAction
+from .actions.random_color.random_color import RandomColorsAction
+from .actions.rename.rename import RenameAction
+from .actions.rasterize.rasterize import RasterizeAction
+from .actions.resize.resize import ResizeAction
+from .actions.rotate.rotate import RotateAction
+from .actions.skeletonize.skeletonize import SkeletonizeAction
+from .actions.sliding_window.sliding_window import SlidingWindowAction
+from .actions.split_masks.split_masks import SplitMasksAction
+from .actions.tag.tag import TagAction
+from .actions.save.save import SaveAction
+from .actions.save_masks.save_masks import SaveMasksAction
+from .actions.supervisely.supervisely import SuperviselyAction
 
 
-DATA_ACTIONS = "Data actions"
-TRANSFORMATION_ACTIONS = "Transformation actions"
+SOURCE_ACTIONS = "Source actions"
+# TRANSFORMATION_ACTIONS = "Transformation actions"
+PIXEL_LEVEL_TRANSFORMS = "Pixel-level transforms"
+SPATIAL_LEVEL_TRANSFORMS = "Spatial-level transforms"
+ANNOTATION_TRANSFORMS = "Annotation transforms"
+OTHER = "Other"
 SAVE_ACTIONS = "Save actions"
 
 
 actions_list = {
-    DATA_ACTIONS: [DataAction.name],
-    TRANSFORMATION_ACTIONS: [
+    SOURCE_ACTIONS: [DataAction.name],
+    PIXEL_LEVEL_TRANSFORMS: [
+        BlurAction.name,
+        ContrastBrightnessAction.name,
+        NoiseAction.name,
+    ],
+    SPATIAL_LEVEL_TRANSFORMS: [
+        CropAction.name,
+        FlipAction.name,
+        InstancesCropAction.name,
+        MultiplyAction.name,
+        ResizeAction.name,
+        RotateAction.name,
+        SlidingWindowAction.name,
+    ],
+    ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
         BackgroundAction.name,
         BBoxAction.name,
         BboxToPolyAction.name,
         Bitmap2LinesAction.name,
         BitwiseMasksAction.name,
-        BlurAction.name,
         ColorClassAction.name,
-        ContrastBrightnessAction.name,
-        CropAction.name,
-        DatasetAction.name,
         DropByClassAction.name,
         DropLinesByLengthAction.name,
         DropNoiseAction.name,
-        DummyAction.name,
         DuplicateObjectsAction.name,
         FindContoursAction.name,
-        FlipAction.name,
-        IfAction.name,
-        InstancesCropAction.name,
         LineToBitmapAction.name,
         MergeBitmapsAction.name,
-        MultiplyAction.name,
-        NoiseAction.name,
         ObjectsFilterAction.name,
         PolygonToBitmapAction.name,
         RandomColorsAction.name,
         RasterizeAction.name,
         RenameAction.name,
-        ResizeAction.name,
         SkeletonizeAction.name,
-        SlidingWindowAction.name,
         SplitMasksAction.name,
         TagAction.name,
+    ],
+    OTHER: [
+        DatasetAction.name,
+        DummyAction.name,
+        IfAction.name,
     ],
     SAVE_ACTIONS: [
         SaveAction.name,
@@ -123,6 +143,7 @@ actions = {
     RasterizeAction.name: RasterizeAction,
     RenameAction.name: RenameAction,
     ResizeAction.name: ResizeAction,
+    RotateAction.name: RotateAction,
     SkeletonizeAction.name: SkeletonizeAction,
     SlidingWindowAction.name: SlidingWindowAction,
     SplitMasksAction.name: SplitMasksAction,

@@ -1,5 +1,5 @@
 from typing import Optional, Union, List
-from supervisely.app.widgets import Widget
+from supervisely.app.widgets import Widget, NotificationBox
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app.widgets import Widget, Button, generate_id
 from supervisely.app import StateJson
@@ -41,10 +41,17 @@ class ClassesList(Widget):
         self,
         classes: Optional[Union[List[ObjClass], ObjClassCollection]] = [],
         multiple: Optional[bool] = False,
+        empty_notification: Optional[NotificationBox] = None,
         widget_id: Optional[str] = None,
     ):
         self._classes = classes
         self._multiple = multiple
+        if empty_notification is None:
+            empty_notification = NotificationBox(
+                title="No classes",
+                description="Connect node and ensure that source node produces classes of type needed for this node.",
+            )
+        self.empty_notification = empty_notification
         super().__init__(widget_id=widget_id, file_path=__file__)
 
         self._select_all_btn = Button(
@@ -111,3 +118,6 @@ class ClassesList(Widget):
         selected = [cls.name in names for cls in self._classes]
         StateJson()[self.widget_id]["selected"] = selected
         StateJson().send_changes()
+
+    def get_all_classes(self):
+        return self._classes

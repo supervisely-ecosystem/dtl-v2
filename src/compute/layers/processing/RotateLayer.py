@@ -9,6 +9,7 @@ from supervisely import aug
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import BadSettingsError
 
 
 class RotateLayer(Layer):
@@ -45,11 +46,12 @@ class RotateLayer(Layer):
         Layer.__init__(self, config)
 
     def validate(self):
+        super().validate()
         if (
             self.settings["rotate_angles"]["min_degrees"]
             > self.settings["rotate_angles"]["max_degrees"]
         ):
-            raise RuntimeError('"min_degrees" should be <= "max_degrees"')
+            raise BadSettingsError('"min_degrees" should be <= "max_degrees"')
 
     def requires_image(self):
         return True
@@ -76,8 +78,6 @@ class RotateLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 
-        aug.rotate(mode=aug.RotationModes.KEEP)
-
         angle_dct = self.settings["rotate_angles"]
         min_degrees, max_degrees = angle_dct["min_degrees"], angle_dct["max_degrees"]
         rotate_degrees = np.random.uniform(min_degrees, max_degrees)
@@ -103,9 +103,20 @@ class RotateLayer(Layer):
         if black_reg_mode == "preserve_size":
             rect_to_crop = Rectangle.from_array(img)
             new_img, (delta_x, delta_y) = self.expand_image_with_rect(new_img, rect_to_crop)
-            new_ann.img_size = new_img.shape[:2]
 
-            new_ann = apply_to_labels(ann, lambda x: x.translate(delta_x, delta_y))
+            top_pad = max((new_img.shape[0] - ann.img_size[0]) // 2, 0)
+            lefet_pad = max((new_img.shape[1] - ann.img_size[1]) // 2, 0)
+            new_img, new_ann = aug.crop(
+                new_img,
+                new_ann,
+                top_pad=top_pad,
+                bottom_pad=new_img.shape[0] - top_pad - ann.img_size[0],
+                left_pad=lefet_pad,
+                right_pad=new_img.shape[1] - lefet_pad - ann.img_size[1],
+            )
+            new_ann.clone(img_size=new_img.shape[:2])
+
+            new_ann = apply_to_labels(new_ann, lambda x: [x.translate(delta_x, delta_y)])
 
         if new_img is None:
             return  # no yield

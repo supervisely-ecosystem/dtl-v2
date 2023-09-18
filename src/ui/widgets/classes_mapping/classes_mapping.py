@@ -1,5 +1,5 @@
 from typing import Optional, Union, List
-from supervisely.app.widgets import Widget
+from supervisely.app.widgets import Widget, NotificationBox
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app import DataJson, StateJson
 
@@ -39,8 +39,15 @@ class ClassesMapping(Widget):
     def __init__(
         self,
         classes: Optional[Union[List[ObjClass], ObjClassCollection]] = [],
+        empty_notification: Optional[NotificationBox] = None,
         widget_id: Optional[str] = None,
     ):
+        if empty_notification is None:
+            empty_notification = NotificationBox(
+                title="No classes",
+                description="Connect node and ensure that source node produces classes of type needed for this node.",
+            )
+        self.empty_notification = empty_notification
         self._classes = classes
         super().__init__(widget_id=widget_id, file_path=__file__)
 

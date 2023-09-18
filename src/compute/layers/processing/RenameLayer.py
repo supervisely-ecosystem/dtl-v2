@@ -5,6 +5,7 @@ from supervisely import Label
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import BadSettingsError
 
 
 class RenameLayer(Layer):
@@ -39,7 +40,7 @@ class RenameLayer(Layer):
         if curr_class in self.cls_mapping:
             new_class = self.cls_mapping[curr_class]
         else:
-            raise RuntimeError("Can not find mapping for class: {}".format(curr_class))
+            raise BadSettingsError("Can not find mapping for class", extra={"class": curr_class})
 
         if new_class == ClassConstants.IGNORE:
             return []  # drop the figure

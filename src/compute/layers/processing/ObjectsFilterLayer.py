@@ -100,10 +100,6 @@ class ObjectsFilterLayer(Layer):
     def __init__(self, config):
         Layer.__init__(self, config)
 
-    def validate(self):
-        if self.settings["filter_by"]["polygon_sizes"]["action"] != "delete":
-            raise NotImplementedError("Class remapping is NIY here.")
-
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 

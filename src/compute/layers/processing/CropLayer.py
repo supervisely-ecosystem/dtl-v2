@@ -6,11 +6,11 @@ from supervisely import logger
 from supervisely.aug.aug import crop
 
 from src.compute.Layer import Layer
+from src.exceptions import BadSettingsError
 
 
 class CropLayer(Layer):
-
-    action = 'crop'
+    action = "crop"
 
     layer_settings = {
         "required": ["settings"],
@@ -31,24 +31,21 @@ class CropLayer(Layer):
                                         "required": ["min_percent", "max_percent"],
                                         "properties": {
                                             "min_percent": {"$ref": "#/definitions/percent"},
-                                            "max_percent": {"$ref": "#/definitions/percent"}
-                                        }
+                                            "max_percent": {"$ref": "#/definitions/percent"},
+                                        },
                                     },
                                     "width": {
                                         "type": "object",
                                         "required": ["min_percent", "max_percent"],
                                         "properties": {
                                             "min_percent": {"$ref": "#/definitions/percent"},
-                                            "max_percent": {"$ref": "#/definitions/percent"}
-                                        }
+                                            "max_percent": {"$ref": "#/definitions/percent"},
+                                        },
                                     },
-                                    "keep_aspect_ratio": {
-                                        "type": "boolean",
-                                        "default": False
-                                    }
-                                }
+                                    "keep_aspect_ratio": {"type": "boolean", "default": False},
+                                },
                             }
-                        }
+                        },
                     },
                     {
                         "type": "object",
@@ -62,38 +59,45 @@ class CropLayer(Layer):
                                     "patternProperties": {
                                         "(left)|(top)|(bottom)|(right)": {
                                             "type": "string",
-                                            "pattern": "^[0-9]+(%)|(px)$"
+                                            "pattern": "^[0-9]+(%)|(px)$",
                                         }
-                                    }
-                                }
+                                    },
+                                },
                             }
-                        }
-                    }
-                ]
+                        },
+                    },
+                ],
             }
-        }
+        },
     }
 
     def __init__(self, config):
         Layer.__init__(self, config)
 
-        if 'random_part' in self.settings:
-            random_part = self.settings['random_part']
-            keep_aspect_ratio = random_part.get('keep_aspect_ratio', False)
-            if keep_aspect_ratio:
-                if random_part['height'] != random_part['width']:
-                    raise RuntimeError("When 'keep_aspect_ratio' is 'true', 'height' and 'width' should be equal.")
-
-            def check_min_max(dictionary, text):
-                if dictionary['min_percent'] > dictionary['max_percent']:
-                    raise RuntimeError("'min_percent' should be <= than 'max_percent' for {}".format(text))
-
-            check_min_max(random_part['height'], 'height')
-            check_min_max(random_part['width'], 'width')
         # @TODO: check 'sides' params for percents... or not
 
     def requires_image(self):
         return True
+
+    def validate(self):
+        super().validate()
+        if "random_part" in self.settings:
+            random_part = self.settings["random_part"]
+            keep_aspect_ratio = random_part.get("keep_aspect_ratio", False)
+            if keep_aspect_ratio:
+                if random_part["height"] != random_part["width"]:
+                    raise BadSettingsError(
+                        "When 'keep_aspect_ratio' is 'true', 'height' and 'width' should be equal"
+                    )
+
+            def check_min_max(dictionary, text):
+                if dictionary["min_percent"] > dictionary["max_percent"]:
+                    raise BadSettingsError(
+                        "'min_percent' should be <= than 'max_percent' for {}".format(text)
+                    )
+
+            check_min_max(random_part["height"], "height")
+            check_min_max(random_part["width"], "width")
 
     def process(self, data_el):
         img_desc, ann = data_el
@@ -113,7 +117,7 @@ class CropLayer(Layer):
             if side in ("left", "right"):
                 return img_w
             return img_h
-        
+
         def get_padding_pixels(raw_side, side_padding_settings):
             if side_padding_settings is None:
                 padding_pixels = 0
@@ -130,13 +134,13 @@ class CropLayer(Layer):
                 )
 
             return padding_pixels
-        
+
         def is_empty_crop(img_h, img_w, paddings):
             return (
                 paddings["left"] + paddings["right"] >= img_w
                 or paddings["top"] + paddings["bottom"] >= img_h
             )
-        
+
         def is_outside_crop(img_h, img_w, paddings):
             return (
                 any(paddings[side] < 0 for side in paddings)
@@ -151,7 +155,7 @@ class CropLayer(Layer):
             height_max_percent = self.settings["random_part"]["height"]["max_percent"]
             width_min_percent = self.settings["random_part"]["width"]["min_percent"]
             width_max_percent = self.settings["random_part"]["width"]["max_percent"]
-            keep_aspect_ratio = self.settings["random_part"].get('keep_aspect_ratio', False)
+            keep_aspect_ratio = self.settings["random_part"].get("keep_aspect_ratio", False)
             rand_percent_w = rand_percent(width_min_percent, width_max_percent)
             if not keep_aspect_ratio:
                 rand_percent_h = rand_percent(height_min_percent, height_max_percent)
@@ -159,12 +163,7 @@ class CropLayer(Layer):
                 rand_percent_h = rand_percent_w
             left, right = calc_paddings(img_w, rand_percent_w)
             top, bottom = calc_paddings(img_h, rand_percent_h)
-            paddings = {
-                "left": left,
-                "right": right,
-                "top": top,
-                "bottom": bottom
-            }
+            paddings = {"left": left, "right": right, "top": top, "bottom": bottom}
         elif "sides" in self.settings:
             paddings = {
                 side: get_padding_pixels(get_raw_size(side), side_setting)
@@ -178,12 +177,12 @@ class CropLayer(Layer):
             return  # no yield
 
         if is_outside_crop(img_h, img_w, paddings):
-            raise RuntimeError(
-                "Crop layer: result crop bounds are outside of source image."
-            )
+            raise RuntimeError("Crop layer: result crop bounds are outside of source image.")
 
         img = img_desc.read_image()
-        new_img, ann = crop(img, ann, paddings["top"], paddings["left"], paddings["bottom"], paddings["right"])
+        new_img, ann = crop(
+            img, ann, paddings["top"], paddings["left"], paddings["bottom"], paddings["right"]
+        )
         new_img_desc = img_desc.clone_with_img(new_img)
 
         yield new_img_desc, ann

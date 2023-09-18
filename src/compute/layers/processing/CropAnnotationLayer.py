@@ -5,6 +5,7 @@ import random
 from supervisely import logger, Rectangle
 
 from src.compute.Layer import Layer
+from src.exceptions import BadSettingsError
 
 
 class CropAnnotationLayer(Layer):
@@ -28,24 +29,16 @@ class CropAnnotationLayer(Layer):
                                         "type": "object",
                                         "required": ["min_percent", "max_percent"],
                                         "properties": {
-                                            "min_percent": {
-                                                "$ref": "#/definitions/percent"
-                                            },
-                                            "max_percent": {
-                                                "$ref": "#/definitions/percent"
-                                            },
+                                            "min_percent": {"$ref": "#/definitions/percent"},
+                                            "max_percent": {"$ref": "#/definitions/percent"},
                                         },
                                     },
                                     "width": {
                                         "type": "object",
                                         "required": ["min_percent", "max_percent"],
                                         "properties": {
-                                            "min_percent": {
-                                                "$ref": "#/definitions/percent"
-                                            },
-                                            "max_percent": {
-                                                "$ref": "#/definitions/percent"
-                                            },
+                                            "min_percent": {"$ref": "#/definitions/percent"},
+                                            "max_percent": {"$ref": "#/definitions/percent"},
                                         },
                                     },
                                     "keep_aspect_ratio": {
@@ -88,16 +81,14 @@ class CropAnnotationLayer(Layer):
             keep_aspect_ratio = random_part.get("keep_aspect_ratio", False)
             if keep_aspect_ratio:
                 if random_part["height"] != random_part["width"]:
-                    raise RuntimeError(
-                        "When 'keep_aspect_ratio' is 'true', 'height' and 'width' should be equal."
+                    raise BadSettingsError(
+                        "When 'keep_aspect_ratio' is 'true', 'height' and 'width' should be equal"
                     )
 
             def check_min_max(dictionary, text):
                 if dictionary["min_percent"] > dictionary["max_percent"]:
-                    raise RuntimeError(
-                        "'min_percent' should be <= than 'max_percent' for {}".format(
-                            text
-                        )
+                    raise BadSettingsError(
+                        "'min_percent' should be <= than 'max_percent' for {}".format(text)
                     )
 
             check_min_max(random_part["height"], "height")
@@ -121,7 +112,7 @@ class CropAnnotationLayer(Layer):
             if side in ("left", "right"):
                 return img_w
             return img_h
-        
+
         def get_padding_pixels(raw_side, side_padding_settings):
             if side_padding_settings is None:
                 padding_pixels = 0
@@ -138,13 +129,13 @@ class CropAnnotationLayer(Layer):
                 )
 
             return padding_pixels
-        
+
         def is_empty_crop(img_h, img_w, paddings):
             return (
                 paddings["left"] + paddings["right"] >= img_w
                 or paddings["top"] + paddings["bottom"] >= img_h
             )
-        
+
         def is_outside_crop(img_h, img_w, paddings):
             return (
                 any(paddings[side] < 0 for side in paddings)
@@ -159,7 +150,7 @@ class CropAnnotationLayer(Layer):
             height_max_percent = self.settings["random_part"]["height"]["max_percent"]
             width_min_percent = self.settings["random_part"]["width"]["min_percent"]
             width_max_percent = self.settings["random_part"]["width"]["max_percent"]
-            keep_aspect_ratio = self.settings["random_part"].get('keep_aspect_ratio', False)
+            keep_aspect_ratio = self.settings["random_part"].get("keep_aspect_ratio", False)
             rand_percent_w = rand_percent(width_min_percent, width_max_percent)
             if not keep_aspect_ratio:
                 rand_percent_h = rand_percent(height_min_percent, height_max_percent)
@@ -167,12 +158,7 @@ class CropAnnotationLayer(Layer):
                 rand_percent_h = rand_percent_w
             left, right = calc_paddings(img_w, rand_percent_w)
             top, bottom = calc_paddings(img_h, rand_percent_h)
-            paddings = {
-                "left": left,
-                "right": right,
-                "top": top,
-                "bottom": bottom
-            }
+            paddings = {"left": left, "right": right, "top": top, "bottom": bottom}
         elif "sides" in self.settings:
             paddings = {
                 side: get_padding_pixels(get_raw_size(side), side_setting)
@@ -186,18 +172,13 @@ class CropAnnotationLayer(Layer):
             return  # no yield
 
         if is_outside_crop(img_h, img_w, paddings):
-            raise RuntimeError(
-                "Crop layer: result crop bounds are outside of source image."
-            )
+            raise RuntimeError("Crop layer: result crop bounds are outside of source image.")
 
         crop_rect = Rectangle(
-            paddings["top"], paddings["left"], img_h - paddings["bottom"] - 1, img_w - paddings["right"] - 1
+            paddings["top"],
+            paddings["left"],
+            img_h - paddings["bottom"] - 1,
+            img_w - paddings["right"] - 1,
         )
         ann = ann.relative_crop(crop_rect)
         yield img_desc, ann
-
-
-
-
-
-

@@ -51,6 +51,7 @@ class InstancesCropLayer(Layer):
         self.classes_to_crop, self.classes_to_save = self._get_cls_lists()
 
     def validate(self):
+        super().validate()
         if len(self.classes_to_crop) == 0:
             raise ValueError("InstancesCropLayer: classes array can not be empty")
         if len(set(self.classes_to_crop) & set(self.classes_to_save)) > 0:

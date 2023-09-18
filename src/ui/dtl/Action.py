@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Optional
+import os
+from pathlib import Path
+from typing import Any, Optional
 
 from supervisely.app.widgets import NodesFlow, Container, Text
-import src.globals as g
 
 
 class Action:
@@ -10,12 +11,16 @@ class Action:
     title = None
     docs_url = None
     description = None
+    md_description = ""
     width = 340
-    # when setting options from settings json, values from _settings_mapping will be mapped to options.
-    # If there is no option mapped directly to setting, set this option mapping to None and set the option value
-    # in set_settings_from_json function. If option name is different from setting name - set mapping in
-    # _settings_mapping below. If option name is the same as setting name - no need to set mapping.
-    _settings_mapping = {}
+    header_color = None
+    header_text_color = None
+
+    try:
+        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
+            md_description = f.read()
+    except:
+        md_description = ""
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -23,18 +28,48 @@ class Action:
 
     @classmethod
     def create_inputs(cls):
-        return [NodesFlow.Node.Input("source", "Source")]
+        return [NodesFlow.Node.Input("source", "Input", color="#000000")]
 
     @classmethod
     def create_outputs(cls):
-        return [NodesFlow.Node.Output("destination", "Destination")]
+        return [NodesFlow.Node.Output("destination", "Output", color="#000000")]
 
     @classmethod
     def create_info_widget(cls):
         return Container(
             widgets=[
-                Text(f"<h3>{cls.title}</h3>", color="white"),
-                Text(f'<a href="{cls.docs_url}" target="_blank" style="color: white;">Docs</a>'),
-                Text(f"<p>{cls.description}</p>", color="white"),
+                Text(f"<h3>{cls.title}</h3>"),
+                Text(f'<a href="{cls.docs_url}" target="_blank">Docs</a>'),
+                Text(f"<p>{cls.description}</p>"),
             ]
         )
+
+
+class SourceAction(Action):
+    header_color = "#13ce66"
+    header_text_color = "#000000"
+
+
+class PixelLevelAction(Action):
+    header_color = "#c9a5fa"
+    header_text_color = "#000000"
+
+
+class SpatialLevelAction(Action):
+    header_color = "#fcd068"
+    header_text_color = "#000000"
+
+
+class AnnotationAction(Action):
+    header_color = "#90ddf5"
+    header_text_color = "#000000"
+
+
+class OtherAction(Action):
+    header_color = "#cfcfcf"
+    header_text_color = "#000000"
+
+
+class OutputAction(Action):
+    header_color = "#ff5e90"
+    header_text_color = "#000000"

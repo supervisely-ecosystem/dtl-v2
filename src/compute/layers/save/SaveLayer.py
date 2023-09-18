@@ -5,14 +5,15 @@ from typing import Tuple
 
 import cv2
 import numpy as np
-from src.compute.utils import imaging
-from src.compute.utils import os_utils
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-
-from src.compute.Layer import Layer
 
 import supervisely as sly
 from supervisely.project.project import Dataset
+
+from src.compute.utils import imaging
+from src.compute.utils import os_utils
+from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.Layer import Layer
+from src.exceptions import GraphError
 
 
 # save to archive
@@ -66,8 +67,12 @@ class SaveLayer(Layer):
         pass
 
     def preprocess(self):
+        if self.net.preview_mode:
+            return
         if self.output_meta is None:
-            sly.logger.warning("Save Layer: output meta is None. Skipped.")
+            raise GraphError(
+                "Output meta is not set. Check that node is connected", extra={"layer": self.action}
+            )
         dst = self.dsts[0]
         self.out_project = sly.Project(
             directory=f"{self.output_folder}/{dst}", mode=sly.OpenMode.CREATE
@@ -84,52 +89,54 @@ class SaveLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
         img_desc, ann = data_el
-        free_name = self.net.get_free_name(img_desc, self.out_project.name)
-        new_dataset_name = img_desc.get_res_ds_name()
 
-        if self.settings.get("visualize"):
-            out_meta = self.output_meta
-            out_meta: sly.ProjectMeta
-            cls_mapping = {}
-            for obj_class in out_meta.obj_classes:
-                color = obj_class.color
-                if color is None:
-                    color = sly.color.random_rgb()
-                cls_mapping[obj_class.name] = color
+        if not self.net.preview_mode:
+            free_name = self.net.get_free_name(img_desc, self.out_project.name)
+            new_dataset_name = img_desc.get_res_ds_name()
 
-            # hack to draw 'black' regions
-            cls_mapping = {k: (1, 1, 1) if max(v) == 0 else v for k, v in cls_mapping.items()}
+            if self.settings.get("visualize"):
+                out_meta = self.output_meta
+                out_meta: sly.ProjectMeta
+                cls_mapping = {}
+                for obj_class in out_meta.obj_classes:
+                    color = obj_class.color
+                    if color is None:
+                        color = sly.color.random_rgb()
+                    cls_mapping[obj_class.name] = color
 
-            vis_img = self.draw_colored_mask(ann, cls_mapping)
-            orig_img = img_desc.read_image()
-            comb_img = imaging.overlay_images(orig_img, vis_img, 0.5)
+                # hack to draw 'black' regions
+                cls_mapping = {k: (1, 1, 1) if max(v) == 0 else v for k, v in cls_mapping.items()}
 
-            sep = np.array([[[0, 255, 0]]] * orig_img.shape[0], dtype=np.uint8)
-            img = np.hstack((orig_img, sep, comb_img))
+                vis_img = self.draw_colored_mask(ann, cls_mapping)
+                orig_img = img_desc.read_image()
+                comb_img = imaging.overlay_images(orig_img, vis_img, 0.5)
 
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-            output_img_path = osp.join(
-                self.output_folder,
-                self.out_project.name,
-                new_dataset_name,
-                "visualize",
-                free_name + ".png",
-            )
-            os_utils.ensure_base_path(output_img_path)
-            cv2.imwrite(output_img_path, img)
+                sep = np.array([[[0, 255, 0]]] * orig_img.shape[0], dtype=np.uint8)
+                img = np.hstack((orig_img, sep, comb_img))
 
-        dataset_name = img_desc.get_res_ds_name()
-        if not self.out_project.datasets.has_key(dataset_name):
-            self.out_project.create_dataset(dataset_name)
-        out_dataset = self.out_project.datasets.get(dataset_name)
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                output_img_path = osp.join(
+                    self.output_folder,
+                    self.out_project.name,
+                    new_dataset_name,
+                    "visualize",
+                    free_name + ".png",
+                )
+                os_utils.ensure_base_path(output_img_path)
+                cv2.imwrite(output_img_path, img)
 
-        out_item_name = free_name + img_desc.get_image_ext()
+            dataset_name = img_desc.get_res_ds_name()
+            if not self.out_project.datasets.has_key(dataset_name):
+                self.out_project.create_dataset(dataset_name)
+            out_dataset = self.out_project.datasets.get(dataset_name)
 
-        # net _always_ downloads images
-        if img_desc.need_write():
-            out_dataset: Dataset
-            out_dataset.add_item_np(out_item_name, img_desc.image_data, ann=ann)
-        else:
-            out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
+            out_item_name = free_name + img_desc.get_image_ext()
+
+            # net _always_ downloads images
+            if img_desc.need_write():
+                out_dataset: Dataset
+                out_dataset.add_item_np(out_item_name, img_desc.image_data, ann=ann)
+            else:
+                out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
 
         yield ([img_desc, ann],)

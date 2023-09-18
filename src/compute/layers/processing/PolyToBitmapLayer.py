@@ -46,7 +46,7 @@ class PolyToBitmapLayer(Layer):
                 return [label]
             new_obj_class = label.obj_class.clone(name=new_title, geometry_type=Bitmap)
 
-            return [label.convert(new_obj_class)]
+            return label.convert(new_obj_class)
 
         ann = apply_to_labels(ann, to_bitmap)
         yield img_desc, ann
