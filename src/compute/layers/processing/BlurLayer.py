@@ -8,11 +8,11 @@ from supervisely import Annotation
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import BadSettingsError
 
 
 class BlurLayer(Layer):
-
-    action = 'blur'
+    action = "blur"
 
     layer_settings = {
         "required": ["settings"],
@@ -22,16 +22,13 @@ class BlurLayer(Layer):
                 "oneOf": [
                     {
                         "type": "object",
-                        "required": [
-                            "name",
-                            "sigma"
-                        ],
+                        "required": ["name", "sigma"],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "enum": [
                                     "gaussian",
-                                ]
+                                ],
                             },
                             "sigma": {
                                 "type": "object",
@@ -39,60 +36,57 @@ class BlurLayer(Layer):
                                 "properties": {
                                     "min": {"type": "number", "minimum": 0.01},
                                     "max": {"type": "number", "minimum": 0.01},
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     {
                         "type": "object",
-                        "required": [
-                            "name",
-                            "kernel"
-                        ],
+                        "required": ["name", "kernel"],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "enum": [
                                     "median",
-                                ]
+                                ],
                             },
-                            "kernel": {
-                                "type": "integer",
-                                "minimum": 3
-                            }
-                        }
-                    }
-                ]
+                            "kernel": {"type": "integer", "minimum": 3},
+                        },
+                    },
+                ],
             }
-        }
+        },
     }
 
     def __init__(self, config):
         Layer.__init__(self, config)
-        if (self.settings['name'] == 'median') and (self.settings['kernel'] % 2 == 0):
-            raise RuntimeError('Kernel for median blur must be odd.')
-
-        def check_min_max(dictionary, text):
-            if dictionary['min'] > dictionary['max']:
-                raise RuntimeError('"min" should be <= than "max" for "{}".'.format(text))
-
-        if self.settings['name'] == 'gaussian':
-            check_min_max(self.settings['sigma'], 'sigma')
 
     def requires_image(self):
         return True
+
+    def validate(self):
+        super().validate()
+        if (self.settings["name"] == "median") and (self.settings["kernel"] % 2 == 0):
+            raise BadSettingsError("Kernel for median blur must be odd")
+
+        def check_min_max(dictionary, text):
+            if dictionary["min"] > dictionary["max"]:
+                raise BadSettingsError('"min" should be <= than "max" for "{}"'.format(text))
+
+        if self.settings["name"] == "gaussian":
+            check_min_max(self.settings["sigma"], "sigma")
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 
         img = img_desc.read_image()
-        img = img.astype(np.float32)
-        if self.settings['name'] == 'gaussian':
-            sigma_b = self.settings['sigma']
-            sigma_value = np.random.uniform(sigma_b['min'], sigma_b['max'])
+        img = img.astype(np.uint8)
+        if self.settings["name"] == "gaussian":
+            sigma_b = self.settings["sigma"]
+            sigma_value = np.random.uniform(sigma_b["min"], sigma_b["max"])
             res_img = cv2.GaussianBlur(img, ksize=(0, 0), sigmaX=sigma_value)
-        elif self.settings['name'] == 'median':
-            res_img = cv2.medianBlur(img, ksize=self.settings['kernel'])
+        elif self.settings["name"] == "median":
+            res_img = cv2.medianBlur(img, ksize=self.settings["kernel"])
         else:
             raise NotImplementedError()
 

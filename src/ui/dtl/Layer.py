@@ -1,40 +1,48 @@
-import copy
-from supervisely import Annotation
-from supervisely.app.widgets import LabeledImage, NodesFlow
-from supervisely.imaging.image import write as write_image
-from src.ui.dtl.Action import Action
-
-
-import numpy as np
-
-
+import time
+from typing import Optional
 import random
-from typing import List, Optional
+
+from supervisely import Annotation
+from supervisely.app.widgets import (
+    LabeledImage,
+    NodesFlow,
+    Markdown,
+    Button,
+    Text,
+)
+from supervisely.imaging.image import write as write_image
+
+from src.ui.dtl.Action import Action
+from src.ui.dtl.utils import (
+    get_separator,
+    get_set_settings_button_style,
+    get_set_settings_container,
+)
+import src.globals as g
+from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 
 
 class Layer:
     def __init__(
         self,
         action: Action,
-        options: List[NodesFlow.Node.Option],
-        get_settings: callable,
+        create_options: callable,
         get_src: Optional[callable] = None,
-        meta_changed_cb: Optional[callable] = None,
+        get_settings: Optional[callable] = None,
         get_dst: Optional[callable] = None,
-        set_settings_from_json: callable = None,
+        meta_changed_cb: Optional[callable] = None,
         id: Optional[str] = None,
     ):
         self.action = action
-        self._id = id
-        if self._id is None:
-            self._id = action.name + "_" + "".join(random.choice("0123456789") for _ in range(8))
+        self.id = id
+        if self.id is None:
+            self.id = action.name + "_" + "".join(random.choice("0123456789") for _ in range(8))
 
-        self._options = options
+        self._create_options = create_options
         self._get_settings = get_settings
         self._get_src = get_src
-        self._meta_changed_cb = meta_changed_cb
         self._get_dst = get_dst
-        self._set_settings_from_json = set_settings_from_json
+        self._meta_changed_cb = meta_changed_cb
 
         self._src = []
         self._settings = {}
@@ -42,9 +50,61 @@ class Layer:
 
         self.output_meta = None
 
-        self._preview_img_url = f"static/{self._id}.jpg"
-        self._ann = None
+        md_description = self.action.md_description.replace(
+            r"../../assets", r"https://raw.githubusercontent.com/supervisely/docs/master/assets"
+        )
 
+        # info option
+        self._info_option = NodesFlow.Node.Option(
+            name="sidebarNodeInfo",
+            option_component=NodesFlow.SidebarNodeInfoOptionComponent(
+                sidebar_template=Markdown(md_description).to_html(),
+                sidebar_width=600,
+            ),
+        )
+        # preview option
+        self._preview_img_url = f"static/{self.id}.jpg"
+        self._ann = None
+        self._img_desc = None
+        self._preview_widget = LabeledImage(enable_zoom=True)
+        self._update_preview_button = Button(
+            text="Update",
+            icon="zmdi zmdi-refresh",
+            button_type="text",
+            button_size="small",
+            style=get_set_settings_button_style(),
+        )
+
+        @self._update_preview_button.click
+        def _update_preview_btn_click_cb():
+            g.updater("nodes")
+
+        self._preview_options = [
+            # NodesFlow.Node.Option(
+            #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
+            # ),
+            NodesFlow.Node.Option(
+                name="update_preview_btn",
+                option_component=NodesFlow.WidgetOptionComponent(
+                    widget=get_set_settings_container(Text("Preview"), self._update_preview_button)
+                ),
+            ),
+            NodesFlow.Node.Option(
+                name="preview",
+                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
+            ),
+        ]
+
+    def get_src(self) -> list:
+        return self._src
+
+    def get_dst(self) -> list:
+        return self._dst
+
+    def get_settings(self) -> dict:
+        return self._settings
+
+    # JSON
     def to_json(self) -> dict:
         return {
             "action": self.action.name,
@@ -53,70 +113,98 @@ class Layer:
             "settings": self._settings,
         }
 
-    def get_destination_name(self, dst_index: int):
-        outputs = self.action.create_outputs()
-        return outputs[dst_index].name
+    def from_json(self, json_data: dict = {}) -> None:
+        """Init src, dst and settings from json data"""
+        src = json_data.get("src", [])
+        if isinstance(src, str):
+            src = [src]
+        self._src = src
+        dst = json_data.get("dst", [])
+        if isinstance(dst, str):
+            dst = [dst]
+        self._dst = dst
+        self._settings = json_data.get("settings", {})
 
-    def set_settings_from_json(self, json_data: dict, node_state: dict):
-        node_state = copy.deepcopy(node_state)
-        settings = json_data["settings"]
-        for settings_key, value in settings.items():
-            node_state_key = self.action._settings_mapping.get(settings_key, settings_key)
-            if node_state_key is not None:
-                node_state[node_state_key] = value
-        if self._set_settings_from_json is not None:
-            node_state = self._set_settings_from_json(json_data, node_state)
-        return node_state
-
+    # NodesFlow.Node
     def create_node(self) -> NodesFlow.Node:
+        """creates node from src, dst and settings"""
         self._inputs = self.action.create_inputs()
         self._outputs = self.action.create_outputs()
-        self._preview_widget = LabeledImage(enable_zoom=True)
-        self._options = [
-            *self._options,
-            NodesFlow.Node.Option(
-                name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-            ),
-            NodesFlow.Node.Option(
-                name="preview",
-                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
-            ),
-        ]
+        options = self._create_options(src=self._src, dst=self._dst, settings=self._settings)
+
+        def combine_options(options: list):
+            result_options = [
+                self._info_option,
+                get_separator(0),
+            ]
+            if len(options["src"]) > 0:
+                result_options.extend(options["src"])
+                result_options.append(get_separator(1))
+
+            if len(options["dst"]) > 0:
+                result_options.extend(options["dst"])
+                result_options.append(get_separator(2))
+
+            if len(options["settings"]) > 0:
+                result_options.extend(options["settings"])
+                result_options.append(get_separator(3))
+
+            return [
+                *result_options,
+                *self._preview_options,
+            ]
+
         return NodesFlow.Node(
-            id=self._id,
+            id=self.id,
             name=self.action.title,
             width=self.action.width,
-            options=self._options,
+            options=combine_options(options),
             inputs=self._inputs,
             outputs=self._outputs,
+            inputs_up=True,
+            header_color=self.action.header_color,
+            header_text_color=self.action.header_text_color,
         )
 
-    def update_src(self, node_options: dict):
-        if self._get_src is not None:
-            self._src = self._get_src(options_json=node_options)
-        else:
-            self._src = []
-
-    def update_dst(self, node_options: dict):
-        if self._get_dst is not None:
-            self._dst = self._get_dst(options_json=node_options)
-        else:
-            self._dst = self._create_destinations()
-
-    def update_settings(self, node_options: dict):
-        if self._get_settings is not None:
-            self._settings = self._get_settings(options_json=node_options)
-        else:
-            self._settings = {}
-
     def parse_options(self, node_options: dict):
-        self.update_src(node_options)
-        self.update_dst(node_options)
-        self.update_settings(node_options)
+        """Read node options and init src, dst and settings"""
+        self._update_src(node_options)
+        self._update_dst(node_options)
+        self._update_settings(node_options)
 
     def add_source(self, from_node_id, from_node_interface):
         src_name = self._connection_name(from_node_id, from_node_interface)
         self._src.append(src_name)
+
+    def clear_preview(self):
+        self._preview_widget.clean_up()
+
+    def get_preview_img_desc(self):
+        return self._img_desc
+
+    def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
+        self._img_desc = img_desc
+        write_image(self._preview_img_url, img_desc.read_image())
+        self._ann = ann
+        self._preview_widget.set(
+            title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._ann
+        )
+
+    def set_preview_loading(self, val: bool):
+        self._preview_widget.loading = val
+        self._update_preview_button.loading = val
+
+    def get_ann(self):
+        return self._ann
+
+    def update_project_meta(self, project_meta):
+        if self._meta_changed_cb is not None:
+            self._meta_changed_cb(project_meta)
+
+    # Utils
+    def get_destination_name(self, dst_index: int):
+        outputs = self.action.create_outputs()
+        return outputs[dst_index].name
 
     def _connection_name(self, name: str, interface: str):
         interface_str = "_".join(
@@ -124,43 +212,31 @@ class Layer:
                 *[
                     part
                     for part in interface.split("_")
-                    if part not in ["", "source", "destination"]
+                    if part not in ["", "source", "destination", "input", "output"]
                 ],
             ]
         )
         return "$" + name + (f"__{interface_str}" if interface_str else "")
 
     def _create_destinations(self):
-        return [self._connection_name(self._id, output.name) for output in self._outputs]
+        return [self._connection_name(self.id, output.name) for output in self._outputs]
 
-    def clear_sources(self):
-        self._src = []
+    def _update_src(self, node_options: dict):
+        if self._get_src is not None:
+            self._src = self._get_src(options_json=node_options)
+        else:
+            self._src = []
 
-    def clear_destinations(self):
-        self._dst = []
+    def _update_dst(self, node_options: dict):
+        """Read node options and init dst"""
+        if self._get_dst is not None:
+            self._dst = self._get_dst(options_json=node_options)
+        else:
+            self._dst = self._create_destinations()
 
-    def clear_settings(self):
-        self._settings = {}
-
-    def clear(self):
-        self.clear_sources()
-        self.clear_destinations()
-        self.clear_settings()
-
-    def get_src(self):
-        return self._src
-
-    def get_dst(self):
-        return self._dst
-
-    def set_preview(self, img: np.ndarray, ann: Annotation):
-        write_image(self._preview_img_url, img)
-        self._ann = ann
-        self._preview_widget.set(title=None, image_url=self._preview_img_url, ann=self._ann)
-
-    def get_ann(self):
-        return self._ann
-
-    def meta_changed_cb(self, project_meta):
-        if self._meta_changed_cb is not None:
-            self._meta_changed_cb(project_meta)
+    def _update_settings(self, node_options: dict):
+        """Read node options and init settings"""
+        if self._get_settings is not None:
+            self._settings = self._get_settings(options_json=node_options)
+        else:
+            self._settings = {}

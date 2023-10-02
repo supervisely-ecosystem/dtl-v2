@@ -1,25 +1,18 @@
 # coding: utf-8
 
 import os
-import re
-from src.utils import LegacyProjectItem
 
+import supervisely as sly
 from supervisely import sly_logger
-from supervisely.app.widgets.sly_tqdm.sly_tqdm import CustomTqdm, Progress
+from supervisely.app.widgets.sly_tqdm.sly_tqdm import Progress
 from supervisely.sly_logger import logger, EventType
 
 from src.compute.dtl_utils.dtl_helper import DtlHelper, DtlPaths
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-
 from src.compute.tasks import task_helpers
-from src.compute.tasks import progress_counter
-
-from src.compute.utils import json_utils
 from src.compute.utils import logging_utils
-
-import supervisely as sly
-
 from src.compute.Net import Net
+from src.exceptions import GraphError, CustomException
+from src.utils import LegacyProjectItem
 
 
 def make_legacy_project_item(project: sly.Project, dataset, item_name):
@@ -79,11 +72,17 @@ def main(progress: Progress):
         net.calc_metas()
         net.preprocess()
         datasets_conflict_map = calculate_datasets_conflict_map(helper)
-    except Exception as e:
+    except CustomException as e:
         logger.error("Error occurred on DTL-graph initialization step!")
+        e.log()
+        raise e
+    except Exception as e:
+        logger.error("Error occurred on DTL-graph initialization step!", exc_info=str(e))
         raise e
 
     total = net.get_total_elements()
+    if total == 0:
+        raise GraphError("There are no elements to process")
     elements_generator = net.get_elements_generator()
     results_counter = 0
     with progress(message=f"Processing items...", total=total) as pbar:

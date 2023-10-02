@@ -2,5 +2,6 @@
 .vscode/
 *.pyc
 local.env
-supervisely
-sly_task_data
+/supervisely
+/sly_task_data
+/static

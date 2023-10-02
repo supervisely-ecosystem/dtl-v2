@@ -3,3 +3,5 @@ jsonschema
 networkx
 scikit-image>=0.17.1, <1.0.0
 cacheout
+markdown
+json2html

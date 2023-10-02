@@ -1,7 +1,9 @@
 import os
+import queue
 from dotenv import load_dotenv
 
 import supervisely as sly
+from supervisely.app.widgets import Dialog, Text, Editor, Container, Button, Flexbox
 
 
 load_dotenv("local.env")
@@ -25,7 +27,61 @@ cache = {
     "dataset_id": {},
     "dataset_info": {},
     "all_datasets": {},
+    "last_search": "",
 }
 
 layers_count = 0
 layers = {}
+
+
+update_queue = queue.Queue()
+
+
+def updater(update: str):
+    global update_queue
+    update_queue.put(update)
+
+
+context_menu_position = None
+
+
+error_description = Text()
+error_extra_literal = Text("Extra:")
+error_extra = Editor(
+    "",
+    height_px=300,
+    language_mode="json",
+    readonly=True,
+    show_line_numbers=False,
+    restore_default_button=False,
+    highlight_active_line=False,
+)
+_error_icon_html = (
+    "<i"
+    "  v-if=\"data.slyAppDialogStatus === 'error'\""
+    '  class="notification-box-icon el-icon-circle-cross information mr15"'
+    '  style="font-size: 35px; color: #ff4949"'
+    "></i>"
+)
+error_icon = Text(_error_icon_html)
+error_close_btn = Button("OK", style="float: right;")
+error_dialog = Dialog(
+    title="Error",
+    content=Container(
+        widgets=[
+            Flexbox(widgets=[error_icon, error_description]),
+            error_extra_literal,
+            Container(
+                widgets=[error_extra],
+                style="max-height: 400px; overflow-y: auto;",
+            ),
+            error_close_btn,
+        ],
+    ),
+    size="tiny",
+)
+
+
+@error_close_btn.click
+def on_error_close():
+    error_dialog.hide()

@@ -1,12 +1,13 @@
 # coding: utf-8
 
-import json
 from typing import Tuple
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-from src.compute.Layer import Layer
-import src.globals as g
 
 import supervisely as sly
+
+from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.Layer import Layer
+from src.exceptions import GraphError
+import src.globals as g
 
 
 class SuperviselyLayer(Layer):
@@ -29,6 +30,14 @@ class SuperviselyLayer(Layer):
                 raise ValueError("Destination name in '{}' layer is empty!".format(self.action))
 
     def preprocess(self):
+        if self.net.preview_mode:
+            return
+        if self.output_meta is None:
+            raise GraphError(
+                "Output meta is not set. Check that node is connected", extra={"layer": self.action}
+            )
+        if len(self.dsts) == 0:
+            raise GraphError("Destination is not set", extra={"layer_config": self.config})
         dst = self.dsts[0]
         self.out_project_name = dst
 
@@ -50,14 +59,17 @@ class SuperviselyLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
         img_desc, ann = data_el
 
-        dataset_name = img_desc.get_res_ds_name()
-        out_item_name = (
-            self.net.get_free_name(img_desc, self.out_project_name) + img_desc.get_image_ext()
-        )
+        if not self.net.preview_mode:
+            dataset_name = img_desc.get_res_ds_name()
+            out_item_name = (
+                self.net.get_free_name(img_desc, self.out_project_name) + img_desc.get_image_ext()
+            )
 
-        if self.sly_project_info is not None:
-            dataset_info = self.get_or_create_dataset(dataset_name)
-            image_info = g.api.image.upload_np(dataset_info.id, out_item_name, img_desc.image_data)
-            g.api.annotation.upload_ann(image_info.id, ann)
+            if self.sly_project_info is not None:
+                dataset_info = self.get_or_create_dataset(dataset_name)
+                image_info = g.api.image.upload_np(
+                    dataset_info.id, out_item_name, img_desc.read_image()
+                )
+                g.api.annotation.upload_ann(image_info.id, ann)
 
         yield ([img_desc, ann],)

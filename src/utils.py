@@ -1,15 +1,26 @@
-from collections import namedtuple
 from typing import Callable, List, Optional, Tuple, Union
+from collections import namedtuple
 import json
 import os
 import shutil
 from tqdm import tqdm
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+
 import supervisely as sly
 
 import src.globals as g
-from src.ui.dtl.Layer import Layer
-from supervisely.app.widgets import Flexbox, Text, ProjectThumbnail, FileThumbnail, Container
+
+
+LegacyProjectItem = namedtuple(
+    "LegacyProjectItem",
+    [
+        "project_name",
+        "ds_name",
+        "image_name",
+        "ia_data",
+        "img_path",
+        "ann_path",
+    ],
+)
 
 
 def download_data(
@@ -176,14 +187,6 @@ def get_all_datasets(project_id: int) -> List[sly.DatasetInfo]:
     return [get_dataset_by_id(ds_id) for ds_id in g.cache["all_datasets"][project_id]]
 
 
-def find_layer_id_by_dst(dst: str):
-    for layer_id, layer in g.layers.items():
-        if dst in layer.get_dst():
-            return layer_id
-    return None
-    # return name.lstrip("$").split("__")[0]
-
-
 def ensure_dir(dir_path):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
@@ -224,142 +227,6 @@ def create_preview_dir():
     ensure_dir(g.PREVIEW_DIR)
 
 
-def init_layers(nodes_state: dict):
-    from src.ui.dtl import DATA_ACTIONS, SAVE_ACTIONS, TRANSFORMATION_ACTIONS, actions_list
-
-    data_layers_ids = []
-    save_layers_ids = []
-    transform_layers_ids = []
-    all_layers_ids = []
-    for node_id, node_options in nodes_state.items():
-        layer = g.layers[node_id]
-        layer: Layer
-
-        layer.clear()
-        layer.parse_options(node_options)
-
-        if layer.action.name in actions_list[DATA_ACTIONS]:
-            data_layers_ids.append(node_id)
-        if layer.action.name in actions_list[SAVE_ACTIONS]:
-            save_layers_ids.append(node_id)
-        if layer.action.name in actions_list[TRANSFORMATION_ACTIONS]:
-            transform_layers_ids.append(node_id)
-        all_layers_ids.append(node_id)
-
-    return {
-        "data_layers_ids": data_layers_ids,
-        "save_layers_ids": save_layers_ids,
-        "transformation_layers_ids": transform_layers_ids,
-        "all_layers_ids": all_layers_ids,
-    }
-
-
-def init_src(edges: list):
-    for edge in edges:
-        from_node_id = edge["output"]["node"]
-        from_node_interface = edge["output"]["interface"]
-        to_node_id = edge["input"]["node"]
-        layer = g.layers[to_node_id]
-        layer: Layer
-        layer.add_source(from_node_id, from_node_interface)
-
-
-def get_input_metas(data_layers_ids):
-    input_metas = {}
-    for data_layer_id in data_layers_ids:
-        data_layer = g.layers[data_layer_id]
-        src = data_layer.get_src()
-        if src is None or len(src) == 0:
-            # Skip if no sources specified for data layer
-            continue
-
-        project_name, _ = src[0].split("/")
-        project_info = get_project_by_name(project_name)
-        project_meta = get_project_meta(project_info.id)
-        input_metas[project_name] = project_meta
-
-    return input_metas
-
-
-def set_preview(data_layers_ids):
-    for data_layer_id in data_layers_ids:
-        data_layer = g.layers[data_layer_id]
-        src = data_layer.get_src()
-        if src is None or len(src) == 0:
-            # Skip if no sources specified for data layer
-            continue
-
-        project_name, dataset_name = src[0].split("/")
-        project_info = get_project_by_name(project_name)
-        project_meta = get_project_meta(project_info.id)
-
-        preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
-        preview_img = sly.image.read(preview_img_path)
-        with open(preview_ann_path, "r") as f:
-            preview_ann = sly.Annotation.from_json(json.load(f), project_meta)
-        data_layer.set_preview(preview_img, preview_ann)
-
-
-def init_output_metas(net, all_layers_ids: list):
-    net.calc_metas()
-    for layer_id, net_layer in zip(all_layers_ids, net.layers):
-        g.layers[layer_id].output_meta = net_layer.output_meta
-
-
-LegacyProjectItem = namedtuple(
-    "LegacyProjectItem",
-    [
-        "project_name",
-        "ds_name",
-        "image_name",
-        "ia_data",
-        "img_path",
-        "ann_path",
-    ],
-)
-
-
-def update_previews(net, data_layers_ids: list, all_layers_ids: list):
-    updated = set()
-    net.preprocess()
-    for data_layer_id in data_layers_ids:
-        data_layer = g.layers[data_layer_id]
-        src = data_layer.get_src()
-        project_name, dataset_name = src[0].split("/")
-        if dataset_name == "*":
-            dataset_name = get_all_datasets(get_project_by_name(project_name).id)[0].name
-        preview_path = f"{g.PREVIEW_DIR}/{project_name}/{dataset_name}"
-
-        img_desc = ImageDescriptor(
-            LegacyProjectItem(
-                project_name=project_name,
-                ds_name=dataset_name,
-                image_name="preview_image",
-                ia_data={"image_ext": ".jpg"},
-                img_path=f"{preview_path}/preview_image.jpg",
-                ann_path=f"{preview_path}/preview_ann.json",
-            ),
-            False,
-        )
-        ann = data_layer.get_ann()
-        data_el = (img_desc, ann)
-
-        processing_generator = net.start_iterate(data_el)
-        for data_el, layer_indx in processing_generator:
-            if layer_indx in updated:
-                continue
-            layer = g.layers[all_layers_ids[layer_indx]]
-            layer: Layer
-            if len(data_el) == 1:
-                img_desc, ann = data_el[0]
-            elif len(data_el) == 3:
-                img_desc, ann, _ = data_el
-            else:
-                img_desc, ann = data_el
-            layer.set_preview(img_desc.read_image(), ann)
-            updated.add(layer_indx)
-
-
 def create_url_html(url, name):
     return f'<a href="{url}" target="_blank">{name}</a>'
 
@@ -389,29 +256,3 @@ def update_project_info(project_info: sly.ProjectInfo):
     updated = g.api.project.get_info_by_id(project_info.id)
     g.cache["project_info"][project_info.id] = updated
     return updated
-
-
-def create_results_widget(file_infos, supervisely_layers):
-    widgets = []
-    if len(file_infos) > 0:
-        widgets.append(
-            Flexbox(
-                widgets=[
-                    Text("Archives: "),
-                    *[FileThumbnail(file_info) for file_info in file_infos],
-                ]
-            )
-        )
-    if len(supervisely_layers) > 0:
-        widgets.append(
-            Flexbox(
-                widgets=[
-                    Text("Projects: "),
-                    *[
-                        ProjectThumbnail(update_project_info(l.sly_project_info))
-                        for l in supervisely_layers
-                    ],
-                ]
-            )
-        )
-    return Container(widgets=widgets)

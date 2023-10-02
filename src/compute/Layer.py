@@ -18,6 +18,7 @@ from supervisely.annotation.json_geometries_map import GET_GEOMETRY_FROM_STR
 from supervisely.imaging.color import hex2rgb
 
 from src.compute.classes_utils import ClassConstants
+from src.exceptions import CustomException, GraphError, CreateMetaError, UnexpectedError
 
 
 def maybe_wrap_in_list(v):
@@ -26,9 +27,9 @@ def maybe_wrap_in_list(v):
 
 def check_connection_name(connection_name):
     if len(connection_name) == 0:
-        raise RuntimeError("Connection name should be non empty.")
+        raise GraphError("Connection name should be non empty.")
     if connection_name[0] != "$" and connection_name != Layer.null:
-        raise RuntimeError('Connection name should be "%s" or start with "$".' % Layer.null)
+        raise GraphError(f'Connection name should be "{Layer.null}" or start with "$".')
 
 
 class Layer:
@@ -51,7 +52,12 @@ class Layer:
         "properties": {
             "action": {"type": "string"},
             "src": {"$ref": "#/definitions/connections"},
-            "dst": {"type": "string"},
+            "dst": {
+                "oneOf": [
+                    {"type": "array"},
+                    {"type": "string"},
+                ]
+            },
         },
     }
 
@@ -84,9 +90,21 @@ class Layer:
         self.output_meta = None
 
     def validate(self):
-        jsonschema.validate(self._config, self.params)
-        self.validate_source_connections()
-        self.validate_dest_connections()
+        try:
+            jsonschema.validate(self._config, self.params)
+        except jsonschema.ValidationError as e:
+            extra = {"layer_config": self._config, "error": e.message}
+
+            # v = jsonschema.Draft202012Validator(self.params)
+            # for error in v.iter_errors(self._config):
+            #     extra.setdefault("errors", []).append(str(error))
+            raise GraphError("Layer not valid", error=e, extra=extra)
+        try:
+            self.validate_source_connections()
+            self.validate_dest_connections()
+        except GraphError as e:
+            e.extra["layer_config"] = self._config
+            raise e
 
     @property
     def config(self):
@@ -110,7 +128,7 @@ class Layer:
     def validate_source_connections(self):
         for src in self.srcs:
             if src == Layer.null:
-                raise RuntimeError('"%s" cannot be in "src".' % Layer.null)
+                raise GraphError(f'"Layer.null" cannot be in "src"')
             check_connection_name(src)
 
     def validate_dest_connections(self):
@@ -130,17 +148,31 @@ class Layer:
                     if existing_obj_class is None:
                         full_input_meta = full_input_meta.add_obj_class(inp_obj_class)
                     elif existing_obj_class.geometry_type != inp_obj_class.geometry_type:
-                        raise RuntimeError(
-                            f"Trying to add new class ({inp_obj_class.name}) with shape ({inp_obj_class.geometry_type.geometry_name()}). Same class with different shape ({existing_obj_class.geometry_type.geometry_name()}) exists."
+                        raise CreateMetaError(
+                            "Trying to add existing ObjClass with different geometry type",
+                            extra={
+                                "existing_class": existing_obj_class.to_json(),
+                                "new_class": inp_obj_class.to_json(),
+                            },
                         )
+                        # raise RuntimeError(
+                        #     f"Trying to add new class ({inp_obj_class.name}) with shape ({inp_obj_class.geometry_type.geometry_name()}). Same class with different shape ({existing_obj_class.geometry_type.geometry_name()}) exists."
+                        # )
                 for inp_tag_meta in inp_meta.tag_metas:
                     existing_tag_meta = full_input_meta.tag_metas.get(inp_tag_meta.name, None)
                     if existing_tag_meta is None:
                         full_input_meta = full_input_meta.add_tag_meta(inp_tag_meta)
                     elif not existing_tag_meta.is_compatible(inp_tag_meta):
-                        raise RuntimeError(
-                            f"Trying to add new tag ({inp_tag_meta.name}) with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}). Same tag with different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
+                        raise CreateMetaError(
+                            "Trying to add existing TagMeta with different type or possible values",
+                            extra={
+                                "existing_tag_meta": existing_tag_meta.to_json(),
+                                "new_tag_meta": inp_tag_meta.to_json(),
+                            },
                         )
+                        # raise RuntimeError(
+                        #     f"Trying to add new tag ({inp_tag_meta.name}) with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}). Same tag with different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
+                        # )
 
             res_meta = deepcopy(full_input_meta)
             in_class_titles = set((obj_class.name for obj_class in full_input_meta.obj_classes))
@@ -152,9 +184,17 @@ class Layer:
                     self.cls_mapping[oclass] = self.cls_mapping[ClassConstants.OTHER]
                 del self.cls_mapping[ClassConstants.OTHER]
 
-            missed_classes = in_class_titles - set(self.cls_mapping.keys())
-            if len(missed_classes) != 0:
-                raise RuntimeError("Some classes in mapping are missed: {}".format(missed_classes))
+            missing_classes = in_class_titles - set(self.cls_mapping.keys())
+            if len(missing_classes) != 0:
+                raise CreateMetaError(
+                    "Some classes in input meta are missing in mapping",
+                    extra={
+                        "missing_classes": [
+                            res_meta.obj_classes.get(obj_class_name)
+                            for obj_class_name in missing_classes
+                        ]
+                    },
+                )
 
             for src_class_title, dst_class in self.cls_mapping.items():
                 # __new__ -> [ list of classes ]
@@ -165,15 +205,22 @@ class Layer:
                         new_name = new_cls_dict["title"]
                         new_shape = new_cls_dict["shape"]
                         new_geometry_type = GET_GEOMETRY_FROM_STR(new_shape)
+                        inp_obj_class = ObjClass(new_name, new_geometry_type)
                         if res_meta.obj_classes.has_key(new_name):
-                            existing_cls = res_meta.obj_classes.get(new_name)
-                            if existing_cls.geometry_type != new_geometry_type:
+                            existing_obj_class = res_meta.obj_classes.get(new_name)
+                            if existing_obj_class.geometry_type != new_geometry_type:
+                                raise CreateMetaError(
+                                    "Trying to add existing ObjClass with different geometry type",
+                                    extra={
+                                        "existing_class": existing_obj_class.to_json(),
+                                        "new_class": inp_obj_class.to_json(),
+                                    },
+                                )
                                 raise RuntimeError(
                                     f"Trying to add new class ({new_name}) with shape ({new_shape}). Same class with different shape ({existing_cls.geometry_type.geometry_name()}) exists."
                                 )
                         else:
-                            new_cls = ObjClass(new_name, new_geometry_type)
-                            res_meta = res_meta.add_obj_class(new_cls)
+                            res_meta = res_meta.add_obj_class(inp_obj_class)
 
                 # __clone__ -> dict {parent_cls_name: child_cls_name}
                 elif src_class_title == ClassConstants.CLONE:
@@ -181,12 +228,14 @@ class Layer:
                         raise RuntimeError("Internal class mapping error in layer (CLONE spec).")
 
                     for src_title, dst_title in dst_class.items():
-                        real_src_cls = full_input_meta.obj_classes.get(src_title, None)
+                        real_src_cls = res_meta.obj_classes.get(src_title, None)
                         if real_src_cls is None:
-                            raise RuntimeError(
-                                'Class mapping error, source class "{}" not found.'.format(
-                                    src_title
-                                )
+                            raise CreateMetaError(
+                                "Class not found in input meta",
+                                extra={
+                                    "class_name": src_title,
+                                    "existing_classes": res_meta.obj_classes.to_json(),
+                                },
                             )
                         real_dst_cls = real_src_cls.clone(name=dst_title)
                         res_meta = res_meta.add_obj_class(real_dst_cls)
@@ -198,21 +247,24 @@ class Layer:
                     for cls_dct in dst_class:
                         title = cls_dct["title"]
                         existing_class = res_meta.obj_classes.get(title, None)
-                        if existing_class is not None:
-                            new_shape = cls_dct.get("shape", None)
-                            new_geometry_type = (
-                                GET_GEOMETRY_FROM_STR(new_shape) if new_shape else None
+                        if existing_class is None:
+                            raise CreateMetaError(
+                                "Class not found in input meta",
+                                extra={
+                                    "class_name": title,
+                                    "existing_classes": res_meta.obj_classes.to_json(),
+                                },
                             )
-                            new_color = cls_dct.get("color", None)
-                            if new_color is not None and new_color[0] == "#":
-                                new_color = hex2rgb(new_color)
-                            new_obj_cls = existing_class.clone(
-                                name=title, geometry_type=new_geometry_type, color=new_color
-                            )
-                            res_meta = res_meta.delete_obj_class(title)
-                            res_meta = res_meta.add_obj_class(new_obj_cls)
-                        else:
-                            raise RuntimeError("Can not update class {}. Not found".format(title))
+                        new_shape = cls_dct.get("shape", None)
+                        new_geometry_type = GET_GEOMETRY_FROM_STR(new_shape) if new_shape else None
+                        new_color = cls_dct.get("color", None)
+                        if new_color is not None and new_color[0] == "#":
+                            new_color = hex2rgb(new_color)
+                        new_obj_cls = existing_class.clone(
+                            name=title, geometry_type=new_geometry_type, color=new_color
+                        )
+                        res_meta = res_meta.delete_obj_class(title)
+                        res_meta = res_meta.add_obj_class(new_obj_cls)
 
                 # smth -> __default__
                 elif dst_class == ClassConstants.DEFAULT:
@@ -244,7 +296,6 @@ class Layer:
                     res_meta = res_meta.delete_obj_class(src_class_title)
                     res_meta = res_meta.add_obj_class(obj_cls)
 
-            # TODO switch to get added / removed tags to be TagMeta instances.
             rm_imtags = [TagMeta.from_json(tag) for tag in self.get_removed_tag_metas()]
             res_meta = res_meta.clone(
                 tag_metas=[tm for tm in res_meta.tag_metas if tm not in rm_imtags]
@@ -253,19 +304,18 @@ class Layer:
             new_imtags_exist = [
                 tm for tm in res_meta.tag_metas.intersection(TagMetaCollection(new_imtags))
             ]
-            # new_imtags_exist = res_meta.tags.intersection(new_imtags).to_list()
             if len(new_imtags_exist) != 0:
                 exist_tag_names = [t.name for t in new_imtags_exist]
                 logger.warn("Tags {} already exist.".format(exist_tag_names))
             res_meta.clone(tag_metas=new_imtags)
             self.output_meta = res_meta
-        except Exception as e:
-            logger.error(
-                "Meta-error occurred in layer '{}' with config: {}".format(
-                    self.action, self._config
-                )
-            )
+        except CustomException as e:
             raise e
+        except Exception as e:
+            raise UnexpectedError(
+                "Unexpected error occurred while creating meta",
+                error=e,
+            )
 
         return self.output_meta
 

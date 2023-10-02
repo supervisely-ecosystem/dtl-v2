@@ -8,6 +8,7 @@ from supervisely import Annotation
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import BadSettingsError
 
 
 class IfLayer(Layer):
@@ -126,8 +127,8 @@ class IfLayer(Layer):
     def _check_project_dataset_str(cls, s):
         src_regex = r"^[^/]+/[^/]+$"
         if not re.search(src_regex, s):
-            raise RuntimeError(
-                'Project/dataset string "{}" does not match regex "{}".'.format(s, src_regex)
+            raise BadSettingsError(
+                'Project/dataset string "{}" does not match regex "{}"'.format(s, src_regex)
             )
 
     @classmethod
@@ -139,7 +140,7 @@ class IfLayer(Layer):
     def _pr_ds_matches(cls, project_dataset_str, img_desc):
         splitted = project_dataset_str.split("/")
         if len(splitted) != 2:
-            raise RuntimeError('Wrong project_dataset string "{}"'.format(project_dataset_str))
+            raise BadSettingsError('Wrong project_dataset string "{}"'.format(project_dataset_str))
         pr_name, ds_name = splitted
         res = cls._matches_ast(pr_name, img_desc.get_pr_name()) and cls._matches_ast(
             ds_name, img_desc.get_ds_name()
