@@ -67,7 +67,7 @@ context_menu_items = [
 ]
 
 nodes_flow = NodesFlow(
-    height="85vh",
+    height="calc(100vh - 195px)",
     context_menu=context_menu_items,
     color_theme="white",
     show_save=False,
