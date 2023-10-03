@@ -90,7 +90,6 @@ class DropLinesByLengthLayer(Layer):
         max_length = self.settings.get("max_length", None)
         if (min_length is not None) and (max_length is not None) and (min_length > max_length):
             raise BadSettingsError(
-                self,
                 '"min_length" should be less than "max_length" for "delete_lines_by_length" layer',
             )
 

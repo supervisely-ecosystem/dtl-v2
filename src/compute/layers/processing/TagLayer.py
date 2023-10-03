@@ -95,6 +95,6 @@ class TagLayer(Layer):
                 ann = ann.clone(img_tags=[*[t for t in ann.img_tags], dst_tag])
 
         if self.is_action_delete:
-            ann = ann.clone(tags=[t for t in ann.img_tags if t.name != dst_tag.name])
+            ann = ann.clone(img_tags=[t for t in ann.img_tags if t.name != dst_tag.name])
 
         yield img_desc, ann
