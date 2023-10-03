@@ -237,6 +237,8 @@ class Layer:
                                     "existing_classes": res_meta.obj_classes.to_json(),
                                 },
                             )
+                        if real_src_cls.name == dst_title:
+                            continue
                         real_dst_cls = real_src_cls.clone(name=dst_title)
                         res_meta = res_meta.add_obj_class(real_dst_cls)
 
