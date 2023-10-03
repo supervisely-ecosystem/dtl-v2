@@ -18,7 +18,7 @@ from src.exceptions import CustomException, BadSettingsError
 
 save_json_button = Button("Save JSON")
 load_json_button = Button("Load JSON")
-json_editor = Editor(height_lines=100)
+json_editor = Editor(height_px=600)
 layout = Container(widgets=[Flexbox(widgets=[save_json_button, load_json_button]), json_editor])
 
 
