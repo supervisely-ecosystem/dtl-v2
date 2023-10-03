@@ -1,5 +1,4 @@
 from pathlib import Path
-import traceback
 
 from supervisely.app.widgets import Button, Container, Progress, Text, ReloadableArea, Empty
 from supervisely.app import show_dialog
@@ -88,7 +87,7 @@ def run():
     except CustomException as e:
         ui_utils.show_error("Error", e)
         raise e
-    except:
+    except Exception as e:
         show_dialog("Error", description=f"Unexpected Error: {str(e)}", status="error")
         raise e
     finally:
