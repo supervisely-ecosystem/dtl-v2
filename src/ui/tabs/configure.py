@@ -139,7 +139,7 @@ sidebar = Sidebar(
     left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;"),
     right_content=nodes_flow,
     width_percent=20,
-    standalone=False,
+    standalone=True,
     height="calc(100vh - 195px)",
 )
 
