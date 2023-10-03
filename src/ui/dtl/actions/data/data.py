@@ -157,6 +157,7 @@ class DataAction(SourceAction):
                 saved_classes_mapping_settings,
                 default_action="copy",
                 ignore_action="keep",
+                missing_value="default",
             )
 
         def _save_classes_mapping_setting():
@@ -188,6 +189,7 @@ class DataAction(SourceAction):
                 project_meta.obj_classes,
                 default_action="keep",
                 ignore_action="keep",
+                new_value="default",
                 other_allowed=True,
             )
             if saved_classes_mapping_settings == {}:
@@ -303,10 +305,6 @@ class DataAction(SourceAction):
             src_options = [
                 NodesFlow.Node.Option(
                     name="Select Datasets",
-                    # option_component=NodesFlow.ButtonOptionComponent(
-                    #     sidebar_component=NodesFlow.WidgetOptionComponent(src_widgets_container),
-                    #     sidebar_width=600,
-                    # ),
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=get_set_settings_container(
                             Text("Select Datasets"), select_datasets_btn

@@ -62,7 +62,7 @@ class FindContoursAction(AnnotationAction):
         def _get_classes_mapping_value():
             return get_classes_mapping_value(
                 classes_mapping_widget,
-                default_action="skip",
+                default_action="copy",
                 ignore_action="skip",
                 other_allowed=False,
                 default_allowed=False,
@@ -73,20 +73,13 @@ class FindContoursAction(AnnotationAction):
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="skip",
+                default_action="copy",
                 ignore_action="skip",
             )
 
         def _save_classes_mapping_setting():
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = _get_classes_mapping_value()
-            set_classes_mapping_preview(
-                classes_mapping_widget,
-                classes_mapping_preview,
-                saved_classes_mapping_settings,
-                default_action="skip",
-                ignore_action="skip",
-            )
 
         def _set_default_classes_mapping_setting():
             # save setting to var
@@ -121,9 +114,17 @@ class FindContoursAction(AnnotationAction):
                 saved_classes_mapping_settings,
                 old_obj_classes,
                 new_obj_classes,
-                default_action="skip",
+                default_action="copy",
                 ignore_action="skip",
                 other_allowed=False,
+            )
+
+            # update classes mapping widget
+            set_classes_mapping_settings_from_json(
+                classes_mapping_widget,
+                saved_classes_mapping_settings,
+                missing_in_settings_action="ignore",
+                missing_in_meta_action="ignore",
             )
 
             # update settings preview
@@ -132,13 +133,13 @@ class FindContoursAction(AnnotationAction):
             classes_mapping_widget.loading = False
 
         def _set_settings_from_json(settings):
-            # if settings is empty, set default
-            if settings.get("classes_mapping", "default") == "default":
+            classes_mapping_settings = settings.get("classes_mapping", {})
+            if classes_mapping_settings == "default":
                 classes_mapping_widget.set_default()
             else:
                 set_classes_mapping_settings_from_json(
                     classes_mapping_widget,
-                    settings["classes_mapping"],
+                    classes_mapping_settings,
                     missing_in_settings_action="ignore",
                     missing_in_meta_action="ignore",
                 )

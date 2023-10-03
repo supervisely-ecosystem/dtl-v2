@@ -10,17 +10,20 @@ from src.exceptions import BadSettingsError
 # Classes Mapping utils
 
 
-def _unpack_classes_mapping_settings(mapping: dict, all_obj_classes_names):
+def _unpack_classes_mapping_settings(
+    mapping: dict, all_obj_classes_names, missing_value: Literal["default", "ignore"] = "ignore"
+):
     unpacked = {}
     if mapping == "default":
         for obj_class_name in all_obj_classes_names:
             unpacked[obj_class_name] = obj_class_name
         return unpacked
+    missing_value = f"__{missing_value}__"
     other = mapping.get("__other__", None)
     for obj_class_name in all_obj_classes_names:
         old_value = mapping.get(obj_class_name, other)
         if old_value is None:
-            old_value = obj_class_name
+            old_value = missing_value
         unpacked[obj_class_name] = old_value
     return unpacked
 
@@ -93,6 +96,7 @@ def classes_mapping_settings_changed_meta(
     new_obj_classes: Union[List[ObjClass], ObjClassCollection],
     default_action: Literal["skip", "keep", "copy"] = "skip",
     ignore_action: Literal["skip", "keep", "empty"] = "skip",
+    new_value: Literal["default", "ignore"] = "ignore",
     other_allowed: bool = False,
 ):
     if settings == "default":
@@ -103,7 +107,7 @@ def classes_mapping_settings_changed_meta(
     new_obj_classes_names = {obj_class.name for obj_class in new_obj_classes}
 
     # unpack old settings
-    new_settings = _unpack_classes_mapping_settings(settings, old_obj_classes_names)
+    new_settings = _unpack_classes_mapping_settings(settings, old_obj_classes_names, new_value)
 
     # remove obj classes that are not in new obj classes
     for obj_class_name in old_obj_classes_names:
@@ -113,7 +117,7 @@ def classes_mapping_settings_changed_meta(
     # add new object classes
     for obj_class_name in new_obj_classes_names:
         if obj_class_name not in old_obj_classes_names:
-            new_settings[obj_class_name] = "__default__"
+            new_settings[obj_class_name] = f"__{new_value}__"
 
     # pack new settings
     new_settings = _pack_classes_mapping_settings(
@@ -131,10 +135,13 @@ def set_classes_mapping_preview(
     classes_mapping_settings: dict,
     default_action: Literal["skip", "keep", "copy"] = "skip",
     ignore_action: Literal["skip", "keep", "empty"] = "skip",
+    missing_value: Literal["default", "ignore"] = "ignore",
 ):
     obj_classes = classes_mapping_widget.get_classes()
     obj_classes_names = [obj_class.name for obj_class in obj_classes]
-    unpacked = _unpack_classes_mapping_settings(classes_mapping_settings, obj_classes_names)
+    unpacked = _unpack_classes_mapping_settings(
+        classes_mapping_settings, obj_classes_names, missing_value=missing_value
+    )
     packed = _pack_classes_mapping_settings(
         unpacked, default_action=default_action, ignore_action=ignore_action, other_allowed=False
     )
@@ -185,6 +192,8 @@ def set_classes_mapping_settings_from_json(
                 "Class not found in settings",
                 extra={"class": obj_class.name},
             )
+        else:
+            classes_mapping[obj_class.name] = ""
     classes_mapping_widget.set_mapping(classes_mapping)
 
 
