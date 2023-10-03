@@ -21,7 +21,22 @@ class ColorClassLayer(Layer):
                 "properties": {
                     "classes_color_mapping": {
                         "type": "object",
-                        "patternProperties": {".*": {"type": "string"}},
+                        "patternProperties": {
+                            ".*": {
+                                "oneOf": [
+                                    {
+                                        "type": "string",
+                                        "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {"type": "number", "minimum": 0, "maximum": 255},
+                                        "maxItems": 3,
+                                        "minItems": 3,
+                                    },
+                                ]
+                            }
+                        },
                     }
                 },
             }
