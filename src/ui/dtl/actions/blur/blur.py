@@ -24,11 +24,13 @@ class BlurAction(PixelLevelAction):
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/blur"
     description = 'Blur layer ("action": "blur") applies blur filter to the image. To use median blur (cv2.medianBlur) set name to median and kernel to odd number. To use gaussian blur (cv2.GaussianBlur) set name to gaussian and sigma to object with two numbers: min and max.'
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -310,12 +310,10 @@ class Layer:
             res_meta.clone(tag_metas=new_imtags)
             self.output_meta = res_meta
         except CustomException as e:
+            e.extra["layer_config"] = self._config
             raise e
-        except Exception as e:
-            raise UnexpectedError(
-                "Unexpected error occurred while creating meta",
-                error=e,
-            )
+        except:
+            raise
 
         return self.output_meta
 

@@ -15,11 +15,13 @@ class SuperviselyAction(OutputAction):
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/supervisely"
     description = "Supervisely layer (supervisely) stores results of data transformations to a new project in your workspace. Remember that you should specify a unique name to your output project. This output project will be created automatically. Supervisely layer doesn't need any settings so just leave this field blank."
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

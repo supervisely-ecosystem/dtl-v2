@@ -14,11 +14,13 @@ class ResizeAction(SpatialLevelAction):
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/resize"
     description = "Resize layer (resize) resizes data (image + annotation) to the certain size."
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
