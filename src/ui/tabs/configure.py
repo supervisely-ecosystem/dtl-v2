@@ -70,7 +70,6 @@ nodes_flow = NodesFlow(
     height="85vh",
     context_menu=context_menu_items,
     color_theme="white",
-    # drag_and_drop_menu=context_menu_items,
     show_save=False,
 )
 
@@ -214,7 +213,10 @@ def filter(value):
         for group_name, group_actions in actions_list.items():
             found = False
             for action_name in group_actions:
-                if action_name.lower().find(value) == -1:
+                if (
+                    action_name.lower().find(value) == -1
+                    and actions[action_name].title.lower().find(value) == -1
+                ):
                     left_sidebar_actions_widgets[action_name].hide()
                 else:
                     left_sidebar_actions_widgets[action_name].show()
