@@ -35,7 +35,7 @@ class DropLinesByLengthAction(AnnotationAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
-        classes_list_widget = ClassesList(multiple=False)
+        classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
         classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
@@ -52,11 +52,11 @@ class DropLinesByLengthAction(AnnotationAction):
             ]
         )
 
-        saved_classes_settings = ""
-        default_classes_settings = ""
+        saved_classes_settings = []
+        default_classes_settings = []
 
         def _get_classes_list_value():
-            return get_classes_list_value(classes_list_widget, multiple=False)
+            return get_classes_list_value(classes_list_widget, multiple=True)
 
         def _set_classes_list_preview():
             set_classes_list_preview(
@@ -100,17 +100,20 @@ class DropLinesByLengthAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            return {
-                "lines_class": saved_classes_settings,
+            settins = {
+                "lines_classes": saved_classes_settings,
                 "resolution_compensation": bool(options_json["Resolution Compensation"]),
                 "invert": bool(options_json["Invert"]),
-                "min_length": options_json["min_length"] if options_json["Min Length"] else 0,
-                "max_length": options_json["max_length"] if options_json["Max Length"] else 0,
             }
+            if options_json["Min Length"]:
+                settins["min_length"] = options_json["min_length"]
+            if options_json["Max Length"]:
+                settins["max_length"] = options_json["max_length"]
+            return settins
 
         def _set_settings_from_json(settings: dict):
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("lines_class", "")
+            classes_list_settings = settings.get("lines_classes", [])
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
@@ -153,7 +156,7 @@ class DropLinesByLengthAction(AnnotationAction):
 
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="Select Class",
+                    name="Select Classes",
                     option_component=NodesFlow.ButtonOptionComponent(
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container

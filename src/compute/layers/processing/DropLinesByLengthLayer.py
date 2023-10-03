@@ -45,13 +45,13 @@ class DropLinesByLengthLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["lines_class"],
+                "required": ["lines_classes"],
                 "properties": {
-                    "lines_class": {
-                        "description_en": "Class-name of lines for processing",
-                        "description_ru": "Название класса линий для обработки",
-                        "type": "string",
-                        "minLength": 1,
+                    "lines_classes": {
+                        "description_en": "Class-names of lines for processing",
+                        "description_ru": "Название классов линий для обработки",
+                        "type": "array",
+                        "items": {"type": "string"},
                     },
                     "min_length": {
                         "description_en": "Mininal length for no-deleted line candidate",
@@ -97,7 +97,7 @@ class DropLinesByLengthLayer(Layer):
         img_desc, ann = data_el
         imgsize_hw = ann.img_size
 
-        lines_class = self.settings.get("lines_class")
+        lines_classes = self.settings.get("lines_classes")
         min_length = self.settings.get("min_length", None)
         max_length = self.settings.get("max_length", None)
         invert_opt = self.settings.get("invert", False)
@@ -119,7 +119,7 @@ class DropLinesByLengthLayer(Layer):
         def drop_by_line_length(label: Label):
             if not isinstance(label.geometry, Polyline):
                 return [label]
-            if lines_class == label.obj_class.name:
+            if label.obj_class.name in lines_classes:
                 if check_line_by_length(label.geometry, min_length, max_length, invert_opt):
                     return [label]
                 else:
