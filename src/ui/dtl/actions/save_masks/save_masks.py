@@ -18,11 +18,13 @@ class SaveMasksAction(OutputAction):
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save_masks"
     description = "Save masks layer (save_masks) gives you an opportunity to get masked representations of data besides just images and annotations that you can get using save layer. It includes machine and human representations. In machine masks each of listed classes are colored in shades of gray that you specify. Note that black color [0, 0, 0] is automatically assigned with the background. In human masks you would get stacked original images with that images having class colors above."
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

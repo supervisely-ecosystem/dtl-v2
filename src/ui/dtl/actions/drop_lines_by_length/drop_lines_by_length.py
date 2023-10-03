@@ -24,11 +24,13 @@ class DropLinesByLengthAction(AnnotationAction):
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_lines_by_length"
     description = "Layer drop_lines_by_length - remove too long or to short lines. Also this layer can drop lines with length in range. Lines with more than two points also supported. For multi-lines total length is calculated as sum of sections."
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

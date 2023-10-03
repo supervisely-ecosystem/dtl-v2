@@ -27,11 +27,13 @@ class MergeBitmapsAction(AnnotationAction):
     )
     description = "This layer (merge_bitmap_masks) takes all bitmap annotations which has same class name and merge it into single bitmap annotation."
 
-    try:
-        with open(Path(os.path.realpath(__file__)).parent.joinpath("readme.md")) as f:
-            md_description = f.read()
-    except:
-        md_description = ""
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
