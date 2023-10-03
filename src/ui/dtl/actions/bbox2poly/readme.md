@@ -2,14 +2,14 @@
 
 `Bbox to Polygon` layer converts rectangles (`bounding boxes`) to polygons.
 
+❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
+
 ### Settings
 
-**classes_mapping** — dict where keys are existing classes of shape rectangle, and values are new names of classes.
+**classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
 
-### Example
-
-Example of json config:
-
+<details>
+  <summary>JSON config</summary>
 ```json
 {
   "action": "bbox2poly",
@@ -23,6 +23,10 @@ Example of json config:
   }
 }
 ```
+</details>
+
+
+### Example
 
 <table>
 <tr>
