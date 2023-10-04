@@ -67,7 +67,7 @@ context_menu_items = [
 ]
 
 nodes_flow = NodesFlow(
-    height="calc(100vh - 195px)",
+    height="calc(100vh - 73px)",
     context_menu=context_menu_items,
     color_theme="white",
     show_save=False,
@@ -140,10 +140,10 @@ sidebar = Sidebar(
     right_content=nodes_flow,
     width_percent=20,
     standalone=True,
-    height="calc(100vh - 195px)",
+    height="calc(100vh - 53px)",
 )
 
-layout = Container(widgets=[add_layer_dialog, sidebar])
+layout = Container(widgets=[add_layer_dialog, sidebar], gap=0)
 
 
 @handle_exception

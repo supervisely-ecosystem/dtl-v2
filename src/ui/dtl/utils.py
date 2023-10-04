@@ -1,7 +1,7 @@
 from typing import List, Literal, Union
 
 from supervisely import ObjClass, ObjClassCollection
-from supervisely.app.widgets import NodesFlow, Container, Text, Button
+from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty
 
 from src.ui.widgets import ClassesMapping, ClassesMappingPreview, ClassesList, ClassesListPreview
 from src.exceptions import BadSettingsError
@@ -253,15 +253,18 @@ def get_separator(idx: int = 0):
     )
 
 
+empty = Empty()
+
+
 def get_set_settings_container(text: Text, button: Button):
     return Container(
-        widgets=[text, button],
+        widgets=[text, empty, button],
         direction="horizontal",
         style="place-items: center",
+        gap=0,
+        fractions=[6, 1, 3],
     )
 
 
 def get_set_settings_button_style():
-    return (
-        "flex: auto; width: 1px; border: 1px solid #bfcbd9; color: black; background-color: white"
-    )
+    return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"

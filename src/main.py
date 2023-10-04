@@ -6,7 +6,7 @@ from supervisely import Application
 
 from src.ui.ui import layout
 from src.ui.tabs.configure import update_metas, update_nodes
-from src.ui.tabs.json_preview import load_json
+from src.ui.tabs.presets import apply_json
 import src.globals as g
 
 shutil.rmtree(g.STATIC_DIR, ignore_errors=True)
@@ -24,7 +24,7 @@ def _update_f():
             continue
         try:
             if "load_json" in updates:
-                load_json()
+                apply_json()
             elif "nodes" in updates:
                 update_nodes()
             else:

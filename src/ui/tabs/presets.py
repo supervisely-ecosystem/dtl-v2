@@ -1,7 +1,15 @@
 import random
 import json
 
-from supervisely.app.widgets import Button, Editor, Container, Flexbox
+from supervisely.app.widgets import (
+    Button,
+    Editor,
+    Container,
+    Flexbox,
+    TeamFilesSelector,
+    Input,
+    Card,
+)
 from supervisely.app import show_dialog
 
 from src.compute.Net import Net
@@ -16,14 +24,35 @@ from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
 
-save_json_button = Button("Save JSON")
-load_json_button = Button("Load JSON")
-json_editor = Editor(height_px=600)
-layout = Container(widgets=[Flexbox(widgets=[save_json_button, load_json_button]), json_editor])
+preset_name_input = Input(placeholder="Preset name")
+save_folder_selector = TeamFilesSelector(
+    team_id=g.TEAM_ID, selection_file_type="folder", max_height=254
+)
+save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
+save_container = Container(widgets=[preset_name_input, save_folder_selector, save_preset_btn])
+
+load_file_selector = TeamFilesSelector(
+    team_id=g.TEAM_ID, selection_file_type="file", max_height=300
+)
+load_preset_btn = Button("Load")
+apply_preset = Button("Apply")
+load_container = Container(
+    widgets=[load_file_selector, Flexbox(widgets=[load_preset_btn, apply_preset])]
+)
+
+json_editor = Editor(language_mode="json")
+json_editor_card = Card(title="JSON Preview", content=json_editor, collapsable=True)
+json_editor_card.collapse()
+
+save_layout = Container(widgets=[save_container, json_editor], gap=0)
+load_layout = Container(widgets=[load_container, json_editor], gap=0)
 
 
-@save_json_button.click
+@save_preset_btn.click
 def save_json_button_cb():
+    print(save_folder_selector.get_selected_items())
+    print(save_folder_selector.get_selected_paths())
+
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
@@ -37,8 +66,14 @@ def save_json_button_cb():
     json_editor.set_text(json.dumps(dtl_json, indent=4), language_mode="json")
 
 
+@load_preset_btn.click
+def load_json_button_cb():
+    print(load_file_selector.get_selected_items())
+    print(load_file_selector.get_selected_paths())
+
+
 @handle_exception
-def load_json():
+def apply_json():
     nodes_flow.loading = True
     try:
         # 1. read json
@@ -199,4 +234,4 @@ def load_json_cb():
     g.updater("load_json")
 
 
-load_json_button.click(load_json_cb)
+apply_preset.click(load_json_cb)
