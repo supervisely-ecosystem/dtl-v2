@@ -341,9 +341,9 @@ class Net:
         require_images = self.may_require_images()
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         project_datasets = {}
+        added = set()
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
-            added = set()
             for src in data_layer.srcs:
                 project_name, dataset_name = src.split("/")
                 project = get_project_by_name(project_name)
