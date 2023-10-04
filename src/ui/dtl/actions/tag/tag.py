@@ -149,6 +149,7 @@ class TagAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             input_tag_widgets_container
                         ),
+                        sidebar_width=340,
                     ),
                 ),
                 NodesFlow.Node.Option(

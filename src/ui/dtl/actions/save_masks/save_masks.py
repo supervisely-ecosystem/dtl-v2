@@ -206,6 +206,7 @@ class SaveMasksAction(OutputAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             human_masks_widgets_container
                         ),
+                        sidebar_width=600,
                     ),
                 ),
                 NodesFlow.Node.Option(
@@ -223,6 +224,7 @@ class SaveMasksAction(OutputAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             machine_masks_widgets_container
                         ),
+                        sidebar_width=600,
                     ),
                 ),
                 NodesFlow.Node.Option(

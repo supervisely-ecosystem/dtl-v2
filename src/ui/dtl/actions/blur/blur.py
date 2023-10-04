@@ -151,6 +151,7 @@ class BlurAction(PixelLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=settings_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(settings_widget),
+                        sidebar_width=300,
                     ),
                 ),
                 NodesFlow.Node.Option(

@@ -303,6 +303,7 @@ class InstancesCropAction(SpatialLevelAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container
                         ),
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(
@@ -314,6 +315,7 @@ class InstancesCropAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=padding_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(padding_container),
+                        sidebar_width=300,
                     ),
                 ),
                 NodesFlow.Node.Option(
