@@ -267,6 +267,7 @@ class ObjectsFilterAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             settings_widgets_container
                         ),
+                        sidebar_width=300,
                     ),
                 ),
                 NodesFlow.Node.Option(

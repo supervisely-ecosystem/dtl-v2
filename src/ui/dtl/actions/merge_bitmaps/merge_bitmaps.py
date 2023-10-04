@@ -159,6 +159,7 @@ class MergeBitmapsAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container
                         ),
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(

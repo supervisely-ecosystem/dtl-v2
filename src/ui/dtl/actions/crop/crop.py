@@ -287,6 +287,7 @@ class CropAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=settings_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(settings_container),
+                        sidebar_width=300,
                     ),
                 ),
                 NodesFlow.Node.Option(
