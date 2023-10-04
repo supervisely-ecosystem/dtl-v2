@@ -25,6 +25,7 @@ from src.exceptions import CustomException
 from src.exceptions import handle_exception
 import src.globals as g
 from src.compute.Net import Net
+from src.ui.widgets import LayerCard
 
 
 # context menu "select" option dialog
@@ -75,12 +76,30 @@ nodes_flow = NodesFlow(
 
 
 # sidebar
+# add_specific_layer_buttons = {
+#     action_name: Button(
+#         "Add", icon="zmdi zmdi-plus", style="align-self: start;", button_size="small"
+#     )
+#     for _, group_actions in actions_list.items()
+#     for action_name in group_actions
+# }
+
+
+# def add_specific_layer_func_factory(action_name: str):
+#     def add_specific_layer_func():
+#         add_layer(action_name)
+
+#     return add_specific_layer_func
+
+
+# for action_name, button in add_specific_layer_buttons.items():
+#     button.click(add_specific_layer_func_factory(action_name))
+
 add_specific_layer_buttons = {
-    action_name: Button(
-        "Add", icon="zmdi zmdi-plus", style="align-self: start;", button_size="small"
+    action_name: LayerCard(
+        name=action.title, key=action_name, icon="zmdi zmdi-folder", color=action.header_color
     )
-    for _, group_actions in actions_list.items()
-    for action_name in group_actions
+    for action_name, action in actions.items()
 }
 
 
@@ -91,41 +110,43 @@ def add_specific_layer_func_factory(action_name: str):
     return add_specific_layer_func
 
 
-for action_name, button in add_specific_layer_buttons.items():
-    button.click(add_specific_layer_func_factory(action_name))
+for action_name, layer_card in add_specific_layer_buttons.items():
+    layer_card.on_add_button(add_specific_layer_func_factory(action_name))
 
 filter_actions_input = Input(placeholder="Filter...")
 filter_actions_field = Field(content=filter_actions_input, title="Filter actions")
 
 left_sidebar_actions_widgets = {
-    action_name: Draggable(
-        Flexbox(
-            widgets=[
-                Field(
-                    title=action.title,
-                    description=action.description,
-                    title_url=action.docs_url,
-                    content=Empty(),
-                ),
-                add_specific_layer_buttons[action_name],
-            ]
-        ),
-        key=action_name,
-    )
+    action_name: add_specific_layer_buttons[action_name]
+    # action_name: Draggable(
+    #     Flexbox(
+    #         widgets=[
+    #             Field(
+    #                 title=action.title,
+    #                 description=action.description,
+    #                 title_url=action.docs_url,
+    #                 content=Empty(),
+    #             ),
+    #             add_specific_layer_buttons[action_name],
+    #         ]
+    #     ),
+    #     key=action_name,
+    # )
     for action_name, action in actions.items()
 }
 
 left_sidebar_groups_widgets = {
     group_name: Container(
         widgets=[
-            Text(f"<h3>{group_name}</h3>"),
+            Text(f"<b>{group_name}</b>"),
             Container(
                 widgets=[
                     left_sidebar_actions_widgets[action_name] for action_name in group_actions
                 ],
                 gap=0,
             ),
-        ]
+        ],
+        gap=2,
     )
     for group_name, group_actions in actions_list.items()
 }
@@ -136,7 +157,7 @@ left_sidebar_widgets = [
     *[left_sidebar_groups_widgets[group_name] for group_name in actions_list.keys()],
 ]
 sidebar = Sidebar(
-    left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;"),
+    left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;", gap=15),
     right_content=nodes_flow,
     width_percent=20,
     standalone=True,
