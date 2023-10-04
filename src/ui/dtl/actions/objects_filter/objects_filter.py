@@ -17,6 +17,7 @@ from supervisely.app.widgets import (
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class ObjectsFilterAction(AnnotationAction):
@@ -125,6 +126,16 @@ class ObjectsFilterAction(AnnotationAction):
             ]
         )
         settings_preview = OneOf(_settings_preview_select)
+        settings_edit_text = Text("Settings")
+        settings_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
         settings_save_btn = Button("Save", icon="zmdi zmdi-floppy")
         settings_widgets_container = Container(
@@ -251,10 +262,11 @@ class ObjectsFilterAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Filter",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=settings_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             settings_widgets_container
-                        )
+                        ),
                     ),
                 ),
                 NodesFlow.Node.Option(

@@ -63,6 +63,7 @@ class DataAction(SourceAction):
             allowed_project_types=[ProjectType.IMAGES],
             compact=False,
         )
+        select_datasets_text = Text("<b>Select Datasets</b>")
         select_datasets_btn = Button(
             text="SELECT",
             icon="zmdi zmdi-folder",
@@ -70,6 +71,9 @@ class DataAction(SourceAction):
             button_size="small",
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
+        )
+        select_datasets_container = get_set_settings_container(
+            select_datasets_text, select_datasets_btn
         )
         src_save_btn = Button("Save", icon="zmdi zmdi-floppy")
         src_preview_widget = Text("")
@@ -108,6 +112,18 @@ class DataAction(SourceAction):
                     gap=355,
                 ),
             ]
+        )
+        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_mapping_edit_conatiner = get_set_settings_container(
+            classes_mapping_edit_text, classes_mapping_edit_btn
         )
 
         default_classes_mapping_settings = "default"
@@ -306,9 +322,7 @@ class DataAction(SourceAction):
                 NodesFlow.Node.Option(
                     name="Select Datasets",
                     option_component=NodesFlow.WidgetOptionComponent(
-                        widget=get_set_settings_container(
-                            Text("Select Datasets"), select_datasets_btn
-                        ),
+                        widget=select_datasets_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(src_widgets_container),
                         sidebar_width=300,
                     ),
@@ -321,7 +335,8 @@ class DataAction(SourceAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Classes Mapping",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_mapping_edit_conatiner,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),

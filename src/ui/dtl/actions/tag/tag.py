@@ -9,6 +9,7 @@ from supervisely.annotation.tag_meta import TagValueType
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag, TagMetasPreview
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class TagAction(AnnotationAction):
@@ -37,6 +38,18 @@ class TagAction(AnnotationAction):
         tag_preview_value = Text("")
         rag_preview_widgets_container = Container(
             widgets=[tag_preview_meta, tag_preview_value], gap=1
+        )
+        input_tag_edit_text = Text("Classes List")
+        input_tag_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        input_tag_edit_container = get_set_settings_container(
+            input_tag_edit_text, input_tag_edit_btn
         )
 
         saved_tag_setting = None
@@ -131,10 +144,11 @@ class TagAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Input Tag",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=input_tag_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             input_tag_widgets_container
-                        )
+                        ),
                     ),
                 ),
                 NodesFlow.Node.Option(

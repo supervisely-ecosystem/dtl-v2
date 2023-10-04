@@ -2,13 +2,14 @@ from typing import Optional
 import os
 from pathlib import Path
 
-from supervisely.app.widgets import NodesFlow, Button, Container
+from supervisely.app.widgets import NodesFlow, Button, Container, Text
 from supervisely import ProjectMeta
 from supervisely.imaging.color import hex2rgb, rgb2hex
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class ColorClassAction(AnnotationAction):
@@ -35,6 +36,18 @@ class ColorClassAction(AnnotationAction):
         classes_colors_save_btn = Button("Save", icon="zmdi zmdi-floppy")
         classes_colors_widgets_container = Container(
             widgets=[classes_colors, classes_colors_save_btn]
+        )
+        classes_colors_edit_text = Text("Classes Mapping")
+        classes_colors_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_colors_edit_conatiner = get_set_settings_container(
+            classes_colors_edit_text, classes_colors_edit_btn
         )
 
         saved_classes_colors_settings = {}
@@ -84,10 +97,11 @@ class ColorClassAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Colors",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_colors_edit_conatiner,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_colors_widgets_container
-                        )
+                        ),
                     ),
                 ),
                 NodesFlow.Node.Option(

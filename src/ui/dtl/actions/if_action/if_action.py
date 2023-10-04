@@ -19,6 +19,7 @@ from supervisely import ProjectMeta
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class IfAction(OtherAction):
@@ -289,6 +290,16 @@ class IfAction(OtherAction):
         _select_preview = Select(items=preview_items)
         settings_preview = OneOf(_select_preview)
         save_settings_btn = Button("Save", icon="zmdi zmdi-floppy")
+        settings_edit_text = Text("Condition")
+        settings_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
         saved_settings = {}
 
@@ -350,8 +361,9 @@ class IfAction(OtherAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Condition",
-                    option_component=NodesFlow.ButtonOptionComponent(
-                        sidebar_component=NodesFlow.WidgetOptionComponent(widget)
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=settings_edit_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(widget),
                     ),
                 ),
                 NodesFlow.Node.Option(
