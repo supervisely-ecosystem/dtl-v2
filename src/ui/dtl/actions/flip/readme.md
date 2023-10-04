@@ -1,6 +1,8 @@
 # Flip
 
-`Flip` layer simply flips data (images + annotations) by vertical or horizontal axis. This layer supports `bitmap`, `polygon`, `rectangle`, `point`, `polyline`, `graph` (`keypoint`) geometries in annotations.
+`Flip` layer simply flips data (images + annotations) by vertical or horizontal axis. 
+
+Supports flipping `bitmap`, `polygon`, `rectangle`, `point`, `polyline`, `graph` (`keypoint`) geometry types.
 
 ### Settings:
 
@@ -39,7 +41,7 @@ Select `vertical` axis in layer settings.
 ### JSON view
 
 <details>
-  <summary>JSON config</summary>
+  <summary>JSON view for vertical axis flip</summary>
 <pre>
 {
   "action": "flip",
