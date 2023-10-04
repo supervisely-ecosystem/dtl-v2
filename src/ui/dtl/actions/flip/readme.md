@@ -18,8 +18,8 @@ Select `horizontal` axis in layer settings.
 <td style="text-align:center; width:50%"><strong>Flip axis: horizontal</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/5a91e7dd-eccc-4f06-b85c-b254ceb81710" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/70a08cb6-1450-4895-82a3-884f0618f1da" alt="Flip axis: horizontal" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/5a89a164-7965-49ac-a749-d3a32b690dd0" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/143c010a-e225-4113-83d6-1f52064f0227" alt="Flip axis: horizontal" /> </td>
 </tr>
 </table>
 
