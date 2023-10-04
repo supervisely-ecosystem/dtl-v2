@@ -18,6 +18,7 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class CropAction(SpatialLevelAction):
@@ -156,8 +157,17 @@ class CropAction(SpatialLevelAction):
         settings_preview = Container(widgets=[mode_preview, params_preview], gap=1)
 
         save_settings_btn = Button("Save", icon="zmdi zmdi-floppy")
-
         settings_container = Container(widgets=[mode_select, OneOf(mode_select), save_settings_btn])
+        settings_edit_text = Text("Settings")
+        settings_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
         saved_settings = {}
 
@@ -274,8 +284,9 @@ class CropAction(SpatialLevelAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Settings",
-                    option_component=NodesFlow.ButtonOptionComponent(
-                        sidebar_component=NodesFlow.WidgetOptionComponent(settings_container)
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=settings_edit_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(settings_container),
                     ),
                 ),
                 NodesFlow.Node.Option(

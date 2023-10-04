@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
@@ -14,6 +14,8 @@ from src.ui.dtl.utils import (
     get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
+    get_set_settings_button_style,
+    get_set_settings_container,
 )
 from src.exceptions import BadSettingsError
 import src.globals as g
@@ -73,6 +75,30 @@ class BitwiseMasksAction(AnnotationAction):
                     gap=105,
                 ),
             ]
+        )
+        class_mask_edit_text = Text("Class Mask. First element of bitwise operation")
+        class_mask_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        class_mask_edit_container = get_set_settings_container(
+            class_mask_edit_text, class_mask_edit_btn
+        )
+        classes_to_correct_edit_text = Text("Classes to correct")
+        classes_to_correct_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_to_correct_edit_container = get_set_settings_container(
+            classes_to_correct_edit_text, classes_to_correct_edit_btn
         )
 
         saved_class_mask_settings = ""
@@ -232,14 +258,9 @@ class BitwiseMasksAction(AnnotationAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="class_mask_text",
-                    option_component=NodesFlow.TextOptionComponent(
-                        "Class Mask. First element of bitwise operation"
-                    ),
-                ),
-                NodesFlow.Node.Option(
                     name="Select Class Mask",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=class_mask_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             class_mask_widgets_container
                         ),
@@ -251,12 +272,9 @@ class BitwiseMasksAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(class_mask_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="classes_text",
-                    option_component=NodesFlow.TextOptionComponent("Classes to correct"),
-                ),
-                NodesFlow.Node.Option(
                     name="Select Classes to correct",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_to_correct_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_to_correct_widgets_container
                         ),

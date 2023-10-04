@@ -24,6 +24,8 @@ from src.ui.dtl.utils import (
     get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
+    get_set_settings_button_style,
+    get_set_settings_container,
 )
 import src.globals as g
 
@@ -62,6 +64,18 @@ class InstancesCropAction(SpatialLevelAction):
                     gap=105,
                 ),
             ]
+        )
+        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_list_edit_container = get_set_settings_container(
+            classes_list_edit_text, classes_list_edit_btn
         )
 
         saved_classes_settings = []
@@ -147,6 +161,16 @@ class InstancesCropAction(SpatialLevelAction):
                 save_padding_btn,
             ]
         )
+        padding_edit_text = Text("Padding")
+        padding_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        padding_edit_container = get_set_settings_container(padding_edit_text, padding_edit_btn)
 
         def _get_padding():
             return {
@@ -274,10 +298,11 @@ class InstancesCropAction(SpatialLevelAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_list_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container
-                        )
+                        ),
                     ),
                 ),
                 NodesFlow.Node.Option(
@@ -286,8 +311,9 @@ class InstancesCropAction(SpatialLevelAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Set Padding",
-                    option_component=NodesFlow.ButtonOptionComponent(
-                        sidebar_component=NodesFlow.WidgetOptionComponent(padding_container)
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=padding_edit_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(padding_container),
                     ),
                 ),
                 NodesFlow.Node.Option(

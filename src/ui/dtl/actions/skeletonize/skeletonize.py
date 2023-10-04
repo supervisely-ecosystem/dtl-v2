@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
 from src.ui.dtl.Action import AnnotationAction
@@ -14,6 +14,8 @@ from src.ui.dtl.utils import (
     get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
+    get_set_settings_button_style,
+    get_set_settings_container,
 )
 import src.globals as g
 
@@ -52,6 +54,18 @@ class SkeletonizeAction(AnnotationAction):
                     gap=105,
                 ),
             ]
+        )
+        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_list_edit_container = get_set_settings_container(
+            classes_list_edit_text, classes_list_edit_btn
         )
 
         saved_classes_settings = []
@@ -148,7 +162,8 @@ class SkeletonizeAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_list_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container
                         ),

@@ -16,6 +16,7 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
 
 
 class BlurAction(PixelLevelAction):
@@ -70,6 +71,16 @@ class BlurAction(PixelLevelAction):
                 save_settings_button,
             ]
         )
+        settings_edit_text = Text("Settings")
+        settings_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
         type_preview = Text("")
         params_preview = Text("")
@@ -137,8 +148,9 @@ class BlurAction(PixelLevelAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Settings",
-                    option_component=NodesFlow.ButtonOptionComponent(
-                        sidebar_component=NodesFlow.WidgetOptionComponent(settings_widget)
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=settings_edit_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(settings_widget),
                     ),
                 ),
                 NodesFlow.Node.Option(

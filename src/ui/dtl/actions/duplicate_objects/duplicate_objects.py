@@ -3,7 +3,7 @@ import copy
 import os
 from pathlib import Path
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
@@ -14,6 +14,8 @@ from src.ui.dtl.utils import (
     classes_mapping_settings_changed_meta,
     set_classes_mapping_preview,
     set_classes_mapping_settings_from_json,
+    get_set_settings_button_style,
+    get_set_settings_container,
 )
 import src.globals as g
 
@@ -50,6 +52,18 @@ class DuplicateObjectsAction(AnnotationAction):
                     gap=355,
                 ),
             ]
+        )
+        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_mapping_edit_conatiner = get_set_settings_container(
+            classes_mapping_edit_text, classes_mapping_edit_btn
         )
 
         saved_classes_mapping_settings = {}
@@ -164,7 +178,8 @@ class DuplicateObjectsAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Classes Mapping",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_mapping_edit_conatiner,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),

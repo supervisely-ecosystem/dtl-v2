@@ -23,6 +23,8 @@ from src.ui.dtl.utils import (
     get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
+    get_set_settings_button_style,
+    get_set_settings_container,
 )
 import src.globals as g
 
@@ -59,6 +61,18 @@ class DropNoiseAction(AnnotationAction):
                     gap=105,
                 ),
             ]
+        )
+        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        classes_list_edit_container = get_set_settings_container(
+            classes_list_edit_text, classes_list_edit_btn
         )
 
         saved_classes_settings = []
@@ -108,6 +122,16 @@ class DropNoiseAction(AnnotationAction):
                 ),
             ]
         )
+        settings_edit_text = Text("Min Area")
+        settings_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
         saved_min_area_settings = "2%"
         default_min_area_settings = "2%"
@@ -219,10 +243,12 @@ class DropNoiseAction(AnnotationAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=classes_list_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_list_widgets_container
-                        )
+                        ),
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(
@@ -231,10 +257,12 @@ class DropNoiseAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Min Area",
-                    option_component=NodesFlow.ButtonOptionComponent(
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=settings_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             min_area_widgets_container
-                        )
+                        ),
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(

@@ -339,11 +339,6 @@ def update_metas_cb():
     g.updater("metas")
 
 
-@nodes_flow.sidebar_toggled
-def sidebar_toggled_cb():
-    print("sidebar toggled")
-
-
 nodes_flow.flow_changed(update_metas_cb)
 nodes_flow.flow_state_changed(update_metas_cb)
 nodes_flow.on_save(update_metas_cb)
