@@ -18,8 +18,8 @@ Select `horizontal` axis in layer settings.
 <td style="text-align:center; width:50%"><strong>Flip axis: horizontal</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/febfdbd2-58f2-4e3a-a3e9-57da99f13ec9" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/06709e30-2a14-4349-b6cd-67adc7dfc4a8" alt="Flip axis: horizontal" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/5a91e7dd-eccc-4f06-b85c-b254ceb81710" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/70a08cb6-1450-4895-82a3-884f0618f1da" alt="Flip axis: horizontal" /> </td>
 </tr>
 </table>
 
@@ -33,8 +33,8 @@ Select `vertical` axis in layer settings.
 <td style="text-align:center; width:50%"><strong>Flip axis: vertical</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/49761074-0bf1-44e3-81e8-30445afe8e9e" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/61001cff-71b2-4c12-9193-ddd551ea9ecc" alt="Flip axis: vertical" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a44f0fe0-c7cb-488f-8831-44f41f92b506" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/c1d95d19-fc85-4e15-acf7-801172ff3e68" alt="Flip axis: vertical" /> </td>
 </tr>
 </table>
 
