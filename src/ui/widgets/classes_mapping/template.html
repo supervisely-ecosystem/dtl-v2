@@ -4,6 +4,36 @@
 <div v-show="data.{{{widget.widget_id}}}.classes.length != 0">
     <link rel="stylesheet" href="./sly/css/app/widgets/object_class_view/style.css" />
     <table>
+        <tr>
+            <th style="padding: 3px 20px;">Class</th>
+            <th style="padding: 3px 20px;">Value</th>
+            <th style="padding: 3px 36px 3px 4px;">
+                <el-checkbox
+                    :value="state.{{{widget.widget_id}}}.classes_values.every(el => el.default)"
+                    @change="
+                        if ($event.target.checked) {
+                            state.{{{widget.widget_id}}}.classes_values.map((el, idx) => {
+                                el.value = data.{{{widget.widget_id}}}.classes[idx].default_value;
+                                el.ignore = false;
+                                el.default = true;
+                            });
+                        }"
+                >Default</el-checkbox>
+            </th>
+            <th style="padding: 3px 36px 3px 4px;">
+                <el-checkbox
+                    :value="state.{{{widget.widget_id}}}.classes_values.every(el => el.ignore)"
+                    @change="
+                        if ($event.target.checked) {
+                            state.{{{widget.widget_id}}}.classes_values.map((el, idx) => {
+                                el.value = '';
+                                el.ignore = true;
+                                el.default = false;
+                            });
+                        }"
+                >Ignore</el-checkbox>
+            </th>
+        </tr>
         <tr
             v-for="(obj_class, idx) in data.{{{widget.widget_id}}}.classes"
         >
@@ -25,7 +55,7 @@
                     v-model="state.{{{widget.widget_id}}}.classes_values[idx].value" 
                     size="small" 
                     maxlength=32 
-                    style="width: 200px"
+                    style="width: 160px"
                     @change="
                         state.{{{widget.widget_id}}}.classes_values[idx].default = $event == obj_class.default_value;
                         state.{{{widget.widget_id}}}.classes_values[idx].ignore = $event == '';"
@@ -50,7 +80,7 @@
             <td>
                 <el-checkbox 
                     v-model="state.{{{widget.widget_id}}}.classes_values[idx].ignore" 
-                    style="padding: 3px 10px;"
+                    style="padding: 3px;"
                     @change="if ($event.target.checked) {
                         state.{{{widget.widget_id}}}.classes_values[idx].value = '';
                         state.{{{widget.widget_id}}}.classes_values[idx].default = false;
