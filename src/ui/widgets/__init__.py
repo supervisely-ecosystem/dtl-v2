@@ -6,3 +6,4 @@ from .input_tag import InputTag
 from .classes_mapping_preview import ClassesMappingPreview
 from .classes_list_preview import ClassesListPreview
 from .tag_metas_preview import TagMetasPreview
+from .layer_card import LayerCard
