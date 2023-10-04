@@ -54,8 +54,10 @@ class ContrastBrightnessAction(PixelLevelAction):
                 settings["contrast"] = {
                     "min": contrast_min,
                     "max": contrast_max,
-                    "center_grey": options_json["Center grey"]
-                    if options_json["Center grey"]
+                    "center_grey": options_json[
+                        "Center grey. Center colors of images (subtract 128) first"
+                    ]
+                    if options_json["Center grey. Center colors of images (subtract 128) first"]
                     else False,
                 }
             else:
