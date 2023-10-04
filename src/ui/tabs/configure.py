@@ -97,7 +97,7 @@ nodes_flow = NodesFlow(
 
 add_specific_layer_buttons = {
     action_name: LayerCard(
-        name=action.title, key=action_name, icon="zmdi zmdi-folder", color=action.header_color
+        name=action.title, key=action_name, icon=action.icon, color=action.header_color
     )
     for action_name, action in actions.items()
 }

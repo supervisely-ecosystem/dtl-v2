@@ -13,8 +13,9 @@ class Action:
     description = None
     md_description = ""
     width = 340
-    header_color = None
-    header_text_color = None
+    header_color = "#cfcfcf"
+    header_text_color = "#000000"
+    icon = "zmdi zmdi-folder"
 
     md_description = ""
     for p in ("readme.md", "README.md"):
@@ -50,28 +51,34 @@ class Action:
 class SourceAction(Action):
     header_color = "#13ce66"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-folder"
 
 
 class PixelLevelAction(Action):
     header_color = "#c9a5fa"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-image-o"
 
 
 class SpatialLevelAction(Action):
     header_color = "#fcd068"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-collection-bookmark"
 
 
 class AnnotationAction(Action):
     header_color = "#90ddf5"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-label-heart"
 
 
 class OtherAction(Action):
     header_color = "#cfcfcf"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-apps"
 
 
 class OutputAction(Action):
     header_color = "#ff5e90"
     header_text_color = "#000000"
+    icon = "zmdi zmdi-floppy"
