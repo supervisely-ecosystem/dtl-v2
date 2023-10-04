@@ -1,10 +1,10 @@
 # Flip
 
-`Flip` layer simply flips data (images + annotations) vertically or horizontally.
+`Flip` layer simply flips data (images + annotations) by vertical or horizontal axis.
 
 ### Settings:
 
-- **axis** - Choose between `horizontal` and `vertical` axis to flip images and annotations.
+- **axis** - Choose the axis along which the images with annotations will be flipped (`vertical` or `horizontal` axis).
 
 ### Examples:
 
