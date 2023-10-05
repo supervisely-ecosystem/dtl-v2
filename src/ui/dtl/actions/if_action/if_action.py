@@ -18,7 +18,7 @@ from supervisely import ProjectMeta
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class IfAction(OtherAction):
@@ -279,7 +279,7 @@ class IfAction(OtherAction):
         preview_items = [condition.preview_item() for condition in conditions.values()]
         _select_preview = Select(items=preview_items)
         settings_preview = OneOf(_select_preview)
-        save_settings_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_settings_btn = create_save_btn()
         settings_edit_text = Text("Condition")
         settings_edit_btn = Button(
             text="EDIT",

@@ -15,7 +15,8 @@ from src.ui.dtl.utils import (
     set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
-    get_layer_docs
+    get_layer_docs,
+    create_save_btn
 )
 import src.globals as g
 
@@ -32,7 +33,7 @@ class BBoxAction(AnnotationAction):
         _current_meta = ProjectMeta()
         classes_mapping_widget = ClassesMapping()
         classes_mapping_preview = ClassesMappingPreview()
-        classes_mapping_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         classes_mapping_widgets_container = Container(
             widgets=[
@@ -53,7 +54,7 @@ class BBoxAction(AnnotationAction):
             button_type="text",
             button_size="small",
             emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
+            style=get_set_settings_button_style()
         )
         classes_mapping_edit_conatiner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn

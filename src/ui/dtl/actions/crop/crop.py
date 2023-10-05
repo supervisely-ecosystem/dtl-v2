@@ -17,7 +17,7 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class CropAction(SpatialLevelAction):
@@ -148,7 +148,7 @@ class CropAction(SpatialLevelAction):
         params_preview = Text("")
         settings_preview = Container(widgets=[mode_preview, params_preview], gap=1)
 
-        save_settings_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_settings_btn = create_save_btn()
         settings_container = Container(widgets=[mode_select, OneOf(mode_select), save_settings_btn])
         settings_edit_text = Text("Settings")
         settings_edit_btn = Button(

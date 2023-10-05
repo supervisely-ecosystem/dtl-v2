@@ -15,7 +15,7 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class BlurAction(PixelLevelAction):
@@ -55,7 +55,7 @@ class BlurAction(PixelLevelAction):
                 ),
             ]
         )
-        save_settings_button = Button("Save", icon="zmdi zmdi-floppy")
+        save_settings_button = create_save_btn()
         settings_widget = Container(
             widgets=[
                 Field(title="Blur type", content=select_name),

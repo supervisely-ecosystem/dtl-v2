@@ -9,9 +9,10 @@ from src.ui.tabs.configure import update_metas, update_nodes
 from src.ui.tabs.presets import apply_json
 import src.globals as g
 
-shutil.rmtree(g.STATIC_DIR, ignore_errors=True)
-os.mkdir(g.STATIC_DIR)
+# shutil.rmtree(g.STATIC_DIR, ignore_errors=True)
+# os.mkdir(g.STATIC_DIR)
 app = Application(layout=layout, static_dir=g.STATIC_DIR)
+
 
 
 def _update_f():

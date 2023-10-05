@@ -25,7 +25,8 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
-    get_layer_docs
+    get_layer_docs,
+    create_save_btn
 )
 import src.globals as g
 
@@ -42,7 +43,7 @@ class InstancesCropAction(SpatialLevelAction):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        classes_list_save_btn = create_save_btn()
         classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         classes_list_widgets_container = Container(
             widgets=[
@@ -130,7 +131,7 @@ class InstancesCropAction(SpatialLevelAction):
             off_content=padding_bot_percent,
         )
         padding_preview = Text("")
-        save_padding_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_padding_btn = create_save_btn()
         padding_container = Container(
             widgets=[
                 Field(

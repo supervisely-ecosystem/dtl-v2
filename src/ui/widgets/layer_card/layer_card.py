@@ -10,9 +10,8 @@ class LayerCard(Widget):
 
         self._add_button = Button(
             "",
-            icon="zmdi zmdi-plus-circle-o",
+            icon="zmdi zmdi-plus",
             button_type="text",
-            style="color: black; margin-left: auto; padding: 10px",
         )
 
         super().__init__(widget_id=widget_id, file_path=__file__)

@@ -70,7 +70,7 @@ context_menu_items = [
 nodes_flow = NodesFlow(
     height="calc(100vh - 73px)",
     context_menu=context_menu_items,
-    color_theme="white",
+    color_theme="light",
     show_save=False,
 )
 
@@ -113,7 +113,7 @@ def add_specific_layer_func_factory(action_name: str):
 for action_name, layer_card in add_specific_layer_buttons.items():
     layer_card.on_add_button(add_specific_layer_func_factory(action_name))
 
-filter_actions_input = Input(placeholder="Filter...")
+filter_actions_input = Input(placeholder="Start typing layer name...", icon="search")
 filter_actions_field = Field(content=filter_actions_input, title="Filter actions")
 
 left_sidebar_actions_widgets = {

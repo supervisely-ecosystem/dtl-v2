@@ -24,7 +24,8 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
-    get_layer_docs
+    get_layer_docs,
+    create_save_btn
 )
 import src.globals as g
 
@@ -41,7 +42,7 @@ class DropNoiseAction(AnnotationAction):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        save_classes_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_classes_btn = create_save_btn()
         set_default_classes_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         classes_list_widgets_container = Container(
             widgets=[
@@ -101,7 +102,7 @@ class DropNoiseAction(AnnotationAction):
         input_value = OneOf(px_or_percent_switch)
         min_area_widgets = Flexbox(widgets=[input_value, px_or_percent_switch])
         min_area_preview = Text("")
-        save_min_area_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_min_area_btn = create_save_btn()
         set_default_min_area_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         min_area_widgets_container = Container(
             widgets=[

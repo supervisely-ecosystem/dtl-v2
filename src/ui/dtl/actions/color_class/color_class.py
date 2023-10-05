@@ -8,7 +8,7 @@ from supervisely.imaging.color import hex2rgb, rgb2hex
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class ColorClassAction(AnnotationAction):
@@ -25,7 +25,7 @@ class ColorClassAction(AnnotationAction):
         _current_meta = ProjectMeta()
         classes_colors = ClassesColorMapping()
         classes_colors_preview = ClassesMappingPreview()
-        classes_colors_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        classes_colors_save_btn = create_save_btn()
         classes_colors_widgets_container = Container(
             widgets=[classes_colors, classes_colors_save_btn]
         )

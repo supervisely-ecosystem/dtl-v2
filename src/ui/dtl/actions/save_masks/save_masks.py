@@ -9,7 +9,7 @@ from supervisely.imaging.color import hex2rgb, rgb2hex
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class SaveMasksAction(OutputAction):
@@ -27,8 +27,8 @@ class SaveMasksAction(OutputAction):
         human_classes_colors_preview = ClassesMappingPreview()
         machine_classes_colors_preview = ClassesMappingPreview()
 
-        human_classes_colors_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        machine_classes_colors_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        human_classes_colors_save_btn = create_save_btn()
+        machine_classes_colors_save_btn = create_save_btn()
         human_masks_widgets_container = Container(
             widgets=[human_classes_colors, human_classes_colors_save_btn]
         )

@@ -15,7 +15,8 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
-    get_layer_docs
+    get_layer_docs,
+    create_save_btn
 )
 from src.exceptions import BadSettingsError
 import src.globals as g
@@ -39,8 +40,8 @@ class BitwiseMasksAction(AnnotationAction):
         class_mask_preview = ClassesListPreview()
         classes_to_correct_preview = ClassesListPreview()
 
-        save_class_mask_btn = Button("Save", icon="zmdi zmdi-floppy")
-        save_classes_to_correct_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_class_mask_btn = create_save_btn()
+        save_classes_to_correct_btn = create_save_btn()
 
         set_default_class_mask_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         set_default_classes_to_correct_btn = Button("Set Default", icon="zmdi zmdi-refresh")

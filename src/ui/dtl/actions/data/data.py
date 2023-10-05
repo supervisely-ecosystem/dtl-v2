@@ -12,7 +12,7 @@ from supervisely.app.widgets import (
     Flexbox,
     NotificationBox,
 )
-from supervisely import ProjectType, ProjectMeta, ObjClassCollection
+from supervisely import ProjectType, ProjectMeta
 
 import src.utils as utils
 import src.globals as g
@@ -27,7 +27,8 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_set_settings_button_style,
     set_classes_mapping_settings_from_json,
-    get_layer_docs
+    get_layer_docs,
+    create_save_btn
 )
 
 
@@ -63,7 +64,7 @@ class DataAction(SourceAction):
         select_datasets_container = get_set_settings_container(
             select_datasets_text, select_datasets_btn
         )
-        src_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        src_save_btn = Button("Save", icon="zmdi zmdi-floppy", emit_on_click="save", call_on_click="closeSidebar();")
         src_preview_widget = Text("")
         src_widgets_container = Container(widgets=[select_datasets, src_save_btn])
 
@@ -86,7 +87,7 @@ class DataAction(SourceAction):
             description="Choose datasets and ensure that source project have classes.",
         )
         classes_mapping_widget = ClassesMapping(empty_notification=empty_src_notification)
-        classes_mapping_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         classes_mapping_preview = ClassesMappingPreview()
         classes_mapping_widgets_container = Container(

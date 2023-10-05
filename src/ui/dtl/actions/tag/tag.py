@@ -8,7 +8,7 @@ from supervisely.annotation.tag_meta import TagValueType
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
 
 
 class TagAction(AnnotationAction):
@@ -24,7 +24,7 @@ class TagAction(AnnotationAction):
 
         select_tag_meta = SelectTagMeta(project_meta=_current_meta)
         input_tag = InputTag(TagMeta(name="", value_type=TagValueType.NONE))
-        save_tag_btn = Button("Save", icon="zmdi zmdi-floppy")
+        save_tag_btn = create_save_btn()
         input_tag_widgets_container = Container(widgets=[select_tag_meta, input_tag, save_tag_btn])
         tag_preview_meta = TagMetasPreview()
         tag_preview_value = Text("")

@@ -250,7 +250,7 @@ def set_classes_list_settings_from_json(
 def get_separator(idx: int = 0):
     return NodesFlow.Node.Option(
         name=f"separator {idx}",
-        option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        option_component=NodesFlow.HtmlOptionComponent('<hr style="border-top: 1px solid #ccc;">'),
     )
 
 
@@ -270,7 +270,14 @@ def get_set_settings_container(text: Text, button: Button):
 def get_set_settings_button_style():
     return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"
 
-def get_layer_docs(layer_dir: str):
+# Sidebar action options utils
+
+def create_save_btn() -> Button:
+    return Button("Save", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();")
+
+# Layer docs utils
+
+def get_layer_docs(layer_dir: str) -> str:
     md_description = ""
     for p in ("readme.md", "README.md"):
         p = join(layer_dir, p)
