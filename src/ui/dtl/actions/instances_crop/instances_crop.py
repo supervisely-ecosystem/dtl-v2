@@ -1,5 +1,6 @@
 import copy
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import (
@@ -34,7 +35,7 @@ class InstancesCropAction(SpatialLevelAction):
     title = "Instances Crop"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/instances_crop"
     description = "Crops objects of specified classes from image with configurable padding."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

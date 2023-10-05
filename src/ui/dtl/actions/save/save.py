@@ -1,5 +1,6 @@
 import json
 from typing import Optional
+from os.path import realpath, dirname
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
@@ -12,7 +13,7 @@ class SaveAction(OutputAction):
     title = "Save"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save"
     description = "Export annotations and images to Team Files."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

@@ -1,5 +1,6 @@
 import copy
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
@@ -27,7 +28,7 @@ class MergeBitmapsAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/merge_masks"
     )
     description = "Takes all Bitmap labels which has same class name and merge it into single Bitmap label."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

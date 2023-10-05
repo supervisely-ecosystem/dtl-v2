@@ -1,5 +1,6 @@
 from typing import Optional
 import copy
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
@@ -26,7 +27,7 @@ class RasterizeAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rasterize"
     )
     description = "Convert shape of all classes to Bitmap."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

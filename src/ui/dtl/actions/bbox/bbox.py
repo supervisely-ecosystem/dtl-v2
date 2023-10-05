@@ -1,4 +1,5 @@
 import copy
+from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -24,7 +25,7 @@ class BBoxAction(AnnotationAction):
     title = "Bounding Box"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bbox"
     description = "Converts annotations of specified classes to bounding boxes."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

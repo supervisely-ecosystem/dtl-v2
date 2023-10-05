@@ -1,5 +1,6 @@
 import copy
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import (
     NodesFlow,
@@ -33,7 +34,7 @@ class DropNoiseAction(AnnotationAction):
     title = "Drop Noise"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_noise_from_bitmap"
     description = "Removes connected components smaller than the specified size from bitmap annotations."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

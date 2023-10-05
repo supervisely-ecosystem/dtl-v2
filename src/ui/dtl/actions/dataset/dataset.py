@@ -1,4 +1,6 @@
 from typing import Optional
+from os.path import realpath, dirname
+
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import OtherAction
@@ -12,7 +14,7 @@ class DatasetAction(OtherAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/dataset"
     )
     description = "Places every image that it sees to dataset with a specified name."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

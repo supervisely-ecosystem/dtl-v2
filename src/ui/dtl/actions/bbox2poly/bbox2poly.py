@@ -1,4 +1,5 @@
 import copy
+from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -26,7 +27,7 @@ class BboxToPolyAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bbox2poly"
     )
     description = 'Converts rectangles ("bounding boxes") to polygons.'
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

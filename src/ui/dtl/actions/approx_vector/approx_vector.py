@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 import copy
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
@@ -26,7 +27,7 @@ class ApproxVectorAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/approx_vector"
     )
     description = "Approximates vector figures: lines and polygons."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
     
 
     @classmethod

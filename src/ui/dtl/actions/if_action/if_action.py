@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import (
     NodesFlow,
@@ -25,7 +26,7 @@ class IfAction(OtherAction):
     title = "If"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/if"
     description = "Split input data to several flows with a specified criterion."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

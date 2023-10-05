@@ -1,4 +1,6 @@
 from typing import Optional
+from os.path import realpath, dirname
+
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
@@ -8,7 +10,7 @@ class DummyAction(OtherAction):
     title = "Dummy"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/dummy"
     description = "Do nothing. Literally. Use when you want to merge multiple layers into one."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

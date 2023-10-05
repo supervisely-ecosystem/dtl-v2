@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow
 
@@ -13,7 +14,7 @@ class RandomColorsAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/random_color"
     )
     description = "Change image colors by randomly moving each of RGB components."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

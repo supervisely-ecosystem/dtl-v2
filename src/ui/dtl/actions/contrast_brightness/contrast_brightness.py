@@ -1,4 +1,6 @@
 from typing import Optional
+from os.path import realpath, dirname
+
 from supervisely.app.widgets import NodesFlow, Slider, Text
 
 from src.ui.dtl import PixelLevelAction
@@ -12,7 +14,7 @@ class ContrastBrightnessAction(PixelLevelAction):
     description = (
         "This layer (contrast_brightness) randomly changes contrast and brightness of images. "
     )
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -1,4 +1,5 @@
 from typing import List, Optional
+from os.path import realpath, dirname
 import copy
 
 from supervisely.app.content import StateJson
@@ -35,7 +36,7 @@ class DataAction(SourceAction):
     title = "Data"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
     description = "Use to specify project and its datasets that will participate in data transformation process."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_inputs(self):

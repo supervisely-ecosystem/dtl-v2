@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import (
@@ -25,7 +26,7 @@ class ObjectsFilterAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/objects_filter"
     )
     description = "Deletes labels with less (or greater) than specified size or percentage of image area."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

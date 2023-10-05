@@ -1,4 +1,5 @@
 import copy
+from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
@@ -26,7 +27,7 @@ class Bitmap2LinesAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bitmap2lines"
     )
     description = "Converts thinned (skeletonized) bitmaps to lines. Use Skeletonize layer first."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

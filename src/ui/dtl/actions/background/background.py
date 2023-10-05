@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import AnnotationAction
@@ -12,7 +13,7 @@ class BackgroundAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/background"
     )
     description = "Use to prepare data to train Neural Network for semantic segmentation."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

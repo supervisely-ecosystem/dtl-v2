@@ -1,5 +1,6 @@
 from typing import Optional
 import json
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Text
 from supervisely import ProjectMeta
@@ -16,7 +17,7 @@ class SaveMasksAction(OutputAction):
     title = "Save Masks"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save_masks"
     description = "Export annotations, masks and images to Team Files."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Text
 from supervisely import ProjectMeta
@@ -17,7 +18,7 @@ class ColorClassAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/color_class"
     )
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

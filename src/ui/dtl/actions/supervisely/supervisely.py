@@ -1,5 +1,6 @@
 from typing import Optional
 import json
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow
 
@@ -13,7 +14,7 @@ class SuperviselyAction(OutputAction):
     title = "Supervisely"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/supervisely"
     description = "Save results of data transformations to a new project in current workspace."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

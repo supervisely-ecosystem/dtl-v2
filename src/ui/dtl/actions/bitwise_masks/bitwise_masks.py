@@ -1,4 +1,5 @@
 import copy
+from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -27,7 +28,7 @@ class BitwiseMasksAction(AnnotationAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bitwise_masks"
     )
     description = "Make bitwise operations between bitmap annotations."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

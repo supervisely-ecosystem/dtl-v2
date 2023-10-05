@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow
 
@@ -13,7 +14,7 @@ class SlidingWindowAction(SpatialLevelAction):
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/sliding_window"
     )
     description = "Crop part of image with its annotations with sliding window algorithms."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -1,4 +1,5 @@
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow
 
@@ -11,7 +12,7 @@ class RotateAction(SpatialLevelAction):
     title = "Rotate"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rotate"
     description = "Rotate images and it's annotations."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

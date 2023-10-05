@@ -1,5 +1,6 @@
 import copy
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta, Polyline, AnyGeometry
@@ -24,7 +25,7 @@ class DropLinesByLengthAction(AnnotationAction):
     title = "Drop Lines by Length"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_lines_by_length"
     description = "Removes too long or to short lines."
-    md_description = get_layer_docs()
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
