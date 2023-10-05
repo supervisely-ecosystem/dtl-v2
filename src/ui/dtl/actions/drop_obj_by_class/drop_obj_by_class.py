@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -16,6 +14,7 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -24,15 +23,8 @@ class DropByClassAction(AnnotationAction):
     name = "drop_obj_by_class"
     title = "Drop by Class"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_obj_by_class"
-    description = "This layer (drop_obj_by_class) simply removes annotations of specified classes. You can also use data layer and map unnecessary classes to __ignore__."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Removes annotations of specified classes."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

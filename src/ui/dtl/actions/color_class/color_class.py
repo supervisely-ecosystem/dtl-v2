@@ -1,6 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Text
 from supervisely import ProjectMeta
@@ -9,24 +7,17 @@ from supervisely.imaging.color import hex2rgb, rgb2hex
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class ColorClassAction(AnnotationAction):
     name = "color_class"
     title = "Color Class"
-    description = "This layer (color_class) used for coloring classes as you wish. Add this class at the end of graph, before data saving."
+    description = "Use for coloring classes as you wish. Add this class at the end of graph, before data saving."
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/color_class"
     )
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

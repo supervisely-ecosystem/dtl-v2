@@ -1,6 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text
 from supervisely import ProjectMeta, TagMeta, Tag
@@ -9,22 +7,15 @@ from supervisely.annotation.tag_meta import TagValueType
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class TagAction(AnnotationAction):
     name = "tag"
     title = "Tag"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/tag"
-    description = "Tag layer (tag) adds or removes tags from images. Tags are used for several things, e.g. to split images by folders in save layers or to filter images by tag."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Add or remove tags from images."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

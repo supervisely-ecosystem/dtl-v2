@@ -1,38 +1,18 @@
 import json
 from typing import Optional
-import os
-from pathlib import Path
 
-import requests
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from supervisely.app.widgets import NodesFlow
+from src.ui.dtl.utils import get_layer_docs
 
 
 class SaveAction(OutputAction):
     name = "save"
     title = "Save"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save"
-    description = (
-        "Save layer (save) allows to export annotations and images. Annotations are "
-        "stored in .json files. Images are stored in .png or .jpg files (due to format"
-        " of source image). When exporting annotations, meta.json file containing all "
-        "used classes for project is also exported. Moreover, you can get visual "
-        "representations of all annotated objects on top of your images by setting "
-        "visualize to true."
-    )
-    md_description_url = (
-        "https://raw.githubusercontent.com/supervisely/docs/master/data-manipulation/dtl/save.md"
-    )
-    md_description = requests.get(md_description_url).text
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Export annotations and images to Team Files."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

@@ -1,4 +1,6 @@
 from typing import List, Literal, Union
+from pathlib import Path
+from os.path import realpath
 
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty
@@ -268,3 +270,13 @@ def get_set_settings_container(text: Text, button: Button):
 
 def get_set_settings_button_style():
     return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"
+
+def get_layer_docs():
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = Path(realpath(__file__)).parent.joinpath(p)
+        if p.exists():
+            with open(p) as f:
+                md_description = f.read()
+            break
+    return md_description

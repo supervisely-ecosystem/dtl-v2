@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -17,6 +15,7 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -27,15 +26,8 @@ class SplitMasksAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/split_masks"
     )
-    description = "This layer (split_masks) takes one bitmap annotation and split it into few bitmap masks if it contain non-connected components."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Split one Bitmap label into few labels if it contains non-connected components."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

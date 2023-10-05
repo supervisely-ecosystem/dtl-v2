@@ -1,12 +1,9 @@
 from typing import Optional
-import os
-from pathlib import Path
-
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-
+from src.ui.dtl.utils import get_layer_docs
 
 class BackgroundAction(AnnotationAction):
     name = "background"
@@ -14,15 +11,8 @@ class BackgroundAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/background"
     )
-    description = "This layer (background) adds background rectangle (size equals to image size) with custom class to image annotations. This layer is used to prepare data to train Neural Network for semantic segmentation."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Use to prepare data to train Neural Network for semantic segmentation."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

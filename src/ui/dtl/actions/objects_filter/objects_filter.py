@@ -1,6 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import (
@@ -17,7 +15,7 @@ from supervisely.app.widgets import (
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class ObjectsFilterAction(AnnotationAction):
@@ -26,15 +24,8 @@ class ObjectsFilterAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/objects_filter"
     )
-    description = "This layer (objects_filter) deletes annotations less (or greater) than specified size or percentage of image area."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Deletes labels with less (or greater) than specified size or percentage of image area."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

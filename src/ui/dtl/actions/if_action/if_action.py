@@ -1,6 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import (
     NodesFlow,
@@ -19,24 +17,15 @@ from supervisely import ProjectMeta
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class IfAction(OtherAction):
     name = "if"
     title = "If"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/if"
-    description = (
-        "This layer (if) is used to split input data to several flows with a specified criterion."
-    )
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Split input data to several flows with a specified criterion."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
 
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
@@ -17,6 +15,7 @@ from src.ui.dtl.utils import (
     set_classes_mapping_settings_from_json,
     get_set_settings_container,
     get_set_settings_button_style,
+    get_layer_docs
 )
 
 
@@ -26,15 +25,8 @@ class Bitmap2LinesAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bitmap2lines"
     )
-    description = "This layer (bitmap2lines) converts thinned (skeletonized) bitmaps to lines. It is extremely useful if you have some raster objects representing lines or edges, maybe forming some tree or net structure, and want to work with vector objects. Each input bitmap should be already thinned (use Skeletonize layer to do it), and for single input mask a number of lines will be produced. Resulting lines may have very many vertices, so consider applying Approx Vector layer to results of this layer. Internally the layer builds a graph of 8-connected pixels, determines minimum spanning tree(s), then greedely extracts diameters from connected components of the tree."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Converts thinned (skeletonized) bitmaps to lines. Use Skeletonize layer first."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

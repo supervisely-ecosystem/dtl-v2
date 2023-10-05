@@ -1,7 +1,5 @@
 from typing import Optional
 import json
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Text
 from supervisely import ProjectMeta
@@ -10,22 +8,15 @@ from supervisely.imaging.color import hex2rgb, rgb2hex
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class SaveMasksAction(OutputAction):
     name = "save_masks"
     title = "Save Masks"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save_masks"
-    description = "Save masks layer (save_masks) gives you an opportunity to get masked representations of data besides just images and annotations that you can get using save layer. It includes machine and human representations. In machine masks each of listed classes are colored in shades of gray that you specify. Note that black color [0, 0, 0] is automatically assigned with the background. In human masks you would get stacked original images with that images having class colors above."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Export annotations, masks and images to Team Files."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

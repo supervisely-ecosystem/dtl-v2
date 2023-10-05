@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
 
 from supervisely.app.widgets import (
@@ -25,6 +23,7 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -33,15 +32,8 @@ class DropNoiseAction(AnnotationAction):
     name = "drop_noise"
     title = "Drop Noise"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_noise_from_bitmap"
-    description = "This layer (drop_noise) removes connected components smaller than the specified size from bitmap annotations. This can be useful to eliminate noise after running neural network."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Removes connected components smaller than the specified size from bitmap annotations."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

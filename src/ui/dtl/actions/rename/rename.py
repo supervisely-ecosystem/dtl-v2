@@ -1,7 +1,5 @@
 from typing import Optional
 import copy
-import os
-from pathlib import Path
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
@@ -16,6 +14,7 @@ from src.ui.dtl.utils import (
     set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -24,15 +23,8 @@ class RenameAction(AnnotationAction):
     name = "rename"
     title = "Rename"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rename"
-    description = "This layer (rename) re-maps existing classes."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Rename existing classes."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

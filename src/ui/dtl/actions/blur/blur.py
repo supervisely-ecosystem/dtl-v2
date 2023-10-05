@@ -1,6 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import (
     NodesFlow,
@@ -16,22 +14,15 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class BlurAction(PixelLevelAction):
     name = "blur"
     title = "Blur"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/blur"
-    description = 'Blur layer ("action": "blur") applies blur filter to the image. To use median blur (cv2.medianBlur) set name to median and kernel to odd number. To use gaussian blur (cv2.GaussianBlur) set name to gaussian and sigma to object with two numbers: min and max.'
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = 'Applies blur filter to the image.'
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -1,28 +1,18 @@
 from typing import Optional
-import os
-from pathlib import Path
-
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
-
+from src.ui.dtl.utils import get_layer_docs
 
 class DatasetAction(OtherAction):
     name = "dataset"
     title = "Dataset"
     docs_url = (
-        "https://docs.supervisely.com/data-manipulation/index/transformation-layers/approx_vector"
+        "https://docs.supervisely.com/data-manipulation/index/transformation-layers/dataset"
     )
-    description = "This layer (dataset) places every image that it sees to dataset with a specified name. Put name of the future dataset in the field name."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Places every image that it sees to dataset with a specified name."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

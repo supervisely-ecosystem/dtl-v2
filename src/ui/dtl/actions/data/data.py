@@ -1,8 +1,5 @@
 from typing import List, Optional
 import copy
-import os
-from pathlib import Path
-import requests
 
 from supervisely.app.content import StateJson
 from supervisely.app.widgets import (
@@ -29,6 +26,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_set_settings_button_style,
     set_classes_mapping_settings_from_json,
+    get_layer_docs
 )
 
 
@@ -36,23 +34,12 @@ class DataAction(SourceAction):
     name = "data"
     title = "Data"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
-    description = "Data layer (data) is used to specify project and its datasets that will participate in data transformation process."
-    md_description_url = (
-        "https://raw.githubusercontent.com/supervisely/docs/master/data-manipulation/dtl/data.md"
-    )
-    md_description = requests.get(md_description_url).text
+    description = "Use to specify project and its datasets that will participate in data transformation process."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_inputs(self):
         return []
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

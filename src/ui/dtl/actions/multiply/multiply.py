@@ -1,26 +1,18 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs
 
 
 class MultiplyAction(SpatialLevelAction):
     name = "multiply"
     title = "Multiply"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/multiply"
-    description = "This layer (multiply) duplicates data (image + annotation)."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Duplicates data (image + annotation)."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

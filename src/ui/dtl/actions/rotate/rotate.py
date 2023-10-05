@@ -1,26 +1,17 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-
+from src.ui.dtl.utils import get_layer_docs
 
 class RotateAction(SpatialLevelAction):
     name = "rotate"
     title = "Rotate"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rotate"
-    description = "Rotate layer (rotate) rotates images and its annotations."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Rotate images and it's annotations."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

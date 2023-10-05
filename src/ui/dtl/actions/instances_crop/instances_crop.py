@@ -1,6 +1,4 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
 
 from supervisely import ProjectMeta
@@ -26,6 +24,7 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -33,18 +32,9 @@ import src.globals as g
 class InstancesCropAction(SpatialLevelAction):
     name = "instances_crop"
     title = "Instances Crop"
-    docs_url = (
-        "https://docs.supervisely.com/data-manipulation/index/transformation-layers/instances_crop"
-    )
-    description = "This layer (instances_crop) crops objects of specified classes from image with configurable padding. So from one image there can be produced multiple images, each with one target object: other objects are removed from crop."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/instances_crop"
+    description = "Crops objects of specified classes from image with configurable padding."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

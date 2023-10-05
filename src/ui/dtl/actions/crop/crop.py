@@ -1,7 +1,4 @@
 from typing import Optional
-import os
-from pathlib import Path
-
 from supervisely.app.widgets import (
     NodesFlow,
     Select,
@@ -18,22 +15,15 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs
 
 
 class CropAction(SpatialLevelAction):
     name = "crop"
     title = "Crop"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/crop"
-    description = "This layer (crop) is used to crop part of image with its annotations. This layer has several modes: it may crop fixed given part of image or random one."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Use to crop part of image with its annotations."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

@@ -1,27 +1,19 @@
 from typing import Optional
 import json
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs
 
 
 class SuperviselyAction(OutputAction):
     name = "supervisely"
     title = "Supervisely"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/supervisely"
-    description = "Supervisely layer (supervisely) stores results of data transformations to a new project in your workspace. Remember that you should specify a unique name to your output project. This output project will be created automatically. Supervisely layer doesn't need any settings so just leave this field blank."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Save results of data transformations to a new project in current workspace."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:

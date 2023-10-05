@@ -1,7 +1,5 @@
 from typing import Optional
 import copy
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
@@ -16,6 +14,7 @@ from src.ui.dtl.utils import (
     set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 import src.globals as g
 
@@ -23,20 +22,9 @@ import src.globals as g
 class FindContoursAction(AnnotationAction):
     name = "find_contours"
     title = "Find Contours"
-    docs_url = (
-        "https://docs.supervisely.com/data-manipulation/index/transformation-layers/find_contours"
-    )
-    description = (
-        "This layer (find_contours) extracts contours from bitmaps and stores results as polygons."
-    )
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/find_contours"
+    description = "Extracts contours from bitmaps and stores results as polygons."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

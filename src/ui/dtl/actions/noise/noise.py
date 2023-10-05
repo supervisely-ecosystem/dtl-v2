@@ -1,26 +1,18 @@
 from typing import Optional
-import os
-from pathlib import Path
 
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs
 
 
 class NoiseAction(PixelLevelAction):
     name = "noise"
     title = "Noise"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/noise"
-    description = "Noise layer (noise) adds noise of Gaussian distribution to the images."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Add gaussian noise to the images."
+    md_description = get_layer_docs()
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):

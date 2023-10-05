@@ -1,8 +1,5 @@
 from typing import Optional
 import copy
-import os
-from pathlib import Path
-
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
 from supervisely import ProjectMeta
 from supervisely import Polygon, Polyline, AnyGeometry
@@ -18,6 +15,7 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs
 )
 
 
@@ -27,15 +25,9 @@ class ApproxVectorAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/approx_vector"
     )
-    description = "This layer (approx_vector) approximates vector figures: lines and polygons. The operation decreases number of vertices with Douglas-Peucker algorithm."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Approximates vector figures: lines and polygons."
+    md_description = get_layer_docs()
+    
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
