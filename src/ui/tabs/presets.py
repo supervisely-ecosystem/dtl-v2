@@ -22,7 +22,6 @@ import src.utils as utils
 import src.globals as g
 from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
-from src.ui.dtl.utils import create_save_btn
 
 preset_name_input = Input(placeholder="Preset name")
 save_folder_selector = TeamFilesSelector(
