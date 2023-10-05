@@ -1,19 +1,48 @@
 # Flip
 
-`Flip` layer simply flips data (image + annotation) vertically or horizontally.
+`Flip` layer simply flips data (images + annotations) by vertical or horizontal axis.
+
+Supports flipping `bitmap`, `polygon`, `rectangle`, `point`, `polyline`, `graph` (`keypoint`) geometry types.
 
 ### Settings:
 
-- Axis:
-  - Possible values: "vertical" or "horizontal"
+- **axis** - Choose the axis along which the images with annotations will be flipped (`vertical` or `horizontal` axis).
 
-### Examples:
+### Example 1. Horizontal axis flip
 
-#### Axis: vertical
+Select `horizontal` axis in layer settings.
 
-Json config example:
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Flip axis: horizontal</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/5a89a164-7965-49ac-a749-d3a32b690dd0" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/143c010a-e225-4113-83d6-1f52064f0227" alt="Flip axis: horizontal" /> </td>
+</tr>
+</table>
 
-```json
+### Example 2. Vertical axis flip
+
+Select `vertical` axis in layer settings.
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Flip axis: vertical</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a44f0fe0-c7cb-488f-8831-44f41f92b506" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/c1d95d19-fc85-4e15-acf7-801172ff3e68" alt="Flip axis: vertical" /> </td>
+</tr>
+</table>
+
+### JSON view
+
+<details>
+  <summary>JSON view for vertical axis flip</summary>
+<pre>
 {
   "action": "flip",
   "src": ["$data1"],
@@ -22,32 +51,5 @@ Json config example:
     "axis": "vertical"
   }
 }
-```
-
-### Axis: horizontal
-
-Json config example:
-
-```json
-{
-  "action": "flip",
-  "src": ["$data1"],
-  "dst": "$data2",
-  "settings": {
-    "axis": "horizontal"
-  }
-}
-```
-
-<table>
-<tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Flip axis: vertical</strong></td>
-<td style="text-align:center"><strong>Flip axis: horizontal</strong></td>
-</tr>
-<tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ab85486c-84ce-4e32-9f82-84a22ff0a1c0" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/91fca97e-6e51-4966-a820-e6911a3cf545" alt="Crop type: Sides" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/2398e07c-058c-4e9c-b67d-2a8bb6845f72" alt="Crop type: Random part" /> </td>
-</tr>
-</table>
+</pre>
+</details>

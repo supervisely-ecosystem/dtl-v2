@@ -1,27 +1,12 @@
 # Multiply
 
-This action `multiplies` images by given value.
+`Multiply` layer duplicates the image and annotations (multiplying by a given value).
 
 ### Settings:
 
-- **Multiply number** (_int_ - multiply value)
+- **multiply** - Set the value to multiply by.
 
 ## Example:
-
-#### Multiply
-
-Json config example:
-
-```json
-{
-  "action": "multiply",
-  "src": ["$data_5"],
-  "dst": "$multiply_12",
-  "settings": {
-    "multiply": 2
-  }
-}
-```
 
 <table>
 <tr>
@@ -33,3 +18,20 @@ Json config example:
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a1b22351-c8b9-406e-8bce-37af6e13c2fa" alt="Multiply" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+  "action": "multiply",
+  "src": ["$data_5"],
+  "dst": "$multiply_12",
+  "settings": {
+    "multiply": 2
+  }
+}
+</pre>
+</details>

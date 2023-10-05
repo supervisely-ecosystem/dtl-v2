@@ -4,82 +4,16 @@
 
 #### Settings:
 
-- **rotate_angles**:
-  - **min_degrees** (_int_. Possible values: integer)
-  - **max_degrees** (_int_. Possible values: integer)
-- **black_regions**:
-  - **mode** (_str_. Possible values: `keep`, `crop`, `preserve_size`)
+- **rotate_angles** - Set the range of angles (`min_degrees` and `max_degrees`) to rotate the image.
+- **black_regions** - Set the `mode` to handle black regions (possible values: `keep`, `crop`, `preserve_size`).
 
-Each image will be rotated by a random angle (around the image center, CCW) with uniform distribution from `min_degrees` to `max_degrees`.You can:
+Each image will be rotated by a random angle (around the image center, CCW) with uniform distribution from `min_degrees` to `max_degrees`. You can:
 
 - keep original image data (`mode: keep`), then new regions will be filled with black color;
 - crop rotated result to exclude black regions (`mode: crop`);
 - crop rotated result to preserve original image size and scale of objects (`mode: preserve_size`);
 
 ### Examples:
-
-#### Rotated Image (min_degrees: -45, max_degrees: 45, mode: keep)
-
-Json config example:
-
-```json
-{
-  "action": "rotate",
-  "src": [],
-  "dst": "$rotate_5",
-  "settings": {
-    "rotate_angles": {
-      "min_degrees": -45,
-      "max_degrees": 45
-    },
-    "black_regions": {
-      "mode": "keep"
-    }
-  }
-}
-```
-
-#### Rotated Image (min_degrees: -45, max_degrees: 45, mode: crop)
-
-Json config example:
-
-```json
-{
-  "action": "rotate",
-  "src": [],
-  "dst": "$rotate_5",
-  "settings": {
-    "rotate_angles": {
-      "min_degrees": -45,
-      "max_degrees": 45
-    },
-    "black_regions": {
-      "mode": "crop"
-    }
-  }
-}
-```
-
-#### Rotated Image (min_degrees: -45, max_degrees: 45, mode: preserve_size)
-
-Json config example:
-
-```json
-{
-  "action": "rotate",
-  "src": [],
-  "dst": "$rotate_5",
-  "settings": {
-    "rotate_angles": {
-      "min_degrees": -45,
-      "max_degrees": 45
-    },
-    "black_regions": {
-      "mode": "crop"
-    }
-  }
-}
-```
 
 <table>
 <tr>
@@ -104,3 +38,25 @@ Json config example:
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/957f43f8-db5a-4644-9e4b-6d6a7a6e27f4" alt="Rotated Image. Mode: preserve_size" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+  "action": "rotate",
+  "src": [],
+  "dst": "$rotate_5",
+  "settings": {
+    "rotate_angles": {
+      "min_degrees": -45,
+      "max_degrees": 45
+    },
+    "black_regions": {
+      "mode": "keep"
+    }
+  }
+}
+</pre>
+</details>

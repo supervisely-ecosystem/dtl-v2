@@ -1,31 +1,13 @@
 # Noise
 
-Noise layer (`noise`) adds noise of Gaussian distribution to the images.
+`Noise` layer adds noise of Gaussian distribution to the images.
 
 ### Settings:
 
-- **Mean**:
-  - _int_. Possible values: number
-- **Spread**:
-  - _int_. Possible values: number
+- **mean** - Set value to specify the peak of the noise distribution.
+- **std** - Set value to increase the spread of the noise distribution.
 
 ### Example:
-
-#### Noise: Mean: 13, Spread: 65
-
-Json config example:
-
-```json
-{
-  "action": "noise",
-  "src": ["$data_5"],
-  "dst": "$noise_10",
-  "settings": {
-    "mean": 13,
-    "std": 65
-  }
-}
-```
 
 <table>
 <tr>
@@ -37,3 +19,20 @@ Json config example:
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/6005c07c-8f5f-41da-8e69-c415c6191f58" alt="Noise: Mean" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+  "action": "noise",
+  "src": ["$data_5"],
+  "dst": "$noise_10",
+  "settings": {
+    "mean": 13,
+    "std": 65
+  }
+}
+</pre>
+</details>

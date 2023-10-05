@@ -1,32 +1,13 @@
 # Skeletonize
 
-Layer extracts skeletons from bitmap figures.
+`Skeletonize` layer extracts skeletons from bitmap figures.
 
 ### Settings
 
-- **Select classes** (only bitmap classes are allowed)
-- **Skeletonization methods**:
-  - **Skelitonization**
-  - **Medial Axis**
-  - **Thinning**
+**classes** - list of classes to apply transformation. Only classes with shape `bitmap` are allowed.
+**method** - algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
 
 ### Example
-
-```json
-{
-    "action": "skeletonize",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$skeletonize_15",
-    "settings": {
-        "classes": [
-            "Squirrel"
-        ],
-        "method": "skeletonization"
-    }
-}
-```
 
 <table>
 <tr>
@@ -38,3 +19,25 @@ Layer extracts skeletons from bitmap figures.
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/7dae7e72-2e71-4b08-a318-ab5a270a8fb7" alt="Skeletonized image" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+<details>
+  <summary>JSON view</summary>
+```json
+{
+    "action": "skeletonize",
+    "src": [
+        "$data_12"
+    ],
+    "dst": "$skeletonize_15",
+    "settings": {
+        "classes": [
+            "Cat",
+            "Squirrel"
+        ],
+        "method": "skeletonization"
+    }
+}
+```
+</details>

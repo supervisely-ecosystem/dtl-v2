@@ -1,46 +1,15 @@
 # Blur
 
-Layer for blurring the image by applying a Gaussian or median filter.
+`Blur` layer for blurring the image by applying a Gaussian or median filter.
 
 ### Settings:
 
-- **Blur type**:
-  - Median
-    settings: Kernel size (_positive odd integer_)
-  - Gaussian
-    settings: Sigma (_positive float_)
+**Blur type** - Choose between Gaussian and Median blur.
+
+- **Gaussian**: set sigma min and max values.
+- **Median**: set kernel size.
 
 ### Examples:
-
-Json config examples:
-
-#### Gaussian blur
-
-```json
-{
-  "action": "blur",
-  "src": ["$data1"],
-  "dst": "$data2",
-  "settings": {
-    "blur_type": "gaussian",
-    "sigma": { "min": 4, "max": 6 }
-  }
-}
-```
-
-#### Median blur
-
-```json
-{
-  "action": "blur",
-  "src": ["$data1"],
-  "dst": "$data2",
-  "settings": {
-    "blur_type": "Median",
-    "kernel_size": 65
-  }
-}
-```
 
 <table>
 <tr>
@@ -54,3 +23,35 @@ Json config examples:
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ed4e54ac-4ddc-4e06-8564-b53aae2d33d2" alt="Median, kernel size: 65" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+<details>
+  <summary>JSON view for Gaussian blur</summary>
+<pre>
+{
+  "action": "blur",
+  "src": ["$data1"],
+  "dst": "$data2",
+  "settings": {
+    "blur_type": "gaussian",
+    "sigma": { "min": 4, "max": 6 }
+  }
+}
+</pre>
+</details>
+
+<details>
+  <summary>JSON view for Median blur</summary>
+<pre>
+{
+  "action": "blur",
+  "src": ["$data1"],
+  "dst": "$data2",
+  "settings": {
+    "blur_type": "Median",
+    "kernel_size": 65
+  }
+}
+</pre>
+</details>

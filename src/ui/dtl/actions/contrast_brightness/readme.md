@@ -4,61 +4,11 @@
 
 ### Settings:
 
-- **Contrast (optional)**:
-  - min (type: _float_, minimum: 0, maximum: 10)
-  - max (type: _float_, minimum: 0, maximum: 10)
-  - center_grey (type: boolean, default: false)
-- **Brightness (optional)**:
-  - min (type: _float_, minimum: -255, maximum: 255)
-  - max (type: _float_, minimum: -255, maximum: 255)
+- **contrast** - Set `min` and `max` values for contrast. Image contrast is changed by multiplying each pixel by random value with uniform distribution from min to max. To center colors of images (subtract 128) first, set `center_grey` to `true`.
+- **brightness** - Set `min` and `max` values for brightness. Image brightness is changed by adding to each pixel a random value with uniform distribution from min to max.
+
 
 ### Examples:
-
-#### Contrast: 6-8, center_grey: true, Brightness: 0-0
-
-Json config example:
-
-```json
-{
-  "action": "contrast_brightness",
-  "src": ["$data_5"],
-  "dst": "$contrast_brightness_9",
-  "settings": {
-    "contrast": {
-      "min": 6,
-      "max": 8,
-      "center_grey": true
-    },
-    "brightness": {
-      "min": 0,
-      "max": 0
-    }
-  }
-}
-```
-
-#### Contrast: 1-1, center_grey: false, Brightness: 60-110
-
-Json config example:
-
-```json
-{
-  "action": "contrast_brightness",
-  "src": ["$data_5"],
-  "dst": "$contrast_brightness_9",
-  "settings": {
-    "contrast": {
-      "min": 0,
-      "max": 0,
-      "center_grey": false
-    },
-    "brightness": {
-      "min": 60,
-      "max": 110
-    }
-  }
-}
-```
 
 <table>
 <tr>
@@ -72,3 +22,27 @@ Json config example:
 <td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ff1afc6e-94cf-4a3b-a414-7e345ec44057" alt="Brightness" /> </td>
 </tr>
 </table>
+
+### JSON view
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+  "action": "contrast_brightness",
+  "src": ["$data_5"],
+  "dst": "$contrast_brightness_9",
+  "settings": {
+    "contrast": {
+      "min": 6,
+      "max": 8,
+      "center_grey": true
+    },
+    "brightness": {
+      "min": 60,
+      "max": 110
+    }
+  }
+}
+</pre>
+</details>
