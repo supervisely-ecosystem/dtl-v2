@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Optional
 import random
@@ -63,6 +64,7 @@ class Layer:
             ),
         )
         # preview option
+        self._preview_img_path = f"{g.STATIC_DIR}/{self.id}.jpg"
         self._preview_img_url = f"static/{self.id}.jpg"
         self._ann = None
         self._img_desc = None
@@ -184,11 +186,12 @@ class Layer:
 
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
         self._img_desc = img_desc
-        write_image(self._preview_img_url, img_desc.read_image())
+        write_image(self._preview_img_path, img_desc.read_image())
         self._ann = ann
         self._preview_widget.set(
             title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._ann
         )
+        os.environ["_SUPERVISELY_OFFLINE_FILES_UPLOADED"] = "False"
 
     def set_preview_loading(self, val: bool):
         self._preview_widget.loading = val
