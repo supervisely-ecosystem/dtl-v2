@@ -222,14 +222,23 @@ def classes_list_settings_changed_meta(
 
 
 def set_classes_list_preview(
-    classes_list_widget: ClassesList,
+    classes_list_widget: Union[ClassesList, ClassesMapping],
     classes_list_preview_widget: ClassesListPreview,
     classes_list_settings: Union[list, str],
 ):
     if isinstance(classes_list_settings, str):
+        if classes_list_settings == "default":
+            if isinstance(classes_list_widget, ClassesMapping):
+                classes_list_preview_widget.set(classes_list_widget.get_classes())
+            else:
+                classes_list_preview_widget.set(classes_list_widget.get_all_classes())
+            return
         names = [classes_list_settings]
+    elif isinstance(classes_list_settings, dict):
+        names = [name for name in classes_list_settings.keys() if name != "__other__"]
     else:
         names = classes_list_settings
+
     obj_classes = classes_list_widget.get_all_classes()
     classes_list_preview_widget.set(
         [obj_class for obj_class in obj_classes if obj_class.name in names]
@@ -237,10 +246,15 @@ def set_classes_list_preview(
 
 
 def set_classes_list_settings_from_json(
-    classes_list_widget: ClassesList, settings: Union[list, str]
+    classes_list_widget: ClassesList, settings: Union[list, dict, str]
 ):
     if isinstance(settings, str):
+        if settings == "default":
+            classes_list_widget.select_all()
+            return
         settings = [settings]
+    elif isinstance(settings, dict):
+        settings = [name for name in settings.keys() if name != "__other__"]
     classes_list_widget.select(settings)
 
 
@@ -270,12 +284,16 @@ def get_set_settings_container(text: Text, button: Button):
 def get_set_settings_button_style():
     return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"
 
+
 # Sidebar action options utils
+
 
 def create_save_btn() -> Button:
     return Button("Save", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();")
 
+
 # Layer docs utils
+
 
 def get_layer_docs(layer_dir: str) -> str:
     md_description = ""

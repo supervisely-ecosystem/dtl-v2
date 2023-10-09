@@ -58,7 +58,7 @@ class Layer:
         self._info_option = NodesFlow.Node.Option(
             name="sidebarNodeInfo",
             option_component=NodesFlow.SidebarNodeInfoOptionComponent(
-                sidebar_template=Markdown(md_description).to_html(),
+                sidebar_template=Markdown(md_description, show_border=False).to_html(),
                 sidebar_width=600,
             ),
         )
