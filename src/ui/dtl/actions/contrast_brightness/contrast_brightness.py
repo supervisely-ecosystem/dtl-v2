@@ -1,11 +1,12 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Slider, Text
+from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
+
 
 class ContrastBrightnessAction(PixelLevelAction):
     name = "contrast_brightness"
@@ -25,9 +26,22 @@ class ContrastBrightnessAction(PixelLevelAction):
             value=[1, 1],
             range=True,
         )
+        contrast_checkbox = Checkbox("Contrast")
+        center_grey_checkbox = Checkbox("Center grey")
+        center_grey_checkbox.disable()
+
+        brightness_checkbox = Checkbox("Brightness")
         brightness_slider = Slider(min=-255, max=255, step=1, value=[0, 0], range=True)
         contrast_preview_widget = Text("min: 1 - max: 1")
         brightness_preview_widget = Text("min: 0 - max: 0")
+
+        @contrast_checkbox.value_changed
+        def contrast_checkbox_value_changed(is_checked):
+            if is_checked:
+                center_grey_checkbox.enable()
+            else:
+                center_grey_checkbox.uncheck()
+                center_grey_checkbox.disable()
 
         @contrast_slider.value_changed
         def contrast_slider_value_changed(value):
@@ -41,15 +55,13 @@ class ContrastBrightnessAction(PixelLevelAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             settings = {}
 
-            if options_json["Contrast"]:
+            if contrast_checkbox.is_checked():
                 contrast_min, contrast_max = contrast_slider.get_value()
                 settings["contrast"] = {
                     "min": contrast_min,
                     "max": contrast_max,
-                    "center_grey": options_json[
-                        "Center grey. Center colors of images (subtract 128) first"
-                    ]
-                    if options_json["Center grey. Center colors of images (subtract 128) first"]
+                    "center_grey": center_grey_checkbox.is_checked()
+                    if center_grey_checkbox.is_checked()
                     else False,
                 }
             else:
@@ -58,7 +70,7 @@ class ContrastBrightnessAction(PixelLevelAction):
                     "max": 1,
                     "center_grey": False,
                 }
-            if options_json["Brightness"]:
+            if brightness_checkbox.is_checked():
                 brightness_min, brightness_max = brightness_slider.get_value()
                 settings["brightness"] = {
                     "min": brightness_min,
@@ -93,13 +105,11 @@ class ContrastBrightnessAction(PixelLevelAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Contrast",
-                    option_component=NodesFlow.CheckboxOptionComponent(default_value=contrast_val),
+                    option_component=NodesFlow.WidgetOptionComponent(contrast_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="Center grey. Center colors of images (subtract 128) first",
-                    option_component=NodesFlow.CheckboxOptionComponent(
-                        default_value=center_grey_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(center_grey_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="contrast_preview",
@@ -115,9 +125,7 @@ class ContrastBrightnessAction(PixelLevelAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Brightness",
-                    option_component=NodesFlow.CheckboxOptionComponent(
-                        default_value=brightness_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(brightness_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="brightness_preview",
