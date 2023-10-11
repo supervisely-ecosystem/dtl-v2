@@ -29,6 +29,7 @@ from supervisely.app.widgets import (
     Text,
     ClassesTable,
     ProjectThumbnail,
+    ObjectClassesList,
 )
 
 
@@ -69,7 +70,7 @@ class DataAction(SourceAction):
         )
         src_preview_widget_text = Text("")
         src_preview_widget_text.hide()
-        src_preview_widget_thumbnail = ProjectThumbnail()
+        src_preview_widget_thumbnail = ProjectThumbnail(remove_margins=True)
         src_preview_widget_thumbnail.hide()
         src_preview_widget = Container(
             widgets=[src_preview_widget_thumbnail, src_preview_widget_text]
@@ -99,7 +100,7 @@ class DataAction(SourceAction):
         classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button(
-            "Set Default", button_type="info", icon="zmdi zmdi-refresh"
+            "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
         )
         classes_mapping_preview = ClassesListPreview()
         classes_mapping_widgets_container = Container(
@@ -156,16 +157,28 @@ class DataAction(SourceAction):
         def _save_src():
             def read_src_from_widget():
                 # get_list and compare ids
-                ids = select_datasets.get_selected_ids()
-                if ids is None or len(ids) == 0 or ids[0] is None:
-                    ids = []
+                selected_dataset_ids = select_datasets.get_selected_ids()
+                project_id = select_datasets.get_selected_project_id()
+                datasets = []
+                if project_id is not None:
+                    datasets = g.api.dataset.get_list(project_id)
+
                 project_info = None
+                if (
+                    selected_dataset_ids is None
+                    or len(selected_dataset_ids) == 0
+                    or selected_dataset_ids[0] is None  # ?
+                ):
+                    selected_dataset_ids = []
+
+                if project_id is not None:
+                    project_info = g.api.project.get_info_by_id(project_id)
+
                 dataset_names = []
-                for id in ids:
-                    dataset_info = utils.get_dataset_by_id(id=id)
-                    if project_info is None:
-                        project_info = utils.get_project_by_id(id=dataset_info.project_id)
-                    dataset_names.append(dataset_info.name)
+                for ds in datasets:
+                    if ds.id in selected_dataset_ids:
+                        dataset_names.append(ds.name)
+
                 if project_info is None:
                     return None, []
                 if project_info.datasets_count == len(dataset_names):
