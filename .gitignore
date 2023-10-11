@@ -5,3 +5,4 @@ local.env
 /supervisely
 /sly_task_data
 # /static
+.DS_Store
