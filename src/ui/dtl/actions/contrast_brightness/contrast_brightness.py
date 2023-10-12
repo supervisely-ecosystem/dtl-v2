@@ -1,7 +1,7 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox, Switch
+from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox, Switch, Flexbox
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
@@ -20,6 +20,7 @@ class ContrastBrightnessAction(PixelLevelAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         # region contrast-widgets
         contrast_switch = Switch()
+        contrast_content = Flexbox([Text("Contrast"), contrast_switch])
 
         contrast_slider = Slider(
             min=0,
@@ -56,7 +57,8 @@ class ContrastBrightnessAction(PixelLevelAction):
 
         # region brightness-widgets
 
-        brightness_switch = Switch(on_text="Brightness", off_text="Brightness", width=100)
+        brightness_switch = Switch()
+        brightness_content = Flexbox([Text("Brightness"), brightness_switch])
 
         brightness_slider = Slider(min=-255, max=255, step=1, value=[0, 0], range=True)
         brightness_slider.hide()
@@ -133,7 +135,7 @@ class ContrastBrightnessAction(PixelLevelAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Contrast",
-                    option_component=NodesFlow.WidgetOptionComponent(contrast_switch),
+                    option_component=NodesFlow.WidgetOptionComponent(contrast_content),
                 ),
                 NodesFlow.Node.Option(
                     name="Center grey. Center colors of images (subtract 128) first",
@@ -153,7 +155,7 @@ class ContrastBrightnessAction(PixelLevelAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Brightness",
-                    option_component=NodesFlow.WidgetOptionComponent(brightness_switch),
+                    option_component=NodesFlow.WidgetOptionComponent(brightness_content),
                 ),
                 NodesFlow.Node.Option(
                     name="brightness_preview",
