@@ -22,18 +22,20 @@ class ContrastBrightnessAction(PixelLevelAction):
         contrast_switch = Switch()
         contrast_content = Flexbox([Text("Contrast"), contrast_switch])
 
+        DEFAULT_CONTRAST = [0, 1]
+
         contrast_slider = Slider(
             min=0,
             max=10,
             step=0.1,
-            value=[1, 1],
+            value=DEFAULT_CONTRAST,
             range=True,
         )
         contrast_slider.hide()
 
         center_grey_checkbox = Checkbox("Center grey")
         center_grey_checkbox.hide()
-        contrast_preview_widget = Text("min: 1 - max: 1")
+        contrast_preview_widget = Text(f"min: {DEFAULT_CONTRAST[0]} - max: {DEFAULT_CONTRAST[1]}")
         contrast_preview_widget.hide()
 
         @contrast_switch.value_changed
@@ -60,10 +62,14 @@ class ContrastBrightnessAction(PixelLevelAction):
         brightness_switch = Switch()
         brightness_content = Flexbox([Text("Brightness"), brightness_switch])
 
-        brightness_slider = Slider(min=-255, max=255, step=1, value=[0, 0], range=True)
+        DEFAULT_BRIGHTNESS = [-20, 20]
+
+        brightness_slider = Slider(min=-255, max=255, step=1, value=DEFAULT_BRIGHTNESS, range=True)
         brightness_slider.hide()
 
-        brightness_preview_widget = Text("min: 0 - max: 0")
+        brightness_preview_widget = Text(
+            f"min: {DEFAULT_BRIGHTNESS[0]} - max: {DEFAULT_BRIGHTNESS[1]}"
+        )
         brightness_preview_widget.hide()
 
         @brightness_switch.value_changed
@@ -115,8 +121,7 @@ class ContrastBrightnessAction(PixelLevelAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             contrast_val = False
-            contrast_min_val = 1
-            contrast_max_val = 1
+            contrast_min_val, contrast_max_val = contrast_slider.get_value()
             center_grey_val = False
             if "contrast" in settings:
                 contrast_val = True
@@ -125,8 +130,7 @@ class ContrastBrightnessAction(PixelLevelAction):
                 center_grey_val = settings["contrast"].get("center_grey", False)
             contrast_slider.set_value([contrast_min_val, contrast_max_val])
             brightness_val = False
-            brightness_min_val = 0
-            brightness_max_val = 0
+            brightness_min_val, brightness_max_val = brightness_slider.get_value()
             if "brightness" in settings:
                 brightness_val = True
                 brightness_min_val = settings["brightness"].get("min", 0)
