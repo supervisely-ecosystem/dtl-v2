@@ -1,19 +1,20 @@
 <link rel="stylesheet" href="./static/css/py-layer-card-widget.css" />
 
-<div
-  draggable
-  @dragstart="(evt)=>{
+<div draggable @dragstart="(evt)=>{
         evt.dataTransfer.dropEffect = 'move';
         evt.dataTransfer.effectAllowed = 'move';
         evt.dataTransfer.setData('itemId', '{{{widget._key}}}');
-    }"
-  class="py-layer-card-widget"
->
-  <i
-    :class="data.{{{widget.widget_id}}}.icon"
-    :style="{ 'padding': '10px', 'color': data.{{{widget.widget_id}}}.color }"
-  ></i>
-  {{data.{{{widget.widget_id}}}.name}}
-  <i class="zmdi zmdi-help-outline" style="padding: 10px"></i>
-  {{{widget._add_button}}}
+    }" class="py-layer-card-widget">
+
+  <div>
+    <i :class="data.{{{widget.widget_id}}}.icon"
+      :style="{ 'padding': '10px', 'color': data.{{{widget.widget_id}}}.color }"></i>
+    {{data.{{{widget.widget_id}}}.name}}
+    <i class="zmdi zmdi-help-outline" style="padding: 10px; color:gray"></i>
+  </div>
+
+  <div class="mr5">
+    {{{widget._add_button}}}
+    <i class="zmdi zmdi-view-headline" style="color:gray"></i>
+  </div>
 </div>

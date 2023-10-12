@@ -17,10 +17,10 @@ class NoiseAction(PixelLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        mean_text = Text("Mean")
+        mean_text = Text("Mean", status="text")
         mean_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True)
 
-        spread_text = Text("Spread")
+        spread_text = Text("Spread", status="text")
         spread_input = InputNumber(value=50.000, step=0.1, controls=True)
 
         def get_settings(options_json: dict) -> dict:

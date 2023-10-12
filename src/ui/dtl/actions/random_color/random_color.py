@@ -1,11 +1,12 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Text, Slider
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
+
 
 class RandomColorsAction(AnnotationAction):
     name = "random_color"
@@ -18,24 +19,26 @@ class RandomColorsAction(AnnotationAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        color_strength_text = Text("Strength", status="text")
+        color_strength_slider = Slider(
+            value=0, min=0, max=1, step=0.01, show_input=True, show_input_controls=True
+        )
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
-                "strength": options_json["strength"],
+                "strength": color_strength_slider.get_value(),
             }
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            str_val = settings.get("strength", 0.25)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="strength_text",
-                    option_component=NodesFlow.TextOptionComponent("Strength"),
+                    option_component=NodesFlow.WidgetOptionComponent(color_strength_text),
                 ),
                 NodesFlow.Node.Option(
                     name="strength",
-                    option_component=NodesFlow.SliderOptionComponent(
-                        min=0, max=1, default_value=str_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(color_strength_slider),
                 ),
             ]
             return {

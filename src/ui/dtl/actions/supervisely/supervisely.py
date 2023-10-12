@@ -2,7 +2,7 @@ from typing import Optional
 import json
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Text, Input
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
@@ -18,8 +18,11 @@ class SuperviselyAction(OutputAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
+        sly_project_name_text = Text("Destination", status="text")
+        sly_project_name_input = Input(value="", size="small")
+
         def get_dst(options_json: dict) -> dict:
-            dst = options_json.get("dst", None)
+            dst = sly_project_name_input.get_value()
             if dst is None or dst == "":
                 return []
             if dst[0] == "[":
@@ -30,17 +33,14 @@ class SuperviselyAction(OutputAction):
             return dst
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            try:
-                dst_value = dst[0]
-            except IndexError:
-                dst_value = ""
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
-                    option_component=NodesFlow.TextOptionComponent("Destination"),
+                    option_component=NodesFlow.WidgetOptionComponent(sly_project_name_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="dst", option_component=NodesFlow.InputOptionComponent(dst_value)
+                    name="dst",
+                    option_component=NodesFlow.WidgetOptionComponent(sly_project_name_input),
                 ),
             ]
             return {

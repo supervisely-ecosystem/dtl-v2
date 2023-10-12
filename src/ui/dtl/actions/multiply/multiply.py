@@ -1,7 +1,7 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, InputNumber, Text
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
@@ -17,24 +17,24 @@ class MultiplyAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        multiply_text = Text("Multiply number", status="text")
+        multiply_input = InputNumber(value=12, step=1, controls=True)
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
-                "multiply": options_json["multiply"],
+                "multiply": multiply_input.get_value(),
             }
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            multiply_val = settings.get("multiply", 1)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="multiply_text",
-                    option_component=NodesFlow.TextOptionComponent("Multiply number"),
+                    option_component=NodesFlow.WidgetOptionComponent(multiply_text),
                 ),
                 NodesFlow.Node.Option(
                     name="multiply",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=multiply_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(multiply_input),
                 ),
             ]
             return {

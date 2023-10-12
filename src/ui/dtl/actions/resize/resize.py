@@ -1,7 +1,7 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, InputNumber, Text, Checkbox
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
@@ -17,11 +17,19 @@ class ResizeAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        width_text = Text("Width", status="text")
+        width_input = InputNumber(value=3, step=1, controls=True)
+
+        height_text = Text("Height", status="text")
+        height_input = InputNumber(value=3, step=1, controls=True)
+
+        keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            keep_aspect_ratio = bool(options_json["Keep aspect ratio"])
-            width = options_json["width"]
-            height = options_json["height"]
+            keep_aspect_ratio = keep_aspect_ratio_checkbox.is_checked()
+            width = width_input.get_value()
+            height = height_input.get_value()
             if width * height == 0:
                 raise ValueError("Width and Height must be positive")
             if not keep_aspect_ratio:
@@ -42,35 +50,26 @@ class ResizeAction(SpatialLevelAction):
             }
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            width_val = settings.get("width", 1)
-            height_val = settings.get("height", 1)
-            keep_aspect_ratio = settings.get("aspect_ratio", {}).get("keep", False)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="width_text",
-                    option_component=NodesFlow.TextOptionComponent("Width"),
+                    option_component=NodesFlow.WidgetOptionComponent(width_text),
                 ),
                 NodesFlow.Node.Option(
                     name="width",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=-1, default_value=width_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(width_input),
                 ),
                 NodesFlow.Node.Option(
                     name="height_text",
-                    option_component=NodesFlow.TextOptionComponent("Height"),
+                    option_component=NodesFlow.WidgetOptionComponent(height_text),
                 ),
                 NodesFlow.Node.Option(
                     name="height",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=-1, default_value=height_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(height_input),
                 ),
                 NodesFlow.Node.Option(
                     name="Keep aspect ratio",
-                    option_component=NodesFlow.CheckboxOptionComponent(
-                        default_value=keep_aspect_ratio
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(keep_aspect_ratio_checkbox),
                 ),
             ]
             return {

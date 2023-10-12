@@ -1,4 +1,4 @@
-from supervisely.app.widgets import Widget, Button
+from supervisely.app.widgets import Widget, Button, Icons
 
 
 class LayerCard(Widget):

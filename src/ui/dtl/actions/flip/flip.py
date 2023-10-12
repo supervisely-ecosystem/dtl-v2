@@ -1,11 +1,12 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Select, Text
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
+
 
 class FlipAction(SpatialLevelAction):
     name = "flip"
@@ -16,29 +17,28 @@ class FlipAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        axis_text = Text("Axis", status="text")
+        axis_selector_items = [
+            Select.Item("vertical", "Vertical"),
+            Select.Item("horizontal", "Horizontal"),
+        ]
+        axis_selector = Select(items=axis_selector_items, size="small")
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
-                "axis": options_json["axis"],
+                "axis": axis_selector.get_value(),
             }
 
-        axis_option_items = [
-            NodesFlow.SelectOptionComponent.Item("vertical", "Vertical"),
-            NodesFlow.SelectOptionComponent.Item("horizontal", "Horizontal"),
-        ]
-
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            axis_val = settings.get("axis", "vertical")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="axis_text",
-                    option_component=NodesFlow.TextOptionComponent("Axis"),
+                    option_component=NodesFlow.WidgetOptionComponent(axis_text),
                 ),
                 NodesFlow.Node.Option(
                     name="axis",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        axis_option_items, default_value=axis_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(axis_selector),
                 ),
             ]
             return {
