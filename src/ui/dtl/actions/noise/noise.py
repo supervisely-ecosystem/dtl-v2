@@ -18,10 +18,10 @@ class NoiseAction(PixelLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         mean_text = Text("Mean", status="text")
-        mean_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True)
+        mean_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True, size="small")
 
         spread_text = Text("Spread", status="text")
-        spread_input = InputNumber(value=50.000, step=0.1, controls=True)
+        spread_input = InputNumber(value=50.000, step=0.1, controls=True, size="small")
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

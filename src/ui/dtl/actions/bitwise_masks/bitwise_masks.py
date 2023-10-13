@@ -2,7 +2,7 @@ import copy
 from os.path import realpath, dirname
 from typing import Optional
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select
 from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
@@ -16,7 +16,7 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
 )
 from src.exceptions import BadSettingsError
 import src.globals as g
@@ -33,6 +33,12 @@ class BitwiseMasksAction(AnnotationAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        operation_type_text = Text("Operation type", status="text")
+        operation_type_selector = Select(
+            [Select.Item("nor", "nor"), Select.Item("and", "and"), Select.Item("or", "or")],
+            size="small",
+        )
+
         _current_meta = ProjectMeta()
         class_mask_widget = ClassesList()
         classes_to_correct_widget = ClassesList(multiple=True)
@@ -140,7 +146,7 @@ class BitwiseMasksAction(AnnotationAction):
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
-                "type": options_json["type"],
+                "type": operation_type_selector.get_value(),
                 "class_mask": saved_class_mask_settings,
                 "classes_to_correct": saved_classes_to_correct_settings,
             }
@@ -231,25 +237,17 @@ class BitwiseMasksAction(AnnotationAction):
             _set_classes_to_correct_preview()
             g.updater("metas")
 
-        type_items = [NodesFlow.SelectOptionComponent.Item(t, t) for t in ("nor", "and", "or")]
-
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            type_val = settings.get("type", "nor")
-            if type_val not in ("nor", "and", "or"):
-                raise BadSettingsError("Type must be one of: nor, and, or")
-
             _set_settings_from_json(settings)
 
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="type_text",
-                    option_component=NodesFlow.TextOptionComponent("Operation type"),
+                    name="operation_type_text",
+                    option_component=NodesFlow.WidgetOptionComponent(operation_type_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="type",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=type_items, default_value=type_val
-                    ),
+                    name="operation_type_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(operation_type_selector),
                 ),
                 NodesFlow.Node.Option(
                     name="Select Class Mask",

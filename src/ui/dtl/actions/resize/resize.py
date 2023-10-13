@@ -56,7 +56,7 @@ class ResizeAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(width_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="width",
+                    name="width_input",
                     option_component=NodesFlow.WidgetOptionComponent(width_input),
                 ),
                 NodesFlow.Node.Option(
@@ -64,11 +64,11 @@ class ResizeAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(height_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="height",
+                    name="height_input",
                     option_component=NodesFlow.WidgetOptionComponent(height_input),
                 ),
                 NodesFlow.Node.Option(
-                    name="Keep aspect ratio",
+                    name="keep_aspect_ratio_checkbox",
                     option_component=NodesFlow.WidgetOptionComponent(keep_aspect_ratio_checkbox),
                 ),
             ]

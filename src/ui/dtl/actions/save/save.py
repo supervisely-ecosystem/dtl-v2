@@ -18,7 +18,7 @@ class SaveAction(OutputAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         save_path_text = Text("Destination", status="text")
-        save_path_input = Input(value="", size="small")
+        save_path_input = Input(value="", placeholder="Enter Team Files path", size="small")
         visualize_checkbox = Checkbox("Visualize")
 
         def get_settings(options_json: dict) -> dict:

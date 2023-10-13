@@ -1,7 +1,7 @@
 from typing import Optional
 from os.path import realpath, dirname
 import copy
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber
 from supervisely import ProjectMeta
 from supervisely import Polygon, Polyline, AnyGeometry
 
@@ -17,7 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
 )
 
 
@@ -29,7 +29,6 @@ class ApproxVectorAction(AnnotationAction):
     )
     description = "Approximates vector figures: lines and polygons."
     md_description = get_layer_docs(dirname(realpath(__file__)))
-    
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -62,6 +61,9 @@ class ApproxVectorAction(AnnotationAction):
         classes_list_edit_container = get_set_settings_container(
             classes_list_edit_text, classes_list_edit_btn
         )
+
+        epsilon_text = Text("Epsilon", status="text")
+        episilon_input = InputNumber(value=3, step=1, controls=True, size="small")
 
         saved_classes_settings = []
         default_classes_settings = []
@@ -114,7 +116,7 @@ class ApproxVectorAction(AnnotationAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes": saved_classes_settings,
-                "epsilon": options_json["epsilon"],
+                "epsilon": episilon_input.get_value(),
             }
 
         def _set_settings_from_json(settings: dict):
@@ -146,9 +148,6 @@ class ApproxVectorAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            epsilon_val = settings.get("epsilon", 3)
-            if epsilon_val < 1:
-                raise ValueError("Epsilon must be greater than 0")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
@@ -166,13 +165,11 @@ class ApproxVectorAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="epsilon_text",
-                    option_component=NodesFlow.TextOptionComponent("Epsilon"),
+                    option_component=NodesFlow.WidgetOptionComponent(epsilon_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="epsilon",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=epsilon_val
-                    ),
+                    name="episilon_input",
+                    option_component=NodesFlow.WidgetOptionComponent(episilon_input),
                 ),
             ]
             return {

@@ -2,14 +2,19 @@ from typing import Optional
 import json
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Text, Input, Checkbox
 from supervisely import ProjectMeta
 from supervisely.imaging.color import hex2rgb, rgb2hex
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesColorMapping, ClassesMappingPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+)
 
 
 class SaveMasksAction(OutputAction):
@@ -22,6 +27,13 @@ class SaveMasksAction(OutputAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         _current_meta = ProjectMeta()
+
+        destination_text = Text("Destination", status="text")
+        destination_input = Input(value="", placeholder="Enter Team Files path", size="small")
+
+        add_human_masks_checkbox = Checkbox("Add human masks")
+        add_machine_masks_checkbox = Checkbox("Add machine masks")
+
         human_classes_colors = ClassesColorMapping()
         machine_classes_colors = ClassesColorMapping()
         human_classes_colors_preview = ClassesMappingPreview()
@@ -47,6 +59,8 @@ class SaveMasksAction(OutputAction):
         human_masks_edit_container = get_set_settings_container(
             human_masks_edit_text, human_masks_edit_btn
         )
+        human_masks_edit_container.hide()
+
         machine_masks_edit_text = Text("Machine Masks")
         machine_masks_edit_btn = Button(
             text="EDIT",
@@ -59,9 +73,24 @@ class SaveMasksAction(OutputAction):
         machine_masks_edit_container = get_set_settings_container(
             machine_masks_edit_text, machine_masks_edit_btn
         )
+        machine_masks_edit_container.hide()
 
         saved_human_classes_colors_settings = {}
         saved_machine_classes_colors_settings = {}
+
+        @add_human_masks_checkbox.value_changed
+        def on_human_masks_checkbox_changed(is_checked):
+            if is_checked:
+                human_masks_edit_container.show()
+            else:
+                human_masks_edit_container.hide()
+
+        @add_machine_masks_checkbox.value_changed
+        def on_machine_masks_checkbox_changed(is_checked):
+            if is_checked:
+                machine_masks_edit_container.show()
+            else:
+                machine_masks_edit_container.hide()
 
         def _get_human_classes_colors_value():
             mapping = human_classes_colors.get_mapping()
@@ -105,12 +134,12 @@ class SaveMasksAction(OutputAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            masks_human = options_json["Add human masks"]
+            masks_human = add_human_masks_checkbox.is_checked()
             gt_human_color = {}
             if masks_human:
                 gt_human_color = saved_human_classes_colors_settings
 
-            masks_machine = options_json["Add machine masks"]
+            masks_machine = add_machine_masks_checkbox.is_checked()
             gt_machine_color = {}
             if masks_machine:
                 gt_machine_color = saved_machine_classes_colors_settings
@@ -135,7 +164,7 @@ class SaveMasksAction(OutputAction):
             machine_classes_colors.loading = False
 
         def get_dst(options_json: dict) -> dict:
-            dst = options_json.get("dst", None)
+            dst = destination_input.get_value()
             if dst is None or dst == "":
                 return []
             if dst[0] == "[":
@@ -170,26 +199,20 @@ class SaveMasksAction(OutputAction):
         machine_classes_colors_save_btn.click(_save_machine_classes_colors)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            try:
-                dst_value = dst[0]
-            except IndexError:
-                dst_value = ""
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
-                    option_component=NodesFlow.TextOptionComponent("Destination"),
+                    option_component=NodesFlow.WidgetOptionComponent(destination_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="dst", option_component=NodesFlow.InputOptionComponent(dst_value)
+                    name="dst", option_component=NodesFlow.WidgetOptionComponent(destination_input)
                 ),
             ]
-            masks_human_val = settings.get("masks_human", False)
-            masks_machine_val = settings.get("masks_machine", False)
             _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Add human masks",
-                    option_component=NodesFlow.CheckboxOptionComponent(masks_human_val),
+                    option_component=NodesFlow.WidgetOptionComponent(add_human_masks_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="Set human masks colors",
@@ -207,7 +230,7 @@ class SaveMasksAction(OutputAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Add machine masks",
-                    option_component=NodesFlow.CheckboxOptionComponent(masks_machine_val),
+                    option_component=NodesFlow.WidgetOptionComponent(add_machine_masks_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="Set machine masks colors",

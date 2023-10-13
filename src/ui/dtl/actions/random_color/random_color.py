@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, Text, Slider
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_slider_style
 
 
 class RandomColorsAction(AnnotationAction):
@@ -21,7 +21,13 @@ class RandomColorsAction(AnnotationAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         color_strength_text = Text("Strength", status="text")
         color_strength_slider = Slider(
-            value=0, min=0, max=1, step=0.01, show_input=True, show_input_controls=True
+            value=0,
+            min=0,
+            max=1,
+            step=0.01,
+            show_input=True,
+            show_input_controls=True,
+            style=get_slider_style(),
         )
 
         def get_settings(options_json: dict) -> dict:

@@ -16,7 +16,7 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
 )
 import src.globals as g
 
@@ -47,7 +47,7 @@ class DropByClassAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text")
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

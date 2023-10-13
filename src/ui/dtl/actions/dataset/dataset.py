@@ -21,7 +21,7 @@ class DatasetAction(OtherAction):
         save_original_checkbox = Checkbox("Save Original")
 
         ds_name_text = Text("Name", status="text")
-        ds_name_input = Input(value="", size="small")
+        ds_name_input = Input(value="", placeholder="Enter dataset name", size="small")
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

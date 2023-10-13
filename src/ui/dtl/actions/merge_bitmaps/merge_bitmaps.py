@@ -17,7 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
 )
 import src.globals as g
 
@@ -28,7 +28,9 @@ class MergeBitmapsAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/merge_masks"
     )
-    description = "Takes all Bitmap labels which has same class name and merge it into single Bitmap label."
+    description = (
+        "Takes all Bitmap labels which has same class name and merge it into single Bitmap label."
+    )
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -50,7 +52,7 @@ class MergeBitmapsAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes")
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

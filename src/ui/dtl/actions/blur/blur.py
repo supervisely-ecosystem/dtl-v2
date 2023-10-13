@@ -20,6 +20,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_slider_style,
 )
 
 
@@ -41,6 +42,7 @@ class BlurAction(PixelLevelAction):
             step=0.5,
             value=[0.5, 10],
             range=True,
+            style=get_slider_style(),
         )
         sigma_preview_text = Text(
             text=f"min: {sigma_slider.get_value()[0]} - max: {sigma_slider.get_value()[1]}",

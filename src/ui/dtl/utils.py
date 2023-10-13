@@ -330,3 +330,10 @@ def get_layer_docs(layer_dir: str) -> str:
                 md_description = f.read()
             break
     return md_description
+
+
+# Widgets utils
+
+
+def get_slider_style():
+    return "padding: 0 7px"

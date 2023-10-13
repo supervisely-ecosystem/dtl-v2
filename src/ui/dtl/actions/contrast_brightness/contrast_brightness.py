@@ -1,10 +1,10 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox, Switch, Flexbox
+from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox, Switch, Container
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_slider_style, get_set_settings_container
 
 
 class ContrastBrightnessAction(PixelLevelAction):
@@ -19,21 +19,24 @@ class ContrastBrightnessAction(PixelLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         # region contrast-widgets
+        contrast_text = Text("Contrast", status="text")
         contrast_switch = Switch()
-        contrast_content = Flexbox([Text("Contrast"), contrast_switch])
+        contrast_container = Container(
+            widgets=[contrast_text, contrast_switch],
+            direction="horizontal",
+            gap=0,
+            fractions=[1, 3],
+            style="place-items: center; padding: 6px",
+        )
 
         DEFAULT_CONTRAST = [0, 1]
-
         contrast_slider = Slider(
-            min=0,
-            max=10,
-            step=0.1,
-            value=DEFAULT_CONTRAST,
-            range=True,
+            min=0, max=10, step=0.1, value=DEFAULT_CONTRAST, range=True, style=get_slider_style()
         )
         contrast_slider.hide()
 
-        center_grey_checkbox = Checkbox("Center grey")
+        center_grey_text = Text("Center grey", status="text")
+        center_grey_checkbox = Checkbox(center_grey_text)
         center_grey_checkbox.hide()
         contrast_preview_widget = Text(f"min: {DEFAULT_CONTRAST[0]} - max: {DEFAULT_CONTRAST[1]}")
         contrast_preview_widget.hide()
@@ -55,16 +58,25 @@ class ContrastBrightnessAction(PixelLevelAction):
         def contrast_slider_value_changed(value):
             contrast_preview_widget.text = f"min: {value[0]} - max: {value[1]}"
 
-        # endregion
-
-        # region brightness-widgets
-
+        brightness_text = Text("Brightness", status="text")
         brightness_switch = Switch()
-        brightness_content = Flexbox([Text("Brightness"), brightness_switch])
+        brightness_container = Container(
+            widgets=[brightness_text, brightness_switch],
+            direction="horizontal",
+            gap=0,
+            fractions=[1, 3],
+            style="place-items: center; padding: 6px",
+        )
 
         DEFAULT_BRIGHTNESS = [-20, 20]
-
-        brightness_slider = Slider(min=-255, max=255, step=1, value=DEFAULT_BRIGHTNESS, range=True)
+        brightness_slider = Slider(
+            min=-255,
+            max=255,
+            step=1,
+            value=DEFAULT_BRIGHTNESS,
+            range=True,
+            style=get_slider_style(),
+        )
         brightness_slider.hide()
 
         brightness_preview_widget = Text(
@@ -138,8 +150,8 @@ class ContrastBrightnessAction(PixelLevelAction):
             brightness_slider.set_value([brightness_min_val, brightness_max_val])
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="Contrast",
-                    option_component=NodesFlow.WidgetOptionComponent(contrast_content),
+                    name="contrast_container",
+                    option_component=NodesFlow.WidgetOptionComponent(contrast_container),
                 ),
                 NodesFlow.Node.Option(
                     name="Center grey. Center colors of images (subtract 128) first",
@@ -158,8 +170,12 @@ class ContrastBrightnessAction(PixelLevelAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="Brightness",
-                    option_component=NodesFlow.WidgetOptionComponent(brightness_content),
+                    name="brightness_container",
+                    option_component=NodesFlow.WidgetOptionComponent(brightness_container),
+                ),
+                NodesFlow.Node.Option(
+                    name="brightness_slider",
+                    option_component=NodesFlow.WidgetOptionComponent(brightness_slider),
                 ),
                 NodesFlow.Node.Option(
                     name="brightness_preview",

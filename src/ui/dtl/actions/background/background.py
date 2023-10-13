@@ -19,7 +19,9 @@ class BackgroundAction(AnnotationAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         bg_class_name_text = Text("Background Class name", status="text")
-        bg_class_name_input = Input(value="", size="small")
+        bg_class_name_input = Input(
+            value="", placeholder="Enter bacground class name", size="small"
+        )
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

@@ -2,7 +2,7 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
 from src.ui.dtl.Action import AnnotationAction
@@ -16,7 +16,7 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
 )
 import src.globals as g
 
@@ -49,7 +49,7 @@ class SkeletonizeAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes")
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -71,6 +71,16 @@ class SkeletonizeAction(AnnotationAction):
             ("thinning", "Thinning"),
         ]
         items = [NodesFlow.SelectOptionComponent.Item(*method) for method in methods]
+
+        skeletonize_methods_text = Text("Operation type", status="text")
+        skeletonize_methods_selector = Select(
+            [
+                Select.Item("skeletonization", "Skeletonization"),
+                Select.Item("medial_axis", "Medial axis"),
+                Select.Item("thinning", "Thinning"),
+            ],
+            size="small",
+        )
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -169,14 +179,12 @@ class SkeletonizeAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(classes_list_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="method_text",
-                    option_component=NodesFlow.TextOptionComponent("Method"),
+                    name="skeletonize_methods_text",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="method",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=items, default_value=method_val
-                    ),
+                    name="skeletonize_methods_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_selector),
                 ),
             ]
             return {
