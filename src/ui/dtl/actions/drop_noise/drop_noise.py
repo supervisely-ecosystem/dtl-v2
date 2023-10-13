@@ -11,6 +11,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     Text,
+    Select,
 )
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
@@ -143,7 +144,7 @@ class DropNoiseAction(AnnotationAction):
             return {
                 "classes": saved_classes_settings,
                 "min_area": saved_min_area_settings,
-                "src_type": options_json["Source type"],
+                "src_type": source_type_selector.get_value(),
             }
 
         def meta_changed_cb(project_meta: ProjectMeta):
@@ -203,10 +204,10 @@ class DropNoiseAction(AnnotationAction):
             _set_classes_list_preview()
             classes_list_widget.loading = False
 
-        src_type_option_items = [
-            NodesFlow.SelectOptionComponent.Item("image", "Image"),
-            NodesFlow.SelectOptionComponent.Item("bbox", "Bounding Box"),
-        ]
+        source_type_text = Text("Source type", status="text", font_size=get_text_font_size())
+        source_type_selector = Select(
+            [Select.Item("image", "Image"), Select.Item("bbox", "Bounding Box")]
+        )
 
         @save_classes_btn.click
         def classes_list_save_btn_cb():
@@ -236,7 +237,6 @@ class DropNoiseAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            src_type_val = settings.get("src_type", "image")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
@@ -267,10 +267,12 @@ class DropNoiseAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(min_area_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="Source type",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=src_type_option_items, default_value=src_type_val
-                    ),
+                    name="source_type_text",
+                    option_component=NodesFlow.WidgetOptionComponent(source_type_text),
+                ),
+                NodesFlow.Node.Option(
+                    name="source_type_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(source_type_selector),
                 ),
             ]
             return {
