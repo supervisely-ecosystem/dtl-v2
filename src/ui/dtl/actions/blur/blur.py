@@ -15,13 +15,7 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import (
-    get_set_settings_button_style,
-    get_set_settings_container,
-    get_layer_docs,
-    create_save_btn,
-    get_slider_style,
-)
+from src.ui.dtl.utils import get_layer_docs, get_slider_style, get_text_font_size
 
 
 class BlurAction(PixelLevelAction):
@@ -47,10 +41,11 @@ class BlurAction(PixelLevelAction):
         sigma_preview_text = Text(
             text=f"min: {sigma_slider.get_value()[0]} - max: {sigma_slider.get_value()[1]}",
             status="text",
+            font_size=get_text_font_size(),
         )
 
-        settings_edit_text = Text("Settings")
-        blur_type_text = Text("Blur type")
+        settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
+        blur_type_text = Text("Blur type", status="text", font_size=get_text_font_size())
 
         blur_selector = Select(
             items=[

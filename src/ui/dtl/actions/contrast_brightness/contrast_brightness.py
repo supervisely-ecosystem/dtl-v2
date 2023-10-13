@@ -4,7 +4,7 @@ from os.path import realpath, dirname
 from supervisely.app.widgets import NodesFlow, Slider, Text, Checkbox, Switch, Container
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs, get_slider_style, get_set_settings_container
+from src.ui.dtl.utils import get_layer_docs, get_slider_style, get_text_font_size
 
 
 class ContrastBrightnessAction(PixelLevelAction):
@@ -19,7 +19,7 @@ class ContrastBrightnessAction(PixelLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         # region contrast-widgets
-        contrast_text = Text("Contrast", status="text")
+        contrast_text = Text("Contrast", status="text", font_size=get_text_font_size())
         contrast_switch = Switch()
         contrast_container = Container(
             widgets=[contrast_text, contrast_switch],
@@ -35,10 +35,14 @@ class ContrastBrightnessAction(PixelLevelAction):
         )
         contrast_slider.hide()
 
-        center_grey_text = Text("Center grey", status="text")
+        center_grey_text = Text("Center grey", status="text", font_size=get_text_font_size())
         center_grey_checkbox = Checkbox(center_grey_text)
         center_grey_checkbox.hide()
-        contrast_preview_widget = Text(f"min: {DEFAULT_CONTRAST[0]} - max: {DEFAULT_CONTRAST[1]}")
+        contrast_preview_widget = Text(
+            f"min: {DEFAULT_CONTRAST[0]} - max: {DEFAULT_CONTRAST[1]}",
+            status="text",
+            font_size=get_text_font_size(),
+        )
         contrast_preview_widget.hide()
 
         @contrast_switch.value_changed
@@ -58,7 +62,7 @@ class ContrastBrightnessAction(PixelLevelAction):
         def contrast_slider_value_changed(value):
             contrast_preview_widget.text = f"min: {value[0]} - max: {value[1]}"
 
-        brightness_text = Text("Brightness", status="text")
+        brightness_text = Text("Brightness", status="text", font_size=get_text_font_size())
         brightness_switch = Switch()
         brightness_container = Container(
             widgets=[brightness_text, brightness_switch],
@@ -80,7 +84,9 @@ class ContrastBrightnessAction(PixelLevelAction):
         brightness_slider.hide()
 
         brightness_preview_widget = Text(
-            f"min: {DEFAULT_BRIGHTNESS[0]} - max: {DEFAULT_BRIGHTNESS[1]}"
+            f"min: {DEFAULT_BRIGHTNESS[0]} - max: {DEFAULT_BRIGHTNESS[1]}",
+            status="text",
+            font_size=get_text_font_size(),
         )
         brightness_preview_widget.hide()
 

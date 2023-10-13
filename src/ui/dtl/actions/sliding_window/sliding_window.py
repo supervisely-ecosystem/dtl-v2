@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, Text, Grid, InputNumber
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class SlidingWindowAction(SpatialLevelAction):
@@ -19,16 +19,16 @@ class SlidingWindowAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        window_text = Text("Window", status="text")
-        width_text = Text("Width", status="text")
-        height_text = Text("Height", status="text")
+        window_text = Text("Window", status="text", font_size=get_text_font_size())
+        width_text = Text("Width", status="text", font_size=get_text_font_size())
+        height_text = Text("Height", status="text", font_size=get_text_font_size())
         width_input = InputNumber(value=128, step=1, controls=True)
         height_input = InputNumber(value=128, step=1, controls=True)
         window_settings = Grid([width_text, height_text, width_input, height_input], columns=2)
 
-        min_overlap_text = Text("Min Overlap", status="text")
-        x_text = Text("X", status="text")
-        y_text = Text("Y", status="text")
+        min_overlap_text = Text("Min Overlap", status="text", font_size=get_text_font_size())
+        x_text = Text("X", status="text", font_size=get_text_font_size())
+        y_text = Text("Y", status="text", font_size=get_text_font_size())
         x_input = InputNumber(value=32, step=1, controls=True)
         y_input = InputNumber(value=32, step=1, controls=True)
         min_overlap_settings = Grid([x_text, y_text, x_input, y_input], columns=2)

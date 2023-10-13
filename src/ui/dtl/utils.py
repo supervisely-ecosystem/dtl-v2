@@ -337,3 +337,7 @@ def get_layer_docs(layer_dir: str) -> str:
 
 def get_slider_style():
     return "padding: 0 7px"
+
+
+def get_text_font_size():
+    return 13

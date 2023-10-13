@@ -5,7 +5,7 @@ from os.path import realpath, dirname
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class SaveAction(OutputAction):
@@ -17,7 +17,7 @@ class SaveAction(OutputAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
-        save_path_text = Text("Destination", status="text")
+        save_path_text = Text("Destination", status="text", font_size=get_text_font_size())
         save_path_input = Input(value="", placeholder="Enter Team Files path", size="small")
         visualize_checkbox = Checkbox("Visualize")
 

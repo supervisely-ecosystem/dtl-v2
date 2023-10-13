@@ -15,21 +15,20 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
+    get_text_font_size,
 )
-from src.ui.widgets import ClassesList, ClassesListPreview
+from src.ui.widgets import ClassesListPreview
 from supervisely import ProjectMeta, ProjectType
 from supervisely.app.content import StateJson
 from supervisely.app.widgets import (
     Button,
     Container,
-    Flexbox,
     NodesFlow,
     NotificationBox,
     SelectDataset,
     Text,
     ClassesTable,
     ProjectThumbnail,
-    ObjectClassesList,
 )
 
 
@@ -53,7 +52,9 @@ class DataAction(SourceAction):
             allowed_project_types=[ProjectType.IMAGES],
             compact=False,
         )
-        select_datasets_text = Text("<b>Select Datasets</b>")
+        select_datasets_text = Text(
+            "Select Datasets", status="text", font_size=get_text_font_size()
+        )
         select_datasets_btn = Button(
             text="SELECT",
             icon="zmdi zmdi-folder",
@@ -68,7 +69,7 @@ class DataAction(SourceAction):
         src_save_btn = Button(
             "Save", icon="zmdi zmdi-floppy", emit_on_click="save", call_on_click="closeSidebar();"
         )
-        src_preview_widget_text = Text("")
+        src_preview_widget_text = Text("", status="text", font_size=get_text_font_size())
         src_preview_widget_text.hide()
         src_preview_widget_thumbnail = ProjectThumbnail(remove_margins=True)
         src_preview_widget_thumbnail.hide()
@@ -92,11 +93,13 @@ class DataAction(SourceAction):
         # Settings widgets
         _current_info = None
         _current_meta = ProjectMeta()
+
+        # add to sidebar when no project selected
         empty_src_notification = NotificationBox(
             title="No classes",
             description="Choose datasets and ensure that source project have classes.",
         )
-        # classes_mapping_widget = ClassesList(multiple=True)
+
         classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button(
@@ -118,7 +121,7 @@ class DataAction(SourceAction):
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes")
+        classes_mapping_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -222,8 +225,6 @@ class DataAction(SourceAction):
             obj_classes = [cls for cls in project_meta.obj_classes]
 
             # set classes to widget
-            # classes_mapping_widget.set(obj_classes)
-            # classes_mapping_widget.set_project_meta(_current_meta)
             if _current_info is not None:
                 classes_mapping_widget.read_project_from_id(_current_info.id)
 

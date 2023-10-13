@@ -16,7 +16,8 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -47,7 +48,9 @@ class RenameAction(AnnotationAction):
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_text = Text(
+            "Classes Mapping", status="text", font_size=get_text_font_size()
+        )
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

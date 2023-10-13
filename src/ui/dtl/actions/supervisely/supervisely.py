@@ -6,7 +6,7 @@ from supervisely.app.widgets import NodesFlow, Text, Input
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class SuperviselyAction(OutputAction):
@@ -18,7 +18,7 @@ class SuperviselyAction(OutputAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
-        sly_project_name_text = Text("Destination", status="text")
+        sly_project_name_text = Text("Destination", status="text", font_size=get_text_font_size())
         sly_project_name_input = Input(value="", placeholder="Enter project name", size="small")
 
         def get_dst(options_json: dict) -> dict:

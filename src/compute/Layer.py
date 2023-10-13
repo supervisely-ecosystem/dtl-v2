@@ -296,7 +296,8 @@ class Layer:
                         name=new_name, geometry_type=new_geometry_type, color=new_color
                     )
                     res_meta = res_meta.delete_obj_class(src_class_title)
-                    res_meta = res_meta.add_obj_class(obj_cls)
+                    if res_meta.get_obj_class(obj_cls.name) is None:
+                        res_meta = res_meta.add_obj_class(obj_cls)
 
             rm_imtags = [TagMeta.from_json(tag) for tag in self.get_removed_tag_metas()]
             res_meta = res_meta.clone(

@@ -17,6 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -49,7 +50,7 @@ class SkeletonizeAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -62,17 +63,9 @@ class SkeletonizeAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        saved_classes_settings = []
-        default_classes_settings = []
-
-        methods = [
-            ("skeletonization", "Skeletonization"),
-            ("medial_axis", "Medial axis"),
-            ("thinning", "Thinning"),
-        ]
-        items = [NodesFlow.SelectOptionComponent.Item(*method) for method in methods]
-
-        skeletonize_methods_text = Text("Operation type", status="text")
+        skeletonize_methods_text = Text(
+            "Operation type", status="text", font_size=get_text_font_size()
+        )
         skeletonize_methods_selector = Select(
             [
                 Select.Item("skeletonization", "Skeletonization"),
@@ -81,6 +74,9 @@ class SkeletonizeAction(AnnotationAction):
             ],
             size="small",
         )
+
+        saved_classes_settings = []
+        default_classes_settings = []
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -130,7 +126,7 @@ class SkeletonizeAction(AnnotationAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes": saved_classes_settings,
-                "method": options_json["method"],
+                "method": skeletonize_methods_selector.get_value(),
             }
 
         def _set_settings_from_json(settings: dict):

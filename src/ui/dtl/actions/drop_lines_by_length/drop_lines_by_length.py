@@ -10,7 +10,6 @@ from supervisely.app.widgets import (
     Text,
     Checkbox,
     InputNumber,
-    Grid,
 )
 from supervisely import ProjectMeta, Polyline, AnyGeometry
 
@@ -26,6 +25,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -56,7 +56,7 @@ class DropLinesByLengthAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

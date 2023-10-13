@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, InputNumber, Text
 
 from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class NoiseAction(PixelLevelAction):
@@ -17,10 +17,10 @@ class NoiseAction(PixelLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        mean_text = Text("Mean", status="text")
+        mean_text = Text("Mean", status="text", font_size=get_text_font_size())
         mean_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True, size="small")
 
-        spread_text = Text("Spread", status="text")
+        spread_text = Text("Spread", status="text", font_size=get_text_font_size())
         spread_input = InputNumber(value=50.000, step=0.1, controls=True, size="small")
 
         def get_settings(options_json: dict) -> dict:

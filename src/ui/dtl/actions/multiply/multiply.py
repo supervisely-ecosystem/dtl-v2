@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, InputNumber, Text
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class MultiplyAction(SpatialLevelAction):
@@ -17,7 +17,7 @@ class MultiplyAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        multiply_text = Text("Multiply number", status="text")
+        multiply_text = Text("Multiply number", status="text", font_size=get_text_font_size())
         multiply_input = InputNumber(value=12, step=1, controls=True)
 
         def get_settings(options_json: dict) -> dict:

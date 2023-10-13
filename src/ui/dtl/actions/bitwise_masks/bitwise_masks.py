@@ -17,6 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 from src.exceptions import BadSettingsError
 import src.globals as g
@@ -33,7 +34,7 @@ class BitwiseMasksAction(AnnotationAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        operation_type_text = Text("Operation type", status="text")
+        operation_type_text = Text("Operation type", status="text", font_size=get_text_font_size())
         operation_type_selector = Select(
             [Select.Item("nor", "nor"), Select.Item("and", "and"), Select.Item("or", "or")],
             size="small",
@@ -76,7 +77,11 @@ class BitwiseMasksAction(AnnotationAction):
                 ),
             ]
         )
-        class_mask_edit_text = Text("Class Mask. First element of bitwise operation")
+        class_mask_edit_text = Text(
+            "Class Mask. First element of bitwise operation",
+            status="text",
+            font_size=get_text_font_size(),
+        )
         class_mask_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -88,7 +93,9 @@ class BitwiseMasksAction(AnnotationAction):
         class_mask_edit_container = get_set_settings_container(
             class_mask_edit_text, class_mask_edit_btn
         )
-        classes_to_correct_edit_text = Text("Classes to correct")
+        classes_to_correct_edit_text = Text(
+            "Classes to correct", status="text", font_size=get_text_font_size()
+        )
         classes_to_correct_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

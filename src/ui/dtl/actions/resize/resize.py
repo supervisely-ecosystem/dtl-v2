@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, InputNumber, Text, Checkbox
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class ResizeAction(SpatialLevelAction):
@@ -17,10 +17,10 @@ class ResizeAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        width_text = Text("Width", status="text")
+        width_text = Text("Width", status="text", font_size=get_text_font_size())
         width_input = InputNumber(value=3, step=1, controls=True)
 
-        height_text = Text("Height", status="text")
+        height_text = Text("Height", status="text", font_size=get_text_font_size())
         height_input = InputNumber(value=3, step=1, controls=True)
 
         keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")

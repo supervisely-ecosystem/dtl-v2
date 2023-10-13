@@ -18,7 +18,13 @@ from supervisely import ProjectMeta
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class IfAction(OtherAction):
@@ -74,7 +80,7 @@ class IfAction(OtherAction):
         def _set_prob_value(condition_json):
             _prob_input.value = condition_json["probability"] * 100
 
-        _prob_preview_widget = Text("")
+        _prob_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _set_prob_preview():
             _prob_preview_widget.text = f"Probability: {_get_prob_value()}"
@@ -100,7 +106,7 @@ class IfAction(OtherAction):
         def _set_min_obj_count_value(condition_json):
             _min_objects_count_input.value = condition_json["min_objects_count"]
 
-        _min_objects_preview_widget = Text("")
+        _min_objects_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _set_min_obj_preview():
             _min_objects_preview_widget.text = (
@@ -128,7 +134,7 @@ class IfAction(OtherAction):
         def _set_min_height_value(condition_json):
             _min_height_input.value = condition_json["min_height"]
 
-        _min_height_preview_widget = Text("")
+        _min_height_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _min_height_preview():
             _min_height_preview_widget.text = f"Min height: {_min_height_input.get_value()}"
@@ -171,7 +177,13 @@ class IfAction(OtherAction):
             widget=_select_tags_widget,
             get_func=_get_tags_value,
             set_func=_set_tags_value,
-            preview_widget=Container(widgets=[Text("Include Tags"), _tags_preview_widget], gap=1),
+            preview_widget=Container(
+                widgets=[
+                    Text("Include Tags", status="text", font_size=get_text_font_size()),
+                    _tags_preview_widget,
+                ],
+                gap=1,
+            ),
             set_preview_func=_set_tags_preview,
         )
 
@@ -198,7 +210,10 @@ class IfAction(OtherAction):
             get_func=lambda: [oc.name for oc in _include_classes_input.get_selected_classes()],
             set_func=_set_include_classes_value,
             preview_widget=Container(
-                widgets=[Text("Include Classes:"), _include_classes_preview_widget],
+                widgets=[
+                    Text("Include Classes:", status="text", font_size=get_text_font_size()),
+                    _include_classes_preview_widget,
+                ],
                 gap=1,
             ),
             set_preview_func=_set_include_classes_preview,
@@ -237,8 +252,8 @@ class IfAction(OtherAction):
                 "frame_step": _names_in_range_inputs["step"].get_value(),
             }
 
-        _names_in_range_preview_range = Text("")
-        _names_in_range_preview_step = Text("")
+        _names_in_range_preview_range = Text("", status="text", font_size=get_text_font_size())
+        _names_in_range_preview_step = Text("", status="text", font_size=get_text_font_size())
         _names_in_range_preview_widget = Container(
             widgets=[_names_in_range_preview_range, _names_in_range_preview_step], gap=1
         )
@@ -280,7 +295,7 @@ class IfAction(OtherAction):
         _select_preview = Select(items=preview_items)
         settings_preview = OneOf(_select_preview)
         save_settings_btn = create_save_btn()
-        settings_edit_text = Text("Condition")
+        settings_edit_text = Text("Condition", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

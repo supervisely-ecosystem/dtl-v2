@@ -14,6 +14,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 
 
@@ -28,7 +29,7 @@ class SaveMasksAction(OutputAction):
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         _current_meta = ProjectMeta()
 
-        destination_text = Text("Destination", status="text")
+        destination_text = Text("Destination", status="text", font_size=get_text_font_size())
         destination_input = Input(value="", placeholder="Enter Team Files path", size="small")
 
         add_human_masks_checkbox = Checkbox("Add human masks")
@@ -47,7 +48,7 @@ class SaveMasksAction(OutputAction):
         machine_masks_widgets_container = Container(
             widgets=[machine_classes_colors, machine_classes_colors_save_btn]
         )
-        human_masks_edit_text = Text("Human Masks")
+        human_masks_edit_text = Text("Human Masks", status="text", font_size=get_text_font_size())
         human_masks_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -61,7 +62,9 @@ class SaveMasksAction(OutputAction):
         )
         human_masks_edit_container.hide()
 
-        machine_masks_edit_text = Text("Machine Masks")
+        machine_masks_edit_text = Text(
+            "Machine Masks", status="text", font_size=get_text_font_size()
+        )
         machine_masks_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

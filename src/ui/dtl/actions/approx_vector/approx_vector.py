@@ -18,6 +18,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 
 
@@ -49,7 +50,7 @@ class ApproxVectorAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -62,7 +63,7 @@ class ApproxVectorAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        epsilon_text = Text("Epsilon", status="text")
+        epsilon_text = Text("Epsilon", status="text", font_size=get_text_font_size())
         episilon_input = InputNumber(value=3, step=1, controls=True, size="small")
 
         saved_classes_settings = []

@@ -25,7 +25,8 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -34,7 +35,9 @@ class DropNoiseAction(AnnotationAction):
     name = "drop_noise"
     title = "Drop Noise"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_noise_from_bitmap"
-    description = "Removes connected components smaller than the specified size from bitmap annotations."
+    description = (
+        "Removes connected components smaller than the specified size from bitmap annotations."
+    )
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -56,7 +59,7 @@ class DropNoiseAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -101,7 +104,7 @@ class DropNoiseAction(AnnotationAction):
         )
         input_value = OneOf(px_or_percent_switch)
         min_area_widgets = Flexbox(widgets=[input_value, px_or_percent_switch])
-        min_area_preview = Text("")
+        min_area_preview = Text("", status="text", font_size=get_text_font_size())
         save_min_area_btn = create_save_btn()
         set_default_min_area_btn = Button("Set Default", icon="zmdi zmdi-refresh")
         min_area_widgets_container = Container(
@@ -116,7 +119,7 @@ class DropNoiseAction(AnnotationAction):
                 ),
             ]
         )
-        settings_edit_text = Text("Min Area")
+        settings_edit_text = Text("Min Area", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

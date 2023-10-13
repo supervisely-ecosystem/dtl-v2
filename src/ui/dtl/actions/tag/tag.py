@@ -13,6 +13,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 
 
@@ -32,11 +33,11 @@ class TagAction(AnnotationAction):
         save_tag_btn = create_save_btn()
         input_tag_widgets_container = Container(widgets=[select_tag_meta, input_tag, save_tag_btn])
         tag_preview_meta = TagMetasPreview()
-        tag_preview_value = Text("")
+        tag_preview_value = Text("", status="text", font_size=get_text_font_size())
         rag_preview_widgets_container = Container(
             widgets=[tag_preview_meta, tag_preview_value], gap=1
         )
-        input_tag_edit_text = Text("Classes List")
+        input_tag_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         input_tag_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -49,7 +50,7 @@ class TagAction(AnnotationAction):
             input_tag_edit_text, input_tag_edit_btn
         )
 
-        action_text = Text("Action", status="text")
+        action_text = Text("Action", status="text", font_size=get_text_font_size())
         action_selector = Select(
             [Select.Item("add", "Add"), Select.Item("delete", "Delete")],
             size="small",

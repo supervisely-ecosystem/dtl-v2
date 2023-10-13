@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, Select, Text
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class FlipAction(SpatialLevelAction):
@@ -17,7 +17,7 @@ class FlipAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        axis_text = Text("Axis", status="text")
+        axis_text = Text("Axis", status="text", font_size=get_text_font_size())
         axis_selector_items = [
             Select.Item("vertical", "Vertical"),
             Select.Item("horizontal", "Horizontal"),

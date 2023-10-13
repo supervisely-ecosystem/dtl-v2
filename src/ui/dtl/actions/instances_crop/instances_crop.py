@@ -26,6 +26,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -58,7 +59,7 @@ class InstancesCropAction(SpatialLevelAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -96,7 +97,7 @@ class InstancesCropAction(SpatialLevelAction):
         padding_right = InputNumber(min=0)
         padding_bot = InputNumber(min=0)
 
-        padding_preview = Text("")
+        padding_preview = Text("", status="text", font_size=get_text_font_size())
         save_padding_btn = create_save_btn()
 
         padding_unit_selector = Select(
@@ -120,7 +121,7 @@ class InstancesCropAction(SpatialLevelAction):
                 save_padding_btn,
             ]
         )
-        padding_edit_text = Text("Padding")
+        padding_edit_text = Text("Padding", status="text", font_size=get_text_font_size())
         padding_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

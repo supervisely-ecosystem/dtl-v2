@@ -4,7 +4,7 @@ from supervisely.app.widgets import NodesFlow, Input, Text
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class BackgroundAction(AnnotationAction):
@@ -18,7 +18,9 @@ class BackgroundAction(AnnotationAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        bg_class_name_text = Text("Background Class name", status="text")
+        bg_class_name_text = Text(
+            "Background Class name", status="text", font_size=get_text_font_size()
+        )
         bg_class_name_input = Input(
             value="", placeholder="Enter bacground class name", size="small"
         )

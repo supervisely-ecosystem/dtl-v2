@@ -5,11 +5,9 @@ from supervisely.app.widgets import (
     NodesFlow,
     Select,
     InputNumber,
-    Switch,
     Container,
-    Field,
-    Flexbox,
     OneOf,
+    Field,
     Checkbox,
     Button,
     Text,
@@ -22,6 +20,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    get_text_font_size,
 )
 
 
@@ -132,15 +131,15 @@ class CropAction(SpatialLevelAction):
             description="Select mode of cropping: by sides or random part of image",
         )
 
-        mode_preview = Text("")
-        params_preview = Text("")
+        mode_preview = Text("", status="text", font_size=get_text_font_size())
+        params_preview = Text("", status="text", font_size=get_text_font_size())
         settings_preview = Container(widgets=[mode_preview, params_preview], gap=1)
 
         save_settings_btn = create_save_btn()
         settings_container = Container(
             widgets=[mode_select_field, OneOf(mode_select), save_settings_btn]
         )
-        settings_edit_text = Text("Settings")
+        settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

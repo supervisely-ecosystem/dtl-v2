@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox
 
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class DatasetAction(OtherAction):
@@ -17,10 +17,12 @@ class DatasetAction(OtherAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        save_original_text = Text("Rule: Save Original", status="text")
+        save_original_text = Text(
+            "Rule: Save Original", status="text", font_size=get_text_font_size()
+        )
         save_original_checkbox = Checkbox("Save Original")
 
-        ds_name_text = Text("Name", status="text")
+        ds_name_text = Text("Name", status="text", font_size=get_text_font_size())
         ds_name_input = Input(value="", placeholder="Enter dataset name", size="small")
 
         def get_settings(options_json: dict) -> dict:

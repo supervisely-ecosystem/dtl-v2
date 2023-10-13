@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, InputNumber, Text, Select
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class RotateAction(SpatialLevelAction):
@@ -17,15 +17,15 @@ class RotateAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        rotate_angles_text = Text("Rotate Angles", status="text")
+        rotate_angles_text = Text("Rotate Angles", status="text", font_size=get_text_font_size())
 
-        min_degrees_text = Text("Min degrees", status="text")
+        min_degrees_text = Text("Min degrees", status="text", font_size=get_text_font_size())
         min_degrees_input = InputNumber(value=45, step=1, controls=True)
 
-        max_degrees_text = Text("Max degrees", status="text")
+        max_degrees_text = Text("Max degrees", status="text", font_size=get_text_font_size())
         max_degrees_input = InputNumber(value=45, step=1, controls=True)
 
-        br_text = Text("Black Regions", status="text")
+        br_text = Text("Black Regions", status="text", font_size=get_text_font_size())
         br_selector_items = [
             Select.Item("keep", "Keep"),
             Select.Item("crop", "Crop"),
