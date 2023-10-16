@@ -6,16 +6,18 @@
 
 **classes** - list of class names for split operation.
 
-### Example
+### Example. Split masks of class `bird`
+
+In this example we will split masks of class `bird` (i.e. if mask contain few non-connected components, then each component will be saved as separate mask).
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Splitted masks</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Splitted masks</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/3722ccf2-3f2d-411d-a9a0-182438b96c8b" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/831d1051-76aa-40cf-8374-ebf31e837a44" alt="Splitted masks" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/57d3cc8e-0222-49f3-bb75-77c39cd30bcc" alt="Merged masks" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/060f54c7-abe9-4097-ae84-5630be822596" alt="Original image" /> </td>
 </tr>
 </table>
 
@@ -23,22 +25,14 @@
 
 <details>
   <summary>JSON view</summary>
-```json
+<pre>
 {
-    "action": "split_masks",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$split_masks_23",
-    "settings": {
-        "classes": [
-            "cat"
-            "dog",
-            "horse",
-            "sheep",
-            "squirrel"
-        ]
-    }
+  "action": "split_masks",
+  "src": ["$data_7"],
+  "dst": "$split_masks_9",
+  "settings": {
+    "classes": ["bird"]
+  }
 }
-```
+</pre>
 </details>

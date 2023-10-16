@@ -11,12 +11,12 @@
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Skeletonized image</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Skeletonized image</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/879c31b6-286e-4e00-90c6-c2ed16784e66" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/7dae7e72-2e71-4b08-a318-ab5a270a8fb7" alt="Skeletonized image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/5215ff13-d53d-4911-a156-8efe4d2b63a1" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/57fbff6c-a434-4c7f-83cd-b961e8f37c48" alt="Skeletonized image" /> </td>
 </tr>
 </table>
 
@@ -24,20 +24,15 @@
 
 <details>
   <summary>JSON view</summary>
-```json
+<pre>
 {
-    "action": "skeletonize",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$skeletonize_15",
-    "settings": {
-        "classes": [
-            "Cat",
-            "Squirrel"
-        ],
-        "method": "skeletonization"
-    }
+  "action": "skeletonize",
+  "src": ["$data_12"],
+  "dst": "$skeletonize_15",
+  "settings": {
+    "classes": ["Cat", "Squirrel"],
+    "method": "skeletonization"
+  }
 }
-```
+</pre>
 </details>

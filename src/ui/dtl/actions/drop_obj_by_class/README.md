@@ -2,37 +2,38 @@
 
 `Drop by Class` layer simply removes annotations of specified classes.
 
-> ℹ️ You can also use data layer and map unnecessary classes to \_\_ignore\_\_
+> ℹ️ You can also use `Data` layer and select classes that you want to keep. All other classes will be removed.
 
 ### Settings
 
 - **classes** — Select classes. All objects of selected classes will be removed.
 
-### Example
+### Example. Remove objects of selected classes
+
+Remove objects of classes `bishop`, `king`, `knight`, `queen` and `rook` and keep all other objects (with class `pawn`).
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Remove objects of selected classes</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Remove objects of selected classes</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/d2fb3d97-d299-4720-bf7a-14232a840f6a" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/7ca78a5c-b5c8-4ec2-a319-23e20fe53437" alt="Drop by Class" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/00a385f1-0637-4da2-8767-7b470e790206" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/b53de5d1-9e1b-4a42-b32e-d8cac5570a5e" alt="Drop by Class" /> </td>
 </tr>
 </table>
 
 ### JSON view
-
 
 <details>
   <summary>JSON view</summary>
 <pre>
 {
   "action": "drop_obj_by_class",
-  "src": ["$data_1"],
-  "dst": "$drop_obj_by_class_4",
+  "src": ["$data_5"],
+  "dst": "$drop_obj_by_class_12",
   "settings": {
-    "classes": ["cell phone", "computer", "notebook"]
+    "classes": ["bishop", "king", "knight", "queen", "rook"]
   }
 }
 </pre>

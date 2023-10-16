@@ -1,21 +1,23 @@
 # Merge Masks
 
-`Merge Masks` layer takes all bitmap labels with selected classes and merge them into single bitmap label.
+`Merge Masks` layer takes all bitmap labels with selected class and merge them into single bitmap label. Support only `bitmap` shape labels.
 
 ### Settings
 
-**class** — name of class for merging.
+**class** — name of class for merging. You can select only one class.
 
-### Example
+### Example. Merge masks
+
+Merge masks with class `bird`
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Merged masks</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Merged masks</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/5482d336-cc5b-4a4f-8f77-b8d16472a5f5" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a66bfa8f-1c14-40c3-8e3d-d16db3da0252" alt="Merged masks" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/060f54c7-abe9-4097-ae84-5630be822596" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/57d3cc8e-0222-49f3-bb75-77c39cd30bcc" alt="Merged masks" /> </td>
 </tr>
 </table>
 
@@ -23,16 +25,14 @@
 
 <details>
   <summary>JSON view</summary>
-```json
+  <per>
 {
-    "action": "merge_bitmap_masks",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$merge_bitmap_masks_24",
-    "settings": {
-        "class": "cat"
-    }
+  "action": "merge_bitmap_masks",
+  "src": ["$data_17"],
+  "dst": "$merge_bitmap_masks_18",
+  "settings": {
+    "class": "bird"
+  }
 }
-```
+</per>
 </details>

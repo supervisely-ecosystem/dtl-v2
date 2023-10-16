@@ -4,22 +4,39 @@ Layer for cropping images by specifying pixels or percentage to crop from each s
 
 ### Settings:
 
-- Crop type "**sides**" - crop from each side by specifying pixels or percentage to crop. Set values for each side (`top`, `left`, `right`, `bottom`).
-- Crop type "**random part**" - crop random part of the image by specifying min and max percentage range for `width` and `height`.
-- **keep aspect ratio** - Specify whether to keep the aspect ratio of the image.
+- Crop type "**sides**" - crop from each side by specifying pixels or percentage to crop:
+  - `top`, `left`, `right`, `bottom` - pixels or percentage to crop from each side.
+- Crop type "**random part**" - crop random part of the image:
+  - `width`, `height` - min and max percentage range for width and height.
+  - `keep_aspect_ratio` - Specify whether to keep the aspect ratio of the image.
 
-### Examples:
+### Example 1. Crop by sides
+
+Set crop type to "**sides**" and specify pixels or percentage to crop from each side.
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Sides: 15% from each side</strong></td>
-<td style="text-align:center"><strong>Random part: 50-70% for width and height. Keep aspect ratio.</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Sides: top 350px, bottom 250px </strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ab85486c-84ce-4e32-9f82-84a22ff0a1c0" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/59edb43f-9269-4efe-a78f-279b21d5a420" alt="Crop type: Sides" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a2cce606-5c7f-4439-9c5c-2188ed21ae96" alt="Crop type: Random part" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/52483886-392d-43a8-aeb4-a5fb01950a30" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/a4f39565-216a-427f-a1a3-b32f180991e0" alt="Crop type: Sides" /> </td>
+</tr>
+</table>
+
+### Example 2. Crop random part
+
+Set crop type to "**random part**" and specify min and max percentage range for `width` and `height`. Also you can specify whether to keep the aspect ratio of the image.
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Random part: 60-65% for width and height. Keep aspect ratio.</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/f29db46e-dc66-415f-a808-6f89a4a112ea" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/a2380eb8-bc82-4321-99c1-e1a4cea2e204" alt="Crop type: Random part" /> </td>
 </tr>
 </table>
 
@@ -30,15 +47,14 @@ Layer for cropping images by specifying pixels or percentage to crop from each s
 <pre>
 {
   "action": "crop",
-  "src": ["$data_3"],
-  "dst": "$crop_5",
+  "src": ["$data_7"],
+  "dst": "$crop_8",
   "settings": {
-    "mode": "sides",
     "sides": {
-      "top": "15%",
-      "left": "15%",
-      "right": "15%",
-      "bottom": "15%"
+      "top": "350px",
+      "left": "0px",
+      "right": "0px",
+      "bottom": "250px"
     }
   }
 }
@@ -50,18 +66,17 @@ Layer for cropping images by specifying pixels or percentage to crop from each s
 <pre>
 {
   "action": "crop",
-  "src": ["$data_3"],
-  "dst": "$crop_5",
+  "src": ["$data_7"],
+  "dst": "$crop_8",
   "settings": {
-    "mode": "random_part",
     "random_part": {
       "height": {
-        "min_percent": 1,
-        "max_percent": 1
+        "min_percent": 60,
+        "max_percent": 65
       },
       "width": {
-        "min_percent": 1,
-        "max_percent": 1
+        "min_percent": 60,
+        "max_percent": 65
       },
       "keep_aspect_ratio": true
     }

@@ -8,18 +8,11 @@ Resize the image to the specified width and height. If aspect ratio is enabled, 
 - **height** - Set the height of the resized image.
 - **aspect_ratio** - Specify whether to keep the aspect ratio of the image.
 
-### Example:
+### Example. Resize image
 
-<table>
-<tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Resized Image</strong></td>
-</tr>
-<tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/22476d1c-684b-4ce0-9675-ba5fc5b34370" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/4d039e70-916e-422a-8151-4e62ee433a73" alt="Resized Image" /> </td>
-</tr>
-</table>
+In this example we will resize image to 1200x1200 pixels without keeping aspect ratio.
+
+<img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e4c90d16-85c6-4e84-9139-259e87835b4c" alt="Resized Image" />
 
 ### JSON view
 
@@ -28,13 +21,13 @@ Resize the image to the specified width and height. If aspect ratio is enabled, 
 <pre>
 {
   "action": "resize",
-  "src": ["$data_5"],
-  "dst": "$resize_14",
+  "src": ["$data_1"],
+  "dst": "$resize_2",
   "settings": {
-    "width": 400,
-    "height": 200,
+    "width": 1200,
+    "height": 1200,
     "aspect_ratio": {
-      "keep": true
+      "keep": false
     }
   }
 }

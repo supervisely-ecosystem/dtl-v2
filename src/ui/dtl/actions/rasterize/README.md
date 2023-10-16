@@ -4,20 +4,21 @@
 
 ### Settings
 
-**classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
+- **classes** — Select classes to rasterize. If no classes are selected, all objects will be preserved.
 
 ### Example
 
+In this example original image contains two objects: **car** and **road** and they are **overlapped** (car object is under the road object).
+On the result image car and road objects are rasterized and now they are not overlapped.
+
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Only Road label</strong></td>
-<td style="text-align:center"><strong>Road with rasterized Car object</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Road with rasterized Car object</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/c0533a4e-a1b7-44e7-814c-aaa15c40eec8" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/d589d6f1-1510-412a-be29-d876eda09f4d" alt="Only Road label" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/fd45dad9-9653-40dc-bc5e-619d18709a61" alt="Road with rasterized Car object" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/ac369766-ffa3-4967-afc2-3bcc9b4bfcdc" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/15e6d16b-b942-45a9-b83e-3ace407e0d14" alt="Road with rasterized Car object" /> </td>
 </tr>
 </table>
 
@@ -25,19 +26,17 @@
 
 <details>
   <summary>JSON view</summary>
-```json
+<pre>
 {
-    "action": "rasterize",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$rasterize_17",
-    "settings": {
-        "classes_mapping": {
-            "Car": "Car_Rasterized",
-            "Road": "Road_Rasterized"
-        }
+  "action": "rasterize",
+  "src": ["$data_7"],
+  "dst": "$rasterize_6",
+  "settings": {
+    "classes_mapping": {
+      "car": "car_rasterized",
+      "road": "road_rasterized"
     }
+  }
 }
-```
+</pre>
 </details>

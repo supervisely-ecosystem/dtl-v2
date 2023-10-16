@@ -7,16 +7,18 @@
 - **mean** - Set value to specify the peak of the noise distribution.
 - **std** - Set value to increase the spread of the noise distribution.
 
-### Example:
+### Example. Add noise to image
+
+In this example, we add noise to the image with mean 23 and spread 65.
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Noise: Mean: 13, Spread: 65</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Noise: Mean: 23, Spread: 65</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/22476d1c-684b-4ce0-9675-ba5fc5b34370" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/6005c07c-8f5f-41da-8e69-c415c6191f58" alt="Noise: Mean" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/62298fa3-3720-4e49-8b07-271162a8e8fb" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/8851e6aa-8316-4f9d-ba5b-9c4a64f20bb6" alt="Noise" /> </td>
 </tr>
 </table>
 
@@ -27,10 +29,10 @@
 <pre>
 {
   "action": "noise",
-  "src": ["$data_5"],
-  "dst": "$noise_10",
+  "src": ["$data_1"],
+  "dst": "$noise_2",
   "settings": {
-    "mean": 13,
+    "mean": 23,
     "std": 65
   }
 }

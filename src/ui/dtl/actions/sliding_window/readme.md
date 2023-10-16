@@ -9,16 +9,16 @@
 
 ![sw_schema](https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/9e04540f-ee5f-4697-8a08-ea145ea2161c)
 
-### Examples
+### Example. Sliding window (512x512, overlap: 32)
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Sliding windows (512x512, overlap: 32)</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Sliding windows (512x512, overlap: 32)</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/88a1995f-3917-4985-88db-998052c28bc2" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/53466f82-5078-4e17-8aca-d9e0fa0d29a5" alt="Sliding window" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/5c821ec5-8a52-4f25-9ffb-316dcb4709f2" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/f6dace1f-565d-4651-8c39-94ab96ebb3dc" alt="Sliding window" /> </td>
 </tr>
 </table>
 
