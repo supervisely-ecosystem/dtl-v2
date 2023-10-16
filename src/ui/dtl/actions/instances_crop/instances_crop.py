@@ -26,6 +26,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    create_set_default_btn,
     get_text_font_size,
 )
 import src.globals as g
@@ -46,7 +47,7 @@ class InstancesCropAction(SpatialLevelAction):
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_set_default_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
                 classes_list_widget,

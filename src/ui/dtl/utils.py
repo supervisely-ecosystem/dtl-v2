@@ -318,6 +318,10 @@ def create_save_btn() -> Button:
     return Button("Save", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();")
 
 
+def create_set_default_btn() -> Button:
+    return Button("Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh")
+
+
 # Layer docs utils
 
 

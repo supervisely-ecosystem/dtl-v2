@@ -14,6 +14,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    create_set_default_btn,
     get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
@@ -37,7 +38,7 @@ class PolygonToBitmapAction(AnnotationAction):
         classes_mapping_widget = ClassesList(multiple=True)
         classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_mapping_set_default_btn = create_set_default_btn()
         classes_mapping_widgets_container = Container(
             widgets=[
                 classes_mapping_widget,

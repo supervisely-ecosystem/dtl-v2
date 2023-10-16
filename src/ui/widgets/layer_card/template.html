@@ -15,7 +15,14 @@
 			:style="{ 'padding': '10px', 'color': data.{{{widget.widget_id}}}.color }"
 		></i>
 		{{data.{{{widget.widget_id}}}.name}}
-		<i class="zmdi zmdi-help-outline" style="padding: 10px; color: gray"></i>
+
+		<el-tooltip content="Click to learn" placement="top">
+			<a href="{{{widget._docs_url}}}"
+				><i
+					class="zmdi zmdi-help-outline py-layer-card-widget-help-highlight"
+				></i
+			></a>
+		</el-tooltip>
 	</div>
 
 	<div>{{{widget._add_button}}}</div>

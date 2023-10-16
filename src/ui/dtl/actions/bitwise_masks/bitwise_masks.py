@@ -17,6 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    create_set_default_btn,
     get_text_font_size,
 )
 from src.exceptions import BadSettingsError
@@ -50,8 +51,8 @@ class BitwiseMasksAction(AnnotationAction):
         save_class_mask_btn = create_save_btn()
         save_classes_to_correct_btn = create_save_btn()
 
-        set_default_class_mask_btn = Button("Set Default", icon="zmdi zmdi-refresh")
-        set_default_classes_to_correct_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        set_default_class_mask_btn = create_set_default_btn()
+        set_default_classes_to_correct_btn = create_set_default_btn()
 
         class_mask_widgets_container = Container(
             widgets=[

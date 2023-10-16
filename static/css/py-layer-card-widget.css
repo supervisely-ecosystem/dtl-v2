@@ -21,3 +21,13 @@
 .py-layer-card-widget .el-button.el-button--text:hover {
     color: #20a0ff;
 }
+
+i.zmdi.zmdi-help-outline.py-layer-card-widget-help-highlight {
+        padding: 10px; 
+        color: gray;
+}
+
+
+i.zmdi.zmdi-help-outline.py-layer-card-widget-help-highlight:hover {
+    color: #20a0ff;
+}

@@ -22,7 +22,7 @@ class BackgroundAction(AnnotationAction):
             "Background Class name", status="text", font_size=get_text_font_size()
         )
         bg_class_name_input = Input(
-            value="", placeholder="Enter bacground class name", size="small"
+            value="", placeholder="Enter background class name", size="small"
         )
 
         def get_settings(options_json: dict) -> dict:

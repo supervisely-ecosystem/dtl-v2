@@ -17,6 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
+    create_set_default_btn,
     get_text_font_size,
 )
 import src.globals as g
@@ -35,7 +36,7 @@ class RenameAction(AnnotationAction):
         classes_mapping_widget = ClassesMapping()
         classes_mapping_preview = ClassesMappingPreview()
         classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_mapping_set_default_btn = create_set_default_btn()
         classes_mapping_widgets_container = Container(
             widgets=[
                 classes_mapping_widget,
