@@ -4,31 +4,30 @@
 
 ### Settings:
 
-- **multiply** - Set the value to multiply by.
+- **multiply** - Set the value to multiply by. For example, if you set the value to 2, then the image and annotations will be duplicated twice.
 
-## Example:
+## Example. Duplicate images with annotations
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Multiply</strong></td>
+<td style="text-align:center; width:33%"><strong>Original images</strong></td>
+<td style="text-align:center; width:66%"><strong>Multiplied images</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/22476d1c-684b-4ce0-9675-ba5fc5b34370" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/a1b22351-c8b9-406e-8bce-37af6e13c2fa" alt="Multiply" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/97c952d1-ecb8-4edb-9e22-b4b480f33a8e" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7080258c-5bf8-46d1-947b-cfab4612479d" alt="Multiply" /> </td>
 </tr>
 </table>
 
 ### JSON view
-
 
 <details>
   <summary>JSON view</summary>
 <pre>
 {
   "action": "multiply",
-  "src": ["$data_5"],
-  "dst": "$multiply_12",
+  "src": ["$data_7"],
+  "dst": "$multiply_9",
   "settings": {
     "multiply": 2
   }

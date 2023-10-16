@@ -4,22 +4,39 @@
 
 ### Settings:
 
-- **contrast** - Set `min` and `max` values for contrast. Image contrast is changed by multiplying each pixel by random value with uniform distribution from min to max. To center colors of images (subtract 128) first, set `center_grey` to `true`.
-- **brightness** - Set `min` and `max` values for brightness. Image brightness is changed by adding to each pixel a random value with uniform distribution from min to max.
+- **contrast** - Image contrast is changed by multiplying each pixel by random value with uniform distribution from `min` to `max`.
+  - Set `min` and `max` values for contrast. To disable, set `min` and `max` to 1.
+  - Set `center_grey` to `true` to center colors of images (subtract 128) first
+- **brightness** - Image brightness is changed by adding to each pixel a random value with uniform distribution from min to max.
+  - Set `min` and `max` values for brightness. To disable, set `min` and `max` to 0.
 
-
-### Examples:
+### Example 1. Contrast
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Contrast: 6-8, center_grey: true</strong></td>
-<td style="text-align:center"><strong>Brightness: 60-110</strong></td>
+<td style="text-align:center; width:33%"><strong>Contrast: 0.4...0.8, center_grey: true</strong></td>
+<td style="text-align:center; width:33%"><strong>Original image</strong></td>
+<td style="text-align:center; width:33%"><strong>Contrast: 6...8, center_grey: true</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/22476d1c-684b-4ce0-9675-ba5fc5b34370" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ab6a60d8-56ac-4012-b4b1-168ef201a41c" alt="Contrast" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ff1afc6e-94cf-4a3b-a414-7e345ec44057" alt="Brightness" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/dda6939b-e8a7-4afd-ab1a-e9212dd4a156" alt="Contrast 0.4-0.8" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/92069f7c-c2f0-4c1a-be22-0a59602039a6" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/1f43c7a3-abfe-4d05-8506-7967628270f5" alt="Contrast 6-8" /> </td>
+</tr>
+</table>
+
+### Example 2. Brightness
+
+<table>
+<tr>
+<td style="text-align:center; width:33%"><strong>Brightness: -110...-60</strong></td>
+<td style="text-align:center; width:33%"><strong>Original image</strong></td>
+<td style="text-align:center; width:33%"><strong>Brightness: 60...110</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/9b09084b-943c-42b0-aea5-5df1fb66673f" alt="Brightness-" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/d52872cb-8d05-4239-a959-7f232fc2027e" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/910a4044-6c3e-4fb3-bb0b-96afdbde368b" alt="Brightness+" /> </td>
 </tr>
 </table>
 
