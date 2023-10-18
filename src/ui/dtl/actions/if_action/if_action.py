@@ -288,11 +288,11 @@ class IfAction(OtherAction):
         }
 
         select_condition_items = [condition.item() for condition in conditions.values()]
-        select_condition = Select(items=select_condition_items)
+        select_condition = Select(items=select_condition_items, size="small")
         condition_input = OneOf(select_condition)
 
         preview_items = [condition.preview_item() for condition in conditions.values()]
-        _select_preview = Select(items=preview_items)
+        _select_preview = Select(items=preview_items, size="small",)
         settings_preview = OneOf(_select_preview)
         save_settings_btn = create_save_btn()
         settings_edit_text = Text("Condition", status="text", font_size=get_text_font_size())

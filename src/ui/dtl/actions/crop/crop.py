@@ -42,7 +42,8 @@ class CropAction(SpatialLevelAction):
             items=[
                 Select.Item("px", "pixels"),
                 Select.Item("%", "percents"),
-            ]
+            ],
+            size="small",
         )
 
         crop_fixed_container = Container(
@@ -123,7 +124,8 @@ class CropAction(SpatialLevelAction):
             items=[
                 Select.Item("sides", "Sides", crop_fixed_container),
                 Select.Item("random_part", "Random part", crop_random_container),
-            ]
+            ],
+            size="small",
         )
         mode_select_field = Field(
             content=mode_select,
@@ -214,11 +216,11 @@ class CropAction(SpatialLevelAction):
             elif mode == "sides":
                 sides = _get_sides()
                 mode_preview.text = "Mode: Sides"
-                params_preview.text = f"Top: {sides['top']}<br>Left: {sides['left']}<br>Right: {sides['right']}<br>Bottom: {sides['bottom']}"
+                params_preview.text = f"<br>Top: {sides['top']}<br>Left: {sides['left']}<br>Right: {sides['right']}<br>Bottom: {sides['bottom']}"
             elif mode == "random_part":
                 random_part = _get_random()
                 mode_preview.text = "Mode: Random part"
-                params_preview.text = f"Height: min {random_part['height']['min_percent']}% - max {random_part['height']['max_percent']}%<br>Width: min {random_part['width']['min_percent']}% - max {random_part['width']['max_percent']}%<br>Keep aspect ratio: {random_part['keep_aspect_ratio']}"
+                params_preview.text = f"<br>Height: min {random_part['height']['min_percent']}% - max {random_part['height']['max_percent']}%<br>Width: min {random_part['width']['min_percent']}% - max {random_part['width']['max_percent']}%<br>Keep aspect ratio: {random_part['keep_aspect_ratio']}"
 
         def _save_settings():
             nonlocal saved_settings

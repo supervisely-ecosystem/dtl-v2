@@ -256,3 +256,14 @@ def update_project_info(project_info: sly.ProjectInfo):
     updated = g.api.project.get_info_by_id(project_info.id)
     g.cache["project_info"][project_info.id] = updated
     return updated
+
+
+def clean_static_dir(static_dir):
+    ignore_dir = "css"
+    for item in os.listdir(static_dir):
+        item_path = os.path.join(static_dir, item)
+        if os.path.isdir(item_path):
+            if item != ignore_dir:
+                shutil.rmtree(item_path)
+        else:
+            os.remove(item_path)

@@ -36,7 +36,7 @@ class ColorClassAction(AnnotationAction):
             widgets=[classes_colors, classes_colors_save_btn]
         )
         classes_colors_edit_text = Text(
-            "Classes Mapping", status="text", font_size=get_text_font_size()
+            "Classes Colors", status="text", font_size=get_text_font_size()
         )
         classes_colors_edit_btn = Button(
             text="EDIT",

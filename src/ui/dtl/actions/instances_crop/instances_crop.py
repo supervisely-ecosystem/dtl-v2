@@ -105,7 +105,8 @@ class InstancesCropAction(SpatialLevelAction):
             items=[
                 Select.Item("px", "pixels"),
                 Select.Item("%", "percents"),
-            ]
+            ],
+            size="small",
         )
 
         padding_container = Container(

@@ -61,10 +61,14 @@ class ObjectsFilterAction(AnnotationAction):
             content=size_input,
         )
         comparator_select = Select(
-            items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")]
+            items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")],
+            size="small",
         )
         comparator_select_field = Field(title="Comparator", content=comparator_select)
-        action_select = Select(items=[Select.Item("delete", "Delete")])
+        action_select = Select(
+            items=[Select.Item("delete", "Delete")],
+            size="small",
+        )
         action_select_field = Field(title="Action", content=action_select)
         action_select.disable()
         filter_items = [
@@ -94,7 +98,7 @@ class ObjectsFilterAction(AnnotationAction):
                 ),
             ),
         ]
-        filter_by_select = Select(filter_items)
+        filter_by_select = Select(filter_items, size="small")
         filter_by_inputs = OneOf(filter_by_select)
 
         filter_by_preview_text = Text("", status="text", font_size=get_text_font_size())
@@ -123,7 +127,8 @@ class ObjectsFilterAction(AnnotationAction):
             items=[
                 Select.Item("names", "names", filter_by_name_preview_container),
                 Select.Item("polygon_sizes", "polygon_sizes", filter_by_size_preview_container),
-            ]
+            ],
+            size="small",
         )
         settings_preview = OneOf(_settings_preview_select)
         settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())

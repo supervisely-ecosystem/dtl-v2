@@ -1,5 +1,3 @@
-import shutil
-import os
 import threading
 import time
 from supervisely import Application
@@ -8,11 +6,10 @@ from src.ui.ui import layout
 from src.ui.tabs.configure import update_metas, update_nodes
 from src.ui.tabs.presets import apply_json
 import src.globals as g
+import src.utils as u
 
-# shutil.rmtree(g.STATIC_DIR, ignore_errors=True)
-# os.mkdir(g.STATIC_DIR)
+u.clean_static_dir(g.STATIC_DIR)
 app = Application(layout=layout, static_dir=g.STATIC_DIR)
-
 
 
 def _update_f():

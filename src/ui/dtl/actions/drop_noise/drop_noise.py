@@ -94,57 +94,32 @@ class DropNoiseAction(AnnotationAction):
             nonlocal saved_classes_settings
             saved_classes_settings = copy.deepcopy(default_classes_settings)
 
-        input_px = InputNumber(min=0)
-        input_percent = InputNumber(min=0, max=100)
-        px_or_percent_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=input_px,
-            off_content=input_percent,
+        min_area_text = Text("Min Area", status="text", font_size=get_text_font_size())
+        measure_unit_selector = Select(
+            [Select.Item("px", "pixels"), Select.Item("%", "percents")],
+            size="small",
         )
-        input_value = OneOf(px_or_percent_switch)
-        min_area_widgets = Flexbox(widgets=[input_value, px_or_percent_switch])
-        min_area_preview = Text("", status="text", font_size=get_text_font_size())
-        save_min_area_btn = create_save_btn()
-        set_default_min_area_btn = create_set_default_btn()
-        min_area_widgets_container = Container(
-            widgets=[
-                min_area_widgets,
-                Flexbox(
-                    widgets=[
-                        save_min_area_btn,
-                        set_default_min_area_btn,
-                    ],
-                    gap=105,
-                ),
-            ]
-        )
-        settings_edit_text = Text("Min Area", status="text", font_size=get_text_font_size())
-        settings_edit_btn = Button(
-            text="EDIT",
-            icon="zmdi zmdi-edit",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
-        settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
+        min_area_input = InputNumber(value=2, min=0, step=1, size="small", controls=True)
 
-        saved_min_area_settings = "2%"
-        default_min_area_settings = "2%"
+        @measure_unit_selector.value_changed
+        def measure_unit_selector_cb(value):
+            if value == "%":
+                if min_area_input.get_value() > 100:
+                    min_area_input.value = 100
 
-        def _save_min_area_setting():
-            nonlocal saved_min_area_settings
-            saved_min_area_settings = _get_min_area()
-            min_area_preview.text = f"Min Area: {saved_min_area_settings}"
+        @min_area_input.value_changed
+        def min_area_input_cb(value):
+            if measure_unit_selector.get_value() == "%":
+                if min_area_input.get_value() > 100:
+                    min_area_input.value = 100
+
+        min_area_widgets = Flexbox(widgets=[measure_unit_selector, min_area_input])
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes": saved_classes_settings,
-                "min_area": saved_min_area_settings,
+                "min_area": _get_min_area(),
                 "src_type": source_type_selector.get_value(),
             }
 
@@ -176,24 +151,9 @@ class DropNoiseAction(AnnotationAction):
             classes_list_widget.loading = False
 
         def _get_min_area():
-            if px_or_percent_switch.is_switched():
-                return f"{input_px.value}px"
-            else:
-                return f"{input_percent.value}%"
-
-        def _set_min_area(value):
-            if value.endswith("px"):
-                px_or_percent_switch.on()
-                input_px.value = int(value[:-2])
-            else:
-                px_or_percent_switch.off()
-                input_percent.value = int(value[:-1])
+            return f"{min_area_input.get_value()}{measure_unit_selector.get_value()}"
 
         def _set_settings_from_json(settings: dict):
-            min_area_widgets.loading = True
-            _set_min_area(settings.get("min_area", "2%"))
-            _save_min_area_setting()
-            min_area_widgets.loading = False
             classes_list_widget.loading = True
             classes_list_settings = settings.get("classes", [])
             set_classes_list_settings_from_json(
@@ -207,7 +167,8 @@ class DropNoiseAction(AnnotationAction):
 
         source_type_text = Text("Source type", status="text", font_size=get_text_font_size())
         source_type_selector = Select(
-            [Select.Item("image", "Image"), Select.Item("bbox", "Bounding Box")]
+            [Select.Item("image", "Image"), Select.Item("bbox", "Bounding Box")],
+            size="small",
         )
 
         @save_classes_btn.click
@@ -223,17 +184,6 @@ class DropNoiseAction(AnnotationAction):
                 classes_list_widget=classes_list_widget, settings=saved_classes_settings
             )
             _set_classes_list_preview()
-            g.updater("metas")
-
-        @save_min_area_btn.click
-        def save_min_area_btn_cb():
-            _save_min_area_setting()
-            g.updater("metas")
-
-        @set_default_min_area_btn.click
-        def set_default_min_area_btn_cb():
-            _set_min_area(default_min_area_settings)
-            _save_min_area_setting()
             g.updater("metas")
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
@@ -255,17 +205,11 @@ class DropNoiseAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Min Area",
-                    option_component=NodesFlow.WidgetOptionComponent(
-                        widget=settings_edit_container,
-                        sidebar_component=NodesFlow.WidgetOptionComponent(
-                            min_area_widgets_container
-                        ),
-                        sidebar_width=380,
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(min_area_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="min_area_preview_text",
-                    option_component=NodesFlow.WidgetOptionComponent(min_area_preview),
+                    name="min_area_widgets",
+                    option_component=NodesFlow.WidgetOptionComponent(min_area_widgets),
                 ),
                 NodesFlow.Node.Option(
                     name="source_type_text",

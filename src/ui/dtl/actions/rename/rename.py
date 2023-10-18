@@ -50,7 +50,7 @@ class RenameAction(AnnotationAction):
             ]
         )
         classes_mapping_edit_text = Text(
-            "Classes Mapping", status="text", font_size=get_text_font_size()
+            "Classes Names", status="text", font_size=get_text_font_size()
         )
         classes_mapping_edit_btn = Button(
             text="EDIT",
