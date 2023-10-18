@@ -67,11 +67,11 @@ class BBoxAction(AnnotationAction):
 
         def _get_classes_mapping_value():
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
-            res_classes = {}
+            mapping = {}
             for cls_name in classes:
-                res_classes[cls_name] = "__default__"
-            res_classes["__other__"] = "__ignore__"
-            return res_classes
+                mapping[cls_name] = cls_name
+            mapping["__other__"] = "__ignore__"
+            return mapping
 
         def _set_classes_mapping_preview():
             set_classes_list_preview(
@@ -101,7 +101,7 @@ class BBoxAction(AnnotationAction):
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
-            old_obj_classes = project_meta.obj_classes
+            old_obj_classes = project_meta.obj_classes  # Why change?
             new_obj_classes = project_meta.obj_classes
 
             # set classes to widget
@@ -129,8 +129,7 @@ class BBoxAction(AnnotationAction):
             classes_mapping_widget.loading = False
 
         def _set_settings_from_json(settings):
-            all_classes = []
-            classes_list_settings = settings.get("classes_mapping", all_classes)
+            classes_list_settings = settings.get("classes_mapping", [])
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget, settings=classes_list_settings
             )

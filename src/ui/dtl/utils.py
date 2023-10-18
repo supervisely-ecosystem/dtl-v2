@@ -213,7 +213,9 @@ def get_classes_list_value(
     else:
         if len(selected) == 0:
             return ""
-        return selected[0].name  # add if for ClassesTable w/o .name
+        elif isinstance(classes_list_widget, ClassesList):
+            return selected[0].name
+        return selected[0].name
 
 
 def classes_list_settings_changed_meta(

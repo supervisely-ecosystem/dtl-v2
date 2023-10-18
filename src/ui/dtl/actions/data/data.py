@@ -193,11 +193,11 @@ class DataAction(SourceAction):
 
         def _get_classes_mapping_value():
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
-            res_classes = {}
+            mapping = {}
             for cls_name in classes:
-                res_classes[cls_name] = "__default__"
-            res_classes["__other__"] = "__ignore__"
-            return res_classes
+                mapping[cls_name] = cls_name
+            mapping["__other__"] = "__ignore__"
+            return mapping
 
         def _set_classes_mapping_preview():
             set_classes_list_preview(
