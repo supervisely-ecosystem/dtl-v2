@@ -5,10 +5,10 @@
 ### Settings:
 
 - **contrast** - Image contrast is changed by multiplying each pixel by random value with uniform distribution from `min` to `max`.
-  - Set `min` and `max` values for contrast. To disable, set `min` and `max` to 1.
-  - Set `center_grey` to `true` to center colors of images (subtract 128) first
+    - Set `min` and `max` values for contrast. To disable, set `min` and `max` to 1.
+    - Set `center_grey` to `true` to center colors of images (subtract 128) first
 - **brightness** - Image brightness is changed by adding to each pixel a random value with uniform distribution from min to max.
-  - Set `min` and `max` values for brightness. To disable, set `min` and `max` to 0.
+    - Set `min` and `max` values for brightness. To disable, set `min` and `max` to 0.
 
 ### Example 1. Contrast
 
