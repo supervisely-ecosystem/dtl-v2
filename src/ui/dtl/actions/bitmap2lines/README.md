@@ -11,47 +11,40 @@ Internally the layer builds a graph of 8-connected pixels, determines minimum sp
 
 ### Settings
 
-**classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
-**min_points_cnt** — min number of vertices for each output line. Other lines will be dropped.
+- **classes** — Select classes to convert. If no classes are selected, all classes will be ignored.
+- **min_points_cnt** — Min number of vertices for each output line. Other lines will be dropped.
 
+### Example. Convert bitmap to lines
 
-### Example
+In this example we will convert bitmap to lines. We will use `Bitmap to Lines` layer to do it.
+But first we need to use `Skeletonize` layer to thin our bitmap. After that we will apply `Bitmap to Lines` layer to get lines. And finally we will apply `Approx Vector` layer to reduce number of vertices and simplify lines.
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image (Bitmap)</strong></td>
-<td style="text-align:center"><strong>Skeletonized</strong></td>
-<td style="text-align:center"><strong>Bitmap to Lines</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image (Bitmap)</strong></td>
+<td style="text-align:center; width:50%"><strong>Bitmap to Lines</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ba91b0c2-8c55-4264-8d85-d5735e4fd972" alt="Original image (Bitmap)"/> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/e8ce60c5-cf94-47d5-94b7-9d442c6591f7" alt="Skeletonized"/> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/899ec8c2-b9ee-4f50-b276-bdf68d0d3237" alt="Bitmap to Lines"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e7ad65e5-96ee-4e8e-8883-4948494e8a2f" alt="Original image (Bitmap)"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/b1baf468-0891-4d10-b4e6-3fff18817a04" alt="Bitmap to Lines"/> </td>
 </tr>
 </table>
 
-
 ### JSON view
-
 
 <details>
   <summary>JSON view</summary>
-
-```json
+<pre>
 {
-    "action": "bitmap2lines",
-    "src": [
-        "$data_1"
-    ],
-    "dst": "$bitmap2lines_7",
-    "settings": {
-        "classes_mapping": {
-            "cat": "cat_line",
-            "horse": "horse_line",
-            "sheep": "sheep_line"
-        },
-        "min_points_cnt": 2
-    }
+  "action": "bitmap2lines",
+  "src": ["$data_1"],
+  "dst": "$bitmap2lines_7",
+  "settings": {
+    "classes_mapping": {
+      "squirrel": "__default__"
+    },
+    "min_points_cnt": 2
+  }
 }
-```
+</pre>
 </details>

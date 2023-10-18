@@ -2,7 +2,15 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import (
+    NodesFlow,
+    Button,
+    Container,
+    Flexbox,
+    Text,
+    Checkbox,
+    InputNumber,
+)
 from supervisely import ProjectMeta, Polyline, AnyGeometry
 
 from src.ui.dtl import AnnotationAction
@@ -16,7 +24,9 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -34,7 +44,7 @@ class DropLinesByLengthAction(AnnotationAction):
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_set_default_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
                 classes_list_widget,
@@ -47,7 +57,7 @@ class DropLinesByLengthAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -60,8 +70,33 @@ class DropLinesByLengthAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
+        resolution_compensation_checkbox = Checkbox("Resolution Compensation")
+        invert_checkbox = Checkbox("Invert")
+
+        min_length_checkbox = Checkbox("Min Length")
+        min_length_input = InputNumber(value=1, min=0, step=1, size="small")
+        min_length_input.hide()
+
+        max_length_checkbox = Checkbox("Max Length")
+        max_length_input = InputNumber(value=1, min=0, step=1, size="small")
+        max_length_input.hide()
+
         saved_classes_settings = []
         default_classes_settings = []
+
+        @min_length_checkbox.value_changed
+        def min_length_checkbox_cb(is_checked: bool):
+            if is_checked:
+                min_length_input.show()
+            else:
+                min_length_input.hide()
+
+        @max_length_checkbox.value_changed
+        def max_length_checkbox_cb(is_checked: bool):
+            if is_checked:
+                max_length_input.show()
+            else:
+                max_length_input.hide()
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -108,16 +143,16 @@ class DropLinesByLengthAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            settins = {
+            settings = {
                 "lines_classes": saved_classes_settings,
-                "resolution_compensation": bool(options_json["Resolution Compensation"]),
-                "invert": bool(options_json["Invert"]),
+                "resolution_compensation": resolution_compensation_checkbox.is_checked(),
+                "invert": invert_checkbox.is_checked(),
             }
-            if options_json["Min Length"]:
-                settins["min_length"] = options_json["min_length"]
-            if options_json["Max Length"]:
-                settins["max_length"] = options_json["max_length"]
-            return settins
+            if min_length_checkbox.is_checked():
+                settings["min_length"] = min_length_input.get_value()
+            if max_length_checkbox.is_checked():
+                settings["max_length"] = max_length_input.get_value()
+            return settings
 
         def _set_settings_from_json(settings: dict):
             classes_list_widget.loading = True
@@ -179,33 +214,29 @@ class DropLinesByLengthAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="Resolution Compensation",
-                    option_component=NodesFlow.CheckboxOptionComponent(
-                        default_value=resolution_compensation_val
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        resolution_compensation_checkbox
                     ),
                 ),
                 NodesFlow.Node.Option(
                     name="Invert",
-                    option_component=NodesFlow.CheckboxOptionComponent(default_value=invert_val),
+                    option_component=NodesFlow.WidgetOptionComponent(invert_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="Min Length",
-                    option_component=NodesFlow.CheckboxOptionComponent(min_length_flag),
+                    option_component=NodesFlow.WidgetOptionComponent(min_length_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="min_length",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=0, default_value=min_length_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(min_length_input),
                 ),
                 NodesFlow.Node.Option(
                     name="Max Length",
-                    option_component=NodesFlow.CheckboxOptionComponent(max_length_flag),
+                    option_component=NodesFlow.WidgetOptionComponent(max_length_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="max_length",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=0, default_value=max_length_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(max_length_input),
                 ),
             ]
             return {

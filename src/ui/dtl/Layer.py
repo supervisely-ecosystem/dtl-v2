@@ -59,7 +59,7 @@ class Layer:
         self._info_option = NodesFlow.Node.Option(
             name="sidebarNodeInfo",
             option_component=NodesFlow.SidebarNodeInfoOptionComponent(
-                sidebar_template=Markdown(md_description).to_html(),
+                sidebar_template=Markdown(md_description, show_border=False).to_html(),
                 sidebar_width=600,
             ),
         )
@@ -68,7 +68,9 @@ class Layer:
         self._preview_img_url = f"static/{self.id}.jpg"
         self._ann = None
         self._img_desc = None
-        self._preview_widget = LabeledImage(enable_zoom=True)
+        self._preview_widget = LabeledImage(
+            enable_zoom=True, empty_message="Click update to show preview image with labels"
+        )
         self._update_preview_button = Button(
             text="Update",
             icon="zmdi zmdi-refresh",

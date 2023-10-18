@@ -5,6 +5,7 @@ from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
 
+
 class DummyAction(OtherAction):
     name = "dummy"
     title = "Dummy"

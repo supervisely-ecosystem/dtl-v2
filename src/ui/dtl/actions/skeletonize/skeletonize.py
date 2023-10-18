@@ -2,7 +2,7 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
 from src.ui.dtl.Action import AnnotationAction
@@ -16,7 +16,9 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -36,7 +38,7 @@ class SkeletonizeAction(AnnotationAction):
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_set_default_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
                 classes_list_widget,
@@ -49,7 +51,7 @@ class SkeletonizeAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -62,15 +64,20 @@ class SkeletonizeAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
+        skeletonize_methods_text = Text(
+            "Operation type", status="text", font_size=get_text_font_size()
+        )
+        skeletonize_methods_selector = Select(
+            [
+                Select.Item("skeletonization", "Skeletonization"),
+                Select.Item("medial_axis", "Medial axis"),
+                Select.Item("thinning", "Thinning"),
+            ],
+            size="small",
+        )
+
         saved_classes_settings = []
         default_classes_settings = []
-
-        methods = [
-            ("skeletonization", "Skeletonization"),
-            ("medial_axis", "Medial axis"),
-            ("thinning", "Thinning"),
-        ]
-        items = [NodesFlow.SelectOptionComponent.Item(*method) for method in methods]
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -120,7 +127,7 @@ class SkeletonizeAction(AnnotationAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes": saved_classes_settings,
-                "method": options_json["method"],
+                "method": skeletonize_methods_selector.get_value(),
             }
 
         def _set_settings_from_json(settings: dict):
@@ -169,14 +176,12 @@ class SkeletonizeAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(classes_list_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="method_text",
-                    option_component=NodesFlow.TextOptionComponent("Method"),
+                    name="skeletonize_methods_text",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="method",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=items, default_value=method_val
-                    ),
+                    name="skeletonize_methods_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_selector),
                 ),
             ]
             return {

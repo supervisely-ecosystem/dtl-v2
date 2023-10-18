@@ -5,11 +5,9 @@ from supervisely.app.widgets import (
     NodesFlow,
     Select,
     InputNumber,
-    Switch,
     Container,
-    Field,
-    Flexbox,
     OneOf,
+    Field,
     Checkbox,
     Button,
     Text,
@@ -17,7 +15,13 @@ from supervisely.app.widgets import (
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class CropAction(SpatialLevelAction):
@@ -29,67 +33,44 @@ class CropAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        crop_fixed_top_px = InputNumber(min=0)
-        crop_fixed_top_percent = InputNumber(min=0, max=100)
-        crop_fixed_top_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=crop_fixed_top_px,
-            off_content=crop_fixed_top_percent,
+        crop_fixed_top = InputNumber(min=0)
+        crop_fixed_left = InputNumber(min=0)
+        crop_fixed_right = InputNumber(min=0)
+        crop_fixed_bot = InputNumber(min=0)
+
+        sides_crop_unit_selector = Select(
+            items=[
+                Select.Item("px", "pixels"),
+                Select.Item("%", "percents"),
+            ]
         )
-        crop_fixed_left_px = InputNumber(min=0)
-        crop_fixed_left_percent = InputNumber(min=0, max=100)
-        crop_fixed_left_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=crop_fixed_left_px,
-            off_content=crop_fixed_left_percent,
-        )
-        crop_fixed_right_px = InputNumber(min=0)
-        crop_fixed_right_percent = InputNumber(min=0, max=100)
-        crop_fixed_right_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=crop_fixed_right_px,
-            off_content=crop_fixed_right_percent,
-        )
-        crop_fixed_bot_px = InputNumber(min=0)
-        crop_fixed_bot_percent = InputNumber(min=0, max=100)
-        crop_fixed_bot_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=crop_fixed_bot_px,
-            off_content=crop_fixed_bot_percent,
-        )
+
         crop_fixed_container = Container(
             widgets=[
                 Field(
+                    content=sides_crop_unit_selector,
+                    title="Crop unit",
+                    description="Select measure unit for cropping: pixels or percents",
+                ),
+                Field(
                     title="top",
-                    content=Flexbox(widgets=[OneOf(crop_fixed_top_switch), crop_fixed_top_switch]),
+                    description="distance from the top of the image to the top of the crop",
+                    content=crop_fixed_top,
                 ),
                 Field(
                     title="left",
-                    content=Flexbox(
-                        widgets=[OneOf(crop_fixed_left_switch), crop_fixed_left_switch]
-                    ),
+                    description="distance from the left of the image to the left of the crop",
+                    content=crop_fixed_left,
                 ),
                 Field(
                     title="right",
-                    content=Flexbox(
-                        widgets=[OneOf(crop_fixed_right_switch), crop_fixed_right_switch]
-                    ),
+                    description="distance from the right of the image to the right of the crop",
+                    content=crop_fixed_right,
                 ),
                 Field(
                     title="bottom",
-                    content=Flexbox(widgets=[OneOf(crop_fixed_bot_switch), crop_fixed_bot_switch]),
+                    description="distance from the bottom of the image to the bottom of the crop",
+                    content=crop_fixed_bot,
                 ),
             ]
         )
@@ -137,20 +118,28 @@ class CropAction(SpatialLevelAction):
                 ),
             ]
         )
+
         mode_select = Select(
             items=[
                 Select.Item("sides", "Sides", crop_fixed_container),
                 Select.Item("random_part", "Random part", crop_random_container),
             ]
         )
+        mode_select_field = Field(
+            content=mode_select,
+            title="Mode",
+            description="Select mode of cropping: by sides or random part of image",
+        )
 
-        mode_preview = Text("")
-        params_preview = Text("")
+        mode_preview = Text("", status="text", font_size=get_text_font_size())
+        params_preview = Text("", status="text", font_size=get_text_font_size())
         settings_preview = Container(widgets=[mode_preview, params_preview], gap=1)
 
         save_settings_btn = create_save_btn()
-        settings_container = Container(widgets=[mode_select, OneOf(mode_select), save_settings_btn])
-        settings_edit_text = Text("Settings")
+        settings_container = Container(
+            widgets=[mode_select_field, OneOf(mode_select), save_settings_btn]
+        )
+        settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -163,62 +152,46 @@ class CropAction(SpatialLevelAction):
 
         saved_settings = {}
 
-        def _set_sides(settings: dict):
-            mode_select.set_value("sides")
-            top_value = settings["sides"]["top"]
-            if top_value.endswith("px"):
-                crop_fixed_top_px.value = int(top_value[:-2])
-                crop_fixed_top_switch.on()
-            else:
-                crop_fixed_top_percent.value = int(top_value[:-1])
-                crop_fixed_top_switch.off()
-            left_value = settings["sides"]["left"]
-            if left_value.endswith("px"):
-                crop_fixed_left_px.value = int(left_value[:-2])
-                crop_fixed_left_switch.on()
-            else:
-                crop_fixed_left_percent.value = int(left_value[:-1])
-                crop_fixed_left_switch.off()
-            right_value = settings["sides"]["right"]
-            if right_value.endswith("px"):
-                crop_fixed_right_px.value = int(right_value[:-2])
-                crop_fixed_right_switch.on()
-            else:
-                crop_fixed_right_percent.value = int(right_value[:-1])
-                crop_fixed_right_switch.off()
-            bot_value = settings["sides"]["bottom"]
-            if bot_value.endswith("px"):
-                crop_fixed_bot_px.value = int(bot_value[:-2])
-                crop_fixed_bot_switch.on()
-            else:
-                crop_fixed_bot_percent.value = int(bot_value[:-1])
-                crop_fixed_bot_switch.off()
+        def _validate_percent_value(value, input_num_widget):
+            if sides_crop_unit_selector.get_value() == "%":
+                if value > 100:
+                    input_num_widget.value = 100
+
+        @crop_fixed_top.value_changed
+        def update_crop_fixed_top(value):
+            _validate_percent_value(value, crop_fixed_top)
+
+        @crop_fixed_left.value_changed
+        def update_crop_fixed_left(value):
+            _validate_percent_value(value, crop_fixed_left)
+
+        @crop_fixed_right.value_changed
+        def update_crop_fixed_right(value):
+            _validate_percent_value(value, crop_fixed_right)
+
+        @crop_fixed_bot.value_changed
+        def update_crop_fixed_bot(value):
+            _validate_percent_value(value, crop_fixed_bot)
+
+        @sides_crop_unit_selector.value_changed
+        def update_crop_fixed_unit(value):
+            if value == "%":
+                if crop_fixed_top.value > 100:
+                    crop_fixed_top.value = 100
+                if crop_fixed_left.value > 100:
+                    crop_fixed_left.value = 100
+                if crop_fixed_right.value > 100:
+                    crop_fixed_right.value = 100
+                if crop_fixed_bot.value > 100:
+                    crop_fixed_bot.value = 100
 
         def _get_sides():
             return {
-                "top": str(crop_fixed_top_px.get_value()) + "px"
-                if crop_fixed_top_switch.is_switched()
-                else str(crop_fixed_top_percent.get_value()) + "%",
-                "left": str(crop_fixed_left_px.get_value()) + "px"
-                if crop_fixed_left_switch.is_switched()
-                else str(crop_fixed_left_percent.get_value()) + "%",
-                "right": str(crop_fixed_right_px.get_value()) + "px"
-                if crop_fixed_right_switch.is_switched()
-                else str(crop_fixed_right_percent.get_value()) + "%",
-                "bottom": str(crop_fixed_bot_px.get_value()) + "px"
-                if crop_fixed_bot_switch.is_switched()
-                else str(crop_fixed_bot_percent.get_value()) + "%",
+                "top": str(crop_fixed_top.get_value()) + sides_crop_unit_selector.get_value(),
+                "left": str(crop_fixed_left.get_value()) + sides_crop_unit_selector.get_value(),
+                "right": str(crop_fixed_right.get_value()) + sides_crop_unit_selector.get_value(),
+                "bottom": str(crop_fixed_bot.get_value()) + sides_crop_unit_selector.get_value(),
             }
-
-        def _set_random(settings: dict):
-            crop_random_height_min.value = settings["random_part"]["height"]["min_percent"]
-            crop_random_height_max.value = settings["random_part"]["height"]["max_percent"]
-            crop_random_width_min.value = settings["random_part"]["width"]["min_percent"]
-            crop_random_width_max.value = settings["random_part"]["width"]["max_percent"]
-            if settings["random_part"]["keep_aspect_ratio"]:
-                crop_random_keep_aspect_ratio.check()
-            else:
-                crop_random_keep_aspect_ratio.uncheck()
 
         def _get_random():
             return {
@@ -241,11 +214,11 @@ class CropAction(SpatialLevelAction):
             elif mode == "sides":
                 sides = _get_sides()
                 mode_preview.text = "Mode: Sides"
-                params_preview.text = f"Top: {sides['top']}; Left: {sides['left']}; Right: {sides['right']}; Bottom: {sides['bottom']}"
+                params_preview.text = f"Top: {sides['top']}<br>Left: {sides['left']}<br>Right: {sides['right']}<br>Bottom: {sides['bottom']}"
             elif mode == "random_part":
                 random_part = _get_random()
                 mode_preview.text = "Mode: Random part"
-                params_preview.text = f"Height: {random_part['height']['min_percent']} - {random_part['height']['max_percent']}; Width: {random_part['width']['min_percent']} - {random_part['width']['max_percent']}; Keep aspect ratio: {random_part['keep_aspect_ratio']}"
+                params_preview.text = f"Height: min {random_part['height']['min_percent']}% - max {random_part['height']['max_percent']}%<br>Width: min {random_part['width']['min_percent']}% - max {random_part['width']['max_percent']}%<br>Keep aspect ratio: {random_part['keep_aspect_ratio']}"
 
         def _save_settings():
             nonlocal saved_settings
@@ -263,10 +236,6 @@ class CropAction(SpatialLevelAction):
             return saved_settings
 
         def _set_settings_from_json(settings):
-            if "sides" in settings:
-                _set_sides(settings)
-            elif "random_part" in settings:
-                _set_random(settings)
             _save_settings()
 
         save_settings_btn.click(_save_settings)

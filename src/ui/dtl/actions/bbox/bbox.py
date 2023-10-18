@@ -7,16 +7,18 @@ from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesMapping, ClassesMappingPreview
+from src.ui.widgets import ClassesList, ClassesListPreview
 from src.ui.dtl.utils import (
-    get_classes_mapping_value,
     classes_mapping_settings_changed_meta,
-    set_classes_mapping_preview,
-    set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_classes_list_value,
+    set_classes_list_preview,
+    set_classes_list_settings_from_json,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -31,10 +33,10 @@ class BBoxAction(AnnotationAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
-        classes_mapping_widget = ClassesMapping()
-        classes_mapping_preview = ClassesMappingPreview()
+        classes_mapping_widget = ClassesList(multiple=True)
+        classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_mapping_set_default_btn = create_set_default_btn()
         classes_mapping_widgets_container = Container(
             widgets=[
                 classes_mapping_widget,
@@ -47,14 +49,14 @@ class BBoxAction(AnnotationAction):
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
             button_type="text",
             button_size="small",
             emit_on_click="openSidebar",
-            style=get_set_settings_button_style()
+            style=get_set_settings_button_style(),
         )
         classes_mapping_edit_conatiner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
@@ -64,21 +66,18 @@ class BBoxAction(AnnotationAction):
         default_classes_mapping_settings = {}
 
         def _get_classes_mapping_value():
-            return get_classes_mapping_value(
-                classes_mapping_widget,
-                default_action="copy",
-                ignore_action="skip",
-                other_allowed=False,
-                default_allowed=False,
-            )
+            classes = get_classes_list_value(classes_mapping_widget, multiple=True)
+            mapping = {}
+            for cls_name in classes:
+                mapping[cls_name] = cls_name
+            mapping["__other__"] = "__ignore__"
+            return mapping
 
         def _set_classes_mapping_preview():
-            set_classes_mapping_preview(
+            set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="copy",
-                ignore_action="skip",
             )
 
         def _save_classes_mapping_setting():
@@ -102,46 +101,38 @@ class BBoxAction(AnnotationAction):
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
-            old_obj_classes = classes_mapping_widget.get_classes()
+            old_obj_classes = project_meta.obj_classes  # Why change?
+            new_obj_classes = project_meta.obj_classes
 
             # set classes to widget
-            classes_mapping_widget.set(project_meta.obj_classes)
+            classes_mapping_widget.set(new_obj_classes)
 
             # update settings according to new meta
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = classes_mapping_settings_changed_meta(
                 saved_classes_mapping_settings,
                 old_obj_classes,
-                project_meta.obj_classes,
+                new_obj_classes,
                 default_action="copy",
                 ignore_action="skip",
                 other_allowed=False,
             )
 
             # update classes mapping widget
-            set_classes_mapping_settings_from_json(
+            set_classes_list_settings_from_json(
                 classes_mapping_widget,
                 saved_classes_mapping_settings,
-                missing_in_settings_action="ignore",
-                missing_in_meta_action="ignore",
             )
 
             # update settings preview
             _set_classes_mapping_preview()
-
             classes_mapping_widget.loading = False
 
         def _set_settings_from_json(settings):
-            classes_mapping_settings = settings.get("classes_mapping", {})
-            if classes_mapping_settings == "default":
-                classes_mapping_widget.set_default()
-            else:
-                set_classes_mapping_settings_from_json(
-                    classes_mapping_widget,
-                    classes_mapping_settings,
-                    missing_in_settings_action="ignore",
-                    missing_in_meta_action="ignore",
-                )
+            classes_list_settings = settings.get("classes_mapping", [])
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_mapping_widget, settings=classes_list_settings
+            )
 
             # save settings
             _save_classes_mapping_setting()
@@ -157,11 +148,9 @@ class BBoxAction(AnnotationAction):
         @classes_mapping_set_default_btn.click
         def classes_mapping_set_default_btn_cb():
             _set_default_classes_mapping_setting()
-            set_classes_mapping_settings_from_json(
+            set_classes_list_settings_from_json(
                 classes_mapping_widget,
                 saved_classes_mapping_settings,
-                missing_in_settings_action="ignore",
-                missing_in_meta_action="ignore",
             )
             _set_classes_mapping_preview()
             g.updater("metas")

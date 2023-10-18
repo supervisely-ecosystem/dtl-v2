@@ -1,11 +1,12 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, InputNumber, Text, Select
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
+
 
 class RotateAction(SpatialLevelAction):
     name = "rotate"
@@ -16,59 +17,61 @@ class RotateAction(SpatialLevelAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        rotate_angles_text = Text("Rotate Angles", status="text", font_size=get_text_font_size())
+
+        min_degrees_text = Text("Min degrees", status="text", font_size=get_text_font_size())
+        min_degrees_input = InputNumber(value=45, step=1, controls=True)
+
+        max_degrees_text = Text("Max degrees", status="text", font_size=get_text_font_size())
+        max_degrees_input = InputNumber(value=45, step=1, controls=True)
+
+        br_text = Text("Black Regions", status="text", font_size=get_text_font_size())
+        br_selector_items = [
+            Select.Item("keep", "Keep"),
+            Select.Item("crop", "Crop"),
+            Select.Item("preserve_size", "Preserve Size"),
+        ]
+        br_selector = Select(items=br_selector_items, size="small")
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "rotate_angles": {
-                    "min_degrees": options_json["min_degrees"],
-                    "max_degrees": options_json["max_degrees"],
+                    "min_degrees": min_degrees_input.get_value(),
+                    "max_degrees": max_degrees_input.get_value(),
                 },
-                "black_regions": {"mode": options_json["black_regions"]},
+                "black_regions": {"mode": br_selector.get_value()},
             }
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            min_degrees_val = settings.get("rotate_angles", {}).get("min_degrees", 45)
-            max_degrees_val = settings.get("rotate_angles", {}).get("max_degrees", 45)
-            black_regions_val = settings.get("black_regions", {}).get("mode", "keep")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="rotate_angles_text",
-                    option_component=NodesFlow.TextOptionComponent("Rotate Angles"),
+                    option_component=NodesFlow.WidgetOptionComponent(rotate_angles_text),
                 ),
                 NodesFlow.Node.Option(
                     name="min_degrees_text",
-                    option_component=NodesFlow.TextOptionComponent("Min Degrees"),
+                    option_component=NodesFlow.WidgetOptionComponent(min_degrees_text),
                 ),
                 NodesFlow.Node.Option(
                     name="min_degrees",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        default_value=min_degrees_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(min_degrees_input),
                 ),
                 NodesFlow.Node.Option(
                     name="max_degrees_text",
-                    option_component=NodesFlow.TextOptionComponent("Max Degrees"),
+                    option_component=NodesFlow.WidgetOptionComponent(max_degrees_text),
                 ),
                 NodesFlow.Node.Option(
                     name="max_degrees",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        default_value=max_degrees_val
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(max_degrees_input),
                 ),
                 NodesFlow.Node.Option(
                     name="black_regions_text",
-                    option_component=NodesFlow.TextOptionComponent("Black Regions"),
+                    option_component=NodesFlow.WidgetOptionComponent(br_text),
                 ),
                 NodesFlow.Node.Option(
                     name="black_regions",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=[
-                            NodesFlow.SelectOptionComponent.Item("keep", "Keep"),
-                            NodesFlow.SelectOptionComponent.Item("crop", "Crop"),
-                            NodesFlow.SelectOptionComponent.Item("preserve_size", "Preserve Size"),
-                        ],
-                        default_value=black_regions_val,
-                    ),
+                    option_component=NodesFlow.WidgetOptionComponent(br_selector),
                 ),
             ]
             return {

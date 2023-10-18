@@ -97,7 +97,11 @@ nodes_flow = NodesFlow(
 
 add_specific_layer_buttons = {
     action_name: LayerCard(
-        name=action.title, key=action_name, icon=action.icon, color=action.header_color
+        name=action.title,
+        key=action_name,
+        icon=action.icon,
+        color=action.header_color,
+        docs_url=action.docs_url,
     )
     for action_name, action in actions.items()
 }

@@ -3,20 +3,22 @@ import copy
 from os.path import realpath, dirname
 
 from supervisely import ProjectMeta, Polyline, AnyGeometry
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesMapping, ClassesMappingPreview
+from src.ui.widgets import ClassesList, ClassesListPreview
 from src.ui.dtl.utils import (
-    get_classes_mapping_value,
     classes_mapping_settings_changed_meta,
-    set_classes_mapping_preview,
-    set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_classes_list_value,
+    set_classes_list_preview,
+    set_classes_list_settings_from_json,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -33,10 +35,10 @@ class LineToBitmapAction(AnnotationAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
-        classes_mapping_widget = ClassesMapping()
-        classes_mapping_preview = ClassesMappingPreview()
+        classes_mapping_widget = ClassesList(multiple=True)
+        classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_mapping_set_default_btn = create_set_default_btn()
         classes_mapping_widgets_container = Container(
             widgets=[
                 classes_mapping_widget,
@@ -49,7 +51,7 @@ class LineToBitmapAction(AnnotationAction):
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -58,29 +60,29 @@ class LineToBitmapAction(AnnotationAction):
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
         )
-        classes_mapping_edit_conatiner = get_set_settings_container(
+        classes_mapping_edit_container = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
         )
+
+        width_text = Text("Width", status="text", font_size=get_text_font_size())
+        width_input = InputNumber(value=1, min=1, step=1, controls=True)
 
         saved_classes_mapping_settings = {}
         default_classes_mapping_settings = {}
 
         def _get_classes_mapping_value():
-            return get_classes_mapping_value(
-                classes_mapping_widget,
-                default_action="copy",
-                ignore_action="skip",
-                other_allowed=False,
-                default_allowed=False,
-            )
+            classes = get_classes_list_value(classes_mapping_widget, multiple=True)
+            mapping = {}
+            for cls_name in classes:
+                mapping[cls_name] = cls_name
+            mapping["__other__"] = "__ignore__"
+            return mapping
 
         def _set_classes_mapping_preview():
-            set_classes_mapping_preview(
+            set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="copy",
-                ignore_action="skip",
             )
 
         def _save_classes_mapping_setting():
@@ -96,7 +98,7 @@ class LineToBitmapAction(AnnotationAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes_mapping": saved_classes_mapping_settings,
-                "width": options_json["width"],
+                "width": width_input.get_value(),
             }
 
         def meta_changed_cb(project_meta: ProjectMeta):
@@ -105,7 +107,7 @@ class LineToBitmapAction(AnnotationAction):
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
-            old_obj_classes = classes_mapping_widget.get_classes()
+            old_obj_classes = project_meta.obj_classes
             new_obj_classes = [
                 obj_class
                 for obj_class in project_meta.obj_classes
@@ -127,11 +129,9 @@ class LineToBitmapAction(AnnotationAction):
             )
 
             # update classes mapping widget
-            set_classes_mapping_settings_from_json(
+            set_classes_list_settings_from_json(
                 classes_mapping_widget,
                 saved_classes_mapping_settings,
-                missing_in_settings_action="ignore",
-                missing_in_meta_action="ignore",
             )
 
             # update settings preview
@@ -140,16 +140,10 @@ class LineToBitmapAction(AnnotationAction):
             classes_mapping_widget.loading = False
 
         def _set_settings_from_json(settings):
-            classes_mapping_settings = settings.get("classes_mapping", {})
-            if classes_mapping_settings == "default":
-                classes_mapping_widget.set_default()
-            else:
-                set_classes_mapping_settings_from_json(
-                    classes_mapping_widget,
-                    classes_mapping_settings,
-                    missing_in_settings_action="ignore",
-                    missing_in_meta_action="ignore",
-                )
+            classes_list_settings = settings.get("classes_mapping", [])
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_mapping_widget, settings=classes_list_settings
+            )
 
             # save settings
             _save_classes_mapping_setting()
@@ -165,23 +159,20 @@ class LineToBitmapAction(AnnotationAction):
         @classes_mapping_set_default_btn.click
         def classes_mapping_set_default_btn_cb():
             _set_default_classes_mapping_setting()
-            set_classes_mapping_settings_from_json(
+            set_classes_list_settings_from_json(
                 classes_mapping_widget,
                 saved_classes_mapping_settings,
-                missing_in_settings_action="ignore",
-                missing_in_meta_action="ignore",
             )
             _set_classes_mapping_preview()
             g.updater("metas")
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            width_val = settings.get("width", 1)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Set Classes Mapping",
                     option_component=NodesFlow.WidgetOptionComponent(
-                        widget=classes_mapping_edit_conatiner,
+                        widget=classes_mapping_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),
@@ -189,10 +180,12 @@ class LineToBitmapAction(AnnotationAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="width",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=width_val
-                    ),
+                    name="width_text",
+                    option_component=NodesFlow.WidgetOptionComponent(width_text),
+                ),
+                NodesFlow.Node.Option(
+                    name="width_input",
+                    option_component=NodesFlow.WidgetOptionComponent(width_input),
                 ),
             ]
             return {

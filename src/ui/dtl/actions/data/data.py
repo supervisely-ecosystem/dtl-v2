@@ -1,34 +1,34 @@
-from typing import List, Optional
-from os.path import realpath, dirname
 import copy
+from os.path import dirname, realpath
+from typing import List, Optional
 
-from supervisely.app.content import StateJson
-from supervisely.app.widgets import (
-    NodesFlow,
-    SelectDataset,
-    Text,
-    Button,
-    Container,
-    Flexbox,
-    NotificationBox,
-)
-from supervisely import ProjectType, ProjectMeta
-
-import src.utils as utils
 import src.globals as g
+import src.utils as utils
 from src.ui.dtl import SourceAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets.classes_mapping import ClassesMapping
-from src.ui.widgets.classes_mapping_preview import ClassesMappingPreview
 from src.ui.dtl.utils import (
-    get_classes_mapping_value,
-    classes_mapping_settings_changed_meta,
-    set_classes_mapping_preview,
-    get_set_settings_container,
-    get_set_settings_button_style,
-    set_classes_mapping_settings_from_json,
+    classes_list_settings_changed_meta,
+    create_save_btn,
+    get_classes_list_value,
     get_layer_docs,
-    create_save_btn
+    get_set_settings_button_style,
+    get_set_settings_container,
+    set_classes_list_preview,
+    set_classes_list_settings_from_json,
+    get_text_font_size,
+)
+from src.ui.widgets import ClassesListPreview
+from supervisely import ProjectMeta, ProjectType
+from supervisely.app.content import StateJson
+from supervisely.app.widgets import (
+    Button,
+    Container,
+    NodesFlow,
+    NotificationBox,
+    SelectDataset,
+    Text,
+    ClassesTable,
+    ProjectThumbnail,
 )
 
 
@@ -52,7 +52,9 @@ class DataAction(SourceAction):
             allowed_project_types=[ProjectType.IMAGES],
             compact=False,
         )
-        select_datasets_text = Text("<b>Select Datasets</b>")
+        select_datasets_text = Text(
+            "Select Datasets", status="text", font_size=get_text_font_size()
+        )
         select_datasets_btn = Button(
             text="SELECT",
             icon="zmdi zmdi-folder",
@@ -64,8 +66,16 @@ class DataAction(SourceAction):
         select_datasets_container = get_set_settings_container(
             select_datasets_text, select_datasets_btn
         )
-        src_save_btn = Button("Save", icon="zmdi zmdi-floppy", emit_on_click="save", call_on_click="closeSidebar();")
-        src_preview_widget = Text("")
+        src_save_btn = Button(
+            "Save", icon="zmdi zmdi-floppy", emit_on_click="save", call_on_click="closeSidebar();"
+        )
+        src_preview_widget_text = Text("", status="text", font_size=get_text_font_size())
+        src_preview_widget_text.hide()
+        src_preview_widget_thumbnail = ProjectThumbnail(remove_margins=True)
+        src_preview_widget_thumbnail.hide()
+        src_preview_widget = Container(
+            widgets=[src_preview_widget_thumbnail, src_preview_widget_text]
+        )
         src_widgets_container = Container(widgets=[select_datasets, src_save_btn])
 
         saved_src = []
@@ -81,28 +91,37 @@ class DataAction(SourceAction):
         StateJson().send_changes()
 
         # Settings widgets
+        _current_info = None
         _current_meta = ProjectMeta()
+
+        # add to sidebar when no project selected
         empty_src_notification = NotificationBox(
             title="No classes",
             description="Choose datasets and ensure that source project have classes.",
         )
-        classes_mapping_widget = ClassesMapping(empty_notification=empty_src_notification)
+
+        classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
-        classes_mapping_preview = ClassesMappingPreview()
+        classes_mapping_set_default_btn = Button(
+            "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
+        )
+        classes_mapping_preview = ClassesListPreview()
         classes_mapping_widgets_container = Container(
             widgets=[
                 classes_mapping_widget,
-                Flexbox(
+                Container(
                     widgets=[
                         classes_mapping_save_btn,
                         classes_mapping_set_default_btn,
                     ],
-                    gap=355,
+                    direction="horizontal",
+                    gap=0,
+                    fractions=[1, 0]
+                    # gap=355,
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -111,7 +130,7 @@ class DataAction(SourceAction):
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
         )
-        classes_mapping_edit_conatiner = get_set_settings_container(
+        classes_mapping_edit_contaniner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
         )
 
@@ -119,50 +138,72 @@ class DataAction(SourceAction):
         saved_classes_mapping_settings = "default"
 
         def _set_src_preview():
-            src_preview_text = "".join(f"<li>{src.replace('/', ' / ')}</li>" for src in saved_src)
-            src_preview_text = (
-                f'<ul style="margin: 1px; padding: 0px 0px 0px 18px">{src_preview_text}<ul>'
-            )
-            src_preview_widget.text = src_preview_text
+            src_preview_text = ""
+            if _current_info is not None:
+                if not _current_info.datasets_count == len(saved_src):
+                    # fix later
+                    if len(saved_src) == 1:
+                        if saved_src[0].endswith("/*"):
+                            src_preview_text = ""
+                    else:
+                        src_preview_text = "".join(
+                            f"<li>{src.replace('/', ' / ')}</li>" for src in saved_src
+                        )
+                        src_preview_text = f'<ul style="margin: 1px; padding: 0px 0px 0px 18px">{src_preview_text}<ul>'
+            if _current_info is not None:
+                if not src_preview_text == "":
+                    src_preview_widget_text.show()
+                src_preview_widget_thumbnail.show()
+                src_preview_widget_thumbnail.set(_current_info)
+                src_preview_widget_text.text = src_preview_text
 
         def _save_src():
             def read_src_from_widget():
-                ids = select_datasets.get_selected_ids()
-                if ids is None or len(ids) == 0 or ids[0] is None:
-                    ids = []
-                project_info = None
-                dataset_names = []
-                for id in ids:
-                    dataset_info = utils.get_dataset_by_id(id=id)
-                    if project_info is None:
-                        project_info = utils.get_project_by_id(id=dataset_info.project_id)
-                    dataset_names.append(dataset_info.name)
-                if project_info is None:
-                    return []
-                if project_info.datasets_count == len(dataset_names):
-                    return [f"{project_info.name}/*"]
-                return [f"{project_info.name}/{name}" for name in dataset_names]
+                # get_list and compare ids
+                selected_dataset_ids = select_datasets.get_selected_ids()
+                project_id = select_datasets.get_selected_project_id()
+                datasets = []
+                if project_id is not None:
+                    datasets = g.api.dataset.get_list(project_id)
 
-            nonlocal saved_src
-            saved_src = read_src_from_widget()
+                project_info = None
+                if (
+                    selected_dataset_ids is None
+                    or len(selected_dataset_ids) == 0
+                    or selected_dataset_ids[0] is None  # ?
+                ):
+                    selected_dataset_ids = []
+
+                if project_id is not None:
+                    project_info = g.api.project.get_info_by_id(project_id)
+
+                dataset_names = []
+                for ds in datasets:
+                    if ds.id in selected_dataset_ids:
+                        dataset_names.append(ds.name)
+
+                if project_info is None:
+                    return None, []
+                if project_info.datasets_count == len(dataset_names):
+                    return project_info, [f"{project_info.name}/*"]
+                return project_info, [f"{project_info.name}/{name}" for name in dataset_names]
+
+            nonlocal _current_info, saved_src
+            _current_info, saved_src = read_src_from_widget()
 
         def _get_classes_mapping_value():
-            return get_classes_mapping_value(
-                classes_mapping_widget,
-                default_action="keep",
-                ignore_action="keep",
-                other_allowed=True,
-                default_allowed=True,
-            )
+            classes = get_classes_list_value(classes_mapping_widget, multiple=True)
+            mapping = {}
+            for cls_name in classes:
+                mapping[cls_name] = cls_name
+            mapping["__other__"] = "__ignore__"
+            return mapping
 
         def _set_classes_mapping_preview():
-            set_classes_mapping_preview(
+            set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="copy",
-                ignore_action="keep",
-                missing_value="default",
             )
 
         def _save_classes_mapping_setting():
@@ -176,33 +217,46 @@ class DataAction(SourceAction):
             saved_classes_mapping_settings = copy.deepcopy(default_classes_mapping_settings)
 
         def meta_changed_cb(project_meta: ProjectMeta):
-            nonlocal _current_meta
+            nonlocal _current_info, _current_meta
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
-            old_obj_classes = classes_mapping_widget.get_classes()
+            obj_classes = [cls for cls in project_meta.obj_classes]
 
             # set classes to widget
-            classes_mapping_widget.set(project_meta.obj_classes)
+            if _current_info is not None:
+                classes_mapping_widget.read_project_from_id(_current_info.id)
 
             # update settings according to new meta
             nonlocal saved_classes_mapping_settings
-            saved_classes_mapping_settings = classes_mapping_settings_changed_meta(
-                saved_classes_mapping_settings,
-                old_obj_classes,
-                project_meta.obj_classes,
-                default_action="keep",
-                ignore_action="keep",
-                new_value="default",
-                other_allowed=True,
+            saved_classes_mapping_settings = "default"  # fix later
+            if saved_classes_mapping_settings == "default":
+                settings = [cls.name for cls in obj_classes]
+            else:
+                settings = [
+                    cls_name
+                    for cls_name in saved_classes_mapping_settings.keys()
+                    if cls_name != "__other__"
+                ]
+            classes_list = classes_list_settings_changed_meta(
+                settings,
+                obj_classes,
             )
-            if saved_classes_mapping_settings == {}:
+            if len(classes_list) == len(obj_classes):
                 saved_classes_mapping_settings = "default"
+            else:
+                saved_classes_mapping_settings = {
+                    **{cls_name: "__default__" for cls_name in classes_list},
+                    "__other__": "__ignore__",
+                }
 
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_mapping_widget,
+                settings=saved_classes_mapping_settings,
+            )
             # update settings preview
             _set_classes_mapping_preview()
-
             classes_mapping_widget.loading = False
 
         def get_src(options_json: dict) -> List[str]:
@@ -216,11 +270,12 @@ class DataAction(SourceAction):
 
         def _set_src_from_json(srcs: List[str]):
             nonlocal saved_src
+            project_info = None
             if len(srcs) == 0:
                 # set empty src to widget
                 StateJson()[select_datasets._project_selector.widget_id]["projectId"] = None
                 StateJson()[select_datasets.widget_id]["datasets"] = []
-                select_datasets._all_datasets_checkbox.uncheck()
+                # select_datasets._all_datasets_checkbox.uncheck()
                 StateJson().send_changes()
 
                 # set empty project meta
@@ -263,21 +318,22 @@ class DataAction(SourceAction):
             meta_changed_cb(project_meta)
 
         def _set_settings_from_json(settings: dict):
-            # if settings is empty, set default
-            if settings.get("classes_mapping", "default") == "default":
-                classes_mapping_widget.set_default()
-            else:
-                set_classes_mapping_settings_from_json(
-                    classes_mapping_widget,
-                    settings["classes_mapping"],
-                    missing_in_settings_action="ignore",
-                    missing_in_meta_action="ignore",
-                )
+            # if settings are empty, set default
 
+            classes_mapping_widget.loading = True
+
+            all_classes = []
+            if classes_mapping_widget.project_meta is not None:
+                all_classes = [cls.name for cls in classes_mapping_widget.project_meta.obj_classes]
+            classes_list_settings = settings.get("classes_mapping", all_classes)
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_mapping_widget, settings=classes_list_settings
+            )
             # save settings
             _save_classes_mapping_setting()
             # update settings preview
             _set_classes_mapping_preview()
+            classes_mapping_widget.loading = False
 
         @src_save_btn.click
         def src_save_btn_cb():
@@ -294,12 +350,12 @@ class DataAction(SourceAction):
         @classes_mapping_set_default_btn.click
         def classes_mapping_set_default_btn_cb():
             _set_default_classes_mapping_setting()
-            set_classes_mapping_settings_from_json(
-                classes_mapping_widget,
-                saved_classes_mapping_settings,
-                missing_in_settings_action="ignore",
-                missing_in_meta_action="ignore",
+
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_mapping_widget,
+                settings=saved_classes_mapping_settings,
             )
+
             _set_classes_mapping_preview()
             g.updater("metas")
 
@@ -323,9 +379,9 @@ class DataAction(SourceAction):
             ]
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="Set Classes Mapping",
+                    name="Set Classes",
                     option_component=NodesFlow.WidgetOptionComponent(
-                        widget=classes_mapping_edit_conatiner,
+                        widget=classes_mapping_edit_contaniner,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),

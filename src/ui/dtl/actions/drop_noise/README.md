@@ -6,20 +6,22 @@ This can be useful to eliminate noise after running neural network.
 
 ### Settings
 
-**classes** - list of classes that will be affected.
-**min_area** - minimal area of connected component to keep. Can be set in pixels or percents.
-**src_type** - type of source data.
+- **classes** - list of classes that will be affected.
+- **min_area** - minimal area of connected component to keep. Can be set in `pixels` or `percents`.
+- **src_type** - type of source data. Can be `image` or `bounding box`.
 
 ### Example
 
+Drop noise from bitmap annotation with minimal area 5%
+
 <table>
 <tr>
-<td style="text-align:center"><strong>Original label</strong></td>
-<td style="text-align:center"><strong>Result label</strong></td>
+<td style="text-align:center; width:50%"><strong>Original labels</strong></td>
+<td style="text-align:center; width:50%"><strong>Result labels</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/56297428-4fd1-4ddc-b04e-593d2d2a233a" alt="Original label"/> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/78aecdcc-7d94-4e65-acff-b79f79806d74" alt="Result label"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/b5258a62-0a47-4631-bbab-c39fb22609e4" alt="Original label"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e98942e3-6d1b-4218-9b13-c746d9bf3f63" alt="Result label"/> </td>
 </tr>
 </table>
 
@@ -27,8 +29,7 @@ This can be useful to eliminate noise after running neural network.
 
 <details>
   <summary>JSON view</summary>
-
-```json
+<pre>
 {
   "action": "drop_noise",
   "src": ["$data_1"],
@@ -39,6 +40,5 @@ This can be useful to eliminate noise after running neural network.
     "src_type": "image"
   }
 }
-```
-
+</pre>
 </details>

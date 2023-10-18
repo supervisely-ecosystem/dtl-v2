@@ -8,16 +8,12 @@ Dummy layer can be useful when you have many destinations of other layers you wa
 
 <details>
   <summary>JSON view</summary>
-
-```json
+<pre>
 {
-    "action": "dummy",
-    "src": [
-        "$data_1"
-    ],
-    "dst": "$dummy_2",
-    "settings": {}
+  "action": "dummy",
+  "src": ["$data_1"],
+  "dst": "$dummy_2",
+  "settings": {}
 }
-```
-
+</pre>
 </details>

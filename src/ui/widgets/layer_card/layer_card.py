@@ -1,12 +1,21 @@
-from supervisely.app.widgets import Widget, Button
+from supervisely.app.widgets import Widget, Button, Icons
 
 
 class LayerCard(Widget):
-    def __init__(self, name: str, key: str, icon: str, color: str = None, widget_id: int = None):
+    def __init__(
+        self,
+        name: str,
+        key: str,
+        icon: str,
+        color: str = None,
+        docs_url: str = None,
+        widget_id: int = None,
+    ):
         self._name = name
         self._key = key
         self._icon = icon
         self._color = color
+        self._docs_url = docs_url
 
         self._add_button = Button(
             "",
@@ -21,6 +30,7 @@ class LayerCard(Widget):
             "name": self._name,
             "icon": self._icon,
             "color": self._color,
+            "docs_url": self._docs_url,
         }
 
     def get_json_state(self):

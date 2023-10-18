@@ -9,18 +9,18 @@ A = np.eye(3) + np.random.randn(3, 3) * strength / 5
 
 ### Settings
 
-- **strength** — color multiplier strength. min: 0, max: 1
+- **strength** — color multiplier strength. min: 0, max: 1. Controls how much image will change its colors.
 
-### Example
+### Example. Random change of colors
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Random color image</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Random color image</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/f84cd464-d0f2-4823-bf96-23562ed58846" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/661b5d83-a91e-4ee6-a0e9-a1d5ed3b9c29" alt="Random color image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/2a7ef9e3-1dba-488a-abf1-ded6d0fd1a87" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/9c0c1789-f40f-4816-9894-c16c70d5d6a2" alt="Random color image" /> </td>
 </tr>
 </table>
 
@@ -28,16 +28,14 @@ A = np.eye(3) + np.random.randn(3, 3) * strength / 5
 
 <details>
   <summary>JSON view</summary>
-```json
+  <pre>
 {
-    "action": "random_color",
-    "src": [
-        "$data_12"
-    ],
-    "dst": "$random_color_21",
-    "settings": {
-        "strength": 0.65
-    }
+  "action": "random_color",
+  "src": ["$data_12"],
+  "dst": "$random_color_21",
+  "settings": {
+    "strength": 0.65
+  }
 }
-```
+</pre>
 </details>

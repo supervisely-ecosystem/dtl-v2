@@ -11,6 +11,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     Text,
+    Select,
 )
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
@@ -25,7 +26,9 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -34,7 +37,9 @@ class DropNoiseAction(AnnotationAction):
     name = "drop_noise"
     title = "Drop Noise"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_noise_from_bitmap"
-    description = "Removes connected components smaller than the specified size from bitmap annotations."
+    description = (
+        "Removes connected components smaller than the specified size from bitmap annotations."
+    )
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -43,7 +48,7 @@ class DropNoiseAction(AnnotationAction):
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         save_classes_btn = create_save_btn()
-        set_default_classes_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        set_default_classes_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
                 classes_list_widget,
@@ -56,7 +61,7 @@ class DropNoiseAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -101,9 +106,9 @@ class DropNoiseAction(AnnotationAction):
         )
         input_value = OneOf(px_or_percent_switch)
         min_area_widgets = Flexbox(widgets=[input_value, px_or_percent_switch])
-        min_area_preview = Text("")
+        min_area_preview = Text("", status="text", font_size=get_text_font_size())
         save_min_area_btn = create_save_btn()
-        set_default_min_area_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        set_default_min_area_btn = create_set_default_btn()
         min_area_widgets_container = Container(
             widgets=[
                 min_area_widgets,
@@ -116,7 +121,7 @@ class DropNoiseAction(AnnotationAction):
                 ),
             ]
         )
-        settings_edit_text = Text("Min Area")
+        settings_edit_text = Text("Min Area", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -140,7 +145,7 @@ class DropNoiseAction(AnnotationAction):
             return {
                 "classes": saved_classes_settings,
                 "min_area": saved_min_area_settings,
-                "src_type": options_json["Source type"],
+                "src_type": source_type_selector.get_value(),
             }
 
         def meta_changed_cb(project_meta: ProjectMeta):
@@ -200,10 +205,10 @@ class DropNoiseAction(AnnotationAction):
             _set_classes_list_preview()
             classes_list_widget.loading = False
 
-        src_type_option_items = [
-            NodesFlow.SelectOptionComponent.Item("image", "Image"),
-            NodesFlow.SelectOptionComponent.Item("bbox", "Bounding Box"),
-        ]
+        source_type_text = Text("Source type", status="text", font_size=get_text_font_size())
+        source_type_selector = Select(
+            [Select.Item("image", "Image"), Select.Item("bbox", "Bounding Box")]
+        )
 
         @save_classes_btn.click
         def classes_list_save_btn_cb():
@@ -233,7 +238,6 @@ class DropNoiseAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            src_type_val = settings.get("src_type", "image")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
@@ -264,10 +268,12 @@ class DropNoiseAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(min_area_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="Source type",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=src_type_option_items, default_value=src_type_val
-                    ),
+                    name="source_type_text",
+                    option_component=NodesFlow.WidgetOptionComponent(source_type_text),
+                ),
+                NodesFlow.Node.Option(
+                    name="source_type_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(source_type_selector),
                 ),
             ]
             return {

@@ -2,22 +2,22 @@
 
 `Bbox to Polygon` layer converts rectangles (`bounding boxes`) to polygons.
 
-❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
-
 ### Settings
 
-- **classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
+- **classes** — Select classes to convert to polygons. If no classes are selected, all classes will be ignored.
 
-### Example
+❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
+
+### Example. Convert bounding boxes to polygons
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image: bounding boxes</strong></td>
-<td style="text-align:center"><strong>Output: polygons</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image: bounding boxes</strong></td>
+<td style="text-align:center; width:50%"><strong>Output: polygons</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/897a9eae-0cf7-4010-83db-4a2fc80a38f9" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/20004430-a2cd-4a06-a6f9-ec541dacb17a" alt="Polygons" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/d58ae002-f23f-499e-b136-192c7719c500" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/a8b53945-a908-4070-a7ed-9c1902f46c27" alt="Polygons" /> </td>
 </tr>
 </table>
 
@@ -28,12 +28,11 @@
 <pre>
 {
   "action": "bbox2poly",
-  "src": ["$data_3"],
-  "dst": "$bbox2poly_20",
+  "src": ["$data_5"],
+  "dst": "$bbox2poly_7",
   "settings": {
     "classes_mapping": {
-      "watch_bbox": "watch_poly",
-      "glasses_bbox": "glasses_poly"
+        "peas": "__default__"
     }
   }
 }

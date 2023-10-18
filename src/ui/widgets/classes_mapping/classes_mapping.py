@@ -70,6 +70,7 @@ class ClassesMapping(Widget):
                     "value": cls.name,
                     "default": True,
                     "ignore": False,
+                    "selected": False,
                 }
                 for cls in self._classes
             ]
@@ -88,6 +89,7 @@ class ClassesMapping(Widget):
                     "value": cls.name,
                     "default": False,
                     "ignore": True,
+                    "selected": False,
                 },
             )
             new_mapping_values.append(value)
@@ -102,7 +104,11 @@ class ClassesMapping(Widget):
         if len(classes_values) != len(self._classes):
             self.update_state()
             return self.get_mapping()
-        mapping = {cls.name: classes_values[idx] for idx, cls in enumerate(self._classes)}
+        mapping = {
+            cls.name: classes_values[idx]
+            for idx, cls in enumerate(self._classes)
+            if classes_values[idx]["selected"]
+        }
         return mapping
 
     def ignore(self, indexes: List[int]):
@@ -124,9 +130,10 @@ class ClassesMapping(Widget):
             new_value = mapping.get(cls.name, cur_value)
             new_mapping_values.append(
                 {
-                    "value": new_value,
+                    "value": new_value if new_value != "" else cls.name,
                     "default": new_value == cls.name,
                     "ignore": new_value == "",
+                    "selected": new_value != "",
                 }
             )
         StateJson()[self.widget_id]["classes_values"] = new_mapping_values

@@ -16,7 +16,9 @@ from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
-    create_save_btn
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -34,7 +36,7 @@ class DropByClassAction(AnnotationAction):
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_set_default_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
                 classes_list_widget,
@@ -47,7 +49,7 @@ class DropByClassAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

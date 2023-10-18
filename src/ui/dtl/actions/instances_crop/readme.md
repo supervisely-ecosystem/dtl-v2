@@ -7,16 +7,18 @@ Layer for cropping instances by specifying classes to crop and pixels or percent
 - **classes** - Select classes of objects to crop. If name is not specified, then the class will not be modified.
 - **pad** - Padding settings (pixels or percentage) for each side of the image (top, left, right, bottom).
 
-### Example:
+### Example. Crop `car` class
+
+Crop instances of class `car` with 50px padding from each side.
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Instances Crop (kiwi class, 40px padding from each side)</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Cropped instance (50px padding from each side)</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/22476d1c-684b-4ce0-9675-ba5fc5b34370" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ccdf3074-fbe9-4278-ba64-e067f4cdd939" alt="Instances Crop" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/07b8e241-3733-4ef3-be21-506cc027c7b2" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/3693d57d-b127-4825-afba-7a4f7a389e5c" alt="Instances Crop" /> </td>
 </tr>
 </table>
 
@@ -27,16 +29,16 @@ Layer for cropping instances by specifying classes to crop and pixels or percent
 <pre>
 {
   "action": "instances_crop",
-  "src": ["$data_3"],
-  "dst": "$instances_crop_10",
+  "src": ["$data_5"],
+  "dst": "$instances_crop_6",
   "settings": {
-    "classes": ["camera", "cell phone", "glasses"],
+    "classes": ["car"],
     "pad": {
       "sides": {
-        "top": "40px",
-        "left": "40px",
-        "right": "40px",
-        "bottom": "40px"
+        "top": "50px",
+        "left": "50px",
+        "right": "50px",
+        "bottom": "50px"
       }
     }
   }

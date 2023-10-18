@@ -1,6 +1,7 @@
 # Approx Vector
 
-`Approx Vector` layer approximates vector figures: `lines` and `polygons`.
+`Approx Vector` layer approximates vector figure – reduce the number of vertices in vector figures and simplify them.
+Supported shapes: `polyline` and `polygon`.
 The operation decreases number of vertices with Douglas-Peucker algorithm.
 
 ### Settings:
@@ -8,17 +9,16 @@ The operation decreases number of vertices with Douglas-Peucker algorithm.
 - **classes** - Choose classes to apply transformation. Only classes with shape `line` or `polygon` are allowed.
 - **epsilon** - Approximation accuracy, maximum distance between the original curve and its approximation.
 
-
-### Example:
+### Example. Approximate vector figures
 
 <table>
 <tr>
-<td style="text-align:center"><strong>Original image</strong></td>
-<td style="text-align:center"><strong>Epsilon: 4</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Epsilon: 10</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/1e2c27b1-7cc3-4ce6-9b6c-e358b378fdb2" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/d8749d1f-0a2a-4359-985a-730d469814e0" alt="Epsilon: 4" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/a1389f2c-8bbc-4182-a7e0-b39c676be777" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/6e6ded99-f9ac-4980-bb8e-bab08a025378" alt="Epsilon: 10" /> </td>
 </tr>
 </table>
 
@@ -29,11 +29,11 @@ The operation decreases number of vertices with Douglas-Peucker algorithm.
 <pre>
 {
   "action": "approx_vector",
-  "src": ["$data_3"],
-  "dst": "$approx_vector_16",
+  "src": ["$data_5"],
+  "dst": "$approx_vector_6",
   "settings": {
-    "classes": ["camera", "cup"],
-    "epsilon": 4
+    "classes": ["ballon"],
+    "epsilon": 10
   }
 }
 </pre>

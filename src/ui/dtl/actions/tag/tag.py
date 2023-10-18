@@ -1,14 +1,20 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text
+from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text, Select
 from supervisely import ProjectMeta, TagMeta, Tag
 from supervisely.annotation.tag_meta import TagValueType
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container, get_layer_docs, create_save_btn
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class TagAction(AnnotationAction):
@@ -27,11 +33,11 @@ class TagAction(AnnotationAction):
         save_tag_btn = create_save_btn()
         input_tag_widgets_container = Container(widgets=[select_tag_meta, input_tag, save_tag_btn])
         tag_preview_meta = TagMetasPreview()
-        tag_preview_value = Text("")
+        tag_preview_value = Text("", status="text", font_size=get_text_font_size())
         rag_preview_widgets_container = Container(
             widgets=[tag_preview_meta, tag_preview_value], gap=1
         )
-        input_tag_edit_text = Text("Classes List")
+        input_tag_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         input_tag_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -42,6 +48,12 @@ class TagAction(AnnotationAction):
         )
         input_tag_edit_container = get_set_settings_container(
             input_tag_edit_text, input_tag_edit_btn
+        )
+
+        action_text = Text("Action", status="text", font_size=get_text_font_size())
+        action_selector = Select(
+            [Select.Item("add", "Add"), Select.Item("delete", "Delete")],
+            size="small",
         )
 
         saved_tag_setting = None
@@ -88,7 +100,7 @@ class TagAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            return {"tag": saved_tag_setting, "action": options_json["Select Action"]}
+            return {"tag": saved_tag_setting, "action": action_selector.get_value()}
 
         def _set_settings_from_json(settings: dict):
             if "tag" not in settings:
@@ -132,7 +144,6 @@ class TagAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            action_val = settings.get("action", "add")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Input Tag",
@@ -150,17 +161,11 @@ class TagAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="action_text",
-                    option_component=NodesFlow.TextOptionComponent("Action"),
+                    option_component=NodesFlow.WidgetOptionComponent(action_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="Select Action",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=[
-                            NodesFlow.SelectOptionComponent.Item("add", "Add"),
-                            NodesFlow.SelectOptionComponent.Item("delete", "Delete"),
-                        ],
-                        default_value=action_val,
-                    ),
+                    name="action_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(action_selector),
                 ),
             ]
             return {
