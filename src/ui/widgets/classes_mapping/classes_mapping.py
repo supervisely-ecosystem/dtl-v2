@@ -70,7 +70,7 @@ class ClassesMapping(Widget):
                     "value": cls.name,
                     "default": True,
                     "ignore": False,
-                    "selected": True,
+                    "selected": False,
                 }
                 for cls in self._classes
             ]
@@ -104,7 +104,11 @@ class ClassesMapping(Widget):
         if len(classes_values) != len(self._classes):
             self.update_state()
             return self.get_mapping()
-        mapping = {cls.name: classes_values[idx] for idx, cls in enumerate(self._classes)}
+        mapping = {
+            cls.name: classes_values[idx]
+            for idx, cls in enumerate(self._classes)
+            if classes_values[idx]["selected"]
+        }
         return mapping
 
     def ignore(self, indexes: List[int]):
