@@ -58,7 +58,7 @@ def run():
         pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
         for i, pr_dir in enumerate(pr_dirs):
             with progress(
-                message=[f'[{i+1}/{len(pr_dirs)}] Archivating result project "{pr_dir.name}"'],
+                message=[f'[{i+1}/{len(pr_dirs)}] Archiving result project "{pr_dir.name}"'],
                 total=1,
             ) as pbar:
                 tar_path = str(pr_dir) + ".tar"

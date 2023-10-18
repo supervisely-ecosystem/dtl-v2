@@ -8,33 +8,37 @@ As a result, an archive with Supervisely project structure will be created in `T
 It contains the following folders and `meta.json` file:
 
 **ann** — contains json annotations for each image
+
 **img** — contains raw images
-**masks_human** — contains visual representation of generated mask
-**masks_machine** — generated masks
+
+**masks\_human** — contains visual representation of generated mask
+
+**masks\_machine** — generated masks
 
 ### Settings
 
 **masks_machine** — if `true` machine readable masks are generated.
+
 **masks_human** — if `true` human readable masks are generated.
-**gt_machine_color** - specifies colors of generated masks for each class exported.
 
-- for class `kiwi` machine color is defined by `RGB=(100,100,100)`.
-- for class `lemon` machine color is defined by `RGB=(200,200,200)`.
+**gt\_machine\_color** - specifies colors of generated masks for each class exported.
 
-**gt_human_color** - specifies colors of generated masks for each class exported used in visual representation
-
-- for class `kiwi` machine color is defined by `RGB=(255,0,0)`.
-- for class `lemon` machine color is defined by `RGB=(27,0,255)`.
+**gt\_human\_color** - specifies colors of generated masks for each class exported used in visual representation
 
 ### Example
 
-**masks_human** example.
-
-![masks_human](https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/33aa3618-1032-4e37-8a74-f763e873670f)
-
-**masks_machine** example.
-
-![masks_machine](https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/ba9da74c-2b7a-4a1b-a4e9-5952a3a439e4)
+<table>
+<tr>
+<td style="text-align:center; width:33%"><strong>Original image</strong></td>
+<td style="text-align:center; width:34%"><strong>Human mask</strong></td>
+<td style="text-align:center; width:33%"><strong>Machine mask</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/48913536/183e6cc6-1067-4d59-9458-00e86490af23" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/48913536/bc822c67-eb11-4ab8-8d03-e51b9625524f" alt="Human mask" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/48913536/cd442328-e22f-417d-8a57-d5a2f3750858" alt="Machine mask" /> </td>
+</tr>
+</table>
 
 ### JSON view
 

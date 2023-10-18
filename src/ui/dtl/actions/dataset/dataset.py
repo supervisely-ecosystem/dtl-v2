@@ -17,13 +17,19 @@ class DatasetAction(OtherAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        save_original_text = Text(
-            "Rule: Save Original", status="text", font_size=get_text_font_size()
-        )
-        save_original_checkbox = Checkbox("Save Original")
+        save_original_checkbox = Checkbox("Keep original datasets")
 
         ds_name_text = Text("Name", status="text", font_size=get_text_font_size())
         ds_name_input = Input(value="", placeholder="Enter dataset name", size="small")
+
+        @save_original_checkbox.value_changed
+        def save_original_checkbox_changed(is_checked: bool):
+            if is_checked:
+                ds_name_text.hide()
+                ds_name_input.hide()
+            else:
+                ds_name_text.show()
+                ds_name_input.show()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -39,10 +45,6 @@ class DatasetAction(OtherAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             settings_options = [
-                NodesFlow.Node.Option(
-                    name="rule_text",
-                    option_component=NodesFlow.WidgetOptionComponent(save_original_text),
-                ),
                 NodesFlow.Node.Option(
                     name="Save original",
                     option_component=NodesFlow.WidgetOptionComponent(save_original_checkbox),

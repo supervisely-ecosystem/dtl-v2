@@ -8,6 +8,7 @@ As a result, an archive with Supervisely project structure will be created in `T
 It contains the following folders and `meta.json` file:
 
 **ann** — contains json annotations for each image
+
 **img** — contains raw images
 
 ### Settings
@@ -18,7 +19,7 @@ It contains the following folders and `meta.json` file:
 
 If `visualize` attribute is set to `true` then for each images corresponding visualizations are generated.
 
-![visualize-true](https://github.com/supervisely-ecosystem/dtl-v2/assets/79905215/7cf3ac03-e584-4327-9ba1-05d9d2cf1d68)
+![visualize-true](https://github.com/supervisely-ecosystem/ml-nodes/assets/48913536/91b70e8d-13f3-4d22-93fd-5c835f9f61f2)
 
 ### JSON view
 
