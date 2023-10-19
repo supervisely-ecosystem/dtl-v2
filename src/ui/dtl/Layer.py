@@ -1,4 +1,5 @@
 import os
+import copy
 import time
 from typing import Optional
 import random
@@ -114,7 +115,7 @@ class Layer:
             "action": self.action.name,
             "src": self._src,  # always list
             "dst": self._dst[0] if len(self._dst) == 1 else self._dst,  # can be str if only one dst
-            "settings": self._settings,
+            "settings": copy.deepcopy(self._settings),
         }
 
     def from_json(self, json_data: dict = {}) -> None:

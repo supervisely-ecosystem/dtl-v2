@@ -204,7 +204,6 @@ def context_menu_clicked_cb(item):
 
 @nodes_flow.item_dropped
 def item_dropped_cb(item):
-    print(item)
     position = item["position"]
     g.context_menu_position = position
     action_name = item["item"]["key"]

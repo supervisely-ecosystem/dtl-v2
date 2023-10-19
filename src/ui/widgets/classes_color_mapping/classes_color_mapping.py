@@ -1,13 +1,15 @@
-from typing import List
+from typing import List, Optional
 from supervisely.imaging.color import rgb2hex
+from supervisely.app.widgets import Widget
 from supervisely.app import StateJson, DataJson
-from src.ui.widgets.classes_mapping.classes_mapping import (
-    ClassesMapping,
-    type_to_shape_text,
-)
+from src.ui.widgets.classes_mapping.classes_mapping import type_to_shape_text, ClassesMapping
 
 
-class ClassesColorMapping(ClassesMapping):
+class ClassesColorMapping(Widget):
+    def __init__(self, classes=[], widget_id=None):
+        self._classes = classes
+        super().__init__(widget_id=widget_id, file_path=__file__)
+
     def get_json_data(self):
         return {
             "classes": [
@@ -27,6 +29,7 @@ class ClassesColorMapping(ClassesMapping):
                     "value": rgb2hex(cls.color),
                     "default": True,
                     "ignore": False,
+                    "selected": False,
                 }
                 for cls in self._classes
             ]
@@ -41,11 +44,7 @@ class ClassesColorMapping(ClassesMapping):
         for cls in self._classes:
             value = cur_mapping.get(
                 cls.name,
-                {
-                    "value": rgb2hex(cls.color),
-                    "default": False,
-                    "ignore": True,
-                },
+                {"value": rgb2hex(cls.color), "default": False, "ignore": True, "selected": False},
             )
             new_mapping_values.append(value)
         StateJson()[self.widget_id]["classes_values"] = new_mapping_values
@@ -58,5 +57,31 @@ class ClassesColorMapping(ClassesMapping):
             classes_values[idx]["value"] = rgb2hex(rgb_color)
             classes_values[idx]["default"] = tuple(cls.color) == tuple(rgb_color)
             classes_values[idx]["ignore"] = False
+        StateJson()[self.widget_id]["classes_values"] = classes_values
+        StateJson().send_changes()
+
+    def get_classes(self):
+        return self._classes
+
+    def get_selected_classes(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        return [cls for idx, cls in enumerate(self._classes) if classes_values[idx]["selected"]]
+
+    def get_mapping(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        if len(classes_values) != len(self._classes):
+            self.update_state()
+            return self.get_mapping()
+        mapping = {cls.name: classes_values[idx] for idx, cls in enumerate(self._classes)}
+        return mapping
+
+    def set_default(self):
+        self.update_state()
+        StateJson().send_changes()
+
+    def select(self, classes: List[str]):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        for idx, obj_class in enumerate(self._classes):
+            classes_values[idx]["selected"] = obj_class.name in classes
         StateJson()[self.widget_id]["classes_values"] = classes_values
         StateJson().send_changes()

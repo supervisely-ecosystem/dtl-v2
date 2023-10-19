@@ -56,9 +56,11 @@ class ColorClassAction(AnnotationAction):
             nonlocal saved_classes_colors_settings
             mapping = classes_colors.get_mapping()
             saved_classes_colors_settings = {
-                cls_name: hex2rgb(value["value"]) for cls_name, value in mapping.items()
+                cls_name: hex2rgb(value["value"])
+                for cls_name, value in mapping.items()
+                if value["selected"]
             }
-            obj_classes = classes_colors.get_classes()
+            obj_classes = classes_colors.get_selected_classes()
             classes_colors_preview.set(
                 obj_classes, {k: rgb2hex(v) for k, v in saved_classes_colors_settings.items()}
             )
@@ -74,6 +76,7 @@ class ColorClassAction(AnnotationAction):
             _current_meta = project_meta
             classes_colors.loading = True
             classes_colors.set(project_meta.obj_classes)
+            _set_settings_from_json(get_settings({}))
             _save_classes_colors_setting()
             classes_colors.loading = False
 
@@ -86,6 +89,7 @@ class ColorClassAction(AnnotationAction):
                     for cls, value in classes_colors.get_mapping().items()
                 ]
             )
+            classes_colors.select([cls_name for cls_name in colors.keys()])
             _save_classes_colors_setting()
             classes_colors.loading = False
 

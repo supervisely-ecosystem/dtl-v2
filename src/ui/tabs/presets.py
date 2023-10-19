@@ -9,6 +9,10 @@ from supervisely.app.widgets import (
     TeamFilesSelector,
     Input,
     Card,
+    NotificationBox,
+    Select,
+    OneOf,
+    Empty,
 )
 from supervisely.app import show_dialog
 
@@ -28,18 +32,57 @@ save_folder_selector = TeamFilesSelector(
     team_id=g.TEAM_ID, selection_file_type="folder", max_height=254
 )
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
-save_container = Container(widgets=[preset_name_input, save_folder_selector, save_preset_btn])
+save_notification_saved = NotificationBox("Preset saved", box_type="success")
+save_notification_empty_name = NotificationBox("Empty preset name", box_type="error")
+save_notification_empty_folder = NotificationBox("Save directory not selected", box_type="error")
+save_notification_select = Select(
+    items=[
+        Select.Item("empty", content=Empty()),
+        Select.Item("saved", content=save_notification_saved),
+        Select.Item("empty_name", content=save_notification_empty_name),
+        Select.Item("empty_folder", content=save_notification_empty_folder),
+    ]
+)
+save_notification_oneof = OneOf(save_notification_select)
+save_container = Container(
+    widgets=[
+        preset_name_input,
+        save_folder_selector,
+        Flexbox(
+            widgets=[
+                save_preset_btn,
+                save_notification_oneof,
+            ],
+            gap=20,
+        ),
+    ]
+)
 
 load_file_selector = TeamFilesSelector(
     team_id=g.TEAM_ID, selection_file_type="file", max_height=300
 )
 load_preset_btn = Button("Load")
-apply_preset = Button("Apply")
+load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
+load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
+load_notification_applied = NotificationBox("Preset applied", box_type="success")
+load_notification_select = Select(
+    items=[
+        Select.Item("empty", content=Empty()),
+        Select.Item("loaded", content=load_notification_loaded),
+        Select.Item("not selected", content=load_notification_file_not_selected),
+        Select.Item("applied", content=load_notification_applied),
+    ]
+)
+load_notification_oneof = OneOf(load_notification_select)
+apply_preset = Button("Apply", style="margin: 0")
 load_container = Container(
-    widgets=[load_file_selector, Flexbox(widgets=[load_preset_btn, apply_preset])]
+    widgets=[
+        load_file_selector,
+        Flexbox(widgets=[load_preset_btn, apply_preset, load_notification_oneof], gap=20),
+    ]
 )
 
-json_editor = Editor(language_mode="json")
+json_editor = Editor(language_mode="json", height_px=300)
 json_editor_card = Card(title="JSON Preview", content=json_editor, collapsable=True)
 json_editor_card.collapse()
 
@@ -49,9 +92,6 @@ load_layout = Container(widgets=[load_container, json_editor], gap=0)
 
 @save_preset_btn.click
 def save_json_button_cb():
-    print(save_folder_selector.get_selected_items())
-    print(save_folder_selector.get_selected_paths())
-
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
@@ -64,11 +104,32 @@ def save_json_button_cb():
     dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
     json_editor.set_text(json.dumps(dtl_json, indent=4), language_mode="json")
 
+    preset_name = preset_name_input.get_value()
+    if preset_name == "":
+        preset_name = preset_name_input.get_value("empty_name")
+        return
+    save_paths = save_folder_selector.get_selected_paths()
+    if len(save_paths) == 0:
+        preset_name = preset_name_input.get_value("empty_folder")
+        return
+    dst_path = save_paths[0] + "/" + preset_name + ".json"
+    src_path = g.DATA_DIR + "/preset.json"
+    with open(src_path, "w") as f:
+        json.dump(dtl_json, f, indent=4)
+    g.api.file.upload(g.TEAM_ID, src_path, dst_path)
+    save_notification_select.set_value("saved")
+
 
 @load_preset_btn.click
 def load_json_button_cb():
-    print(load_file_selector.get_selected_items())
-    print(load_file_selector.get_selected_paths())
+    paths = load_file_selector.get_selected_paths()
+    if len(paths) == 0:
+        load_notification_select.set_value("not selected")
+        return
+    g.api.file.download(g.TEAM_ID, paths[0], g.DATA_DIR + "/preset.json")
+    with open(g.DATA_DIR + "/preset.json", "r") as f:
+        json_editor.set_text(f.read(), language_mode="json")
+    load_notification_select.set_value("loaded")
 
 
 @handle_exception
@@ -216,6 +277,7 @@ def apply_json():
                             except:
                                 pass
         nodes_flow.set_edges(nodes_flow_edges)
+        load_notification_select.set_value("applied")
 
     except CustomException as e:
         ui_utils.show_error("Error loading json", e)
