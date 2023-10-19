@@ -31,12 +31,13 @@ from supervisely.app.widgets import (
     Text,
     ClassesTable,
     ProjectThumbnail,
+    Field,
 )
 
 
 class DataAction(SourceAction):
     name = "data"
-    title = "Data"
+    title = "Images Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
     description = "Use to specify project and its datasets that will participate in data transformation process."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -54,9 +55,7 @@ class DataAction(SourceAction):
             allowed_project_types=[ProjectType.IMAGES],
             compact=False,
         )
-        select_datasets_text = Text(
-            "Select Datasets", status="text", font_size=get_text_font_size()
-        )
+        select_datasets_text = Text("Select Project", status="text", font_size=get_text_font_size())
         select_datasets_btn = Button(
             text="SELECT",
             icon="zmdi zmdi-folder",
@@ -108,9 +107,18 @@ class DataAction(SourceAction):
             "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
         )
         classes_mapping_preview = ClassesListPreview()
+
+        classes_mapping_field = Field(
+            content=classes_mapping_widget,
+            title="Classes",
+            description=(
+                "Select classes that will be used in data transformation processes. "
+                "If class is not selected, it will be ignored."
+            ),
+        )
         classes_mapping_widgets_container = Container(
             widgets=[
-                classes_mapping_widget,
+                classes_mapping_field,
                 Container(
                     widgets=[
                         classes_mapping_save_btn,

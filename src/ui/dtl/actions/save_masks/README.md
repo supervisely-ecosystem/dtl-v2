@@ -1,6 +1,6 @@
-# Save Masks
+# Export Archive with Masks
 
-`Save Masks` layer gives you an opportunity to get masked representations of data besides just images and annotations that you can get using `Save` layer. It includes machine and human masks representations.
+`Export Archive with Masks` layer gives you an opportunity to get masked representations of data besides just images and annotations that you can get using `Export Archive` layer. It includes machine and human masks representations.
 
 In machine masks each of listed classes are colored in shades of gray that you specify. Note that black color `[0, 0, 0]` is automatically assigned to the `background` class. In human masks you would get stacked original images with the images having class colors above (see example).
 

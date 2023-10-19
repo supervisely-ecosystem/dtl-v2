@@ -10,7 +10,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 class SaveAction(OutputAction):
     name = "save"
-    title = "Save"
+    title = "Export Archive"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save"
     description = "Export annotations and images to Team Files."
     md_description = get_layer_docs(dirname(realpath(__file__)))

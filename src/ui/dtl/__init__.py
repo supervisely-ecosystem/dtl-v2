@@ -48,13 +48,13 @@ from .actions.save_masks.save_masks import SaveMasksAction
 from .actions.supervisely.supervisely import SuperviselyAction
 
 
-SOURCE_ACTIONS = "Source actions"
+SOURCE_ACTIONS = "Input"
 # TRANSFORMATION_ACTIONS = "Transformation actions"
 PIXEL_LEVEL_TRANSFORMS = "Pixel-level transforms"
 SPATIAL_LEVEL_TRANSFORMS = "Spatial-level transforms"
 ANNOTATION_TRANSFORMS = "Annotation transforms"
 OTHER = "Other"
-SAVE_ACTIONS = "Save actions"
+SAVE_ACTIONS = "Output"
 
 
 actions_list = {

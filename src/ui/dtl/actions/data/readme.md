@@ -1,6 +1,6 @@
-# Data
+# Images Project
 
-`Data` layer is used to specify project and its datasets that will participate in data transformation process. It allows to select classes that will be used in data transformation process.
+`Images Project` layer is used to specify project and its datasets that will participate in data transformation process. It allows to select classes that will be used in data transformation process.
 
 ### Settings:
 

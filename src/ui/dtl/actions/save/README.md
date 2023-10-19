@@ -1,6 +1,6 @@
-# Save
+# Export Archive
 
-`Save` layer allows to export annotations and images. Annotations are stored in `.json` files. Images are stored in `.png` or `.jpg` files (due to format of source image). When exporting annotations, `meta.json` file containing all used classes for project is also exported.
+`Export Archive` layer allows to export annotations and images. Annotations are stored in `.json` files. Images are stored in `.png` or `.jpg` files (due to format of source image). When exporting annotations, `meta.json` file containing all used classes for project is also exported.
 
 Moreover, you can get visual representations of all annotated objects on top of your images by setting visualize to true.
 

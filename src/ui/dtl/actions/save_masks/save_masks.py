@@ -20,7 +20,7 @@ from src.ui.dtl.utils import (
 
 class SaveMasksAction(OutputAction):
     name = "save_masks"
-    title = "Save Masks"
+    title = "Export Archive with Masks"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save_masks"
     description = "Export annotations, masks and images to Team Files."
     md_description = get_layer_docs(dirname(realpath(__file__)))

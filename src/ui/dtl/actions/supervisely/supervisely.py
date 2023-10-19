@@ -11,7 +11,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 class SuperviselyAction(OutputAction):
     name = "supervisely"
-    title = "Supervisely"
+    title = "New Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/supervisely"
     description = "Save results of data transformations to a new project in current workspace."
     md_description = get_layer_docs(dirname(realpath(__file__)))
