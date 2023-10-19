@@ -17,11 +17,9 @@
 		{{data.{{{widget.widget_id}}}.name}}
 
 		<el-tooltip content="Click to learn" placement="top">
-			<a href="{{{widget._docs_url}}}"
-				><i
-					class="zmdi zmdi-help-outline py-layer-card-widget-help-highlight"
-				></i
-			></a>
+			<div class="zmdi zmdi-help-outline py-layer-card-widget-help-highlight">
+				{{{widget._open_docs}}}
+			</div>
 		</el-tooltip>
 	</div>
 

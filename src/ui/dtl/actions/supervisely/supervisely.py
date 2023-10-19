@@ -54,6 +54,7 @@ class SuperviselyAction(OutputAction):
             id=layer_id,
             create_options=create_options,
             get_dst=get_dst,
+            need_preview=False,
         )
 
     @classmethod

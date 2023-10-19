@@ -30,4 +30,5 @@ class DummyAction(OtherAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
+            need_preview=False,
         )

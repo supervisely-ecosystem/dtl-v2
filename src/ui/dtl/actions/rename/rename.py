@@ -200,4 +200,5 @@ class RenameAction(AnnotationAction):
             create_options=create_options,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )

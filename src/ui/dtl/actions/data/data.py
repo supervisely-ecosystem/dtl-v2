@@ -379,7 +379,7 @@ class DataAction(SourceAction):
 
             src_options = [
                 NodesFlow.Node.Option(
-                    name="Select Datasets",
+                    name="Select Project",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=select_datasets_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(src_widgets_container),

@@ -33,6 +33,7 @@ class Layer:
         get_settings: Optional[callable] = None,
         get_dst: Optional[callable] = None,
         meta_changed_cb: Optional[callable] = None,
+        need_preview: bool = True,
         id: Optional[str] = None,
     ):
         self.action = action
@@ -45,6 +46,7 @@ class Layer:
         self._get_src = get_src
         self._get_dst = get_dst
         self._meta_changed_cb = meta_changed_cb
+        self._need_preview = need_preview
 
         self._src = []
         self._settings = {}
@@ -72,33 +74,39 @@ class Layer:
         self._preview_widget = LabeledImage(
             enable_zoom=True, empty_message="Click update to show preview image with labels"
         )
-        self._update_preview_button = Button(
-            text="Update",
-            icon="zmdi zmdi-refresh",
-            button_type="text",
-            button_size="small",
-            style=get_set_settings_button_style(),
-        )
 
-        @self._update_preview_button.click
-        def _update_preview_btn_click_cb():
-            g.updater("nodes")
+        if self._need_preview:
+            self._update_preview_button = Button(
+                text="Update",
+                icon="zmdi zmdi-refresh",
+                button_type="text",
+                button_size="small",
+                style=get_set_settings_button_style(),
+            )
 
-        self._preview_options = [
-            # NodesFlow.Node.Option(
-            #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-            # ),
-            NodesFlow.Node.Option(
-                name="update_preview_btn",
-                option_component=NodesFlow.WidgetOptionComponent(
-                    widget=get_set_settings_container(Text("Preview"), self._update_preview_button)
+            @self._update_preview_button.click
+            def _update_preview_btn_click_cb():
+                g.updater("nodes")
+
+        self._preview_options = []
+        if self._need_preview:
+            self._preview_options = [
+                # NodesFlow.Node.Option(
+                #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
+                # ),
+                NodesFlow.Node.Option(
+                    name="update_preview_btn",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=get_set_settings_container(
+                            Text("Preview"), self._update_preview_button
+                        )
+                    ),
                 ),
-            ),
-            NodesFlow.Node.Option(
-                name="preview",
-                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
-            ),
-        ]
+                NodesFlow.Node.Option(
+                    name="preview",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
+                ),
+            ]
 
     def get_src(self) -> list:
         return self._src
@@ -182,12 +190,16 @@ class Layer:
         self._src.append(src_name)
 
     def clear_preview(self):
-        self._preview_widget.clean_up()
+        if self._need_preview:
+            self._preview_widget.clean_up()
 
     def get_preview_img_desc(self):
-        return self._img_desc
+        if self._need_preview:
+            return self._img_desc
 
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
+        if not self._need_preview:
+            return
         self._img_desc = img_desc
         write_image(self._preview_img_path, img_desc.read_image())
         self._ann = ann
@@ -197,6 +209,8 @@ class Layer:
         os.environ["_SUPERVISELY_OFFLINE_FILES_UPLOADED"] = "False"
 
     def set_preview_loading(self, val: bool):
+        if not self._need_preview:
+            return
         self._preview_widget.loading = val
         self._update_preview_button.loading = val
 

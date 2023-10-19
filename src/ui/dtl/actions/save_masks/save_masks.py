@@ -265,6 +265,7 @@ class SaveMasksAction(OutputAction):
             get_settings=get_settings,
             get_dst=get_dst,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )
 
     @classmethod

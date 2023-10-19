@@ -4,7 +4,7 @@ from os.path import realpath, dirname
 
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
-from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox
+from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox, Markdown
 from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
@@ -66,6 +66,7 @@ class SaveAction(OutputAction):
             create_options=create_options,
             get_dst=get_dst,
             get_settings=get_settings,
+            need_preview=False,
         )
 
     @classmethod

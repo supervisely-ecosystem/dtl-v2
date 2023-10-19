@@ -1,4 +1,4 @@
-from supervisely.app.widgets import Widget, Button, Icons
+from supervisely.app.widgets import Widget, Button, Icons, Dialog, Select
 
 
 class LayerCard(Widget):
@@ -7,15 +7,26 @@ class LayerCard(Widget):
         name: str,
         key: str,
         icon: str,
+        dialog_widget: Dialog,
+        selector_widget: Select,
         color: str = None,
-        docs_url: str = None,
         widget_id: int = None,
     ):
         self._name = name
         self._key = key
         self._icon = icon
         self._color = color
-        self._docs_url = docs_url
+        self._dialog_widget = dialog_widget
+        self._selector_widget = selector_widget
+
+        self._open_docs = Button(
+            "", icon="zmdi zmdi-help-outline", button_type="text"  # , style="color: gray;"
+        )
+
+        @self._open_docs.click
+        def on_open_docs():
+            self._selector_widget.set_value(self._key)
+            self._dialog_widget.show()
 
         self._add_button = Button(
             "",
@@ -30,7 +41,6 @@ class LayerCard(Widget):
             "name": self._name,
             "icon": self._icon,
             "color": self._color,
-            "docs_url": self._docs_url,
         }
 
     def get_json_state(self):

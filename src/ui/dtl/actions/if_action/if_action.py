@@ -292,7 +292,10 @@ class IfAction(OtherAction):
         condition_input = OneOf(select_condition)
 
         preview_items = [condition.preview_item() for condition in conditions.values()]
-        _select_preview = Select(items=preview_items, size="small",)
+        _select_preview = Select(
+            items=preview_items,
+            size="small",
+        )
         settings_preview = OneOf(_select_preview)
         save_settings_btn = create_save_btn()
         settings_edit_text = Text("Condition", status="text", font_size=get_text_font_size())
@@ -389,6 +392,7 @@ class IfAction(OtherAction):
             create_options=create_options,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )
 
     @classmethod

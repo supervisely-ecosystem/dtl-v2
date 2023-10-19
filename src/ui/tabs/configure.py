@@ -12,6 +12,8 @@ from supervisely.app.widgets import (
     Sidebar,
     Input,
     Draggable,
+    Markdown,
+    OneOf,
 )
 from supervisely.app import show_dialog
 from supervisely import ProjectMeta
@@ -95,13 +97,26 @@ nodes_flow = NodesFlow(
 # for action_name, button in add_specific_layer_buttons.items():
 #     button.click(add_specific_layer_func_factory(action_name))
 
+select_items = [
+    Select.Item(
+        value=action_name,
+        label=action_name,
+        content=Markdown(action.md_description, show_border=False),
+    )
+    for action_name, action in actions.items()
+]
+select_widget = Select(items=select_items)
+oneof_widget = OneOf(conditional_widget=select_widget)
+dialog_widgets = Dialog(content=oneof_widget)
+
 add_specific_layer_buttons = {
     action_name: LayerCard(
         name=action.title,
         key=action_name,
         icon=action.icon,
+        dialog_widget=dialog_widgets,
+        selector_widget=select_widget,
         color=action.header_color,
-        docs_url=action.docs_url,
     )
     for action_name, action in actions.items()
 }
@@ -168,7 +183,7 @@ sidebar = Sidebar(
     height="calc(100vh - 53px)",
 )
 
-layout = Container(widgets=[add_layer_dialog, sidebar], gap=0)
+layout = Container(widgets=[dialog_widgets, add_layer_dialog, sidebar], gap=0)
 
 
 @handle_exception
