@@ -19,6 +19,7 @@ from src.ui.dtl.utils import (
     set_classes_list_preview,
     set_classes_list_settings_from_json,
     get_text_font_size,
+    classes_list_to_mapping,
 )
 import src.globals as g
 
@@ -67,11 +68,9 @@ class BBoxAction(AnnotationAction):
 
         def _get_classes_mapping_value():
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
-            mapping = {}
-            for cls_name in classes:
-                mapping[cls_name] = cls_name
-            mapping["__other__"] = "__ignore__"
-            return mapping
+            return classes_list_to_mapping(
+                classes, [oc.name for oc in _current_meta.obj_classes], other="skip"
+            )
 
         def _set_classes_mapping_preview():
             set_classes_list_preview(

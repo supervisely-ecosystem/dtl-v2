@@ -9,6 +9,7 @@ from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview
 from src.ui.dtl.utils import (
+    classes_list_to_mapping,
     classes_mapping_settings_changed_meta,
     get_set_settings_button_style,
     get_set_settings_container,
@@ -69,11 +70,9 @@ class BboxToPolyAction(AnnotationAction):
 
         def _get_classes_mapping_value():
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
-            mapping = {}
-            for cls_name in classes:
-                mapping[cls_name] = cls_name
-            mapping["__other__"] = "__ignore__"
-            return mapping
+            return classes_list_to_mapping(
+                classes, [oc.name for oc in _current_meta.obj_classes], other="skip"
+            )
 
         def _set_classes_mapping_preview():
             set_classes_list_preview(

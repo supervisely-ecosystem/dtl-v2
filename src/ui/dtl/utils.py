@@ -67,6 +67,37 @@ def _pack_classes_mapping_settings(
     return new_mapping
 
 
+def classes_list_to_mapping(
+    selected_classes: list,
+    all_classes: list,
+    other: Literal["skip", "default", "ignore"] = "skip",
+    default_allowed: bool = False,
+):
+    if default_allowed and len(selected_classes) == len(all_classes):
+        return "default"
+    mapping = {}
+    for cls_name in selected_classes:
+        mapping[cls_name] = cls_name
+    if other == "skip":
+        return mapping
+    if len(mapping) < len(all_classes):
+        mapping["__other__"] = f"__{other}__"
+    return mapping
+
+
+def mapping_to_list(mapping: dict, rename: bool = False):
+    """Converts mapping to list"""
+    classes = []
+    for cls_name, cls_value in mapping.items():
+        if cls_value == "__ignore__":
+            continue
+        if rename:
+            classes.append(cls_value if cls_value != "__default__" else cls_name)
+        else:
+            classes.append(cls_name)
+    return classes
+
+
 def get_classes_mapping_value(
     classes_mapping_widget: ClassesMapping,
     default_action: Literal["skip", "keep", "copy"] = "skip",
@@ -242,42 +273,37 @@ def set_classes_list_preview(
             else:
                 classes_list_widget.select_all()
                 meta = classes_list_widget.project_meta
-                classes_list_preview_widget.set([obj_class for obj_class in meta.obj_classes])
+                if meta is None:
+                    all_calsses = []
+                else:
+                    all_calsses = [obj_class for obj_class in meta.obj_classes]
+                classes_list_preview_widget.set(all_calsses)
             return
         names = [classes_list_settings]
-    elif isinstance(classes_list_settings, dict):
-        names = [name for name in classes_list_settings.keys() if name != "__other__"]
     else:
         names = classes_list_settings
 
     if not isinstance(classes_list_widget, ClassesTable):
+        # both ClassesList and ClassesMapping
         obj_classes = classes_list_widget.get_all_classes()
-        classes_list_preview_widget.set(
-            [obj_class for obj_class in obj_classes if obj_class.name in names]
-        )
     else:
-        obj_classes = classes_list_widget.get_selected_classes()
-        meta = classes_list_widget._project_meta
-        res_obj_classes = []
-        if meta is not None:
-            for cls in meta.obj_classes:
-                if cls.name in obj_classes:
-                    res_obj_classes.append(cls)
-        classes_list_preview_widget.set(
-            [obj_class for obj_class in res_obj_classes if obj_class.name in names]
-        )
+        if classes_list_widget.project_meta is None:
+            obj_classes = []
+        else:
+            obj_classes = [obj_class for obj_class in classes_list_widget.project_meta.obj_classes]
+    classes_list_preview_widget.set(
+        [obj_class for obj_class in obj_classes if obj_class.name in names]
+    )
 
 
 def set_classes_list_settings_from_json(
-    classes_list_widget: Union[ClassesList, ClassesTable], settings: Union[list, dict, str]
+    classes_list_widget: Union[ClassesList, ClassesTable], settings: Union[list, str]
 ):
     if isinstance(settings, str):
         if settings == "default":
             classes_list_widget.select_all()
             return
         settings = [settings]
-    elif isinstance(settings, dict):
-        settings = [name for name in settings.keys() if name != "__other__"]
 
     if isinstance(classes_list_widget, ClassesList):
         classes_list_widget.select(settings)

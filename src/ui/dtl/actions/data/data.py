@@ -16,6 +16,8 @@ from src.ui.dtl.utils import (
     set_classes_list_preview,
     set_classes_list_settings_from_json,
     get_text_font_size,
+    classes_list_to_mapping,
+    mapping_to_list,
 )
 from src.ui.widgets import ClassesListPreview
 from supervisely import ProjectMeta, ProjectType
@@ -192,18 +194,23 @@ class DataAction(SourceAction):
             _current_info, saved_src = read_src_from_widget()
 
         def _get_classes_mapping_value():
+            nonlocal _current_meta
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
-            mapping = {}
-            for cls_name in classes:
-                mapping[cls_name] = cls_name
-            mapping["__other__"] = "__ignore__"
-            return mapping
+            all_classes = [oc.name for oc in _current_meta.obj_classes]
+            return classes_list_to_mapping(
+                selected_classes=classes,
+                all_classes=all_classes,
+                other="ignore",
+                default_allowed=True,
+            )
 
         def _set_classes_mapping_preview():
             set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
-                saved_classes_mapping_settings,
+                saved_classes_mapping_settings
+                if saved_classes_mapping_settings == "default"
+                else mapping_to_list(saved_classes_mapping_settings),
             )
 
         def _save_classes_mapping_setting():
@@ -222,38 +229,35 @@ class DataAction(SourceAction):
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
-            obj_classes = [cls for cls in project_meta.obj_classes]
+            new_obj_classes = [cls for cls in project_meta.obj_classes]
+            new_names = [oc.name for oc in new_obj_classes]
 
             # set classes to widget
-            if _current_info is not None:
+            if _current_info is None:
+                classes_mapping_widget.set_project_meta(project_meta)
+            else:
                 classes_mapping_widget.read_project_from_id(_current_info.id)
 
             # update settings according to new meta
             nonlocal saved_classes_mapping_settings
-            saved_classes_mapping_settings = "default"  # fix later
-            if saved_classes_mapping_settings == "default":
-                settings = [cls.name for cls in obj_classes]
-            else:
-                settings = [
-                    cls_name
-                    for cls_name in saved_classes_mapping_settings.keys()
-                    if cls_name != "__other__"
-                ]
-            classes_list = classes_list_settings_changed_meta(
-                settings,
-                obj_classes,
-            )
-            if len(classes_list) == len(obj_classes):
-                saved_classes_mapping_settings = "default"
-            else:
-                saved_classes_mapping_settings = {
-                    **{cls_name: "__default__" for cls_name in classes_list},
-                    "__other__": "__ignore__",
-                }
+            if saved_classes_mapping_settings != "default":
+                current_classes_list = mapping_to_list(saved_classes_mapping_settings)
+                classes_list = classes_list_settings_changed_meta(
+                    current_classes_list,
+                    new_obj_classes,
+                )
+                saved_classes_mapping_settings = classes_list_to_mapping(
+                    classes_list,
+                    new_names,
+                    other="ignore",
+                    default_allowed=False,
+                )
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
-                settings=saved_classes_mapping_settings,
+                settings=new_names
+                if saved_classes_mapping_settings == "default"
+                else mapping_to_list(saved_classes_mapping_settings),
             )
             # update settings preview
             _set_classes_mapping_preview()
@@ -322,12 +326,12 @@ class DataAction(SourceAction):
 
             classes_mapping_widget.loading = True
 
-            all_classes = []
-            if classes_mapping_widget.project_meta is not None:
-                all_classes = [cls.name for cls in classes_mapping_widget.project_meta.obj_classes]
-            classes_list_settings = settings.get("classes_mapping", all_classes)
+            classes_mapping_settings = settings.get("classes_mapping", "default")
             set_classes_list_settings_from_json(
-                classes_list_widget=classes_mapping_widget, settings=classes_list_settings
+                classes_list_widget=classes_mapping_widget,
+                settings=classes_mapping_settings
+                if classes_mapping_settings == "default"
+                else mapping_to_list(classes_mapping_settings),
             )
             # save settings
             _save_classes_mapping_setting()
@@ -353,7 +357,9 @@ class DataAction(SourceAction):
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
-                settings=saved_classes_mapping_settings,
+                settings=saved_classes_mapping_settings
+                if saved_classes_mapping_settings == "default"
+                else mapping_to_list(saved_classes_mapping_settings),
             )
 
             _set_classes_mapping_preview()

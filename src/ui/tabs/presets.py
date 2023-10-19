@@ -49,9 +49,6 @@ load_layout = Container(widgets=[load_container, json_editor], gap=0)
 
 @save_preset_btn.click
 def save_json_button_cb():
-    print(save_folder_selector.get_selected_items())
-    print(save_folder_selector.get_selected_paths())
-
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
