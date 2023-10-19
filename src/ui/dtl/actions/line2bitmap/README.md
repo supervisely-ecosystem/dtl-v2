@@ -4,8 +4,8 @@
 
 ### Settings
 
-**classes_mapping** — select classes to convert. If no classes are selected, all classes will be ignored.
-**width** — result `bitmap` width in pixels.
+- **classes_mapping** — select classes to convert. If no classes are selected, all classes will be ignored.
+- **width** — result `bitmap` width in pixels.
 
 ### Example
 

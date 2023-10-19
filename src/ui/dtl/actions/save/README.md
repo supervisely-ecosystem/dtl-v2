@@ -13,7 +13,7 @@ It contains the following folders and `meta.json` file:
 
 ### Settings
 
-**visualize** — if `true` visual representations of all annotated objects are generated. `Bitmap` objects are drawn without modifications, `polygons` are filled with color associated with the class, for `rectangles` only borders are drawn.
+- **visualize** — if `true` visual representations of all annotated objects are generated. `Bitmap` objects are drawn without modifications, `polygons` are filled with color associated with the class, for `rectangles` only borders are drawn.
 
 ### Example
 

@@ -25,7 +25,7 @@ import src.globals as g
 
 class RenameAction(AnnotationAction):
     name = "rename"
-    title = "Rename"
+    title = "Rename Classes"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rename"
     description = "Rename existing classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))

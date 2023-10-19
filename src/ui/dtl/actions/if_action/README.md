@@ -5,7 +5,7 @@ All "true" data will be passed to the first branch (`$if_<id>__true`), all "fals
 
 ### Settings
 
-- **`condition`**- condition for splitting data. Possible following options:
+- **`condition`** - condition for splitting data. Possible following options:
   - **`probability`** - specify probability percentage to split data
   - **`min_objects_count`** - input minimum objects count to split data
   - **`min_height`** - split data by image height

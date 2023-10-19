@@ -4,7 +4,7 @@
 
 ### Settings
 
-**classes** - list of class names for split operation.
+- **classes** - list of class names for split operation.
 
 ### Example. Split masks of class `bird`
 

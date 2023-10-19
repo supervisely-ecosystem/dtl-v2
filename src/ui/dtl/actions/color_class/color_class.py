@@ -19,7 +19,7 @@ from src.ui.dtl.utils import (
 
 class ColorClassAction(AnnotationAction):
     name = "color_class"
-    title = "Color Class"
+    title = "Change Classes Colors"
     description = "Use for coloring classes as you wish. Add this class at the end of graph, before data saving."
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/color_class"

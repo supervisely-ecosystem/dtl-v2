@@ -4,7 +4,7 @@
 
 ### Settings
 
-**classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
+- **classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
 
 ### Example
 

@@ -4,7 +4,7 @@
 
 ### Settings
 
-**class** — name of class for merging. You can select only one class.
+- **class** — name of class for merging. You can select only one class.
 
 ### Example. Merge masks
 

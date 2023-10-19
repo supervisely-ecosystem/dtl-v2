@@ -17,13 +17,10 @@ It contains the following folders and `meta.json` file:
 
 ### Settings
 
-**masks_machine** — if `true` machine readable masks are generated.
-
-**masks_human** — if `true` human readable masks are generated.
-
-**gt\_machine\_color** - specifies colors of generated masks for each class exported.
-
-**gt\_human\_color** - specifies colors of generated masks for each class exported used in visual representation
+- **masks_machine** — if `true` machine readable masks are generated.
+- **masks_human** — if `true` human readable masks are generated.
+- **gt\_machine\_color** - specifies colors of generated masks for each class exported.
+- **gt\_human\_color** - specifies colors of generated masks for each class exported used in visual representation
 
 ### Example
 

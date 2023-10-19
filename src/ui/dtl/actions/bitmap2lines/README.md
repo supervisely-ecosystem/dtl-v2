@@ -12,7 +12,7 @@ Internally the layer builds a graph of 8-connected pixels, determines minimum sp
 ### Settings
 
 - **classes** — Select classes to convert. If no classes are selected, all classes will be ignored.
-- **min_points_cnt** — Min number of vertices for each output line. Other lines will be dropped.
+- **min\_points\_cnt** — Min number of vertices for each output line. Other lines will be dropped.
 
 ### Example. Convert bitmap to lines
 

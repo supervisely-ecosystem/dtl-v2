@@ -4,8 +4,8 @@
 
 ### Settings
 
-**classes** - list of classes to apply transformation. Only classes with shape `bitmap` are allowed.
-**method** - algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
+- **classes** - list of classes to apply transformation. Only classes with shape `bitmap` are allowed.
+- **method** - algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
 
 ### Example
 

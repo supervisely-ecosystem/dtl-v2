@@ -4,7 +4,7 @@
 
 ### Settings:
 
-- **classes_color_mapping** - Assign a new class color to each class. All specified classes will be colored. If you want to leave some classes unchanged select `default` option.
+- **classes\_color\_mapping** - Assign a new class color to each class. All specified classes will be colored. If you want to leave some classes unchanged select `default` option.
 
 ### Example. Change color of classes `horse` and `person`
 

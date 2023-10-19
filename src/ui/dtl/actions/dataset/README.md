@@ -4,8 +4,8 @@
 
 ### Settings
 
-**rule** — rule for dataset creation. Possible values: `save_original`. If `save_original` is selected, then dataset will keep it's original name.
-**name** — name of the dataset. 
+- **rule** — rule for dataset creation. Possible values: `save_original`. If `save_original` is selected, then dataset will keep it's original name.
+- **name** — name of the dataset.
 
 Use only `rule` or only `name` field.
 

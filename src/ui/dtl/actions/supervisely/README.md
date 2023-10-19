@@ -4,7 +4,7 @@
 
 ### Settings
 
-**settings** - `Supervisely` layer don't need any settings so just leave this field blank.
+- **settings** - `Supervisely` layer don't need any settings so just leave this field blank.
 
 <details>
   <summary>JSON view</summary>

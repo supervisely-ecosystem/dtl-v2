@@ -1,0 +1,5 @@
+.color-picker-compact .el-color-picker .el-color-picker__trigger {
+    height: 0px;
+    padding: 0;
+    border: none;
+}
