@@ -106,11 +106,11 @@ def save_json_button_cb():
 
     preset_name = preset_name_input.get_value()
     if preset_name == "":
-        preset_name = preset_name_input.get_value("empty_name")
+        preset_name = preset_name_input.set_value("empty_name")
         return
     save_paths = save_folder_selector.get_selected_paths()
     if len(save_paths) == 0:
-        preset_name = preset_name_input.get_value("empty_folder")
+        preset_name = preset_name_input.set_value("empty_folder")
         return
     dst_path = save_paths[0] + "/" + preset_name + ".json"
     src_path = g.DATA_DIR + "/preset.json"
