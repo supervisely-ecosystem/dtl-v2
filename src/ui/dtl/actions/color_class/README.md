@@ -1,6 +1,6 @@
-# Color Class
+# Change Classes Colors
 
-`Color Class` layer used for coloring classes as you wish.
+`Change Classes Colors` layer used for coloring classes as you wish.
 
 ### Settings:
 
@@ -11,11 +11,11 @@
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Color classes</strong></td>
+<td style="text-align:center; width:50%"><strong>New classes colors</strong></td>
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/8e03c98c-4c2c-4e30-8911-f17ada18b658" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e1e24235-c7eb-40aa-bb03-af3cf859f0d5" alt="Color classes" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e1e24235-c7eb-40aa-bb03-af3cf859f0d5" alt="New classes colors" /> </td>
 </tr>
 </table>
 

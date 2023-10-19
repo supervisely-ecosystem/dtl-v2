@@ -19,9 +19,7 @@ class LayerCard(Widget):
         self._dialog_widget = dialog_widget
         self._selector_widget = selector_widget
 
-        self._open_docs = Button(
-            "", icon="zmdi zmdi-help-outline", button_type="text"  # , style="color: gray;"
-        )
+        self._open_docs = Button("", icon="zmdi zmdi-help-outline", button_type="text")
 
         @self._open_docs.click
         def on_open_docs():

@@ -22,12 +22,11 @@
     color: #20a0ff;
 }
 
-i.zmdi.zmdi-help-outline.py-layer-card-widget-help-highlight {
+.py-layer-card-widget-help-highlight .el-button.el-button--text {
         padding: 10px; 
         color: gray;
 }
 
-
-i.zmdi.zmdi-help-outline.py-layer-card-widget-help-highlight:hover {
+.py-layer-card-widget-help-highlight .el-button.el-button--text:hover {
     color: #20a0ff;
 }
