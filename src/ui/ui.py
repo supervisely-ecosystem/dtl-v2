@@ -34,10 +34,10 @@ load_button = Button(
     style="color: black;",
 )
 
-buttons = Flexbox(widgets=[run_button, save_button, load_button])
+header = Flexbox(widgets=[run_button, save_button, load_button])
 
 layout = Container(
-    widgets=[error_dialog, run_dialog, save_dialog, load_dialog, buttons, configure_tab_layout],
+    widgets=[error_dialog, run_dialog, save_dialog, load_dialog, configure_tab_layout],
     gap=0,
 )
 

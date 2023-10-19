@@ -2,14 +2,15 @@ import threading
 import time
 from supervisely import Application
 
-from src.ui.ui import layout
+from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_metas, update_nodes
 from src.ui.tabs.presets import apply_json
 import src.globals as g
 import src.utils as u
 
 u.clean_static_dir(g.STATIC_DIR)
-app = Application(layout=layout, static_dir=g.STATIC_DIR)
+
+app = Application(layout=layout, static_dir=g.STATIC_DIR, session_info_extra_content=header)
 
 
 def _update_f():
