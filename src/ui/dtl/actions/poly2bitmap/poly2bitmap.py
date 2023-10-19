@@ -17,6 +17,7 @@ from src.ui.dtl.utils import (
     create_save_btn,
     create_set_default_btn,
     get_classes_list_value,
+    mapping_to_list,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
     get_text_font_size,
@@ -78,7 +79,7 @@ class PolygonToBitmapAction(AnnotationAction):
             set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
-                saved_classes_mapping_settings,
+                mapping_to_list(saved_classes_mapping_settings),
             )
 
         def _save_classes_mapping_setting():
