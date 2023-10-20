@@ -349,9 +349,12 @@ class DataAction(SourceAction):
 
         @src_save_btn.click
         def src_save_btn_cb():
+            _temp_info = _current_info
             _save_src()
             _set_src_preview()
             g.updater("metas")
+            if _current_info != _temp_info:
+                g.updater(("nodes", layer_id))
 
         @classes_mapping_save_btn.click
         def classes_mapping_save_btn_cb():

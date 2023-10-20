@@ -104,7 +104,7 @@ actions_list = {
     ],
     SAVE_ACTIONS: [
         SaveAction.name,
-        SaveMasksAction.name,
+        # SaveMasksAction.name,
         SuperviselyAction.name,
     ],
 }
