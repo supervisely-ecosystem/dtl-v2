@@ -1,6 +1,14 @@
 from pathlib import Path
 
-from supervisely.app.widgets import Button, Container, Progress, Text, ReloadableArea, Empty
+from supervisely.app.widgets import (
+    Button,
+    Container,
+    Progress,
+    Text,
+    ReloadableArea,
+    Empty,
+    NotificationBox,
+)
 from supervisely.app import show_dialog
 from supervisely.io.fs import get_file_size
 import supervisely as sly
@@ -20,12 +28,17 @@ download_archives_urls = Text("")
 results = ReloadableArea(Empty())
 results.hide()
 
-layout = Container(widgets=[run_btn, progress, download_archives_urls, results])
+error_notification = NotificationBox(title="Error", description="", box_type="error")
+error_notification.hide()
+
+layout = Container(widgets=[run_btn, progress, error_notification, download_archives_urls, results])
 
 
 @run_btn.click
 @handle_exception
 def run():
+    error_notification.hide()
+
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
@@ -85,10 +98,12 @@ def run():
         results.reload()
         results.show()
     except CustomException as e:
-        ui_utils.show_error("Error", e)
+        error_notification.set(title="Error", description=str(e))
+        error_notification.show()
         raise e
     except Exception as e:
-        show_dialog("Error", description=f"Unexpected Error: {str(e)}", status="error")
+        error_notification.set("Error", description=str(e))
+        error_notification.show()
         raise e
     finally:
         progress.hide()

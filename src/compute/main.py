@@ -82,7 +82,9 @@ def main(progress: Progress):
 
     total = net.get_total_elements()
     if total == 0:
-        raise GraphError("There are no elements to process")
+        raise GraphError(
+            "There are no elements to process. Make sure that you selected input project"
+        )
     elements_generator = net.get_elements_generator()
     results_counter = 0
     with progress(message=f"Processing items...", total=total) as pbar:

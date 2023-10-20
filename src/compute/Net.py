@@ -89,9 +89,9 @@ class Net:
                 graph_has_savel = True
 
         if graph_has_datal is False:
-            raise GraphError("Missing data layer")
+            raise GraphError("Missing Input layer")
         if graph_has_savel is False:
-            raise GraphError("Missing save layer")
+            raise GraphError("Missing Output layer")
         if len(self.layers) < 2:
             raise GraphError("Less than two layers")
         self.check_connections()
