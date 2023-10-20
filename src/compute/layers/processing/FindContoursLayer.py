@@ -3,7 +3,6 @@
 from typing import Tuple
 import cv2
 import numpy as np
-from exceptions import WrongGeometryError
 
 from supervisely import Bitmap, Polygon, Annotation, Label
 
@@ -11,6 +10,7 @@ from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 # FigureBitmap to FigurePolygon

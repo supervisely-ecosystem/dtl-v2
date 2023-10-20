@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from typing import Tuple
-from exceptions import WrongGeometryError
 
 from supervisely import Annotation, Polygon, Rectangle, Label
 from supervisely.geometry.helpers import geometry_to_polygon
@@ -11,6 +10,7 @@ from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 class BBoxToPolyLayer(Layer):

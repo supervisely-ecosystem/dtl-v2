@@ -5,13 +5,13 @@ import math
 import cv2
 import numpy as np
 from shapely.geometry import Polygon as ShPolygon
-from exceptions import WrongGeometryError
 
 from supervisely import Polygon, Polyline, Annotation, Label, ObjClass
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import WrongGeometryError
 
 
 def simple_distance(p1, p2) -> float:

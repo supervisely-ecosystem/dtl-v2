@@ -4,13 +4,13 @@ from typing import Tuple
 
 import numpy as np
 from skimage.morphology import skeletonize, medial_axis, thin
-from exceptions import WrongGeometryError
 
 from supervisely import Annotation, Label, Bitmap
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 # processes FigureBitmap

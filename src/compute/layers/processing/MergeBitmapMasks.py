@@ -2,12 +2,12 @@
 
 from typing import List, Tuple
 import numpy as np
-from exceptions import WrongGeometryError
 
 from supervisely import Bitmap, Annotation, Label
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import WrongGeometryError
 
 
 class MergeMasksLayer(Layer):

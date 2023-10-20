@@ -2,7 +2,6 @@
 
 from typing import List, Tuple
 import math
-from exceptions import WrongGeometryError
 
 from supervisely import Polygon, Rectangle, Annotation, Label, ObjClass
 from supervisely.imaging.color import hex2rgb
@@ -11,6 +10,7 @@ from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 def fix_coord(coord, min_value, max_value):

@@ -2,13 +2,13 @@
 
 from typing import Tuple
 from skimage.morphology import remove_small_objects
-from exceptions import WrongGeometryError
 
 from supervisely import Bitmap, Annotation, Label
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils import apply_to_labels
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import WrongGeometryError
 
 
 class DropNoiseFromBitmap(Layer):
