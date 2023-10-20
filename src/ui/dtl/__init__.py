@@ -67,7 +67,7 @@ actions_list = {
     SPATIAL_LEVEL_TRANSFORMS: [
         CropAction.name,
         FlipAction.name,
-        InstancesCropAction.name,
+        # InstancesCropAction.name,
         # MultiplyAction.name,
         ResizeAction.name,
         RotateAction.name,
