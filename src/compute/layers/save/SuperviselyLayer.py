@@ -37,7 +37,9 @@ class SuperviselyLayer(Layer):
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0:
-            raise GraphError("Destination is not set", extra={"layer_config": self.config})
+            raise GraphError(
+                "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            )
         dst = self.dsts[0]
         self.out_project_name = dst
 

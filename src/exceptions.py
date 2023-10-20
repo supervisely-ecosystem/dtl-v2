@@ -10,12 +10,47 @@ class CustomException(Exception):
         self, message: str, error: Optional[Exception] = None, extra: Optional[dict] = None
     ):
         super().__init__(message)
-        self.message = message
+        self.message = message + "." if not message.endswith(".") else ""
         self.error = error
         self.extra = extra
 
     def __str__(self):
-        return self.message
+        from src.ui.dtl import actions_dict
+        import src.globals as g
+
+        msg = self.message
+        extra_text = ""
+        if "layer_id" in self.extra:
+            layer_id = self.extra["layer_id"]
+            try:
+                layer_title = g.layers[layer_id].action.title
+            except:
+                layer_title = layer_id
+            extra_text = f" Layer: {layer_title}"
+        elif "layer_name" in self.extra:
+            try:
+                layer_title = actions_dict[self.extra["layer_name"]].title
+            except:
+                layer_title = self.extra["layer_name"]
+            extra_text = f" Layer: {layer_title}"
+        elif "layer" in self.extra:
+            try:
+                layer_title = actions_dict[self.extra["layer"]].title
+            except:
+                layer_title = self.extra["layer"]
+            extra_text = f" Layer: {layer_title}"
+        elif "layer_config" in self.extra:
+            try:
+                action = self.extra["layer_config"]["action"]
+                try:
+                    layer_title = actions_dict[action].title
+                except:
+                    layer_title = action
+                extra_text = f" Layer: {layer_title}"
+            except:
+                pass
+
+        return msg + extra_text
 
     def log(self):
         exc_info = (

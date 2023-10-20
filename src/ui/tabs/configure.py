@@ -8,18 +8,15 @@ from supervisely.app.widgets import (
     NodesFlow,
     Field,
     Text,
-    Empty,
     Sidebar,
     Input,
-    Draggable,
     Markdown,
     OneOf,
 )
 from supervisely.app import show_dialog
-from supervisely import ProjectMeta
 
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl import actions, actions_list
+from src.ui.dtl import actions_dict, actions_list
 from src.ui.dtl import SOURCE_ACTIONS
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -36,7 +33,7 @@ select_action_name = Select(
         Select.Group(
             group_name,
             items=[
-                Select.Item(action_name, actions[action_name].title)
+                Select.Item(action_name, actions_dict[action_name].title)
                 for action_name in group_actions
             ],
         )
@@ -59,7 +56,7 @@ context_menu_items = [
         {
             "label": group_name,
             "items": [
-                {"key": action_name, "label": actions[action_name].title}
+                {"key": action_name, "label": actions_dict[action_name].title}
                 for action_name in group_actions
             ],
             "divided": group_name == SOURCE_ACTIONS,
@@ -103,7 +100,7 @@ select_items = [
         label=action_name,
         content=Markdown(action.md_description, show_border=False),
     )
-    for action_name, action in actions.items()
+    for action_name, action in actions_dict.items()
 ]
 select_widget = Select(items=select_items)
 oneof_widget = OneOf(conditional_widget=select_widget)
@@ -118,7 +115,7 @@ add_specific_layer_buttons = {
         selector_widget=select_widget,
         color=action.header_color,
     )
-    for action_name, action in actions.items()
+    for action_name, action in actions_dict.items()
 }
 
 
@@ -151,7 +148,7 @@ left_sidebar_actions_widgets = {
     #     ),
     #     key=action_name,
     # )
-    for action_name, action in actions.items()
+    for action_name, action in actions_dict.items()
 }
 
 left_sidebar_groups_widgets = {
@@ -254,7 +251,7 @@ def filter(value):
             for action_name in group_actions:
                 if (
                     action_name.lower().find(value) == -1
-                    and actions[action_name].title.lower().find(value) == -1
+                    and actions_dict[action_name].title.lower().find(value) == -1
                 ):
                     left_sidebar_actions_widgets[action_name].hide()
                 else:

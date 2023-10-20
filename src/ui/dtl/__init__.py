@@ -109,7 +109,7 @@ actions_list = {
     ],
 }
 
-actions = {
+actions_dict = {
     # Data layers
     DataAction.name: DataAction,
     # Pixel-level transforms layers

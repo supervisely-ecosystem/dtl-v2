@@ -10,16 +10,14 @@ from src.utils import (
     get_project_meta,
     download_preview,
     update_project_info,
-    get_all_datasets,
 )
 from src.compute.Net import Net
 from src.compute.Layer import Layer as NetLayer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-from src.ui.dtl import actions, actions_list
+from src.ui.dtl import actions_dict, actions_list
 from src.ui.dtl.Action import Action, SourceAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import (
-    SOURCE_ACTIONS,
     SAVE_ACTIONS,
     PIXEL_LEVEL_TRANSFORMS,
     SPATIAL_LEVEL_TRANSFORMS,
@@ -27,9 +25,9 @@ from src.ui.dtl import (
     OTHER,
 )
 from src.exceptions import (
+    BadSettingsError,
     CustomException,
     ActionNotFoundError,
-    CreateNodeError,
     LayerNotFoundError,
 )
 import src.globals as g
@@ -356,9 +354,15 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             else:
                 img_desc = layer.get_src_img_desc()
                 preview_ann = layer.get_src_ann()
+    if img_desc is None:
+        raise BadSettingsError(
+            "Cannot load preview image for input layer. Check that you selected input project"
+        )
 
     data_el = (img_desc, preview_ann)
-    layers_idx_whitelist = None if layers_id_chain is None else [all_layers_ids.index(id) for id in layers_id_chain]
+    layers_idx_whitelist = (
+        None if layers_id_chain is None else [all_layers_ids.index(id) for id in layers_id_chain]
+    )
     processing_generator = net.start_iterate(
         data_el, layer_idx=layer_idx, layers_idx_whitelist=layers_idx_whitelist
     )
@@ -501,7 +505,7 @@ def create_new_layer(
     action_name: str,
 ) -> Layer:
     try:
-        action = actions[action_name]
+        action = actions_dict[action_name]
     except KeyError:
         raise ActionNotFoundError(action_name)
     id = get_layer_id(action_name)
