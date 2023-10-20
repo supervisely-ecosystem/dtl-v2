@@ -10,6 +10,7 @@ from supervisely.app.widgets import (
     Text,
     Checkbox,
     InputNumber,
+    Field,
 )
 from supervisely import ProjectMeta, Polyline, AnyGeometry
 
@@ -42,12 +43,17 @@ class DropLinesByLengthAction(AnnotationAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
+        classes_mapping_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select the POLYLINE classes to be removed depending on their length",
+        )
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
         classes_list_set_default_btn = create_set_default_btn()
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_mapping_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,

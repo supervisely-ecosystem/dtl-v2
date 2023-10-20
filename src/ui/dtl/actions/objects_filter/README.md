@@ -1,6 +1,6 @@
 # Objects Filter
 
-`Objects Filter` layer allows to filter objects by class names, area percentage or bounding box size. You can specify area size in percentage of image area or in pixels (width and height of bounding box) and filter objects by `less` or `greater` comparison.
+`Objects Filter` layer allows filtering objects by class names, area percentage or bounding box size. You can specify area size in percentage of image area or in pixels (width and height of bounding box) and filter objects by `less` or `greater` comparison.
 
 ### Settings
 
@@ -12,7 +12,7 @@
   - `area_size` - specify area size (`percent` of image area or `width` and `height` of bounding box).
 
 Objects can be filtered in 3 ways: by class names, by area percentage and by bounding box size.
-Here is an examples of how to use each of them.
+Here are examples of how to use each of them.
 
 ### Example 1. Filter by class names
 

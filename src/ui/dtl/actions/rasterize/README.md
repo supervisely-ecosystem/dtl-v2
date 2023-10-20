@@ -8,8 +8,8 @@
 
 ### Example
 
-In this example original image contains two objects: **car** and **road** and they are **overlapped** (car object is under the road object).
-On the result image car and road objects are rasterized and now they are not overlapped.
+In this example original image contains two objects: **car** and **road**, and they are **overlapped** (car object is under the road object).
+On the result image car and road objects are rasterized, and now they are not overlapped.
 
 <table>
 <tr>

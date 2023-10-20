@@ -3,7 +3,7 @@ import copy
 from os.path import realpath, dirname
 
 from supervisely import ProjectMeta, Polyline, AnyGeometry
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber, Field
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
@@ -41,9 +41,14 @@ class LineToBitmapAction(AnnotationAction):
         classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = create_set_default_btn()
+        classes_mapping_widget_field = Field(
+            content=classes_mapping_widget,
+            title="Classes",
+            description="Select classes to convert them to BITMAP",
+        )
         classes_mapping_widgets_container = Container(
             widgets=[
-                classes_mapping_widget,
+                classes_mapping_widget_field,
                 Flexbox(
                     widgets=[
                         classes_mapping_save_btn,

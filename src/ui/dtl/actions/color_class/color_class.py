@@ -1,7 +1,7 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Text, Field
 from supervisely import ProjectMeta
 from supervisely.imaging.color import hex2rgb, rgb2hex
 
@@ -34,6 +34,11 @@ class ColorClassAction(AnnotationAction):
         classes_colors_save_btn = create_save_btn()
         classes_colors_widgets_container = Container(
             widgets=[classes_colors, classes_colors_save_btn]
+        )
+        classes_colors_widget_field = Field(
+            content=classes_colors_widgets_container,
+            title="Classes",
+            description="Select the classes for which you want to change the color",
         )
         classes_colors_edit_text = Text(
             "Classes Colors", status="text", font_size=get_text_font_size()
@@ -104,7 +109,7 @@ class ColorClassAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=classes_colors_edit_conatiner,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
-                            classes_colors_widgets_container
+                            classes_colors_widget_field
                         ),
                         sidebar_width=600,
                     ),
