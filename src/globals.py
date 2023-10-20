@@ -71,11 +71,11 @@ error_dialog = Dialog(
     content=Container(
         widgets=[
             Flexbox(widgets=[error_icon, error_description]),
-            error_extra_literal,
-            Container(
-                widgets=[error_extra],
-                style="max-height: 400px; overflow-y: auto;",
-            ),
+            # error_extra_literal,
+            # Container(
+            #     widgets=[error_extra],
+            #     style="max-height: 400px; overflow-y: auto;",
+            # ),
             error_close_btn,
         ],
     ),

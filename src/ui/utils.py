@@ -104,51 +104,6 @@ def init_src(edges: list):
         layer.add_source(from_node_id, from_node_interface)
 
 
-def set_preview(data_layers_ids):
-    for data_layer_id in data_layers_ids:
-        data_layer = g.layers[data_layer_id]
-        src = data_layer.get_src()
-        if src is None or len(src) == 0:
-            # Skip if no sources specified for data layer
-            continue
-
-        project_name, dataset_name = src[0].split("/")
-        try:
-            project_info = get_project_by_name(project_name)
-            project_meta = get_project_meta(project_info.id)
-        except Exception as e:
-            raise CustomException(
-                f"Error getting project meta", error=e, extra={"project_name": project_name}
-            )
-
-        try:
-            preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
-        except Exception as e:
-            raise CustomException(
-                f"Error downloading image and annotation for preview",
-                error=e,
-                extra={"project_name": project_name, "dataset_name": dataset_name},
-            )
-        preview_img = sly.image.read(preview_img_path)
-        with open(preview_ann_path, "r") as f:
-            preview_ann = sly.Annotation.from_json(json.load(f), project_meta)
-        preview_path = f"{g.PREVIEW_DIR}/{project_name}/{dataset_name}"
-        img_desc = ImageDescriptor(
-            LegacyProjectItem(
-                project_name=project_name,
-                ds_name=dataset_name,
-                image_name="preview_image",
-                ia_data={"image_ext": ".jpg"},
-                img_path=f"{preview_path}/preview_image.jpg",
-                ann_path=f"{preview_path}/preview_ann.json",
-            ),
-            False,
-        )
-        img_desc = img_desc.clone_with_img(preview_img)
-        img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
-        data_layer.update_preview(img_desc, preview_ann)
-
-
 def init_output_metas(
     net: Net, data_layers_ids: list, all_layers_ids: list, nodes_state: dict, edges: list
 ):
@@ -261,7 +216,7 @@ def init_output_metas(
     return net
 
 
-def get_layers_chain(layer_id: str, chain: list = None):
+def get_layer_parents_chain(layer_id: str, chain: list = None):
     if chain is None:
         chain = []
     layer: Layer = g.layers[layer_id]
@@ -276,8 +231,20 @@ def get_layers_chain(layer_id: str, chain: list = None):
             continue
         if src_layer in chain:
             continue
-        return get_layers_chain(src_layer, chain)
+        return get_layer_parents_chain(src_layer, chain)
     return chain
+
+
+def get_layer_children_list(layer_id, layers: list = None):
+    if layers is None:
+        layers = []
+    if layer_id in layers:
+        return layers
+    layers.append(layer_id)
+    layer: Layer = g.layers[layer_id]
+    for dst in layer.get_dst():
+        layers = get_layer_children_list(dst, layers)
+    return layers
 
 
 def load_preview_for_data_layer(layer: Layer):
@@ -343,7 +310,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
         preview_ann = layer.get_src_ann()
         if img_desc is None:
             # try previous layer
-            layers_id_chain = get_layers_chain(layer.id)
+            layers_id_chain = get_layer_parents_chain(layer.id)
             if len(layers_id_chain) == 0:
                 return
             layer_id = layers_id_chain[-1]
@@ -356,13 +323,16 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
                 preview_ann = layer.get_src_ann()
     if img_desc is None:
         raise BadSettingsError(
-            "Cannot load preview image for input layer. Check that you selected input project"
+            "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
         )
 
     data_el = (img_desc, preview_ann)
-    layers_idx_whitelist = (
-        None if layers_id_chain is None else [all_layers_ids.index(id) for id in layers_id_chain]
-    )
+    if layers_id_chain is None:
+        layers_idx_whitelist = None
+    else:
+        children = get_layer_children_list(layer_id)
+        layers_idx_whitelist = [all_layers_ids.index(id) for id in layers_id_chain]
+        layers_idx_whitelist.extend([all_layers_ids.index(id) for id in children])
     processing_generator = net.start_iterate(
         data_el, layer_idx=layer_idx, layers_idx_whitelist=layers_idx_whitelist
     )

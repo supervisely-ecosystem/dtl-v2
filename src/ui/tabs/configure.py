@@ -73,27 +73,6 @@ nodes_flow = NodesFlow(
     show_save=False,
 )
 
-
-# sidebar
-# add_specific_layer_buttons = {
-#     action_name: Button(
-#         "Add", icon="zmdi zmdi-plus", style="align-self: start;", button_size="small"
-#     )
-#     for _, group_actions in actions_list.items()
-#     for action_name in group_actions
-# }
-
-
-# def add_specific_layer_func_factory(action_name: str):
-#     def add_specific_layer_func():
-#         add_layer(action_name)
-
-#     return add_specific_layer_func
-
-
-# for action_name, button in add_specific_layer_buttons.items():
-#     button.click(add_specific_layer_func_factory(action_name))
-
 select_items = [
     Select.Item(
         value=action_name,
@@ -134,20 +113,6 @@ filter_actions_field = Field(content=filter_actions_input, title="Filter actions
 
 left_sidebar_actions_widgets = {
     action_name: add_specific_layer_buttons[action_name]
-    # action_name: Draggable(
-    #     Flexbox(
-    #         widgets=[
-    #             Field(
-    #                 title=action.title,
-    #                 description=action.description,
-    #                 title_url=action.docs_url,
-    #                 content=Empty(),
-    #             ),
-    #             add_specific_layer_buttons[action_name],
-    #         ]
-    #     ),
-    #     key=action_name,
-    # )
     for action_name, action in actions_dict.items()
 }
 
