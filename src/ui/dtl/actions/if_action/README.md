@@ -3,9 +3,9 @@
 `if` layer is used to split input data to several flows with a specified criterion. By choosing one of the conditions, you can split data by probability, objects count, image height, tags, class presence, images names in range, and step.
 All "true" data will be passed to the first branch (`$if_<id>__true`), all "false" data will be passed to the second branch (`$if_<id>__false`).
 
-### Settings
+### Conditions
 
-- **`condition`** - condition for splitting data. Possible following options:
+Condition for splitting data. Possible following options:
   - **`probability`** - specify probability percentage to split data
   - **`min_objects_count`** - input minimum objects count to split data
   - **`min_height`** - split data by image height
@@ -13,7 +13,7 @@ All "true" data will be passed to the first branch (`$if_<id>__true`), all "fals
   - **`include_classes`** - select classes to split data
   - **`name_in_range`** and **`frame_step`** - input names in range and frame step to split data
 
-### Split data by probability
+#### Split data by probability
 
 It can be used in several scenarios. Split data to train and val subsets.
 First scenario is when we are going to split data into train and validation sets by adding corresponding tag to each image.
@@ -21,36 +21,36 @@ First scenario is when we are going to split data into train and validation sets
 For example, we are going to split data by probability 95%.
 In this case input data (image + annotation) will go to the "left" branch (`$if_10__true`) with probability 95% and to the "right" branch (`$if_10__false`) with probability 5%.
 
-### Split data by objects count
+#### Split data by objects count
 
 This case allows you to split data by objects count (`min_objects_count` value).
 
 For example, we are going to split data by objects count == 3.
-So, images with equal or more that three objects will be passed to `$if_10__true` branch, other images — to the `$if_10__false` branch.
+So, images with equal or more than three objects will be passed to `$if_10__true` branch, other images — to the `$if_10__false` branch.
 
-### Split by image height
+#### Split by image height
 
 This option is useful when we are going to skip some small images after applying `Crop` layer.
 
 For example, we are going to filter images by minimum image height 200 pixels and all images with height more than 200 pixels will be passed to `$if_10__true` branch, other images — to the `$if_10__false` branch.
 
-### Split by tags
+#### Split by tags
 
 This option is useful when we are going to split data by tags, for example, by existing tags "train" and "val" for train and validation subsets. It can be useful in neural networks training workflow.
 
-### Split by class presence
+#### Split by class presence
 
 This option can be used for splitting data by class presence.
 
 For example, if images contain any object of some required class (`person`) they will be passed to the `$if_10__true` branch, else to the `$if_10__false` branch.
 
-### Split by images names in range, and step
+#### Split by images names in range, and step
 
 Option `name_in_range` allows you to split data by images names in range, and step.
 
-**Names is ordered alphabetical (a, b ,c ...).**
+**Names is ordered alphabetical (a, b, c ...).**
 
-### Json views
+### JSON views
 
 <details>
   <summary>Use case: split with probability</summary>

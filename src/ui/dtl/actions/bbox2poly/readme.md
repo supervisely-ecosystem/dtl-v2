@@ -1,6 +1,6 @@
-# Bbox to Polygon
+# BBox to Polygon
 
-`Bbox to Polygon` layer converts rectangles (`bounding boxes`) to polygons.
+`BBox to Polygon` layer converts rectangles (`bounding boxes`) to polygons.
 
 ### Settings
 

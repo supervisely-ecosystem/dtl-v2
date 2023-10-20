@@ -40,7 +40,11 @@ class ObjectsFilterAction(AnnotationAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes = ClassesList(multiple=True)
-        classes_field = Field(title="Select Classes", content=classes)
+        classes_field = Field(
+            title="Classes",
+            content=classes,
+            description="Select the classes for which you want to set filtering criteria",
+        )
         percent_input = InputNumber(min=0, max=100, value=5)
         percent_input_field = Field(
             title="Input %",
@@ -72,7 +76,7 @@ class ObjectsFilterAction(AnnotationAction):
         action_select_field = Field(title="Action", content=action_select)
         action_select.disable()
         filter_items = [
-            Select.Item("names", "Names", classes),
+            Select.Item("names", "Names", classes_field),
             Select.Item(
                 "area_percent",
                 "Area percent",

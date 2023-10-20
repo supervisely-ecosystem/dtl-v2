@@ -2,8 +2,9 @@ import copy
 from os.path import realpath, dirname
 from typing import Optional
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select, Field
 from supervisely import ProjectMeta
+from supervisely import Bitmap, AnyGeometry
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
@@ -44,7 +45,16 @@ class BitwiseMasksAction(AnnotationAction):
         _current_meta = ProjectMeta()
         class_mask_widget = ClassesList()
         classes_to_correct_widget = ClassesList(multiple=True)
-
+        classes_mask_widget_field = Field(
+            content=class_mask_widget,
+            title="Classes",
+            description="Select the class relative to which the mask will be corrected",
+        )
+        classes_to_correct_widget_field = Field(
+            content=classes_to_correct_widget,
+            title="Classes",
+            description="Select the classes whose masks you want to correct",
+        )
         class_mask_preview = ClassesListPreview()
         classes_to_correct_preview = ClassesListPreview()
 
@@ -56,7 +66,7 @@ class BitwiseMasksAction(AnnotationAction):
 
         class_mask_widgets_container = Container(
             widgets=[
-                class_mask_widget,
+                classes_mask_widget_field,
                 Flexbox(
                     widgets=[
                         save_class_mask_btn,
@@ -68,7 +78,7 @@ class BitwiseMasksAction(AnnotationAction):
         )
         classes_to_correct_widgets_container = Container(
             widgets=[
-                classes_to_correct_widget,
+                classes_to_correct_widget_field,
                 Flexbox(
                     widgets=[
                         save_classes_to_correct_btn,
@@ -166,7 +176,11 @@ class BitwiseMasksAction(AnnotationAction):
             _current_meta = project_meta
 
             class_mask_widget.loading = True
-            obj_classes = [cls for cls in project_meta.obj_classes]
+            obj_classes = [
+                obj_class
+                for obj_class in project_meta.obj_classes
+                if obj_class.geometry_type in [Bitmap, AnyGeometry]
+            ]
             # set classes to widget
             class_mask_widget.set(obj_classes)
             # update settings according to new meta
@@ -179,7 +193,11 @@ class BitwiseMasksAction(AnnotationAction):
             class_mask_widget.loading = False
 
             classes_to_correct_widget.loading = True
-            obj_classes = [cls for cls in project_meta.obj_classes]
+            obj_classes = [
+                obj_class
+                for obj_class in project_meta.obj_classes
+                if obj_class.geometry_type in [Bitmap, AnyGeometry]
+            ]
             # set classes to widget
             classes_to_correct_widget.set(obj_classes)
             # update settings according to new meta

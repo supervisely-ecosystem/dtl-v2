@@ -12,6 +12,7 @@ from supervisely.app.widgets import (
     Button,
     Text,
     Select,
+    Field,
 )
 
 from src.ui.dtl import SpatialLevelAction
@@ -48,9 +49,14 @@ class InstancesCropAction(SpatialLevelAction):
         classes_list_preview = ClassesListPreview()
         classes_list_save_btn = create_save_btn()
         classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select classes to get cropped images for their objects",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,

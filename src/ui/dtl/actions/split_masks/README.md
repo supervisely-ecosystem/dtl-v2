@@ -1,6 +1,6 @@
 # Split Masks
 
-`Split Masks` layer takes one bitmap label mask and split it into few bitmap masks if it contain non-connected components.
+`Split Masks` layer takes one bitmap label mask and split it into few bitmap masks if it contains non-connected components.
 
 ### Settings
 

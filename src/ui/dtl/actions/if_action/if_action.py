@@ -12,6 +12,7 @@ from supervisely.app.widgets import (
     OneOf,
     Button,
     Text,
+    Field,
 )
 from supervisely import ProjectMeta
 
@@ -191,7 +192,7 @@ class IfAction(OtherAction):
         _include_classes_input = ClassesList(multiple=True)
         _include_classes_widget = Field(
             title="Include classes",
-            description="Select classes",
+            description="Select the classes that will be the criteria for splitting the data",
             content=_include_classes_input,
         )
 

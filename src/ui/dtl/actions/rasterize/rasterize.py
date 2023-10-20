@@ -2,7 +2,7 @@ from typing import Optional
 import copy
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Field
 from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
@@ -41,9 +41,14 @@ class RasterizeAction(AnnotationAction):
         classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = create_set_default_btn()
+        classes_mapping_widget_field = Field(
+            content=classes_mapping_widget,
+            title="Classes",
+            description="Select classes to rasterize their objects on the image",
+        )
         classes_mapping_widgets_container = Container(
             widgets=[
-                classes_mapping_widget,
+                classes_mapping_widget_field,
                 Flexbox(
                     widgets=[
                         classes_mapping_save_btn,

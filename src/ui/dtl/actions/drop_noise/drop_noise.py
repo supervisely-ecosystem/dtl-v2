@@ -12,6 +12,7 @@ from supervisely.app.widgets import (
     Container,
     Text,
     Select,
+    Field,
 )
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
@@ -49,9 +50,14 @@ class DropNoiseAction(AnnotationAction):
         classes_list_preview = ClassesListPreview()
         save_classes_btn = create_save_btn()
         set_default_classes_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select BITMAP classes for whose masks noise in the form of components smaller than the specified size will be removed",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         save_classes_btn,

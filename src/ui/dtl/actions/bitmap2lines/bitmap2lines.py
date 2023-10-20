@@ -3,7 +3,7 @@ from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber, Field
 
 import src.globals as g
 from src.ui.dtl import AnnotationAction
@@ -38,12 +38,17 @@ class Bitmap2LinesAction(AnnotationAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_mapping_widget = ClassesList(multiple=True)
+        classes_mapping_widget_field = Field(
+            content=classes_mapping_widget,
+            title="Classes",
+            description="Select classes to convert them to POLYLINE",
+        )
         classes_mapping_preview = ClassesListPreview()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = create_set_default_btn()
         classes_mapping_widgets_container = Container(
             widgets=[
-                classes_mapping_widget,
+                classes_mapping_widget_field,
                 Flexbox(
                     widgets=[
                         classes_mapping_save_btn,
