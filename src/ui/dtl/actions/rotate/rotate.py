@@ -33,6 +33,16 @@ class RotateAction(SpatialLevelAction):
         ]
         br_selector = Select(items=br_selector_items, size="small")
 
+        @min_degrees_input.value_changed
+        def min_degrees_input_changed(value):
+            if value > max_degrees_input.get_value():
+                max_degrees_input.value = value
+
+        @max_degrees_input.value_changed
+        def max_degrees_input_changed(value):
+            if value < min_degrees_input.get_value():
+                max_degrees_input.value = min_degrees_input.get_value()
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
