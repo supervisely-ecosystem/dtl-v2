@@ -64,30 +64,25 @@ load_file_selector = TeamFilesSelector(
 load_preset_btn = Button("Load")
 load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
 load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
-load_notification_applied = NotificationBox("Preset applied", box_type="success")
+load_notification_error = NotificationBox("Error loading preset", box_type="error")
 load_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
         Select.Item("loaded", content=load_notification_loaded),
         Select.Item("not selected", content=load_notification_file_not_selected),
-        Select.Item("applied", content=load_notification_applied),
+        Select.Item("error", content=load_notification_error),
     ]
 )
 load_notification_oneof = OneOf(load_notification_select)
-apply_preset = Button("Apply", style="margin: 0")
 load_container = Container(
     widgets=[
         load_file_selector,
-        Flexbox(widgets=[load_preset_btn, apply_preset, load_notification_oneof], gap=20),
+        Flexbox(widgets=[load_preset_btn, load_notification_oneof], gap=20),
     ]
 )
 
-json_editor = Editor(language_mode="json", height_px=300)
-json_editor_card = Card(title="JSON Preview", content=json_editor, collapsable=True)
-json_editor_card.collapse()
-
-save_layout = Container(widgets=[save_container, json_editor], gap=0)
-load_layout = Container(widgets=[load_container, json_editor], gap=0)
+save_layout = Container(widgets=[save_container], gap=0)
+load_layout = Container(widgets=[load_container], gap=0)
 
 
 @save_preset_btn.click
@@ -102,7 +97,6 @@ def save_json_button_cb():
     ui_utils.init_src(edges)
 
     dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-    json_editor.set_text(json.dumps(dtl_json, indent=4), language_mode="json")
 
     preset_name = preset_name_input.get_value()
     if preset_name == "":
@@ -128,34 +122,19 @@ def load_json_button_cb():
         return
     g.api.file.download(g.TEAM_ID, paths[0], g.DATA_DIR + "/preset.json")
     with open(g.DATA_DIR + "/preset.json", "r") as f:
-        json_editor.set_text(f.read(), language_mode="json")
+        dtl_json = json.load(f)
+    try:
+        apply_json(dtl_json)
+    except Exception as e:
+        load_notification_error.description = str(e)
+        load_notification_select.set_value("error")
+        raise
     load_notification_select.set_value("loaded")
 
 
 @handle_exception
-def apply_json():
-    nodes_flow.loading = True
+def apply_json(dtl_json):
     try:
-        # 1. read json
-        try:
-            dtl_json = json.loads(json_editor.get_text())
-        except:
-            show_dialog(
-                title="Error",
-                description="Invalid json",
-                status="error",
-            )
-            nodes_flow.loading = False
-            return
-        if type(dtl_json) is not list:
-            show_dialog(
-                title="Error",
-                description="Invalid json. Must be list of layers",
-                status="error",
-            )
-            nodes_flow.loading = False
-            return
-
         # create layer objects
         nodes_flow.clear()
         ids = []
@@ -277,7 +256,6 @@ def apply_json():
                             except:
                                 pass
         nodes_flow.set_edges(nodes_flow_edges)
-        load_notification_select.set_value("applied")
 
     except CustomException as e:
         ui_utils.show_error("Error loading json", e)
@@ -287,12 +265,7 @@ def apply_json():
             title="Error loading json", description=f"Unexpected Error: {str(e)}", status="error"
         )
         raise e
-    finally:
-        nodes_flow.loading = False
 
 
 def load_json_cb():
     g.updater("load_json")
-
-
-apply_preset.click(load_json_cb)
