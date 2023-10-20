@@ -18,7 +18,7 @@ class SuperviselyAction(OutputAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
-        sly_project_name_text = Text("Destination", status="text", font_size=get_text_font_size())
+        sly_project_name_text = Text("Project name", status="text", font_size=get_text_font_size())
         sly_project_name_input = Input(value="", placeholder="Enter project name", size="small")
 
         def get_dst(options_json: dict) -> dict:
