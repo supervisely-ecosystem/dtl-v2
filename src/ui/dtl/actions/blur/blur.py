@@ -28,7 +28,7 @@ class BlurAction(PixelLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _cur_kernel = 5
-        kernel_input = InputNumber(value=_cur_kernel, min=3, step=2, size="small")
+        kernel_input = InputNumber(value=_cur_kernel, min=3, max=255, step=2, size="small")
 
         sigma_slider = Slider(
             min=0.5,

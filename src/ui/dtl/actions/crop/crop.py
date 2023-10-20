@@ -175,6 +175,26 @@ class CropAction(SpatialLevelAction):
         def update_crop_fixed_bot(value):
             _validate_percent_value(value, crop_fixed_bot)
 
+        @crop_random_width_min.value_changed
+        def update_crop_random_width_min(value):
+            if crop_random_width_max.value < value:
+                crop_random_width_max.value = value
+
+        @crop_random_width_max.value_changed
+        def update_crop_random_width_max(value):
+            if value < crop_random_width_min.value:
+                crop_random_width_max.value = value
+
+        @crop_random_height_min.value_changed
+        def update_crop_random_height_min(value):
+            if crop_random_height_max.value < value:
+                crop_random_height_max.value = value
+
+        @crop_random_height_max.value_changed
+        def update_crop_random_height_max(value):
+            if value < crop_random_height_min.value:
+                crop_random_height_max.value = value
+
         @sides_crop_unit_selector.value_changed
         def update_crop_fixed_unit(value):
             if value == "%":

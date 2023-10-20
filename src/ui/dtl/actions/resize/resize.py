@@ -18,10 +18,10 @@ class ResizeAction(SpatialLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         width_text = Text("Width", status="text", font_size=get_text_font_size())
-        width_input = InputNumber(value=3, step=1, controls=True)
+        width_input = InputNumber(value=3, min=1, step=1, controls=True)
 
         height_text = Text("Height", status="text", font_size=get_text_font_size())
-        height_input = InputNumber(value=3, step=1, controls=True)
+        height_input = InputNumber(value=3, min=1, step=1, controls=True)
 
         keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")
 

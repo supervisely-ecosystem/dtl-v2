@@ -44,8 +44,8 @@ class MergeBitmapsAction(AnnotationAction):
         classes_list_set_default_btn = create_set_default_btn()
         classes_list_widget_field = Field(
             content=classes_list_widget,
-            title="Classes",
-            description="Select the classes for which, for each class, you want to merge all the labels into one",
+            title="Class",
+            description="Select the class for which you want to merge all labels into one",
         )
         classes_list_widgets_container = Container(
             widgets=[
@@ -59,7 +59,9 @@ class MergeBitmapsAction(AnnotationAction):
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
+        classes_list_edit_text = Text(
+            "Class to merge", status="text", font_size=get_text_font_size()
+        )
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
