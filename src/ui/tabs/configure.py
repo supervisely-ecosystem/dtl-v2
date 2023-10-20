@@ -107,7 +107,7 @@ select_items = [
 ]
 select_widget = Select(items=select_items)
 oneof_widget = OneOf(conditional_widget=select_widget)
-dialog_widgets = Dialog(content=oneof_widget)
+dialog_widgets = Dialog(title="Node Documentation", content=oneof_widget)
 
 add_specific_layer_buttons = {
     action_name: LayerCard(
