@@ -78,7 +78,7 @@ actions_list = {
         # BackgroundAction.name,
         BBoxAction.name,
         BboxToPolyAction.name,
-        Bitmap2LinesAction.name,
+        # Bitmap2LinesAction.name,
         BitwiseMasksAction.name,
         # ColorClassAction.name,
         # DropByClassAction.name,
