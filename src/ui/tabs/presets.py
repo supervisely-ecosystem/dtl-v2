@@ -3,16 +3,17 @@ import json
 
 from supervisely.app.widgets import (
     Button,
-    Editor,
     Container,
     Flexbox,
     TeamFilesSelector,
+    FileViewer,
     Input,
-    Card,
+    Field,
     NotificationBox,
     Select,
     OneOf,
     Empty,
+    FileThumbnail,
 )
 from supervisely.app import show_dialog
 
@@ -28,26 +29,26 @@ from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
 preset_name_input = Input(placeholder="Preset name")
-save_folder_selector = TeamFilesSelector(
-    team_id=g.TEAM_ID, selection_file_type="folder", max_height=254
-)
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
+save_preset_file_thumbnail = FileThumbnail()
+save_preset_file_thumbnail.hide()
 save_notification_saved = NotificationBox("Preset saved", box_type="success")
 save_notification_empty_name = NotificationBox("Empty preset name", box_type="error")
-save_notification_empty_folder = NotificationBox("Save directory not selected", box_type="error")
 save_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
         Select.Item("saved", content=save_notification_saved),
         Select.Item("empty_name", content=save_notification_empty_name),
-        Select.Item("empty_folder", content=save_notification_empty_folder),
     ]
 )
 save_notification_oneof = OneOf(save_notification_select)
 save_container = Container(
     widgets=[
-        preset_name_input,
-        save_folder_selector,
+        Field(
+            title="Preset name",
+            description=f'Preset will be saved to folder "{g.TEAM_FILES_PATH}/presets" in your Team files',
+            content=preset_name_input,
+        ),
         Flexbox(
             widgets=[
                 save_preset_btn,
@@ -55,12 +56,14 @@ save_container = Container(
             ],
             gap=20,
         ),
+        save_preset_file_thumbnail,
     ]
 )
 
-load_file_selector = TeamFilesSelector(
-    team_id=g.TEAM_ID, selection_file_type="file", max_height=300
+presets_infos = g.api.file.list(
+    g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
 )
+load_file_selector = FileViewer([{"path": info.path} for info in presets_infos])
 load_preset_btn = Button("Load")
 load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
 load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
@@ -102,21 +105,20 @@ def save_json_button_cb():
     if preset_name == "":
         preset_name = preset_name_input.set_value("empty_name")
         return
-    save_paths = save_folder_selector.get_selected_paths()
-    if len(save_paths) == 0:
-        preset_name = preset_name_input.set_value("empty_folder")
-        return
-    dst_path = save_paths[0] + "/" + preset_name + ".json"
+
+    dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
     src_path = g.DATA_DIR + "/preset.json"
     with open(src_path, "w") as f:
         json.dump(dtl_json, f, indent=4)
-    g.api.file.upload(g.TEAM_ID, src_path, dst_path)
+    file_info = g.api.file.upload(g.TEAM_ID, src_path, dst_path)
+    save_preset_file_thumbnail.set(file_info)
+    save_preset_file_thumbnail.show()
     save_notification_select.set_value("saved")
 
 
 @load_preset_btn.click
 def load_json_button_cb():
-    paths = load_file_selector.get_selected_paths()
+    paths = load_file_selector.get_selected_items()
     if len(paths) == 0:
         load_notification_select.set_value("not selected")
         return

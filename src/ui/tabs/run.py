@@ -86,7 +86,7 @@ def run():
                 file_info = g.api.file.upload(
                     g.TEAM_ID,
                     src=tar_path,
-                    dst=f"/dtl/{utils.get_task()}/{Path(tar_path).name}",
+                    dst=f"/{g.TEAM_FILES_PATH}/archives/{Path(tar_path).name}",
                     progress_cb=pbar,
                 )
             file_infos.append(file_info)

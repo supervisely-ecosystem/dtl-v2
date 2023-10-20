@@ -16,6 +16,7 @@ DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
 STATIC_DIR = "static"
+TEAM_FILES_PATH = "ml-nodes"
 
 api = sly.Api()
 
