@@ -4,7 +4,7 @@ from collections import deque
 
 import numpy as np
 import networkx as nx
-from exceptions import WrongGeometryError
+
 from supervisely import Bitmap, Polyline, Annotation, Label
 from supervisely import timeit
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
@@ -12,6 +12,7 @@ from src.compute.dtl_utils import apply_to_labels
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
+from src.exceptions import WrongGeometryError
 
 
 # @TODO: check, it may be dirty
