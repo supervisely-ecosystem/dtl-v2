@@ -4,6 +4,7 @@ from collections import deque
 
 import numpy as np
 import networkx as nx
+from exceptions import WrongGeometryError
 from supervisely import Bitmap, Polyline, Annotation, Label
 from supervisely import timeit
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
@@ -41,7 +42,7 @@ def _bfs_path(G, v):
     try:
         curr = path[-1][1]
     except IndexError:
-        raise RuntimeError('Someone hasn\'t implemented bfs correctly.')
+        raise RuntimeError("Someone hasn't implemented bfs correctly.")
     i = len(path) - 1
 
     true_path1 = [curr]
@@ -86,8 +87,7 @@ def _get_all_diameters(G: nx.Graph):
 
 # FigureBitmap to FigureLine
 class BitmapToLinesLayer(Layer):
-
-    action = 'bitmap2lines'
+    action = "bitmap2lines"
 
     layer_settings = {
         "required": ["settings"],
@@ -98,42 +98,39 @@ class BitmapToLinesLayer(Layer):
                 "properties": {
                     "classes_mapping": {
                         "type": "object",
-                        "patternProperties": {
-                            ".*": {"type": "string"}
-                        }
+                        "patternProperties": {".*": {"type": "string"}},
                     },
-                    "min_points_cnt": {
-                        "type": "integer",
-                        "minimum": 2
-                    },
-                    "approx_epsilon": {
-                        "type": "number",
-                        "minimum": 0
-                    }
-                }
+                    "min_points_cnt": {"type": "integer", "minimum": 2},
+                    "approx_epsilon": {"type": "number", "minimum": 0},
+                },
             }
-        }
+        },
     }
 
     def __init__(self, config):
         Layer.__init__(self, config)
 
     def define_classes_mapping(self):
-        for old_class, new_class in self.settings['classes_mapping'].items():
-            self.cls_mapping[old_class] = {'title': new_class, 'shape': Polyline.geometry_name()}
+        for old_class, new_class in self.settings["classes_mapping"].items():
+            self.cls_mapping[old_class] = {"title": new_class, "shape": Polyline.geometry_name()}
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
-        approx_epsilon = self.settings.get('approx_epsilon')
+        approx_epsilon = self.settings.get("approx_epsilon")
 
         @timeit
         def to_lines(label: Label):
-            new_title = self.settings['classes_mapping'].get(label.obj_class.name)
+            new_title = self.settings["classes_mapping"].get(label.obj_class.name)
             if new_title is None:
                 return [label]
             if not isinstance(label.geometry, Bitmap):
-                raise RuntimeError('Input class must be a Bitmap in bitmap2lines layer.')
+                raise WrongGeometryError(
+                    None,
+                    "Bitmap",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
+                )
 
             origin, mask = label.geometry.origin, label.geometry.data
             graph = _get_graph(mask)
@@ -142,17 +139,17 @@ class BitmapToLinesLayer(Layer):
 
             res = []
             for coords in paths:
-                if len(coords) < self.settings['min_points_cnt']:
+                if len(coords) < self.settings["min_points_cnt"]:
                     continue
                 coords = np.asarray(coords)
                 points = coords + [origin.row, origin.col]
 
                 new_obj_class = label.obj_class.clone(name=new_title, geometry_type=Polyline)
                 new_geometry = Polyline(exterior=[(p[0], p[1]) for p in points])
-                
+
                 if approx_epsilon is not None:
                     new_geometry = new_geometry.approx_dp(approx_epsilon)
-                
+
                 res.append(Label(geometry=new_geometry, obj_class=new_obj_class))
 
             return res

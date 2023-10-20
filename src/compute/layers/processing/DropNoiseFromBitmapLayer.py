@@ -2,6 +2,7 @@
 
 from typing import Tuple
 from skimage.morphology import remove_small_objects
+from exceptions import WrongGeometryError
 
 from supervisely import Bitmap, Annotation, Label
 
@@ -43,7 +44,12 @@ class DropNoiseFromBitmap(Layer):
                 return [label]
 
             if not isinstance(label.geometry, Bitmap):
-                raise RuntimeError("Input class must be a Bitmap in drop_noise layer.")
+                raise WrongGeometryError(
+                    None,
+                    "Bitmap",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
+                )
 
             if area_str.endswith("%"):
                 if self.settings["src_type"] == "image":

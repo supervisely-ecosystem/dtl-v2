@@ -138,6 +138,12 @@ class CreateMetaError(CustomException):
         super().__init__(message, error=error, extra=extra)
 
 
+class WrongGeometryError(CustomException):
+    def __init__(self, message, expected_geometry, got_geometry, extra: Optional[dict] = {}):
+        message = f"Wrong geometry. {message+'. ' if message else ''}Expected: {expected_geometry}. Got: {got_geometry}"
+        super().__init__(message, extra=extra)
+
+
 def handle_exception(func):
     """Decorator to log exception and silence it"""
 

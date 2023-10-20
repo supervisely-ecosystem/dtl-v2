@@ -2,6 +2,7 @@
 
 from typing import List, Tuple
 import math
+from exceptions import WrongGeometryError
 
 from supervisely import Polygon, Rectangle, Annotation, Label, ObjClass
 from supervisely.imaging.color import hex2rgb
@@ -36,7 +37,7 @@ def contour_stepper(lines, step=0.5, eps=0.1):
     counter = 0.0
 
     for point_index in range(1, len(lines)):
-        previous_point = lines[point_index-1]
+        previous_point = lines[point_index - 1]
         current_point = lines[point_index]
 
         vx, vy = normalize(previous_point, current_point)
@@ -46,7 +47,7 @@ def contour_stepper(lines, step=0.5, eps=0.1):
         while path < current_distance:
             path = path + eps
             counter = counter + eps
-            if(counter >= step):
+            if counter >= step:
                 counter = 0
                 current_pos = [(previous_point[0] + vx * path), (previous_point[1] + vy * path)]
                 yield current_pos
@@ -58,8 +59,8 @@ def generate_box(x, y, box_wh, image_wh):
     half_w = box_wh[0] // 2
     half_h = box_wh[1] // 2
 
-    x = fix_coord(x, half_w, (image_wh[0]-1)-half_w)
-    y = fix_coord(y, half_h, (image_wh[1]-1)-half_h)
+    x = fix_coord(x, half_w, (image_wh[0] - 1) - half_w)
+    y = fix_coord(y, half_h, (image_wh[1] - 1) - half_h)
 
     left = x - half_w
     right = x + half_w
@@ -78,7 +79,9 @@ def add_boxes_for_contour(label: Label, image_wh, box_wh, distance, box_class_ti
     for x, y in contour_stepper(figure_points, step=distance):
         left, top, right, bottom = generate_box(x, y, box_wh, image_wh)
         geometry = Rectangle(top, left, bottom, right)
-        obj_class = ObjClass(name=box_class_title, geometry_type=Rectangle, color=hex2rgb("#00EE00"))
+        obj_class = ObjClass(
+            name=box_class_title, geometry_type=Rectangle, color=hex2rgb("#00EE00")
+        )
         rect_label = label.clone(geometry=geometry, obj_class=obj_class, tags=[], description="")
         labels.append(rect_label)
 
@@ -86,8 +89,7 @@ def add_boxes_for_contour(label: Label, image_wh, box_wh, distance, box_class_ti
 
 
 class ContourSlidingBoxLayer(Layer):
-
-    action = 'contour_sliding_box'
+    action = "contour_sliding_box"
 
     layer_settings = {
         "required": ["settings"],
@@ -104,48 +106,39 @@ class ContourSlidingBoxLayer(Layer):
                             "patternProperties": {
                                 "(width)|(height)": {
                                     "type": "string",
-                                    "pattern": "^[0-9]+(%)|(px)$"
+                                    "pattern": "^[0-9]+(%)|(px)$",
                                 }
-                            }
-                        }
+                            },
+                        },
                     },
-                    "distance": {
-                        "type": "string",
-                        "pattern": "^[0-9]+(%)|(px)$"
-                    },
-                    "classes": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "box_class": {
-                        "type": "string"
-                    }
-                }
+                    "distance": {"type": "string", "pattern": "^[0-9]+(%)|(px)$"},
+                    "classes": {"type": "array", "items": {"type": "string"}},
+                    "box_class": {"type": "string"},
+                },
             }
-        }
+        },
     }
 
     def __init__(self, config):
         Layer.__init__(self, config)
 
     def define_classes_mapping(self):
-        new_class = self.settings['box_class']
-        self.cls_mapping[ClassConstants.NEW] = [{'title': new_class, 'shape': Rectangle.geometry_name(), 'color': '#00EE00'}]
+        new_class = self.settings["box_class"]
+        self.cls_mapping[ClassConstants.NEW] = [
+            {"title": new_class, "shape": Rectangle.geometry_name(), "color": "#00EE00"}
+        ]
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
     def fix_percent(self, value, abs_value):
         if isinstance(value, str):
-            if '%' in value:
-                value = value.replace('%', '')
-                if value.replace('.', '').isdigit():
+            if "%" in value:
+                value = value.replace("%", "")
+                if value.replace(".", "").isdigit():
                     return int(float(value) / 100.0 * abs_value)
-            if 'px' in value:
-                value = value.replace('px', '')
+            if "px" in value:
+                value = value.replace("px", "")
                 if value.isdigit():
                     return int(value)
-
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
@@ -164,13 +157,22 @@ class ContourSlidingBoxLayer(Layer):
             results = [label]
             if label.obj_class.name in classes:
                 if not isinstance(label.geometry, Polygon):
-                    raise RuntimeError('Input class must be a Polygon in <contour_sliding_box> layer.')
+                    raise WrongGeometryError(
+                        None,
+                        "Polygon",
+                        label.geometry.geometry_name(),
+                        extra={"layer": self.action},
+                    )
 
-                results.extend(add_boxes_for_contour(label,
-                                                     image_wh=imsize_wh,
-                                                     box_wh=box_wh,
-                                                     distance=distance,
-                                                     box_class_title=box_class))
+                results.extend(
+                    add_boxes_for_contour(
+                        label,
+                        image_wh=imsize_wh,
+                        box_wh=box_wh,
+                        distance=distance,
+                        box_class_title=box_class,
+                    )
+                )
             return results
 
         ann = apply_to_labels(ann, add_contour_boxies)

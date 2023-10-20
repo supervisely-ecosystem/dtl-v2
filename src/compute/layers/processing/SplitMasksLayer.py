@@ -3,6 +3,7 @@
 from typing import Tuple
 
 from cv2 import connectedComponents
+from exceptions import WrongGeometryError
 from supervisely import Annotation, Bitmap, Label
 
 from src.compute.Layer import Layer
@@ -35,7 +36,12 @@ class SplitMasksLayer(Layer):
                 return [label]
 
             if not isinstance(label.geometry, Bitmap):
-                raise RuntimeError("Input class must be a Bitmap in split_masks layer.")
+                raise WrongGeometryError(
+                    None,
+                    "Bitmap",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
+                )
 
             old_origin, old_mask = label.geometry.origin, label.geometry.data
             ret, masks = connectedComponents(old_mask.astype("uint8"), connectivity=8)

@@ -5,6 +5,7 @@ import math
 import cv2
 import numpy as np
 from shapely.geometry import Polygon as ShPolygon
+from exceptions import WrongGeometryError
 
 from supervisely import Polygon, Polyline, Annotation, Label, ObjClass
 
@@ -80,15 +81,11 @@ def remove_intersections_in_poly(vertices):
         j = i + 2
         while j < (len(vertices) - 1):
             if i != j:
-                if intersect(
-                    vertices[i], vertices[i + 1], vertices[j], vertices[j + 1]
-                ):
+                if intersect(vertices[i], vertices[i + 1], vertices[j], vertices[j + 1]):
                     target_index = i + 1
                     target_jndex = j + 1
                     mid_part = list(reversed(vertices[target_index:target_jndex]))
-                    vertices = (
-                        vertices[:target_index] + mid_part + vertices[target_jndex:]
-                    )
+                    vertices = vertices[:target_index] + mid_part + vertices[target_jndex:]
                     changed = True
             j += 1
         if not changed:
@@ -166,9 +163,7 @@ def ExtractCrackNets4(
     if enable_subclustering and len(simple_format_points) >= min_points_in_cluster:
         import hdbscan
 
-        hdb = hdbscan.HDBSCAN(min_cluster_size=min_points_in_cluster).fit(
-            simple_format_points
-        )
+        hdb = hdbscan.HDBSCAN(min_cluster_size=min_points_in_cluster).fit(simple_format_points)
         hdb_labels = hdb.labels_
         points_group = combine_clusters(labels=hdb_labels, X=integer_points)
     else:
@@ -314,8 +309,11 @@ class FindCracknetsLayer(Layer):
         for label in ann.labels:
             if label.obj_class.name == crack_class:
                 if not isinstance(label.geometry, Polyline):
-                    raise RuntimeError(
-                        "Input class must be a Line in find_cracknets layer."
+                    raise WrongGeometryError(
+                        None,
+                        "Polyline",
+                        label.geometry.geometry_name(),
+                        extra={"layer": self.action},
                     )
                 points = label.geometry.exterior_np
                 crack_lines.append(points)

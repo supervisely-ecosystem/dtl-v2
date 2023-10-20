@@ -5,7 +5,7 @@ import numpy as np
 
 from supervisely import Bitmap, Label
 
-from src.exceptions import BadSettingsError
+from src.exceptions import BadSettingsError, WrongGeometryError
 from src.compute.Layer import Layer
 
 
@@ -34,10 +34,11 @@ class BitwiseMasksLayer(Layer):
         for label in labels:
             if label.obj_class.name == class_mask_name:
                 if not isinstance(label.geometry, Bitmap):
-                    raise RuntimeError(
-                        "Class <{}> must be a Bitmap in bitwise_masks layer.".format(
-                            class_mask_name
-                        )
+                    raise WrongGeometryError(
+                        None,
+                        "Bitmap",
+                        label.geometry.geometry_name(),
+                        extra={"layer": self.action},
                     )
                 return label
 
@@ -80,7 +81,12 @@ class BitwiseMasksLayer(Layer):
                     new_labels.append(label)
                 else:
                     if not isinstance(label.geometry, Bitmap):
-                        raise RuntimeError("Input class must be a Bitmap in bitwise_masks layer.")
+                        raise WrongGeometryError(
+                            None,
+                            "Bitmap",
+                            label.geometry.geometry_name(),
+                            extra={"layer": self.action},
+                        )
 
                     origin, mask = label.geometry.origin, label.geometry.data
                     full_size_mask = np.full(imsize, False, bool)

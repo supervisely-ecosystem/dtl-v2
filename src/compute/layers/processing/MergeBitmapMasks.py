@@ -2,6 +2,7 @@
 
 from typing import List, Tuple
 import numpy as np
+from exceptions import WrongGeometryError
 
 from supervisely import Bitmap, Annotation, Label
 
@@ -46,7 +47,12 @@ class MergeMasksLayer(Layer):
         for label in ann.labels:
             if label.obj_class.name == class_mask:
                 if not isinstance(label.geometry, Bitmap):
-                    raise RuntimeError("Input class must be a Bitmap in road_lines layer.")
+                    raise WrongGeometryError(
+                        None,
+                        "Bitmap",
+                        label.geometry.geometry_name(),
+                        extra={"layer": self.action},
+                    )
                 bitmaps_for_merge.append(label.geometry)
                 obj_class = label.obj_class
             else:
