@@ -5,7 +5,6 @@ from supervisely.app.widgets import (
     Button,
     Container,
     Flexbox,
-    TeamFilesSelector,
     FileViewer,
     Input,
     Field,
@@ -14,8 +13,8 @@ from supervisely.app.widgets import (
     OneOf,
     Empty,
     FileThumbnail,
+    Dialog,
 )
-from supervisely.app import show_dialog
 
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
@@ -60,19 +59,20 @@ save_container = Container(
     ]
 )
 
-presets_infos = g.api.file.list(
-    g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
-)
-load_file_selector = FileViewer([{"path": info.path} for info in presets_infos])
+
+load_file_selector = FileViewer([])
 load_preset_btn = Button("Load")
 load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
 load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
+load_notification_file_multiple = NotificationBox("Select maximum one preset", box_type="error")
 load_notification_error = NotificationBox("Error loading preset", box_type="error")
+load_notification_no_presets = NotificationBox("No presets found", box_type="info")
 load_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
         Select.Item("loaded", content=load_notification_loaded),
         Select.Item("not selected", content=load_notification_file_not_selected),
+        Select.Item("multiple", content=load_notification_file_multiple),
         Select.Item("error", content=load_notification_error),
     ]
 )
@@ -80,12 +80,15 @@ load_notification_oneof = OneOf(load_notification_select)
 load_container = Container(
     widgets=[
         load_file_selector,
+        load_notification_no_presets,
         Flexbox(widgets=[load_preset_btn, load_notification_oneof], gap=20),
     ]
 )
 
 save_layout = Container(widgets=[save_container], gap=0)
 load_layout = Container(widgets=[load_container], gap=0)
+save_dialog = Dialog(title="Save Preset", content=save_layout)
+load_dialog = Dialog(title="Load Preset", content=load_layout)
 
 
 @save_preset_btn.click
@@ -107,6 +110,8 @@ def save_json_button_cb():
         return
 
     dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
+    if g.api.file.exists(g.TEAM_ID, dst_path):
+        dst_path = g.api.file.get_free_name(g.TEAM_ID, dst_path)
     src_path = g.DATA_DIR + "/preset.json"
     with open(src_path, "w") as f:
         json.dump(dtl_json, f, indent=4)
@@ -117,157 +122,162 @@ def save_json_button_cb():
 
 
 @load_preset_btn.click
+@handle_exception
 def load_json_button_cb():
     paths = load_file_selector.get_selected_items()
     if len(paths) == 0:
         load_notification_select.set_value("not selected")
         return
-    g.api.file.download(g.TEAM_ID, paths[0], g.DATA_DIR + "/preset.json")
-    with open(g.DATA_DIR + "/preset.json", "r") as f:
-        dtl_json = json.load(f)
-    try:
-        apply_json(dtl_json)
-    except Exception as e:
-        load_notification_error.description = str(e)
-        load_notification_select.set_value("error")
-        raise
+    # if len(paths) > 1:
+    #     load_notification_select.set_value("multiple")
+    #     return
+    nodes_flow.clear()
+    for path in paths:
+        try:
+            g.api.file.download(g.TEAM_ID, path, g.DATA_DIR + "/preset.json")
+            with open(g.DATA_DIR + "/preset.json", "r") as f:
+                dtl_json = json.load(f)
+            apply_json(dtl_json)
+        except Exception as e:
+            load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
+            load_notification_select.set_value("error")
+            raise
     load_notification_select.set_value("loaded")
+    load_dialog.hide()
 
 
-@handle_exception
 def apply_json(dtl_json):
-    try:
-        # create layer objects
-        nodes_flow.clear()
-        ids = []
-        data_layers_ids = []
-        for layer_json in dtl_json:
-            action_name = layer_json.get("action", None)
-            if action_name is None:
-                raise BadSettingsError(
-                    'Missing "action" field in layer config', extra={"layer_config": layer_json}
-                )
-            settings = layer_json.get("settings", None)
-            if settings is None:
-                raise BadSettingsError(
-                    'Missing "settings" field in layer config', extra={"layer_config": layer_json}
-                )
-
-            layer = ui_utils.create_new_layer(action_name)
-            ids.append(layer.id)
-            if action_name in actions_list[SOURCE_ACTIONS]:
-                data_layers_ids.append(layer.id)
-
-        # update src and dst
-        for i, layer_id in enumerate(ids):
-            layer_json = dtl_json[i]
-            layer = g.layers[layer_id]
-            layer: Layer
-
-            src = layer_json.get("src", [])
-            if type(src) is str:
-                src = [src]
-            layer._src = src
-
-            dst = layer_json.get("dst", [])
-            if type(dst) is str:
-                dst = [dst]
-            layer._dst = dst
-
-        # update settings
-        for i, layer_id in enumerate(ids):
-            layer_json = dtl_json[i]
-            layer = g.layers[layer_id]
-            layer.from_json(layer_json)
-
-        # init metas for data layers
-        for i, layer_id in enumerate(data_layers_ids):
-            data_layer = g.layers[layer_id]
-            src = data_layer.get_src()
-            if len(src) == 0:
-                # Skip if no sources specified for data layer
-                continue
-
-            # Add project meta
-            try:
-                project_name, dataset_name = src[0].split("/")
-            except:
-                raise BadSettingsError(
-                    'Wrong "data" layer source path. Use "project_name/dataset_name" or "project_name/*"',
-                    extra={"layer_config": dtl_json[i]},
-                )
-            try:
-                project_info = utils.get_project_by_name(project_name)
-                project_meta = utils.get_project_meta(project_info.id)
-            except Exception as e:
-                raise CustomException(
-                    f"Error getting project meta", error=e, extra={"project_name": project_name}
-                )
-            data_layer.update_project_meta(project_meta)
-
-        # init metas for all layers
-        net = Net(dtl_json, g.RESULTS_DIR)
-        net.calc_metas()
-        for layer_id, net_layer in zip(ids, net.layers):
-            layer = g.layers[layer_id]
-            layer: Layer
-            layer.output_meta = net_layer.output_meta
-
-        for layer_id in ids:
-            if layer_id in data_layers_ids:
-                continue
-            layer = g.layers[layer_id]
-            layer_input_meta = utils.merge_input_metas(
-                [
-                    g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta
-                    for src in layer.get_src()
-                ]
+    # create layer objects
+    ids = []
+    data_layers_ids = []
+    for layer_json in dtl_json:
+        action_name = layer_json.get("action", None)
+        if action_name is None:
+            raise BadSettingsError(
+                'Missing "action" field in layer config', extra={"layer_config": layer_json}
             )
-            layer.update_project_meta(layer_input_meta)
+        settings = layer_json.get("settings", None)
+        if settings is None:
+            raise BadSettingsError(
+                'Missing "settings" field in layer config', extra={"layer_config": layer_json}
+            )
 
-        # create nodes
-        for layer_id in ids:
-            layer = g.layers[layer_id]
-            node = layer.create_node()
-            nodes_flow.add_node(node)
+        layer = ui_utils.create_new_layer(action_name)
+        ids.append(layer.id)
+        if action_name in actions_list[SOURCE_ACTIONS]:
+            data_layers_ids.append(layer.id)
 
-        # create node connections
-        nodes_flow_edges = []
-        for dst_layer_id in ids:
-            dst_layer = g.layers[dst_layer_id]
-            dst_layer: Layer
-            for src in dst_layer.get_src():
-                for src_layer_id in ids:
-                    src_layer = g.layers[src_layer_id]
-                    for dst_idx, dst in enumerate(src_layer.get_dst()):
-                        if dst == src:
-                            try:
-                                nodes_flow_edges.append(
-                                    {
-                                        "id": random.randint(10000000000000, 99999999999999),
-                                        "output": {
-                                            "node": src_layer_id,
-                                            "interface": src_layer.get_destination_name(dst_idx),
-                                        },
-                                        "input": {
-                                            "node": dst_layer_id,
-                                            "interface": "source",
-                                        },
-                                    }
-                                )
-                            except:
-                                pass
-        nodes_flow.set_edges(nodes_flow_edges)
+    # update src and dst
+    for i, layer_id in enumerate(ids):
+        layer_json = dtl_json[i]
+        layer = g.layers[layer_id]
+        layer: Layer
 
-    except CustomException as e:
-        ui_utils.show_error("Error loading json", e)
-        raise e
-    except Exception as e:
-        show_dialog(
-            title="Error loading json", description=f"Unexpected Error: {str(e)}", status="error"
+        src = layer_json.get("src", [])
+        if type(src) is str:
+            src = [src]
+        layer._src = src
+
+        dst = layer_json.get("dst", [])
+        if type(dst) is str:
+            dst = [dst]
+        layer._dst = dst
+
+    # update settings
+    for i, layer_id in enumerate(ids):
+        layer_json = dtl_json[i]
+        layer = g.layers[layer_id]
+        layer.from_json(layer_json)
+
+    # init metas for data layers
+    for i, layer_id in enumerate(data_layers_ids):
+        data_layer = g.layers[layer_id]
+        src = data_layer.get_src()
+        if len(src) == 0:
+            # Skip if no sources specified for data layer
+            continue
+
+        # Add project meta
+        try:
+            project_name, dataset_name = src[0].split("/")
+        except:
+            raise BadSettingsError(
+                'Wrong "data" layer source path. Use "project_name/dataset_name" or "project_name/*"',
+                extra={"layer_config": dtl_json[i]},
+            )
+        try:
+            project_info = utils.get_project_by_name(project_name)
+            project_meta = utils.get_project_meta(project_info.id)
+        except Exception as e:
+            raise CustomException(
+                f"Error getting project meta", error=e, extra={"project_name": project_name}
+            )
+        data_layer.update_project_meta(project_meta)
+
+    # init metas for all layers
+    net = Net(dtl_json, g.RESULTS_DIR)
+    net.calc_metas()
+    for layer_id, net_layer in zip(ids, net.layers):
+        layer = g.layers[layer_id]
+        layer: Layer
+        layer.output_meta = net_layer.output_meta
+
+    for layer_id in ids:
+        if layer_id in data_layers_ids:
+            continue
+        layer = g.layers[layer_id]
+        layer_input_meta = utils.merge_input_metas(
+            [g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta for src in layer.get_src()]
         )
-        raise e
+        layer.update_project_meta(layer_input_meta)
+
+    # create nodes
+    for layer_id in ids:
+        layer = g.layers[layer_id]
+        node = layer.create_node()
+        nodes_flow.add_node(node)
+
+    # create node connections
+    nodes_flow_edges = []
+    for dst_layer_id in ids:
+        dst_layer = g.layers[dst_layer_id]
+        dst_layer: Layer
+        for src in dst_layer.get_src():
+            for src_layer_id in ids:
+                src_layer = g.layers[src_layer_id]
+                for dst_idx, dst in enumerate(src_layer.get_dst()):
+                    if dst == src:
+                        try:
+                            nodes_flow_edges.append(
+                                {
+                                    "id": random.randint(10000000000000, 99999999999999),
+                                    "output": {
+                                        "node": src_layer_id,
+                                        "interface": src_layer.get_destination_name(dst_idx),
+                                    },
+                                    "input": {
+                                        "node": dst_layer_id,
+                                        "interface": "source",
+                                    },
+                                }
+                            )
+                        except:
+                            pass
+    nodes_flow.set_edges(nodes_flow_edges)
 
 
 def load_json_cb():
     g.updater("load_json")
+
+
+def update_load_dialog():
+    load_file_selector.loading = True
+    presets_infos = g.api.file.list(
+        g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
+    )
+    load_file_selector.update_file_tree([{"path": info.path} for info in presets_infos])
+    if len(presets_infos) == 0:
+        load_notification_no_presets.show()
+    else:
+        load_notification_no_presets.hide()
+    load_file_selector.loading = False
