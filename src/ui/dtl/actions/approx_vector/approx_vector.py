@@ -67,8 +67,8 @@ class ApproxVectorAction(AnnotationAction):
         epsilon_text = Text("Epsilon", status="text", font_size=get_text_font_size())
         episilon_input = InputNumber(value=3, step=1, controls=True, size="small")
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -109,6 +109,11 @@ class ApproxVectorAction(AnnotationAction):
                 saved_classes_settings, obj_classes
             )
 
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
+
             # update settings preview
             _set_classes_list_preview()
 
@@ -116,8 +121,11 @@ class ApproxVectorAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes = saved_classes_settings
+            if classes == "default":
+                classes = [cls.name for cls in classes_list_widget.get_all_classes()]
             return {
-                "classes": saved_classes_settings,
+                "classes": classes,
                 "epsilon": episilon_input.get_value(),
             }
 

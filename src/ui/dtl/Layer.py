@@ -213,6 +213,12 @@ class Layer:
     def set_src_ann(self, ann):
         self._ann = ann
 
+    def get_src_img_desc(self):
+        return self._img_desc
+
+    def get_src_ann(self):
+        return self._ann
+
     def get_preview_img_desc(self):
         if self._need_preview:
             return self._res_img_desc

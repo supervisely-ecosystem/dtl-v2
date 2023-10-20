@@ -255,6 +255,8 @@ def classes_list_settings_changed_meta(
 ):
     names = {obj_class.name for obj_class in new_obj_classes}
     if isinstance(settings, str):
+        if settings == "default":
+            return "default"
         return settings if settings in names else ""
     return [class_name for class_name in settings if class_name in names]
 

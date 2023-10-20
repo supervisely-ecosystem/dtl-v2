@@ -151,7 +151,7 @@ class Net:
                 self.check_connections(next_layer_indx)
             self.layers[indx].color = "visited"
 
-    def get_next_layer_indxs(self, indx, branch=-1):
+    def get_next_layer_indxs(self, indx, branch=-1, layers_idx_whitelist=None):
         #:param indx:
         #:param branch: specify when calling while processing images, do not specify when calling before processing images
         #:return:
@@ -188,7 +188,8 @@ class Net:
         for dst in dsts:
             for i, layer_ in enumerate(self.layers):
                 if dst in layer_.srcs:
-                    result.append(i)
+                    if layers_idx_whitelist is None or i in layers_idx_whitelist:
+                        result.append(i)
         return result
 
     # will construct 'export' archive
@@ -199,7 +200,7 @@ class Net:
     def reset_existing_names(self):
         self.existing_names = {}
 
-    def start(self, data_el):
+    def start(self, data_el, layers_idx_whitelist=None):
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
@@ -215,11 +216,13 @@ class Net:
             raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
         for start_layer_indx in start_layer_indxs:
-            output_generator = self.process(start_layer_indx, data_el)
+            output_generator = self.process(
+                start_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+            )
             for output in output_generator:
                 yield output
 
-    def start_iterate(self, data_el, layer_idx: int = None):
+    def start_iterate(self, data_el, layer_idx: int = None, layers_idx_whitelist: list = None):
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
@@ -228,6 +231,8 @@ class Net:
         else:
             start_layer_indxs = set()
             for idx, layer in enumerate(self.layers):
+                if layers_idx_whitelist is not None and idx not in layers_idx_whitelist:
+                    continue
                 if layer.type != "data":
                     continue
                 if layer.project_name == img_pr_name and (
@@ -238,23 +243,33 @@ class Net:
                 raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
 
         for start_layer_indx in start_layer_indxs:
-            output_generator = self.process_iterate(start_layer_indx, data_el)
+            output_generator = self.process_iterate(
+                start_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+            )
             for output in output_generator:
                 yield output
 
-    def push(self, indx, data_el, branch):
-        next_layer_indxs = self.get_next_layer_indxs(indx, branch=branch)
+    def push(self, indx, data_el, branch, layers_idx_whitelist=None):
+        next_layer_indxs = self.get_next_layer_indxs(
+            indx, branch=branch, layers_idx_whitelist=layers_idx_whitelist
+        )
         for next_layer_indx in next_layer_indxs:
-            for x in self.process(next_layer_indx, data_el):
+            for x in self.process(
+                next_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+            ):
                 yield x
 
-    def push_iterate(self, indx, data_el, branch):
-        next_layer_indxs = self.get_next_layer_indxs(indx, branch=branch)
+    def push_iterate(self, indx, data_el, branch, layers_idx_whitelist=None):
+        next_layer_indxs = self.get_next_layer_indxs(
+            indx, branch=branch, layers_idx_whitelist=layers_idx_whitelist
+        )
         for next_layer_indx in next_layer_indxs:
-            for x in self.process_iterate(next_layer_indx, data_el):
+            for x in self.process_iterate(
+                next_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+            ):
                 yield x
 
-    def process(self, indx, data_el):
+    def process(self, indx, data_el, layers_idx_whitelist=None):
         layer = self.layers[indx]
         for layer_output in layer.process_timed(data_el):
             if layer_output is None:
@@ -275,10 +290,12 @@ class Net:
                         layer, len(layer_output)
                     )
                 )
-            for x in self.push(indx, new_data_el, branch):
+            for x in self.push(
+                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+            ):
                 yield x
 
-    def process_iterate(self, indx, data_el):
+    def process_iterate(self, indx, data_el, layers_idx_whitelist=None):
         layer = self.layers[indx]
         try:
             layer.validate()
@@ -307,7 +324,9 @@ class Net:
                     )
                 )
             yield layer_output, indx
-            for x in self.push_iterate(indx, new_data_el, branch):
+            for x in self.push_iterate(
+                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+            ):
                 yield x
 
     ############################################################################################################
