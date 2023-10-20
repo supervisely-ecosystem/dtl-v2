@@ -2,7 +2,7 @@ from typing import Optional
 import json
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Text, Input, Checkbox
+from supervisely.app.widgets import NodesFlow, Button, Container, Text, Input, Checkbox, Field
 from supervisely import ProjectMeta
 from supervisely.imaging.color import hex2rgb, rgb2hex
 
@@ -42,11 +42,21 @@ class SaveMasksAction(OutputAction):
 
         human_classes_colors_save_btn = create_save_btn()
         machine_classes_colors_save_btn = create_save_btn()
+        human_classes_color_widget_field = Field(
+            content=human_classes_colors,
+            title="Classes",
+            description="Select classes which you want to include in human masks",
+        )
+        machine_classes_color_widget_field = Field(
+            content=machine_classes_colors,
+            title="Classes",
+            description="Select classes which you want to include in machine masks",
+        )
         human_masks_widgets_container = Container(
-            widgets=[human_classes_colors, human_classes_colors_save_btn]
+            widgets=[human_classes_color_widget_field, human_classes_colors_save_btn]
         )
         machine_masks_widgets_container = Container(
-            widgets=[machine_classes_colors, machine_classes_colors_save_btn]
+            widgets=[machine_classes_color_widget_field, machine_classes_colors_save_btn]
         )
         human_masks_edit_text = Text("Human Masks", status="text", font_size=get_text_font_size())
         human_masks_edit_btn = Button(
