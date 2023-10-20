@@ -70,7 +70,9 @@ class Layer:
         self._preview_img_path = f"{g.STATIC_DIR}/{self.id}.jpg"
         self._preview_img_url = f"static/{self.id}.jpg"
         self._ann = None
+        self._res_ann = None
         self._img_desc = None
+        self._res_img_desc = None
         self._preview_widget = LabeledImage(
             enable_zoom=True, empty_message="Click update to show preview image with labels"
         )
@@ -86,7 +88,7 @@ class Layer:
 
             @self._update_preview_button.click
             def _update_preview_btn_click_cb():
-                g.updater("nodes")
+                g.updater(("nodes", self.id))
 
         self._preview_options = []
         if self._need_preview:
@@ -193,18 +195,24 @@ class Layer:
         if self._need_preview:
             self._preview_widget.clean_up()
 
+    def set_src_img_desc(self, img_desc):
+        self._img_desc = img_desc
+
+    def set_src_ann(self, ann):
+        self._ann = ann
+
     def get_preview_img_desc(self):
         if self._need_preview:
-            return self._img_desc
+            return self._res_img_desc
 
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
         if not self._need_preview:
             return
-        self._img_desc = img_desc
-        write_image(self._preview_img_path, img_desc.read_image())
-        self._ann = ann
+        self._res_img_desc = img_desc
+        write_image(self._preview_img_path, self._res_img_desc.read_image())
+        self._res_ann = ann
         self._preview_widget.set(
-            title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._ann
+            title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
         )
         os.environ["_SUPERVISELY_OFFLINE_FILES_UPLOADED"] = "False"
 
@@ -215,7 +223,7 @@ class Layer:
         self._update_preview_button.loading = val
 
     def get_ann(self):
-        return self._ann
+        return self._res_ann
 
     def update_project_meta(self, project_meta):
         if self._meta_changed_cb is not None:

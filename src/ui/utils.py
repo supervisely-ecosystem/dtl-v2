@@ -151,8 +151,23 @@ def set_preview(data_layers_ids):
         data_layer.update_preview(img_desc, preview_ann)
 
 
-def init_output_metas(net: Net, all_layers_ids: list, nodes_state: dict, edges: list):
+def init_output_metas(
+    net: Net, data_layers_ids: list, all_layers_ids: list, nodes_state: dict, edges: list
+):
     def calc_metas(net):
+        # Call meta changed callbacks for Data layers
+        for layer_id in data_layers_ids:
+            layer = g.layers[layer_id]
+            layer: Layer
+            src = layer.get_src()
+            layer_input_meta = ProjectMeta()
+            if src:
+                project_name, _ = src[0].split("/")
+                layer_input_meta = utils.get_project_meta(
+                    utils.get_project_by_name(project_name).id
+                )
+            layer.update_project_meta(layer_input_meta)
+
         cur_level_layers_idxs = {
             idx for idx, layer in enumerate(net.layers) if layer.type == "data"
         }
@@ -248,25 +263,43 @@ def init_output_metas(net: Net, all_layers_ids: list, nodes_state: dict, edges: 
     return net
 
 
-def update_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
-    for layer in g.layers.values():
-        layer.clear_preview()
-    updated = set()
+def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_id: str):
+    layer = g.layers[layer_id]
+    layer.clear_preview()
+
+    layer_idx = all_layers_ids.index(layer_id)
 
     net.preview_mode = True
+    net.calc_metas()
     net.preprocess()
 
-    for data_layer_id in data_layers_ids:
-        data_layer = g.layers[data_layer_id]
-        src = data_layer.get_src()
-        if len(src) == 0:
-            # if no sources specified for data layer, skip
-            continue
-        project_name, dataset_name = src[0].split("/")
-        if dataset_name == "*":
-            dataset_name = get_all_datasets(get_project_by_name(project_name).id)[0].name
-        preview_path = f"{g.PREVIEW_DIR}/{project_name}/{dataset_name}"
+    layer = g.layers[layer_id]
+    if layer.action.name in actions_list[SOURCE_ACTIONS]:
+        src = layer.get_src()
+        if src is None or len(src) == 0:
+            return
 
+        project_name, dataset_name = src[0].split("/")
+        try:
+            project_info = get_project_by_name(project_name)
+            project_meta = get_project_meta(project_info.id)
+        except Exception as e:
+            raise CustomException(
+                f"Error getting project meta", error=e, extra={"project_name": project_name}
+            )
+
+        try:
+            preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
+        except Exception as e:
+            raise CustomException(
+                f"Error downloading image and annotation for preview",
+                error=e,
+                extra={"project_name": project_name, "dataset_name": dataset_name},
+            )
+        preview_img = sly.image.read(preview_img_path)
+        with open(preview_ann_path, "r") as f:
+            preview_ann = sly.Annotation.from_json(json.load(f), project_meta)
+        preview_path = f"{g.PREVIEW_DIR}/{layer.id}"
         img_desc = ImageDescriptor(
             LegacyProjectItem(
                 project_name=project_name,
@@ -278,10 +311,100 @@ def update_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             ),
             False,
         )
-        ann = data_layer.get_ann()
-        data_el = (img_desc, ann)
+        img_desc = img_desc.clone_with_img(preview_img)
+        img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
+    else:
+        img_desc = layer._img_desc
+        preview_ann = layer._res_ann
+        if img_desc is None:
+            # try previous layer
+            return
 
-        processing_generator = net.start_iterate(data_el, skip_save_layers=True)
+    data_el = (img_desc, preview_ann)
+    processing_generator = net.start_iterate(data_el, layer_idx=layer_idx)
+    updated = set()
+    f = False
+    prev_img_desc = None
+    prev_ann = None
+    for data_el, layer_indx in processing_generator:
+        if layer_indx in updated:
+            continue
+        layer = g.layers[all_layers_ids[layer_indx]]
+        layer: Layer
+        if len(data_el) == 1:
+            img_desc, ann = data_el[0]
+        elif len(data_el) == 3:
+            img_desc, ann, _ = data_el
+        else:
+            img_desc, ann = data_el
+        updated.add(layer_indx)
+        if f:
+            layer.set_src_img_desc(prev_img_desc)
+            layer.set_src_ann(prev_ann)
+        else:
+            prev_img_desc = img_desc
+            prev_ann = ann
+            f = True
+        layer.update_preview(img_desc, ann)
+        layer.set_preview_loading(False)
+
+    net.preview_mode = False
+
+
+def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
+    for layer in g.layers.values():
+        layer.clear_preview()
+    updated = set()
+
+    net.preview_mode = True
+    net.calc_metas()
+    net.preprocess()
+
+    for data_layer_id in data_layers_ids:
+        data_layer = g.layers[data_layer_id]
+        src = data_layer.get_src()
+        if src is None or len(src) == 0:
+            # Skip if no sources specified for data layer
+            continue
+
+        project_name, dataset_name = src[0].split("/")
+        try:
+            project_info = get_project_by_name(project_name)
+            project_meta = get_project_meta(project_info.id)
+        except Exception as e:
+            raise CustomException(
+                f"Error getting project meta", error=e, extra={"project_name": project_name}
+            )
+
+        try:
+            preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
+        except Exception as e:
+            raise CustomException(
+                f"Error downloading image and annotation for preview",
+                error=e,
+                extra={"project_name": project_name, "dataset_name": dataset_name},
+            )
+        preview_img = sly.image.read(preview_img_path)
+        with open(preview_ann_path, "r") as f:
+            preview_ann = sly.Annotation.from_json(json.load(f), project_meta)
+        preview_path = f"{g.PREVIEW_DIR}/{data_layer.id}"
+        img_desc = ImageDescriptor(
+            LegacyProjectItem(
+                project_name=project_name,
+                ds_name=dataset_name,
+                image_name="preview_image",
+                ia_data={"image_ext": ".jpg"},
+                img_path=f"{preview_path}/preview_image.jpg",
+                ann_path=f"{preview_path}/preview_ann.json",
+            ),
+            False,
+        )
+        img_desc = img_desc.clone_with_img(preview_img)
+        img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
+
+        data_el = (img_desc, preview_ann)
+
+        processing_generator = net.start_iterate(data_el)
         for data_el, layer_indx in processing_generator:
             if layer_indx in updated:
                 continue

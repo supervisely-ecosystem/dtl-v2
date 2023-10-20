@@ -1,3 +1,4 @@
+import random
 from typing import Callable, List, Optional, Tuple, Union
 from collections import namedtuple
 import json
@@ -23,37 +24,9 @@ LegacyProjectItem = namedtuple(
 )
 
 
-def download_data(
-    project_name: str,
-    dataset_names: Union[str, None],
-    progress_cb: Optional[Union[tqdm, Callable]] = None,
-):
-    """
-    Download Project and Datasets from Supervisely to local storage
-    :param project_name: name of project to download
-    :param dataset_names: name of datasets to download. If None, download all datasets
-    :param progress_cb: progress callback
-    """
-    project_info = get_project_by_name(project_name)
-    if project_info is None:
-        raise RuntimeError(f"Project {project_name} not found")
-    if dataset_names is None:
-        datasets_ids = [ds.id for ds in g.api.dataset.get_list(project_info.id)]
-    else:
-        datasets_ids = []
-        for dataset_name in dataset_names:
-            dataset_info = get_dataset_by_name(dataset_name, project_info.id)
-            if dataset_info is None:
-                raise RuntimeError(f"Dataset {dataset_name} not found in project {project_name}")
-            datasets_ids.append(dataset_info.id)
-    sly.download_project(
-        g.api,
-        project_info.id,
-        f"{g.DATA_DIR}/{project_name}",
-        dataset_ids=datasets_ids,
-        progress_cb=progress_cb,
-        save_images=True,
-    )
+def get_random_image(dataset_id: int):
+    images = g.api.image.get_list(dataset_id)
+    return random.choice(images)
 
 
 def download_preview(project_name, dataset_name) -> Tuple[str, str]:
@@ -70,7 +43,7 @@ def download_preview(project_name, dataset_name) -> Tuple[str, str]:
     preview_project_path = f"{g.PREVIEW_DIR}/{project_name}"
     preview_dataset_path = f"{preview_project_path}/{dataset_name}"
     ensure_dir(preview_dataset_path)
-    image_id = g.api.image.get_list(dataset_info.id, limit=1)[0].id
+    image_id = get_random_image(dataset_info.id).id
     preview_img_path = f"{preview_dataset_path}/preview_image.jpg"
     g.api.image.download(image_id, preview_img_path)
     ann_json = g.api.annotation.download_json(image_id)

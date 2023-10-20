@@ -267,50 +267,59 @@ def filter(value):
 
 
 @handle_exception
-def update_nodes():
+def update_nodes(layer_id: str = None):
     try:
-        for layer in g.layers.values():
-            layer.set_preview_loading(True)
+        if layer_id is None:
+            for layer in g.layers.values():
+                layer.set_preview_loading(True)
 
-        edges = nodes_flow.get_edges_json()
-        nodes_state = nodes_flow.get_nodes_state_json()
+            edges = nodes_flow.get_edges_json()
+            nodes_state = nodes_flow.get_nodes_state_json()
 
-        # Init layers data
-        layers_ids = ui_utils.init_layers(nodes_state)
-        data_layers_ids = layers_ids["data_layers_ids"]
-        all_layers_ids = layers_ids["all_layers_ids"]
+            # Init layers data
+            layers_ids = ui_utils.init_layers(nodes_state)
+            data_layers_ids = layers_ids["data_layers_ids"]
+            all_layers_ids = layers_ids["all_layers_ids"]
 
-        # Call meta changed callbacks for Data layers
-        for layer_id in data_layers_ids:
+            # Init sources
+            ui_utils.init_src(edges)
+
+            utils.delete_results_dir()
+            utils.create_results_dir()
+            dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+            net = Net(dtl_json, g.RESULTS_DIR)
+            net.preview_mode = True
+
+            # Load preview for data layers
+            utils.delete_preview_dir()
+            utils.create_preview_dir()
+
+            # Update preview
+            ui_utils.update_all_previews(net, data_layers_ids, all_layers_ids)
+
+        else:
             layer = g.layers[layer_id]
             layer: Layer
-            src = layer.get_src()
-            layer_input_meta = ProjectMeta()
-            if src:
-                project_name, _ = src[0].split("/")
-                layer_input_meta = utils.get_project_meta(
-                    utils.get_project_by_name(project_name).id
-                )
-            layer.update_project_meta(layer_input_meta)
+            layer.set_preview_loading(True)
 
-        # Init sources
-        ui_utils.init_src(edges)
+            edges = nodes_flow.get_edges_json()
+            nodes_state = nodes_flow.get_nodes_state_json()
 
-        # Calculate output metas for all layers
-        utils.delete_results_dir()
-        utils.create_results_dir()
-        dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-        net = Net(dtl_json, g.RESULTS_DIR)
-        net.preview_mode = True
-        net = ui_utils.init_output_metas(net, all_layers_ids, nodes_state, edges)
+            # Init layers data
+            layers_ids = ui_utils.init_layers(nodes_state)
+            data_layers_ids = layers_ids["data_layers_ids"]
+            all_layers_ids = layers_ids["all_layers_ids"]
 
-        # Load preview for data layers
-        utils.delete_preview_dir()
-        utils.create_preview_dir()
-        ui_utils.set_preview(data_layers_ids)
+            # Init sources
+            ui_utils.init_src(edges)
 
-        # Update preview
-        ui_utils.update_previews(net, data_layers_ids, all_layers_ids)
+            utils.delete_results_dir()
+            utils.create_results_dir()
+            dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+            net = Net(dtl_json, g.RESULTS_DIR)
+            net.preview_mode = True
+
+            ui_utils.update_preview(net, data_layers_ids, all_layers_ids, layer_id)
 
     except CustomException as e:
         ui_utils.show_error("Error updating nodes", e)
@@ -336,19 +345,6 @@ def update_metas():
         all_layers_ids = layers_ids["all_layers_ids"]
         data_layers_ids = layers_ids["data_layers_ids"]
 
-        # Call meta changed callbacks for Data layers
-        for layer_id in data_layers_ids:
-            layer = g.layers[layer_id]
-            layer: Layer
-            src = layer.get_src()
-            layer_input_meta = ProjectMeta()
-            if src:
-                project_name, _ = src[0].split("/")
-                layer_input_meta = utils.get_project_meta(
-                    utils.get_project_by_name(project_name).id
-                )
-            layer.update_project_meta(layer_input_meta)
-
         # Init sources
         ui_utils.init_src(edges)
 
@@ -358,7 +354,7 @@ def update_metas():
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR)
         net.preview_mode = True
-        ui_utils.init_output_metas(net, all_layers_ids, nodes_state, edges)
+        ui_utils.init_output_metas(net, data_layers_ids, all_layers_ids, nodes_state, edges)
 
     except CustomException as e:
         ui_utils.show_error("Error updating nodes", e)
@@ -371,7 +367,7 @@ def update_metas():
 
 
 def update_nodes_cb():
-    g.updater("nodes")
+    g.updater(("nodes", None))
 
 
 def update_metas_cb():

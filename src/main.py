@@ -24,10 +24,13 @@ def _update_f():
         try:
             if "load_json" in updates:
                 apply_json()
-            elif "nodes" in updates:
-                update_nodes()
-            else:
+                continue
+            if "metas" in updates:
                 update_metas()
+            for u in updates:
+                if isinstance(u, tuple):
+                    if u[0] == "nodes":
+                        update_nodes(u[1])
         finally:
             for _ in range(len(updates)):
                 g.update_queue.task_done()

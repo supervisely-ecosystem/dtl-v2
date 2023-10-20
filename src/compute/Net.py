@@ -219,7 +219,7 @@ class Net:
             for output in output_generator:
                 yield output
 
-    def start_iterate(self, data_el, layer_idx: int = None, skip_save_layers=False):
+    def start_iterate(self, data_el, layer_idx: int = None):
         img_pr_name = data_el[0].get_pr_name()
         img_ds_name = data_el[0].get_ds_name()
 
