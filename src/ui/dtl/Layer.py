@@ -92,18 +92,30 @@ class Layer:
 
         self._preview_options = []
         if self._need_preview:
-            self._preview_options = [
-                # NodesFlow.Node.Option(
-                #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-                # ),
-                NodesFlow.Node.Option(
+            if self.action.name == "data":
+                preview_text = NodesFlow.Node.Option(
+                    name="update_preview_btn",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=get_set_settings_container(
+                            Text("Preview Random Image"), self._update_preview_button
+                        )
+                    ),
+                )
+            else:
+                preview_text = NodesFlow.Node.Option(
                     name="update_preview_btn",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=get_set_settings_container(
                             Text("Preview"), self._update_preview_button
                         )
                     ),
-                ),
+                )
+
+            self._preview_options = [
+                # NodesFlow.Node.Option(
+                #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
+                # ),
+                preview_text,
                 NodesFlow.Node.Option(
                     name="preview",
                     option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),

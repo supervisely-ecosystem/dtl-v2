@@ -27,7 +27,7 @@ from src.ui.dtl.utils import (
 
 class Bitmap2LinesAction(AnnotationAction):
     name = "bitmap2lines"
-    title = "Bitmap to Lines"
+    title = "Mask to Lines"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bitmap2lines"
     )

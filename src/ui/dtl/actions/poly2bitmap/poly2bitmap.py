@@ -27,7 +27,7 @@ import src.globals as g
 
 class PolygonToBitmapAction(AnnotationAction):
     name = "poly2bitmap"
-    title = "Polygon to Bitmap"
+    title = "Polygon to Mask"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/poly2bitmap"
     )

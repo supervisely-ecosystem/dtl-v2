@@ -27,7 +27,7 @@ import src.globals as g
 
 class LineToBitmapAction(AnnotationAction):
     name = "line2bitmap"
-    title = "Line to Bitmap"
+    title = "Line to Mask"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/line2bitmap"
     )
