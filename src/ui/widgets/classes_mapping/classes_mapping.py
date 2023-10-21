@@ -1,5 +1,5 @@
 from typing import Optional, Union, List
-from supervisely.app.widgets import Widget, NotificationBox
+from supervisely.app.widgets import Widget, NotificationBox, Button, generate_id
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app import DataJson, StateJson
 
@@ -49,6 +49,33 @@ class ClassesMapping(Widget):
             )
         self.empty_notification = empty_notification
         self._classes = classes
+
+        self._select_all_btn = Button()
+        self._deselect_all_btn = Button()
+
+        self._select_all_btn = Button(
+            "Select all",
+            button_type="text",
+            show_loading=False,
+            icon="zmdi zmdi-check-all",
+            widget_id=generate_id(),
+        )
+        self._deselect_all_btn = Button(
+            "Deselect all",
+            button_type="text",
+            show_loading=False,
+            icon="zmdi zmdi-square-o",
+            widget_id=generate_id(),
+        )
+
+        @self._select_all_btn.click
+        def _select_all_btn_clicked():
+            self.select_all()
+
+        @self._deselect_all_btn.click
+        def _deselect_all_btn_clicked():
+            self.deselect_all()
+
         super().__init__(widget_id=widget_id, file_path=__file__)
 
     def get_json_data(self):
@@ -137,4 +164,20 @@ class ClassesMapping(Widget):
                 }
             )
         StateJson()[self.widget_id]["classes_values"] = new_mapping_values
+        StateJson().send_changes()
+
+    def select_all(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: dict
+        for value in classes_values:
+            value["selected"] = True
+        StateJson()[self.widget_id]["classes_values"] = classes_values
+        StateJson().send_changes()
+
+    def deselect_all(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: dict
+        for value in classes_values:
+            value["selected"] = False
+        StateJson()[self.widget_id]["classes_values"] = classes_values
         StateJson().send_changes()
