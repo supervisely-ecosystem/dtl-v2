@@ -73,21 +73,18 @@ class InstancesCropLayer(Layer):
         img_desc, ann = data_el
         padding_dct = self.settings["pad"]["sides"]
 
-        for label in ann.labels:
-            if label.obj_class.name not in self.classes_to_crop:
-                continue
-
+        for obj_class_name in self.classes_to_crop:
             results = instance_crop(
                 img=img_desc.read_image(),
                 ann=ann,
-                class_title=label.obj_class.name,
+                class_title=obj_class_name,
                 save_other_classes_in_crop=False,
                 padding_config=padding_dct,
             )
 
             for idx, (new_img, new_ann) in enumerate(results):
                 new_img_desc = img_desc.clone_with_img(new_img).clone_with_name(
-                    img_desc.get_img_name() + "_crop_" + label.obj_class.name + str(idx)
+                    img_desc.get_img_name() + "_crop_" + obj_class_name + str(idx)
                 )
                 new_img_desc = new_img_desc
                 yield new_img_desc, new_ann
