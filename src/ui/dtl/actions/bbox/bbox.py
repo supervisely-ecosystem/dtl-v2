@@ -3,7 +3,7 @@ from os.path import realpath, dirname
 from typing import Optional
 
 from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Field
-from supervisely import ProjectMeta
+from supervisely import ProjectMeta, Rectangle, Polygon, Polyline, Bitmap, Point, AnyGeometry
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
@@ -107,7 +107,12 @@ class BBoxAction(AnnotationAction):
             _current_meta = project_meta
             classes_mapping_widget.loading = True
             old_obj_classes = project_meta.obj_classes  # Why change?
-            new_obj_classes = project_meta.obj_classes
+            new_obj_classes = [
+                obj_class
+                for obj_class in project_meta.obj_classes
+                if obj_class.geometry_type
+                in [Rectangle, Polygon, Polyline, Bitmap, Point, AnyGeometry]
+            ]
 
             # set classes to widget
             classes_mapping_widget.set(new_obj_classes)
