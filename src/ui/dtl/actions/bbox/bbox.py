@@ -107,22 +107,16 @@ class BBoxAction(AnnotationAction):
             _current_meta = project_meta
             classes_mapping_widget.loading = True
             old_obj_classes = project_meta.obj_classes  # Why change?
-            new_obj_classes = [
-                obj_class
-                for obj_class in project_meta.obj_classes
-                if obj_class.geometry_type
-                in [Rectangle, Polygon, Polyline, Bitmap, Point, AnyGeometry]
-            ]
 
             # set classes to widget
-            classes_mapping_widget.set(new_obj_classes)
+            classes_mapping_widget.set(old_obj_classes)
 
             # update settings according to new meta
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = classes_mapping_settings_changed_meta(
                 saved_classes_mapping_settings,
                 old_obj_classes,
-                new_obj_classes,
+                old_obj_classes,
                 default_action="copy",
                 ignore_action="skip",
                 other_allowed=False,
