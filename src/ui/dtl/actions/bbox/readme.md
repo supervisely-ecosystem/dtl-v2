@@ -1,7 +1,6 @@
 # Bounding Box
 
-`Bounding Box` layer converts annotations of specified classes to bounding boxes.
-Supported shapes: `polygon`, `bitmap`, `polyline`, `point`, `rectangle`.
+`Bounding Box` layer converts annotations of classes with shapes of other types into classes with bounding boxes.
 
 Coordinates of bounding boxes are calculated like this:
 
