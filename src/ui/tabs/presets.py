@@ -113,6 +113,7 @@ def save_json_button_cb():
     if g.api.file.exists(g.TEAM_ID, dst_path):
         dst_path = g.api.file.get_free_name(g.TEAM_ID, dst_path)
     src_path = g.DATA_DIR + "/preset.json"
+    utils.create_data_dir()
     with open(src_path, "w") as f:
         json.dump(dtl_json, f, indent=4)
     file_info = g.api.file.upload(g.TEAM_ID, src_path, dst_path)
@@ -134,6 +135,7 @@ def load_json_button_cb():
     nodes_flow.clear()
     for path in paths:
         try:
+            utils.create_data_dir()
             g.api.file.download(g.TEAM_ID, path, g.DATA_DIR + "/preset.json")
             with open(g.DATA_DIR + "/preset.json", "r") as f:
                 dtl_json = json.load(f)
