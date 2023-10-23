@@ -41,6 +41,16 @@ def find_layer_id_by_dst(dst: str):
     return None
 
 
+def find_children(parent: Layer):
+    children = []
+    parent_dst = parent.get_dst()
+    for layer_id, layer in g.layers.items():
+        for l_src in layer.get_src():
+            if l_src in parent_dst:
+                children.append(layer_id)
+    return children
+
+
 def init_layers(nodes_state: dict):
     data_layers_ids = []
     save_layers_ids = []
@@ -242,8 +252,8 @@ def get_layer_children_list(layer_id, layers: list = None):
         return layers
     layers.append(layer_id)
     layer: Layer = g.layers[layer_id]
-    for dst in layer.get_dst():
-        layers = get_layer_children_list(dst, layers)
+    for child in find_children(layer):
+        get_layer_children_list(child, layers)
     return layers
 
 
@@ -313,14 +323,14 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             layers_id_chain = get_layer_parents_chain(layer.id)
             if len(layers_id_chain) == 0:
                 return
-            layer_id = layers_id_chain[-1]
-            layer_idx = all_layers_ids.index(layer_id)
-            layer = g.layers[layer_id]
-            if issubclass(layer.action, SourceAction) and layer.get_src_img_desc() is None:
-                img_desc, preview_ann = load_preview_for_data_layer(layer)
+            start_layer_id = layers_id_chain[-1]
+            layer_idx = all_layers_ids.index(start_layer_id)
+            start_layer = g.layers[start_layer_id]
+            if issubclass(layer.action, SourceAction) and start_layer.get_src_img_desc() is None:
+                img_desc, preview_ann = load_preview_for_data_layer(start_layer)
             else:
-                img_desc = layer.get_src_img_desc()
-                preview_ann = layer.get_src_ann()
+                img_desc = start_layer.get_src_img_desc()
+                preview_ann = start_layer.get_src_ann()
     if img_desc is None:
         raise BadSettingsError(
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
