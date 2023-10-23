@@ -69,7 +69,7 @@ class SpatialLevelAction(Action):
 class AnnotationAction(Action):
     header_color = "#90ddf5"
     header_text_color = "#000000"
-    icon = "zmdi zmdi-label-heart"
+    icon = "zmdi zmdi-shape"
 
 
 class OtherAction(Action):
