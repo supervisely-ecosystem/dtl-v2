@@ -60,7 +60,7 @@ save_container = Container(
 )
 
 
-load_file_selector = FileViewer([])
+load_file_selector = Select(items=[])
 load_preset_btn = Button("Load")
 load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
 load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
@@ -125,25 +125,22 @@ def save_json_button_cb():
 @load_preset_btn.click
 @handle_exception
 def load_json_button_cb():
-    paths = load_file_selector.get_selected_items()
-    if len(paths) == 0:
+    filename = load_file_selector.get_value()
+    if filename is None:
         load_notification_select.set_value("not selected")
         return
-    # if len(paths) > 1:
-    #     load_notification_select.set_value("multiple")
-    #     return
+    path = f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
     nodes_flow.clear()
-    for path in paths:
-        try:
-            utils.create_data_dir()
-            g.api.file.download(g.TEAM_ID, path, g.DATA_DIR + "/preset.json")
-            with open(g.DATA_DIR + "/preset.json", "r") as f:
-                dtl_json = json.load(f)
-            apply_json(dtl_json)
-        except Exception as e:
-            load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
-            load_notification_select.set_value("error")
-            raise
+    try:
+        utils.create_data_dir()
+        g.api.file.download(g.TEAM_ID, path, g.DATA_DIR + "/preset.json")
+        with open(g.DATA_DIR + "/preset.json", "r") as f:
+            dtl_json = json.load(f)
+        apply_json(dtl_json)
+    except Exception as e:
+        load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
+        load_notification_select.set_value("error")
+        raise
     load_notification_select.set_value("loaded")
     load_dialog.hide()
 
@@ -277,9 +274,13 @@ def update_load_dialog():
     presets_infos = g.api.file.list(
         g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
     )
-    load_file_selector.update_file_tree([{"path": info.path} for info in presets_infos])
+    load_file_selector.set(
+        items=[Select.Item(".".join(info.name.split(".")[:-1])) for info in presets_infos]
+    )
     if len(presets_infos) == 0:
         load_notification_no_presets.show()
+        load_file_selector.hide()
     else:
         load_notification_no_presets.hide()
+        load_file_selector.show()
     load_file_selector.loading = False
