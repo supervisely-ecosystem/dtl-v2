@@ -2,6 +2,7 @@ from supervisely.app.widgets import Container, Flexbox, Button, Dialog
 
 from src.ui.tabs.configure import layout as configure_tab_layout
 from src.ui.tabs.presets import (
+    update_save_dialog,
     update_load_dialog,
     save_dialog,
     load_dialog,
@@ -42,6 +43,7 @@ def show_run_dialog():
 @save_button.click
 def save_presets_dialog():
     save_dialog.show()
+    update_save_dialog()
 
 
 @load_button.click

@@ -4,16 +4,14 @@ import json
 from supervisely.app.widgets import (
     Button,
     Container,
-    Flexbox,
-    FileViewer,
     Input,
     Field,
-    NotificationBox,
     Select,
     OneOf,
     Empty,
     FileThumbnail,
     Dialog,
+    Text,
 )
 
 from src.compute.Net import Net
@@ -27,12 +25,12 @@ import src.globals as g
 from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
-preset_name_input = Input(placeholder="Preset name")
+preset_name_input = Input(value="preset", placeholder="Preset name")
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
 save_preset_file_thumbnail = FileThumbnail()
 save_preset_file_thumbnail.hide()
-save_notification_saved = NotificationBox("Preset saved", box_type="success")
-save_notification_empty_name = NotificationBox("Empty preset name", box_type="error")
+save_notification_saved = Text("Preset saved", status="success")
+save_notification_empty_name = Text("Empty preset name", status="error")
 save_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
@@ -48,13 +46,8 @@ save_container = Container(
             description=f'Preset will be saved to folder "{g.TEAM_FILES_PATH}/presets" in your Team files',
             content=preset_name_input,
         ),
-        Flexbox(
-            widgets=[
-                save_preset_btn,
-                save_notification_oneof,
-            ],
-            gap=20,
-        ),
+        save_preset_btn,
+        save_notification_oneof,
         save_preset_file_thumbnail,
     ]
 )
@@ -62,11 +55,11 @@ save_container = Container(
 
 load_file_selector = Select(items=[])
 load_preset_btn = Button("Load")
-load_notification_loaded = NotificationBox("Preset loaded", box_type="success")
-load_notification_file_not_selected = NotificationBox("File not selected", box_type="error")
-load_notification_file_multiple = NotificationBox("Select maximum one preset", box_type="error")
-load_notification_error = NotificationBox("Error loading preset", box_type="error")
-load_notification_no_presets = NotificationBox("No presets found", box_type="info")
+load_notification_loaded = Text("Preset loaded", status="success")
+load_notification_file_not_selected = Text("File not selected", status="error")
+load_notification_file_multiple = Text("Select maximum one preset", status="error")
+load_notification_error = Text("Error loading preset", status="error")
+load_notification_no_presets = Text("No presets found", status="info")
 load_notification_no_presets.hide()
 load_notification_select = Select(
     items=[
@@ -80,9 +73,14 @@ load_notification_select = Select(
 load_notification_oneof = OneOf(load_notification_select)
 load_container = Container(
     widgets=[
-        load_file_selector,
+        Field(
+            title="Select preset",
+            description=f'Presets are stored in folder "{g.TEAM_FILES_PATH}/presets" in your Team files',
+            content=load_file_selector,
+        ),
         load_notification_no_presets,
-        Flexbox(widgets=[load_preset_btn, load_notification_oneof], gap=20),
+        load_preset_btn,
+        load_notification_oneof,
     ]
 )
 
@@ -107,7 +105,7 @@ def save_json_button_cb():
 
     preset_name = preset_name_input.get_value()
     if preset_name == "":
-        preset_name = preset_name_input.set_value("empty_name")
+        save_notification_select.set_value("empty_name")
         return
 
     dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
@@ -121,6 +119,16 @@ def save_json_button_cb():
     save_preset_file_thumbnail.set(file_info)
     save_preset_file_thumbnail.show()
     save_notification_select.set_value("saved")
+
+
+@preset_name_input.value_changed
+def preset_name_input_cb(value):
+    if value == "":
+        save_notification_select.set_value("empty_name")
+        save_preset_btn.disable()
+    else:
+        save_notification_select.set_value("empty")
+        save_preset_btn.enable()
 
 
 @load_preset_btn.click
@@ -287,3 +295,7 @@ def update_load_dialog():
         load_notification_no_presets.hide()
         load_file_selector.show()
     load_file_selector.loading = False
+
+
+def update_save_dialog():
+    save_preset_file_thumbnail.hide()
