@@ -213,8 +213,14 @@ class Layer:
         self._src.append(src_name)
 
     def clear_preview(self):
+        self._img_desc = None
+        self._ann = None
+        self._res_img_desc = None
+        self._res_ann = None
         if self._need_preview:
             self._preview_widget.clean_up()
+            self._preview_widget.hide()
+            self._empty_preview_text.show()
 
     def set_src_img_desc(self, img_desc):
         self._img_desc = img_desc
