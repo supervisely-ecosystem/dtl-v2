@@ -37,6 +37,7 @@ class Layer:
         meta_changed_cb: Optional[callable] = None,
         need_preview: bool = True,
         id: Optional[str] = None,
+        custom_update_btn: Button = None,
     ):
         self.action = action
         self.id = id
@@ -86,13 +87,16 @@ class Layer:
         )
 
         if self._need_preview:
-            self._update_preview_button = Button(
-                text="Update",
-                icon="zmdi zmdi-refresh",
-                button_type="text",
-                button_size="small",
-                style=get_set_settings_button_style(),
-            )
+            if custom_update_btn is not None:
+                self._update_preview_button = custom_update_btn
+            else:
+                self._update_preview_button = Button(
+                    text="Update",
+                    icon="zmdi zmdi-refresh",
+                    button_type="text",
+                    button_size="small",
+                    style=get_set_settings_button_style(),
+                )
 
             if self.action.name == "data":
                 if not isinstance(self.output_meta, ProjectMeta):
@@ -225,7 +229,6 @@ class Layer:
             self._preview_widget.clean_up()
             self._preview_widget.hide()
             self._empty_preview_text.show()
-            self._update_preview_button.enable()
 
     def set_src_img_desc(self, img_desc):
         self._img_desc = img_desc
@@ -246,7 +249,6 @@ class Layer:
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
         if not self._need_preview:
             return
-        self._update_preview_button.enable()
         self._res_img_desc = img_desc
         write_image(self._preview_img_path, self._res_img_desc.read_image())
         self._res_ann = ann

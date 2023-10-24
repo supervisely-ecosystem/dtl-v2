@@ -147,6 +147,15 @@ class DataAction(SourceAction):
             classes_mapping_edit_text, classes_mapping_edit_btn
         )
 
+        update_preview_btn = Button(
+            text="Update",
+            icon="zmdi zmdi-refresh",
+            button_type="text",
+            button_size="small",
+            style=get_set_settings_button_style(),
+        )
+        update_preview_btn.disable()
+
         default_classes_mapping_settings = "default"
         saved_classes_mapping_settings = "default"
 
@@ -266,6 +275,7 @@ class DataAction(SourceAction):
 
             if isinstance(_current_meta, ProjectMeta):
                 classes_mapping_edit_btn.enable()
+                update_preview_btn.enable()
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
@@ -425,4 +435,5 @@ class DataAction(SourceAction):
             get_src=get_src,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            custom_update_btn=update_preview_btn,
         )
