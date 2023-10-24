@@ -2,6 +2,7 @@ import json
 
 from supervisely.app.widgets import Container, Flexbox, FileThumbnail, ProjectThumbnail, Text
 from supervisely import ProjectMeta
+from supervisely.app.content import StateJson, DataJson
 import supervisely as sly
 
 from src.utils import (
@@ -497,6 +498,8 @@ def create_new_layer(
     except Exception as e:
         raise e
     register_layer(layer)
+    StateJson().send_changes()
+    DataJson().send_changes()
     return layer
 
 
