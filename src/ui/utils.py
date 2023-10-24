@@ -313,9 +313,19 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     net.preprocess()
 
     layer = g.layers[layer_id]
+
     layers_id_chain = None
     if issubclass(layer.action, SourceAction):
         img_desc, preview_ann = load_preview_for_data_layer(layer)
+    # if layer has no sources, clean preview
+    elif not layer.get_src():
+        layer.clear_preview()
+        children = get_layer_children_list(layer_id)
+        if children:
+            for l_id in children:
+                g.layers[l_id].clear_preview()
+        net.preview_mode = False
+        return
     else:
         img_desc = layer.get_src_img_desc()
         preview_ann = layer.get_src_ann()
@@ -332,7 +342,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             source_layer_id = layers_id_chain[-1]
             source_layer = g.layers[source_layer_id]
             if (
-                issubclass(layer.action, SourceAction)
+                issubclass(source_layer.action, SourceAction)
                 and source_layer.get_preview_img_desc() is None
             ):
                 img_desc, preview_ann = load_preview_for_data_layer(source_layer)
