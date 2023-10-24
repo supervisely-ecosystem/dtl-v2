@@ -16,6 +16,7 @@ from supervisely.app.widgets import (
 
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.Action import SourceAction
 from src.ui.dtl import actions_list
 from src.ui.dtl import SOURCE_ACTIONS
 from src.ui.tabs.configure import nodes_flow
@@ -185,6 +186,14 @@ def apply_json(dtl_json):
         src = layer_json.get("src", [])
         if type(src) is str:
             src = [src]
+        if g.PROJECT_ID and issubclass(layer.action, SourceAction):
+            ds = "*"
+            if g.DATASET_ID:
+                ds = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+            pr = g.api.project.get_info_by_id(g.PROJECT_ID).name
+            src = [f"{pr}/{ds}"]
+            layer_json["src"] = src
+
         layer._src = src
 
         dst = layer_json.get("dst", [])

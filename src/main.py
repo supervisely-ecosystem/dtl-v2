@@ -3,10 +3,12 @@ import time
 from supervisely import Application
 
 from src.ui.ui import layout, header
-from src.ui.tabs.configure import update_metas, update_nodes
+from src.ui.tabs.configure import update_metas, update_nodes, nodes_flow
 from src.ui.tabs.presets import apply_json
+from src.ui.dtl.actions.data.data import DataAction
 import src.globals as g
 import src.utils as u
+from src.ui.utils import create_new_layer
 
 u.clean_static_dir(g.STATIC_DIR)
 
@@ -44,3 +46,14 @@ update_loop = threading.Thread(
 )
 
 update_loop.start()
+
+if g.PROJECT_ID:
+    ds = "*"
+    if g.DATASET_ID:
+        ds = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+    pr = g.api.project.get_info_by_id(g.PROJECT_ID).name
+    src = [f"{pr}/{ds}"]
+    layer = create_new_layer(DataAction.name)
+    layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
+    node = layer.create_node()
+    nodes_flow.add_node(node)
