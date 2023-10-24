@@ -133,7 +133,7 @@ def merge_input_metas(input_metas: List[sly.ProjectMeta]) -> sly.ProjectMeta:
                 full_input_meta = full_input_meta.add_obj_class(inp_obj_class)
             elif existing_obj_class.geometry_type != inp_obj_class.geometry_type:
                 raise RuntimeError(
-                    f"Trying to add new class ({inp_obj_class.name}) with shape ({inp_obj_class.geometry_type.geometry_name()}). Same class with different shape ({existing_obj_class.geometry_type.geometry_name()}) exists."
+                    f"When trying to add a new class '{inp_obj_class.name}' with shape type ({inp_obj_class.geometry_type.geometry_name()}), it is found that a class with the same name and a different shape type ({existing_obj_class.geometry_type.geometry_name()}) exists."
                 )
         for inp_tag_meta in inp_meta.tag_metas:
             existing_tag_meta = full_input_meta.tag_metas.get(inp_tag_meta.name, None)
@@ -141,7 +141,7 @@ def merge_input_metas(input_metas: List[sly.ProjectMeta]) -> sly.ProjectMeta:
                 full_input_meta = full_input_meta.add_tag_meta(inp_tag_meta)
             elif not existing_tag_meta.is_compatible(inp_tag_meta):
                 raise RuntimeError(
-                    f"Trying to add new tag ({inp_tag_meta.name}) with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}). Same tag with different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
+                    f"When trying to add a new tag '{inp_tag_meta.name}' with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}), it is found that a tag with the same name and a different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
                 )
     return full_input_meta
 
