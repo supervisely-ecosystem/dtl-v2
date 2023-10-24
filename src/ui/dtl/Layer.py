@@ -7,10 +7,12 @@ import random
 from supervisely import Annotation
 from supervisely.app.widgets import (
     LabeledImage,
+    LabeledImage2,
     NodesFlow,
     Markdown,
     Button,
     Text,
+    Container,
 )
 from supervisely.imaging.image import write as write_image
 
@@ -73,8 +75,14 @@ class Layer:
         self._res_ann = None
         self._img_desc = None
         self._res_img_desc = None
-        self._preview_widget = LabeledImage(
-            enable_zoom=True, empty_message="Click update to show preview image with labels"
+        # self._preview_widget = LabeledImage(
+        #     enable_zoom=True, empty_message="Click update to show preview image with labels"
+        # )
+        self._preview_widget = LabeledImage2(enable_zoom=True)
+        self._preview_widget.hide()
+        self._empty_preview_text = Text("Click update to show preview image with labels")
+        _preview_container = Container(
+            widgets=[self._empty_preview_text, self._preview_widget], gap=0
         )
 
         if self._need_preview:
@@ -112,13 +120,14 @@ class Layer:
                 )
 
             self._preview_options = [
-                # NodesFlow.Node.Option(
-                #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-                # ),
                 preview_text,
+                # NodesFlow.Node.Option(
+                #     name="preview",
+                #     option_component=NodesFlow.WidgetOptionComponent(widget=_preview_container),
+                # ),
                 NodesFlow.Node.Option(
                     name="preview",
-                    option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
+                    option_component=NodesFlow.WidgetOptionComponent(widget=_preview_container),
                 ),
             ]
 
@@ -229,9 +238,20 @@ class Layer:
         self._res_img_desc = img_desc
         write_image(self._preview_img_path, self._res_img_desc.read_image())
         self._res_ann = ann
+        # self._preview_widget.set(
+        #     title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
+        # )
         self._preview_widget.set(
-            title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
+            image_url=f"{self._preview_img_url}?{time.time()}",
+            ann=self._res_ann,
+            project_meta=self.output_meta,
         )
+        if self._preview_widget.is_empty():
+            self._preview_widget.hide()
+            self._empty_preview_text.show()
+        else:
+            self._preview_widget.show()
+            self._empty_preview_text.hide()
         os.environ["_SUPERVISELY_OFFLINE_FILES_UPLOADED"] = "False"
 
     def set_preview_loading(self, val: bool):
