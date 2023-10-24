@@ -67,6 +67,7 @@ load_notification_file_not_selected = NotificationBox("File not selected", box_t
 load_notification_file_multiple = NotificationBox("Select maximum one preset", box_type="error")
 load_notification_error = NotificationBox("Error loading preset", box_type="error")
 load_notification_no_presets = NotificationBox("No presets found", box_type="info")
+load_notification_no_presets.hide()
 load_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
@@ -125,6 +126,7 @@ def save_json_button_cb():
 @load_preset_btn.click
 @handle_exception
 def load_json_button_cb():
+    load_notification_select.set_value("empty")
     filename = load_file_selector.get_value()
     if filename is None:
         load_notification_select.set_value("not selected")
@@ -270,6 +272,7 @@ def load_json_cb():
 
 
 def update_load_dialog():
+    load_notification_select.set_value("empty")
     load_file_selector.loading = True
     presets_infos = g.api.file.list(
         g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
