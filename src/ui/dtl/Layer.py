@@ -4,7 +4,7 @@ import time
 from typing import Optional
 import random
 
-from supervisely import Annotation
+from supervisely import Annotation, ProjectMeta
 from supervisely.app.widgets import (
     LabeledImage,
     LabeledImage2,
@@ -93,6 +93,10 @@ class Layer:
                 button_size="small",
                 style=get_set_settings_button_style(),
             )
+
+            if self.action.name == "data":
+                if not isinstance(self.output_meta, ProjectMeta):
+                    self._update_preview_button.disable()
 
             @self._update_preview_button.click
             def _update_preview_btn_click_cb():
@@ -221,6 +225,7 @@ class Layer:
             self._preview_widget.clean_up()
             self._preview_widget.hide()
             self._empty_preview_text.show()
+            self._update_preview_button.enable()
 
     def set_src_img_desc(self, img_desc):
         self._img_desc = img_desc
@@ -241,6 +246,7 @@ class Layer:
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
         if not self._need_preview:
             return
+        self._update_preview_button.enable()
         self._res_img_desc = img_desc
         write_image(self._preview_img_path, self._res_img_desc.read_image())
         self._res_ann = ann

@@ -35,6 +35,7 @@ from supervisely.app.widgets import (
 )
 
 
+# ImagesProject
 class DataAction(SourceAction):
     name = "data"
     title = "Images Project"
@@ -140,6 +141,8 @@ class DataAction(SourceAction):
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
         )
+        classes_mapping_edit_btn.disable()
+
         classes_mapping_edit_contaniner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
         )
@@ -260,6 +263,9 @@ class DataAction(SourceAction):
                     other="ignore",
                     default_allowed=False,
                 )
+
+            if isinstance(_current_meta, ProjectMeta):
+                classes_mapping_edit_btn.enable()
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,

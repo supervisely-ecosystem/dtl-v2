@@ -1,11 +1,13 @@
 from typing import Optional
 from os.path import realpath, dirname
-
+from math import ceil
 from supervisely.app.widgets import NodesFlow, InputNumber, Text, Checkbox
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs, get_text_font_size
+
+DEFAULT_ASPECT_RATIO = 16 / 9
 
 
 class ResizeAction(SpatialLevelAction):
@@ -18,12 +20,29 @@ class ResizeAction(SpatialLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         width_text = Text("Width", status="text", font_size=get_text_font_size())
-        width_input = InputNumber(value=3, min=1, step=1, controls=True)
+        width_input = InputNumber(value=128, min=1, step=1, controls=True)
 
         height_text = Text("Height", status="text", font_size=get_text_font_size())
-        height_input = InputNumber(value=3, min=1, step=1, controls=True)
+        height_input = InputNumber(value=128, min=1, step=1, controls=True)
 
         keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")
+
+        @height_input.value_changed
+        def height_input_value_changed(value):
+            if keep_aspect_ratio_checkbox.is_checked():
+                width_input.value = int(ceil(value * DEFAULT_ASPECT_RATIO))
+
+        @width_input.value_changed
+        def width_input_value_changed(value):
+            if keep_aspect_ratio_checkbox.is_checked():
+                height_input.value = int(ceil((value / DEFAULT_ASPECT_RATIO)))
+
+        @keep_aspect_ratio_checkbox.value_changed
+        def keep_aspect_ratio_checkbox_value_changed(is_checked):
+            if is_checked:
+                h = height_input.get_value()
+                # w = width_input.get_value()
+                width_input.value = int(ceil(h * DEFAULT_ASPECT_RATIO))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
