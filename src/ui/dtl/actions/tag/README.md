@@ -11,7 +11,7 @@ Tags are used for several things, e.g. to split images by folders in save layers
 
 ### Example
 
-Assing tag `train` to all images in train dataset. You can use `If` node to split images by different conditions and assign different tags.
+Assign tag `train` to all images in train dataset. You can use `If` node to split images by different conditions and assign different tags.
 
 <table>
 <tr>
