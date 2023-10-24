@@ -232,7 +232,7 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         chain = []
     layer: Layer = g.layers[layer_id]
     chain.append(layer_id)
-    if layer.get_src_img_desc() is not None:
+    if layer.get_preview_img_desc() is not None:
         return chain
     if issubclass(layer.action, SourceAction):
         return chain
@@ -324,14 +324,21 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             layers_id_chain = get_layer_parents_chain(layer.id)
             if len(layers_id_chain) == 0:
                 return
-            start_layer_id = layers_id_chain[-1]
-            layer_idx = all_layers_ids.index(start_layer_id)
-            start_layer = g.layers[start_layer_id]
-            if issubclass(layer.action, SourceAction) and start_layer.get_src_img_desc() is None:
-                img_desc, preview_ann = load_preview_for_data_layer(start_layer)
+            if len(layers_id_chain) == 1:
+                start_layer_id = layers_id_chain[0]
             else:
-                img_desc = start_layer.get_src_img_desc()
-                preview_ann = start_layer.get_src_ann()
+                start_layer_id = layers_id_chain[-2]
+            layer_idx = all_layers_ids.index(start_layer_id)
+            source_layer_id = layers_id_chain[-1]
+            source_layer = g.layers[source_layer_id]
+            if (
+                issubclass(layer.action, SourceAction)
+                and source_layer.get_preview_img_desc() is None
+            ):
+                img_desc, preview_ann = load_preview_for_data_layer(source_layer)
+            else:
+                img_desc = source_layer.get_preview_img_desc()
+                preview_ann = source_layer.get_ann()
     if img_desc is None:
         raise BadSettingsError(
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
