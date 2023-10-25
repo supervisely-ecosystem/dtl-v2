@@ -192,6 +192,10 @@ class LineToBitmapAction(AnnotationAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
+                    name="classes_preview",
+                    option_component=NodesFlow.WidgetOptionComponent(classes_mapping_preview),
+                ),
+                NodesFlow.Node.Option(
                     name="width_text",
                     option_component=NodesFlow.WidgetOptionComponent(width_text),
                 ),
