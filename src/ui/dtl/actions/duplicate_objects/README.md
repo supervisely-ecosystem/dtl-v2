@@ -8,7 +8,9 @@
 
 ### Example. Duplicate `dog` class objects
 
-Select `dog` class in settings and run the app. All `dog` class objects will be duplicated.
+Select `dog` class in settings and run the app. 
+
+Each figure of class `dog` will be cloned. This will not create new image, so both source and resulting objects will belong to the same image.
 
 <table>
 <tr>

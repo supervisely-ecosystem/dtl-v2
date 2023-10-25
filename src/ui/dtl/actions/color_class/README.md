@@ -4,7 +4,7 @@
 
 ### Settings:
 
-- **classes\_color\_mapping** - Assign a new class color to each class. All specified classes will be colored. If you want to leave some classes unchanged select `default` option.
+- **classes_color_mapping** - Select classes and set new color for them using color picker. If you want to leave some classes unchanged just unselect them.
 
 ### Example. Change color of classes `horse` and `person`
 
@@ -19,11 +19,9 @@
 </tr>
 </table>
 
-### Hex color
-
-Hex color format present as string with 4 components: # + RED + GREEN + BLUE. Use online color converters to more accurately achieve the desired color.
-
 ### JSON view
+
+Color format present as list of 3 components: [`RED`, `GREEN`, `BLUE`]. Use online color converters to more accurately achieve the desired color.
 
 <details>
   <summary>JSON view</summary>

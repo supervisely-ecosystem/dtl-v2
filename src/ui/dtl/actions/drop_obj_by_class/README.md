@@ -2,7 +2,7 @@
 
 `Drop by Class` layer simply removes annotations of specified classes.
 
-> ℹ️ You can also use `Data` layer and select classes that you want to keep. All other classes will be removed.
+> ℹ️ You can also use `Images Project` layer and select classes that you want to keep. All other classes will be removed.
 
 ### Settings
 

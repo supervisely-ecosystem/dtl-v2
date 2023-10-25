@@ -35,9 +35,9 @@ In this example we will keep only annotations of classes "truck". All other anno
 
 In this example we will delete annotations of classes from filtering_classes that have area greater than 4% of image area.
 
-area_size: `4%`
-comparator: `greater`
-action: `delete`
+- area_size: `4%`
+- comparator: `greater`
+- action: `delete`
 
 <table>
 <tr>
@@ -54,9 +54,9 @@ action: `delete`
 
 In this example we will delete annotations of classes from filtering_classes that have bounding box size greater than 140x140 pixels.
 
-area_size: `140x140 pixels`
-comparator: `greater`
-action: `delete`
+- area_size: `140x140 pixels`
+- comparator: `greater`
+- action: `delete`
 
 <table>
 <tr>

@@ -13,11 +13,14 @@ max_y = max(y_coords);
 
 ### Settings:
 
-- **classes** - Select classes to convert to bounding boxes. If no classes are selected, all classes will be ignored.
+- **classes_mapping** - Select classes to convert to bounding boxes. If no classes are selected, no annotations will be converted.
 
-❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
+❗ Selected classes will be replaced. If you want to keep them, use `Duplicate Objects` layer first.
 
 ### Example. Convert annotations to bounding boxes
+
+In this example we will take all objects of class "nearest ballon" and convert them to rectangles.
+Objects of other classes ("ballon") will be left unchanged.
 
 <table>
 <tr>
@@ -25,8 +28,8 @@ max_y = max(y_coords);
 <td style="text-align:center; width:50%"><strong>Output: bounding boxes</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/175304fb-563c-4a62-b300-e972de93d82e" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/d936292b-ca1d-4ba7-8dce-51b01edcf069" alt="Bounding boxes" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/249cb518-b46d-46cd-9169-c2aec71ec690" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/3386d230-5b7b-4117-9245-c5134be6d62b" alt="Bounding boxes" /> </td>
 </tr>
 </table>
 
@@ -36,14 +39,16 @@ max_y = max(y_coords);
   <summary>JSON view</summary>
 <pre>
 {
-  "action": "bbox",
-  "src": ["$data_5"],
-  "dst": "$bbox_7",
-  "settings": {
-    "classes_mapping": {
-      "ballon": "__default__"
+    "action": "bbox",
+    "src": [
+        "$data_1"
+    ],
+    "dst": "$bbox_12",
+    "settings": {
+        "classes_mapping": {
+            "nearest ballon": "nearest ballon"
+        }
     }
-  }
 }
 </pre>
 </details>

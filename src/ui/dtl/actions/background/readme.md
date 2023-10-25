@@ -2,7 +2,7 @@
 
 `Background` layer adds background rectangle (size equals to image size) with custom class to image annotations. 
 
-This layer is used to prepare data to train Neural Network for semantic segmentation.
+This layer can be used to prepare data for semantic segmentation training tasks.
 
 ### Settings:
 

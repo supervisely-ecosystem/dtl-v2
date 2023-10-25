@@ -21,9 +21,9 @@ In this example we will make `nor` operation between `branch` class and `chamele
 `branch` class will be unchanged, `chameleon` class will be corrected.
 As a result `chameleon` class will include only mask pixels only difference between `branch` and `chameleon` classes masks.
 
-`type`: `nor`
-`class_mask`: `branch`
-`classes_to_correct`: `chameleon`
+- `type`: `nor`
+- `class_mask`: `branch`
+- `classes_to_correct`: `chameleon`
 
 <table>
 <tr>
@@ -42,9 +42,9 @@ In this example we will make `and` operation between `branch` class and `chamele
 `branch` class will be unchanged, `chameleon` class will be corrected.
 As a result we will get only intersection between `branch` and `chameleon` classes masks.
 
-`type`: `and`
-`class_mask`: `branch`
-`classes_to_correct`: `chameleon`
+- `type`: `and`
+- `class_mask`: `branch`
+- `classes_to_correct`: `chameleon`
 
 <table>
 <tr>
@@ -63,9 +63,9 @@ In this example we will make `or` operation between `branch` class and `chameleo
 `branch` class will be unchanged, `chameleon` class will be corrected.
 As a result we will get union between `branch` and `chameleon` classes masks.
 
-`type`: `or`
-`class_mask`: `branch`
-`classes_to_correct`: `chameleon`
+- `type`: `or`
+- `class_mask`: `branch`
+- `classes_to_correct`: `chameleon`
 
 <table>
 <tr>

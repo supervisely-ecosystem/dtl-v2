@@ -7,6 +7,12 @@
 - **mean** - Set value to specify the peak of the noise distribution.
 - **std** - Set value to increase the spread of the noise distribution.
 
+Minimum area (`min_area`) for pixel group to be removed can be provided in pixels (`ex. 10px`) or in percentage (`1%`).
+
+If min_area is in percentage, area of pixel group to delete can be calculated based on total resoultion of image (`src_type` `=` `image`) or based on area of bounding box of annotation (`src_type` `=` `bbox`).
+
+Only annotations of classes from array `classes` would be processed. Those classes should have shape `bitmap`.
+
 ### Example. Add noise to image
 
 In this example, we add noise to the image with mean 23 and spread 65.

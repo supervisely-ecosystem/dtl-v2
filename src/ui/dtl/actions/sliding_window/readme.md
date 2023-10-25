@@ -7,6 +7,8 @@
 - **window** - Set the `width` and `height` (in pixels) of the sliding window.
 - **min_overlap** - Set the minimum overlap (in pixels) of the sliding window along `x` and `y` axis.
 
+Here is the graphical description of fields:
+
 ![sw_schema](https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/44ff0861-212b-460b-93b9-a7fc8436b0f3)
 
 ### Example. Sliding window (512x512, overlap: 32)

@@ -1,6 +1,6 @@
-# Line to Bitmap
+# Line to Mask
 
-`Line to Bitmap` layer convert labels with shape `Line` to `Bitmap`.
+`Line to Bitmap` layer convert labels with shape `Polyline` to `Bitmap`.
 
 ### Settings
 

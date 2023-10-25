@@ -3,15 +3,23 @@
 `Drop Lines by Length` layer remove too long or to short lines.
 
 Also this layer can drop lines with length in range.
+
 Lines with more than two points also supported. For multi-lines total length is calculated as sum of sections.
 
 ### Settings
 
 - **lines_class** - class name of target lines.
 - **resolution_compensation** - used for images with different resolution (scales). If `false` - line length calcalute with pixels. If `true` - in relative units.
+- **invert** - invert drop results. This mode can be used to remove lines with length in range.
 - **min_length** - minimal line length.
 - **max_length** - maximal line length.
-- **invert** - invert drop results. This mode can be used to remove lines with length in range.
+
+**Resolution compensation**:
+
+Guess that we have images with width `1000px` and `2000px`. Also guess that we want to remove lines with length less than `10px`.
+Resolution compenstation based on images width and calculated as:
+`new_min_length = (image_width / 1000) * min_length`
+If resolution_compensation is enabled, actual minimal line length will be `10px` and `20px` respectively.
 
 ### Example
 
