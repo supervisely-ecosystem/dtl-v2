@@ -38,7 +38,15 @@ class SaveAction(OutputAction):
                 dst = [dst.strip("'\"")]
             return dst
 
+        def _set_settings_from_json(settings: dict):
+            visualize_setting = settings.get("visualize", False)
+            if visualize_setting:
+                visualize_checkbox.check()
+            else:
+                visualize_checkbox.uncheck()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",

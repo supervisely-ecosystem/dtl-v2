@@ -27,12 +27,12 @@ import src.globals as g
 from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
-preset_name_input = Input(value="preset", placeholder="Preset name")
+preset_name_input = Input(value="preset", placeholder="Enter preset name")
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
 save_preset_file_thumbnail = FileThumbnail()
 save_preset_file_thumbnail.hide()
-save_notification_saved = Text("Preset saved", status="success")
-save_notification_empty_name = Text("Empty preset name", status="error")
+save_notification_saved = Text("Preset has been successfully saved", status="success")
+save_notification_empty_name = Text("Preset name is empty", status="error")
 save_notification_select = Select(
     items=[
         Select.Item("empty", content=Empty()),
@@ -45,7 +45,7 @@ save_container = Container(
     widgets=[
         Field(
             title="Preset name",
-            description=f'Preset will be saved to folder "{g.TEAM_FILES_PATH}/presets" in your Team files',
+            description=f'Preset will be saved to folder "{g.TEAM_FILES_PATH}/presets" in your Team files with .json extension',
             content=preset_name_input,
         ),
         save_preset_btn,
@@ -55,7 +55,7 @@ save_container = Container(
 )
 
 
-load_file_selector = Select(items=[])
+load_file_selector = Select(items=[], filterable=True)
 load_preset_btn = Button("Load")
 load_notification_loaded = Text("Preset loaded", status="success")
 load_notification_file_not_selected = Text("File not selected", status="error")
@@ -121,6 +121,8 @@ def save_json_button_cb():
     save_preset_file_thumbnail.set(file_info)
     save_preset_file_thumbnail.show()
     save_notification_select.set_value("saved")
+    # clean input name after saving
+    preset_name_input.set_value("")
 
 
 @preset_name_input.value_changed

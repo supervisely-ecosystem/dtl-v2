@@ -26,14 +26,19 @@ class MultiplyAction(SpatialLevelAction):
                 "multiply": multiply_input.get_value(),
             }
 
+        def _set_settings_from_json(settings: dict):
+            multiply_cal = settings.get("multiply", 12)
+            multiply_input.value = multiply_cal
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="multiply_text",
                     option_component=NodesFlow.WidgetOptionComponent(multiply_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="multiply",
+                    name="multiply_input",
                     option_component=NodesFlow.WidgetOptionComponent(multiply_input),
                 ),
             ]

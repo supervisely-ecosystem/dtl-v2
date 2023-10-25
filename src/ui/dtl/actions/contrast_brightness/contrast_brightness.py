@@ -53,7 +53,6 @@ class ContrastBrightnessAction(PixelLevelAction):
                 contrast_preview_widget.show()
             else:
                 center_grey_checkbox.uncheck()
-
                 contrast_slider.hide()
                 center_grey_checkbox.hide()
                 contrast_preview_widget.hide()
@@ -137,23 +136,43 @@ class ContrastBrightnessAction(PixelLevelAction):
                 }
             return settings
 
-        def create_options(src: list, dst: list, settings: dict) -> dict:
-            contrast_val = False
-            contrast_min_val, contrast_max_val = contrast_slider.get_value()
-            center_grey_val = False
+        def _set_settings_from_json(settings: dict):
+            # contrast_min_val, contrast_max_val = contrast_slider.get_value()
             if "contrast" in settings:
-                contrast_val = True
                 contrast_min_val = settings["contrast"].get("min", 1)
                 contrast_max_val = settings["contrast"].get("max", 1)
                 center_grey_val = settings["contrast"].get("center_grey", False)
-            contrast_slider.set_value([contrast_min_val, contrast_max_val])
-            brightness_val = False
-            brightness_min_val, brightness_max_val = brightness_slider.get_value()
+                if contrast_min_val != 1 or contrast_max_val != 1:
+                    contrast_switch.on()
+                    if center_grey_val is True:
+                        center_grey_checkbox.check()
+                    contrast_slider.show()
+                    center_grey_checkbox.show()
+                    contrast_preview_widget.show()
+                else:
+                    contrast_switch.off()
+                    center_grey_checkbox.uncheck()
+                    contrast_slider.hide()
+                    center_grey_checkbox.hide()
+                    contrast_preview_widget.hide()
+                contrast_slider.set_value([contrast_min_val, contrast_max_val])
+
+            # brightness_min_val, brightness_max_val = brightness_slider.get_value()
             if "brightness" in settings:
-                brightness_val = True
                 brightness_min_val = settings["brightness"].get("min", 0)
                 brightness_max_val = settings["brightness"].get("max", 0)
-            brightness_slider.set_value([brightness_min_val, brightness_max_val])
+                if brightness_min_val != 0 or brightness_max_val != 0:
+                    brightness_switch.on()
+                    brightness_slider.show()
+                    brightness_preview_widget.show()
+                else:
+                    brightness_switch.off()
+                    brightness_slider.hide()
+                    brightness_preview_widget.hide()
+                brightness_slider.set_value([brightness_min_val, brightness_max_val])
+
+        def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="contrast_container",

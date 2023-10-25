@@ -53,7 +53,18 @@ class RotateAction(SpatialLevelAction):
                 "black_regions": {"mode": br_selector.get_value()},
             }
 
+        def _set_settings_from_json(settings: dict):
+            if "rotate_angles" in settings:
+                rotate_angles = settings["rotate_angles"]
+                min_degrees_input.value = rotate_angles["min_degrees"]
+                max_degrees_input.value = rotate_angles["max_degrees"]
+
+            if "black_regions" in settings:
+                black_regions = settings["black_regions"]
+                br_selector.set_value(black_regions["mode"])
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="rotate_angles_text",

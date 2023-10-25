@@ -30,9 +30,12 @@ class NoiseAction(PixelLevelAction):
                 "std": spread_input.get_value(),
             }
 
+        def _set_settings_from_json(settings: dict):
+            mean_input.value = settings.get("mean", 10)
+            spread_input.value = settings.get("std", 50)
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            mean_val = settings.get("mean", 10)
-            std_val = settings.get("std", 50)
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="mean_text",

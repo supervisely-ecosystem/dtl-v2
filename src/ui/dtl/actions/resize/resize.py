@@ -20,29 +20,29 @@ class ResizeAction(SpatialLevelAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         width_text = Text("Width", status="text", font_size=get_text_font_size())
-        width_input = InputNumber(value=128, min=1, step=1, controls=True)
+        width_input = InputNumber(value=512, min=1, step=1, controls=True)
 
         height_text = Text("Height", status="text", font_size=get_text_font_size())
-        height_input = InputNumber(value=128, min=1, step=1, controls=True)
+        height_input = InputNumber(value=512, min=1, step=1, controls=True)
 
         keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")
 
-        @height_input.value_changed
-        def height_input_value_changed(value):
-            if keep_aspect_ratio_checkbox.is_checked():
-                width_input.value = int(ceil(value * DEFAULT_ASPECT_RATIO))
+        # @height_input.value_changed
+        # def height_input_value_changed(value):
+        #     if keep_aspect_ratio_checkbox.is_checked():
+        #         width_input.value = int(ceil(value * DEFAULT_ASPECT_RATIO))
 
-        @width_input.value_changed
-        def width_input_value_changed(value):
-            if keep_aspect_ratio_checkbox.is_checked():
-                height_input.value = int(ceil((value / DEFAULT_ASPECT_RATIO)))
+        # @width_input.value_changed
+        # def width_input_value_changed(value):
+        #     if keep_aspect_ratio_checkbox.is_checked():
+        #         height_input.value = int(ceil((value / DEFAULT_ASPECT_RATIO)))
 
-        @keep_aspect_ratio_checkbox.value_changed
-        def keep_aspect_ratio_checkbox_value_changed(is_checked):
-            if is_checked:
-                h = height_input.get_value()
-                # w = width_input.get_value()
-                width_input.value = int(ceil(h * DEFAULT_ASPECT_RATIO))
+        # @keep_aspect_ratio_checkbox.value_changed
+        # def keep_aspect_ratio_checkbox_value_changed(is_checked):
+        #     if is_checked:
+        #         h = height_input.get_value()
+        #         # w = width_input.get_value()
+        #         width_input.value = int(ceil(h * DEFAULT_ASPECT_RATIO))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -68,7 +68,23 @@ class ResizeAction(SpatialLevelAction):
                 },
             }
 
+        def _set_settings_from_json(settings: dict):
+            width = settings.get("width", 512)
+            height = settings.get("height", 512)
+            if "aspect_ratio" in settings:
+                keep_aspect_ratio: dict = settings["aspect_ratio"].get("keep", False)
+            else:
+                keep_aspect_ratio = False
+
+            width_input.value = width
+            height_input.value = height
+            if keep_aspect_ratio:
+                keep_aspect_ratio_checkbox.check()
+            else:
+                keep_aspect_ratio_checkbox.uncheck()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="width_text",

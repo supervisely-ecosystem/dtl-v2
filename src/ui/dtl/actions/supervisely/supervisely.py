@@ -32,7 +32,11 @@ class SuperviselyAction(OutputAction):
 
             return dst
 
+        def _set_settings_from_json(settings: dict):
+            return
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",

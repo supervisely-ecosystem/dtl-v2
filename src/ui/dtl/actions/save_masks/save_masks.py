@@ -197,6 +197,8 @@ class SaveMasksAction(OutputAction):
                     ]
                 )
                 _save_human_classes_colors()
+                add_human_masks_checkbox.check()
+
             if "gt_machine_color" in settings:
                 machine_colors = settings["gt_machine_color"]
                 current_colors_mapping = machine_classes_colors.get_mapping()
@@ -207,11 +209,13 @@ class SaveMasksAction(OutputAction):
                     ]
                 )
                 _save_machine_classes_colors()
+                add_machine_masks_checkbox.check()
 
         human_classes_colors_save_btn.click(_save_human_classes_colors)
         machine_classes_colors_save_btn.click(_save_machine_classes_colors)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
@@ -221,7 +225,6 @@ class SaveMasksAction(OutputAction):
                     name="dst", option_component=NodesFlow.WidgetOptionComponent(destination_input)
                 ),
             ]
-            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Add human masks",

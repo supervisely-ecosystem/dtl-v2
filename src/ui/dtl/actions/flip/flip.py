@@ -30,14 +30,19 @@ class FlipAction(SpatialLevelAction):
                 "axis": axis_selector.get_value(),
             }
 
+        def _set_settings_from_json(settings: dict):
+            axis = settings.get("axis", "vertical")
+            axis_selector.set_value(axis)
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="axis_text",
                     option_component=NodesFlow.WidgetOptionComponent(axis_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="axis",
+                    name="axis_selector",
                     option_component=NodesFlow.WidgetOptionComponent(axis_selector),
                 ),
             ]

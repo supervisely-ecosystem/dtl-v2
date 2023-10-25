@@ -31,7 +31,12 @@ class BackgroundAction(AnnotationAction):
                 "class": bg_class_name_input.get_value(),
             }
 
+        def _set_settings_from_json(settings: dict):
+            background_class = settings.get("class", "")
+            bg_class_name_input.set_value(background_class)
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="class_text",

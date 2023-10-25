@@ -145,6 +145,10 @@ class ApproxVectorAction(AnnotationAction):
                 _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
+
+            epsilon_val = settings.get("epsilon", 3)
+            episilon_input.value = epsilon_val
+
             classes_list_widget.loading = False
 
         @classes_list_save_btn.click

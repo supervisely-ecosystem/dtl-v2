@@ -183,7 +183,7 @@ class CropAction(SpatialLevelAction):
         @crop_random_width_max.value_changed
         def update_crop_random_width_max(value):
             if value < crop_random_width_min.value:
-                crop_random_width_max.value = value
+                crop_random_width_min.value = value
 
         @crop_random_height_min.value_changed
         def update_crop_random_height_min(value):
@@ -193,7 +193,7 @@ class CropAction(SpatialLevelAction):
         @crop_random_height_max.value_changed
         def update_crop_random_height_max(value):
             if value < crop_random_height_min.value:
-                crop_random_height_max.value = value
+                crop_random_height_min.value = value
 
         @sides_crop_unit_selector.value_changed
         def update_crop_fixed_unit(value):
@@ -208,11 +208,12 @@ class CropAction(SpatialLevelAction):
                     crop_fixed_bot.value = 100
 
         def _get_sides():
+            crop_unit = sides_crop_unit_selector.get_value()
             return {
-                "top": str(crop_fixed_top.get_value()) + sides_crop_unit_selector.get_value(),
-                "left": str(crop_fixed_left.get_value()) + sides_crop_unit_selector.get_value(),
-                "right": str(crop_fixed_right.get_value()) + sides_crop_unit_selector.get_value(),
-                "bottom": str(crop_fixed_bot.get_value()) + sides_crop_unit_selector.get_value(),
+                "top": str(crop_fixed_top.get_value()) + crop_unit,
+                "left": str(crop_fixed_left.get_value()) + crop_unit,
+                "right": str(crop_fixed_right.get_value()) + crop_unit,
+                "bottom": str(crop_fixed_bot.get_value()) + crop_unit,
             }
 
         def _get_random():
@@ -257,7 +258,47 @@ class CropAction(SpatialLevelAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return saved_settings
 
+        def _set_sides(settings: dict):
+            mode_select.set_value("sides")
+            top_value = settings["sides"]["top"]
+            left_value = settings["sides"]["left"]
+            right_value = settings["sides"]["right"]
+            bot_value = settings["sides"]["bottom"]
+
+            if top_value.endswith("%"):
+                sides_crop_unit_selector.set_value("%")
+                crop_unit_slice = -1
+            else:
+                sides_crop_unit_selector.set_value("px")
+                crop_unit_slice = -2
+
+            crop_fixed_top.value = int(top_value[:crop_unit_slice])
+            crop_fixed_left.value = int(left_value[:crop_unit_slice])
+            crop_fixed_right.value = int(right_value[:crop_unit_slice])
+            crop_fixed_bot.value = int(bot_value[:crop_unit_slice])
+            mode_select.set_value("sides")
+
+        def _set_random(settings: dict):
+            h_min = settings["random_part"]["height"]["min_percent"]
+            h_max = settings["random_part"]["height"]["max_percent"]
+            w_min = settings["random_part"]["width"]["min_percent"]
+            w_max = settings["random_part"]["width"]["max_percent"]
+
+            crop_random_height_min.value = h_min
+            crop_random_height_max.value = h_max
+            crop_random_width_min.value = w_min
+            crop_random_width_max.value = w_max
+            if settings["random_part"]["keep_aspect_ratio"]:
+                crop_random_keep_aspect_ratio.check()
+            else:
+                crop_random_keep_aspect_ratio.uncheck()
+            mode_select.set_value("random_part")
+
         def _set_settings_from_json(settings):
+            if "sides" in settings:
+                _set_sides(settings)
+            elif "random_part" in settings:
+                _set_random(settings)
             _save_settings()
 
         save_settings_btn.click(_save_settings)

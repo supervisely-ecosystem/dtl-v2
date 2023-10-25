@@ -43,7 +43,19 @@ class DatasetAction(OtherAction):
                 "name": name,
             }
 
+        def _set_settings_from_json(settings: dict):
+            rule = settings.get("rule", None)
+            if rule == "save_original":
+                save_original_checkbox.check()
+                ds_name_input.hide()
+            else:
+                save_original_checkbox.uncheck()
+                ds_name = settings.get("name", "")
+                ds_name_input.set_value(ds_name)
+                ds_name_input.show()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Save original",

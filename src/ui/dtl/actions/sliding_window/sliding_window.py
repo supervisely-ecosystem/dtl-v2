@@ -46,7 +46,19 @@ class SlidingWindowAction(SpatialLevelAction):
                 },
             }
 
+        def _set_settings_from_json(settings: dict):
+            if "window" in settings:
+                window = settings["window"]
+                width_input.value = window["width"]
+                height_input.value = window["height"]
+
+            if "min_overlap" in settings:
+                min_overlap = settings["min_overlap"]
+                x_input.value = min_overlap["x"]
+                y_input.value = min_overlap["y"]
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="window_text",

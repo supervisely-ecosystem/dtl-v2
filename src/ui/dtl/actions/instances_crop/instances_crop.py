@@ -200,22 +200,6 @@ class InstancesCropAction(SpatialLevelAction):
                 "pad": saved_padding_settings,
             }
 
-        def _set_settings_from_json(settings: dict):
-            padding_container.loading = True
-            _save_padding()
-            padding_container.loading = False
-            classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", default_classes_settings)
-            set_classes_list_settings_from_json(
-                classes_list_widget=classes_list_widget, settings=classes_list_settings
-            )
-            # save settings
-            if classes_list_settings != "default":
-                _save_classes_list_settings()
-            # update settings preview
-            _set_classes_list_preview()
-            classes_list_widget.loading = False
-
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta
             if project_meta == _current_meta:
@@ -260,6 +244,42 @@ class InstancesCropAction(SpatialLevelAction):
             )
             _set_classes_list_preview()
             g.updater("metas")
+
+        def _set_padding(settings: dict):
+            if "pad" in settings:
+                top_value = settings["pad"]["sides"]["top"]
+                left_value = settings["pad"]["sides"]["left"]
+                right_value = settings["pad"]["sides"]["right"]
+                bot_value = settings["pad"]["sides"]["bottom"]
+
+                if top_value.endswith("%"):
+                    padding_unit_selector.set_value("%")
+                    crop_unit_slice = -1
+                else:
+                    padding_unit_selector.set_value("px")
+                    crop_unit_slice = -2
+
+                padding_top.value = int(top_value[:crop_unit_slice])
+                padding_left.value = int(left_value[:crop_unit_slice])
+                padding_right.value = int(right_value[:crop_unit_slice])
+                padding_bot.value = int(bot_value[:crop_unit_slice])
+
+        def _set_settings_from_json(settings: dict):
+            padding_container.loading = True
+            _set_padding(settings)
+            _save_padding()
+            padding_container.loading = False
+            classes_list_widget.loading = True
+            classes_list_settings = settings.get("classes", default_classes_settings)
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_list_widget, settings=classes_list_settings
+            )
+            # save settings
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
+            # update settings preview
+            _set_classes_list_preview()
+            classes_list_widget.loading = False
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)

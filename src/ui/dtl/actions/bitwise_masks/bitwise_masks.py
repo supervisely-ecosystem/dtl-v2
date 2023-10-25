@@ -47,13 +47,13 @@ class BitwiseMasksAction(AnnotationAction):
         classes_to_correct_widget = ClassesList(multiple=True)
         classes_mask_widget_field = Field(
             content=class_mask_widget,
-            title="Classes",
-            description="Select the class relative to which the mask will be corrected",
+            title="Class",
+            description="Choose the class that will be the basis for the mask's correction",
         )
         classes_to_correct_widget_field = Field(
             content=classes_to_correct_widget,
             title="Classes",
-            description="Select the classes whose masks you want to correct",
+            description="Select which classes you want to have their masks corrected",
         )
         class_mask_preview = ClassesListPreview()
         classes_to_correct_preview = ClassesListPreview()
@@ -265,7 +265,6 @@ class BitwiseMasksAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-
             settings_options = [
                 NodesFlow.Node.Option(
                     name="operation_type_text",
