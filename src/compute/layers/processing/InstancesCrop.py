@@ -46,8 +46,8 @@ class InstancesCropLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
         self.classes_to_crop, self.classes_to_save = self._get_cls_lists()
 
     def validate(self):

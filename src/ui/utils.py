@@ -189,11 +189,11 @@ def init_output_metas(
                     raise ActionNotFoundError(action)
                 layer_cls = NetLayer.actions_mapping[action]
                 if layer_cls.type == "data":
-                    layer = layer_cls(layer_config)
+                    layer = layer_cls(layer_config, net=net)
                 elif layer_cls.type == "processing":
-                    layer = layer_cls(layer_config)
+                    layer = layer_cls(layer_config, net=net)
                 elif layer_cls.type == "save":
-                    layer = layer_cls(layer_config, g.RESULTS_DIR, net)
+                    layer = layer_cls(layer_config, g.RESULTS_DIR, net=net)
                     net.save_layer = layer
                 net.layers[cur_layer_idx] = layer
 

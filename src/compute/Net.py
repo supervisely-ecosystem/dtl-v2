@@ -54,11 +54,11 @@ class Net:
                 raise ActionNotFoundError(action)
             layer_cls = Layer.actions_mapping[action]
             if layer_cls.type == "data":
-                layer = layer_cls(layer_config)
+                layer = layer_cls(layer_config, net=self)
             elif layer_cls.type == "processing":
-                layer = layer_cls(layer_config)
+                layer = layer_cls(layer_config, net=self)
             elif layer_cls.type == "save":
-                layer = layer_cls(layer_config, output_folder, self)
+                layer = layer_cls(layer_config, output_folder, net=self)
                 self.save_layer = layer
             else:
                 raise NotImplementedError()

@@ -34,8 +34,8 @@ class FindContoursLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         for old_class, new_class in self.settings["classes_mapping"].items():

@@ -27,8 +27,8 @@ class BitwiseMasksLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def find_mask_class(self, labels: List[Label], class_mask_name):
         for label in labels:

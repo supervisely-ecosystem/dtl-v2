@@ -117,8 +117,8 @@ class IfLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
         self.frame_counter = 0
 

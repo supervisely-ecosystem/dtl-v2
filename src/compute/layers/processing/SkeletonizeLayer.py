@@ -40,8 +40,8 @@ class SkeletonizeLayer(Layer):
         "thinning": thin,
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         super().define_classes_mapping()  # don't change

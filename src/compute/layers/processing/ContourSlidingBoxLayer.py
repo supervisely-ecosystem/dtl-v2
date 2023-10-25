@@ -119,8 +119,8 @@ class ContourSlidingBoxLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         new_class = self.settings["box_class"]

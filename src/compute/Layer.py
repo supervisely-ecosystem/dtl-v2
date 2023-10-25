@@ -77,8 +77,9 @@ class Layer:
 
     actions_mapping = {}
 
-    def __init__(self, config):
+    def __init__(self, config, net=None):
         self._config = deepcopy(config)
+        self.net = net
 
         self.srcs = maybe_wrap_in_list(config["src"])
         self.dsts = maybe_wrap_in_list(config["dst"])

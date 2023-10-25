@@ -73,8 +73,8 @@ class CropAnnotationLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
         if "random_part" in self.settings:
             random_part = self.settings["random_part"]

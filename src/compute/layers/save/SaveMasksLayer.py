@@ -70,10 +70,9 @@ class SaveMasksLayer(Layer):
         return comb_img
 
     def __init__(self, config, output_folder, net):
-        Layer.__init__(self, config)
+        Layer.__init__(self, config, net=net)
 
         self.output_folder = output_folder
-        self.net = net
 
     def is_archive(self):
         return True

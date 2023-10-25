@@ -24,8 +24,8 @@ class MergeMasksLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def merge_bitmaps(self, bitmaps: List[Bitmap], img_size):
         base_mask = np.zeros(img_size, bool)

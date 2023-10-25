@@ -21,8 +21,8 @@ class FlipLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
         self.horiz = self.settings["axis"] == "horizontal"
 
     def requires_image(self):
