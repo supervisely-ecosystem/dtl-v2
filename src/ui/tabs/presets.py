@@ -13,6 +13,7 @@ from supervisely.app.widgets import (
     Dialog,
     Text,
 )
+from supervisely.app import show_dialog
 
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
@@ -213,23 +214,33 @@ def apply_json(dtl_json):
         src = data_layer.get_src()
         if len(src) == 0:
             # Skip if no sources specified for data layer
+            show_dialog(
+                title="Empty source",
+                description=f"Project is not specified for {data_layer.action.title} layer. Please select the project manually in the layer card",
+                status="info",
+            )
             continue
 
         # Add project meta
         try:
             project_name, dataset_name = src[0].split("/")
         except:
-            raise BadSettingsError(
-                'Wrong "data" layer source path. Use "project_name/dataset_name" or "project_name/*"',
-                extra={"layer_config": dtl_json[i]},
+            show_dialog(
+                title="Bad source",
+                description=f'Wrong source path for {data_layer.action.title} layer. Should be "project_name/dataset_name" or "project_name/*". Please select the project manually in the layer card',
+                status="error",
             )
+            continue
         try:
             project_info = utils.get_project_by_name(project_name)
             project_meta = utils.get_project_meta(project_info.id)
         except Exception as e:
-            raise CustomException(
-                f"Error getting project meta", error=e, extra={"project_name": project_name}
+            show_dialog(
+                "Source not found",
+                description=f'Cannot find project "{project_name}". Please select the project manually in the layer card',
+                status="error",
             )
+            continue
         data_layer.update_project_meta(project_meta)
 
     # init metas for all layers
