@@ -87,8 +87,8 @@ class DropLinesByLengthAction(AnnotationAction):
         max_length_input = InputNumber(value=1, min=0, step=1, size="small")
         max_length_input.hide()
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         @min_length_checkbox.value_changed
         def min_length_checkbox_cb(is_checked: bool):
@@ -142,6 +142,11 @@ class DropLinesByLengthAction(AnnotationAction):
                 saved_classes_settings, obj_classes
             )
 
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
+
             # update settings preview
             _set_classes_list_preview()
 
@@ -150,7 +155,9 @@ class DropLinesByLengthAction(AnnotationAction):
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             settings = {
-                "lines_classes": saved_classes_settings,
+                "lines_classes": _get_classes_list_value()
+                if saved_classes_settings == "default"
+                else saved_classes_settings,
                 "resolution_compensation": resolution_compensation_checkbox.is_checked(),
                 "invert": invert_checkbox.is_checked(),
             }
@@ -162,12 +169,13 @@ class DropLinesByLengthAction(AnnotationAction):
 
         def _set_settings_from_json(settings: dict):
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("lines_classes", [])
+            classes_list_settings = settings.get("lines_classes", default_classes_settings)
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            _save_classes_list_settings()
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
             classes_list_widget.loading = False
@@ -189,20 +197,6 @@ class DropLinesByLengthAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-
-            min_length_flag = False
-            min_length_val = 1
-            if "min_length" in settings:
-                min_length_flag = True
-                min_length_val = settings.get("min_length", 1)
-            max_length_flag = False
-            max_length_val = 1
-            if "max_length" in settings:
-                max_length_flag = True
-                max_length_val = settings.get("max_length", 1)
-            invert_val = settings.get("invert", False)
-            resolution_compensation_val = settings.get("resolution_compensation", False)
-
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",

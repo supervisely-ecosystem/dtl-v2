@@ -116,6 +116,11 @@ class MergeBitmapsAction(AnnotationAction):
                 saved_classes_settings, obj_classes
             )
 
+            if saved_classes_settings == "":
+                classes_list_widget.deselect_all()
+            else:
+                classes_list_widget.select(saved_classes_settings)
+
             # update settings preview
             _set_classes_list_preview()
 

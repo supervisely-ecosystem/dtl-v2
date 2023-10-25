@@ -74,8 +74,8 @@ class LineToBitmapAction(AnnotationAction):
         width_text = Text("Width", status="text", font_size=get_text_font_size())
         width_input = InputNumber(value=1, min=1, step=1, controls=True)
 
-        saved_classes_mapping_settings = {}
-        default_classes_mapping_settings = {}
+        saved_classes_mapping_settings = "default"
+        default_classes_mapping_settings = "default"
 
         def _get_classes_mapping_value():
             classes = get_classes_list_value(classes_mapping_widget, multiple=True)
@@ -87,7 +87,9 @@ class LineToBitmapAction(AnnotationAction):
             set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
-                mapping_to_list(saved_classes_mapping_settings),
+                "default"
+                if saved_classes_mapping_settings == "default"
+                else mapping_to_list(saved_classes_mapping_settings),
             )
 
         def _save_classes_mapping_setting():
@@ -101,8 +103,11 @@ class LineToBitmapAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes_mapping = saved_classes_mapping_settings
+            if saved_classes_mapping_settings == "default":
+                classes_mapping = _get_classes_mapping_value()
             return {
-                "classes_mapping": saved_classes_mapping_settings,
+                "classes_mapping": classes_mapping,
                 "width": width_input.get_value(),
             }
 
@@ -145,13 +150,15 @@ class LineToBitmapAction(AnnotationAction):
             classes_mapping_widget.loading = False
 
         def _set_settings_from_json(settings):
-            classes_list_settings = settings.get("classes_mapping", [])
+            classes_list_settings = settings.get(
+                "classes_mapping", default_classes_mapping_settings
+            )
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget, settings=classes_list_settings
             )
 
-            # save settings
-            _save_classes_mapping_setting()
+            if classes_list_settings != "default":
+                classes_list_settings()
             # update settings preview
             _set_classes_mapping_preview()
 

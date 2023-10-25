@@ -136,12 +136,13 @@ class ApproxVectorAction(AnnotationAction):
 
         def _set_settings_from_json(settings: dict):
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", [])
+            classes_list_settings = settings.get("classes", saved_classes_settings)
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            _save_classes_list_settings()
+            if saved_classes_settings != "default":
+                _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
             classes_list_widget.loading = False

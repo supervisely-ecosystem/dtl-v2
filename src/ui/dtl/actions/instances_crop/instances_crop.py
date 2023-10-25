@@ -79,8 +79,8 @@ class InstancesCropAction(SpatialLevelAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -192,8 +192,11 @@ class InstancesCropAction(SpatialLevelAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes = saved_classes_settings
+            if saved_classes_settings == "default":
+                classes = _get_classes_list_value()
             return {
-                "classes": saved_classes_settings,
+                "classes": classes,
                 "pad": saved_padding_settings,
             }
 
@@ -202,12 +205,13 @@ class InstancesCropAction(SpatialLevelAction):
             _save_padding()
             padding_container.loading = False
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", [])
+            classes_list_settings = settings.get("classes", default_classes_settings)
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            _save_classes_list_settings()
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
             classes_list_widget.loading = False
@@ -229,6 +233,11 @@ class InstancesCropAction(SpatialLevelAction):
             saved_classes_settings = classes_list_settings_changed_meta(
                 saved_classes_settings, obj_classes
             )
+
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
 
             # update settings preview
             _set_classes_list_preview()
