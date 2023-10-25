@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import random
 from typing import Tuple
 
 from supervisely import Annotation
@@ -73,6 +74,7 @@ class InstancesCropLayer(Layer):
         img_desc, ann = data_el
         padding_dct = self.settings["pad"]["sides"]
 
+        all_results = []
         for obj_class_name in self.classes_to_crop:
             results = instance_crop(
                 img=img_desc.read_image(),
@@ -82,9 +84,14 @@ class InstancesCropLayer(Layer):
                 padding_config=padding_dct,
             )
 
-            for idx, (new_img, new_ann) in enumerate(results):
-                new_img_desc = img_desc.clone_with_img(new_img).clone_with_name(
-                    img_desc.get_img_name() + "_crop_" + obj_class_name + str(idx)
-                )
-                new_img_desc = new_img_desc
-                yield new_img_desc, new_ann
+            all_results.extend(results)
+
+        if self.net.preview_mode:
+            random.shuffle(all_results)
+
+        for idx, (new_img, new_ann) in enumerate(all_results):
+            new_img_desc = img_desc.clone_with_img(new_img).clone_with_name(
+                img_desc.get_img_name() + "_crop_" + obj_class_name + str(idx)
+            )
+            new_img_desc = new_img_desc
+            yield new_img_desc, new_ann
