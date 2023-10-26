@@ -153,7 +153,7 @@ class BboxToPolyAction(AnnotationAction):
             )
 
             if classes_list_settings != "default":
-                classes_list_settings()
+                _save_classes_mapping_setting()
             # update settings preview
             _set_classes_mapping_preview()
 
