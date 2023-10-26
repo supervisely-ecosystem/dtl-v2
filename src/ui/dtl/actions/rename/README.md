@@ -1,10 +1,10 @@
-# Rename
+# Rename Classes
 
-`Rename` layer change names of the existing classes with given class names.
+`Rename Classes` layer change names of the existing classes with given class names.
 
 ### Settings
 
-- **classes_mapping** — Assign a new class name to each class. If name is not specified, then the class will not be modified.
+- **classes_mapping** — Select the classes to be renamed and specify the new names for them.
 
 ### Example
 

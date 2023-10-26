@@ -7,6 +7,13 @@
 - **classes** - list of classes to apply transformation. Only classes with shape `bitmap` are allowed.
 - **method** - algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
 
+
+Each figure of selected classes will be reduced to 1 pixel wide representation. Each source mask (figure of shape "bitmap") produces one resulting mask (shape "bitmap").
+
+It uses scikit-image as a backend, so three methods of skeletonization are provided. For more information, look [here](https://scikit-image.org/docs/dev/auto_examples/edges/plot_skeleton.html).
+
+> For large images it may be not fast.
+
 ### Example
 
 <table>

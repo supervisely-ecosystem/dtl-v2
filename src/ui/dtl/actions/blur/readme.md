@@ -1,16 +1,17 @@
 # Blur
 
-`Blur` layer for blurring the image by applying a Gaussian or median filter.
+`Blur` layer blurs the image by applying a Gaussian or median filter.
 
 ### Settings:
 
 **Blur type** - Choose between Gaussian and Median blur.
 
-- `blur_type` - Select between Gaussian and Median blur types.
-  - **`gaussian`** `blur_type`:
-    - `sigma` - Set `min` and `max` values.
-  - **`median`** `blur_type`:
-    - `kernel_size` - Set kernel size (must be **odd** and positive number).
+`blur_type` - Select between Gaussian and Median blur types:
+
+- **`gaussian`** `blur_type`:
+  - `sigma` - Set `min` and `max` values.
+- **`median`** `blur_type`:
+  - `kernel_size` - Set kernel size (must be **odd** and positive number).
 
 ### Example 1. Gaussian blur
 

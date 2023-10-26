@@ -4,7 +4,7 @@
 
 ### Settings
 
-- **classes** — Select classes to convert to polygons. If no classes are selected, all classes will be ignored.
+- **classes_mapping** — Select classes to convert to polygons. If no classes are selected, all classes will be ignored.
 
 ❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
 

@@ -4,11 +4,12 @@ Layer for cropping images by specifying pixels or percentage to crop from each s
 
 ### Settings:
 
-- Crop type "**sides**" - crop from each side by specifying pixels or percentage to crop:
+- Crop type "**sides**" - crop image by specifying pixels or percentages to crop from each side:
     - `top`, `left`, `right`, `bottom` - pixels or percentage to crop from each side.
 - Crop type "**random part**" - crop random part of the image:
     - `width`, `height` - min and max percentage range for width and height.
-    - `keep_aspect_ratio` - Specify whether to keep the aspect ratio of the image.
+    - `keep_aspect_ratio` - specify whether to keep the aspect ratio of the image (should resulting random crop have the same aspect ratio as a source image).
+
 
 ### Example 1. Crop by sides
 
@@ -17,7 +18,7 @@ Set crop type to "**sides**" and specify pixels or percentage to crop from each 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Sides: top 350px, bottom 250px </strong></td>
+<td style="text-align:center; width:50%"><strong>Cropped image: 350px from top, 250px from bottom</strong></td>
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/52483886-392d-43a8-aeb4-a5fb01950a30" alt="Original image" /> </td>
@@ -27,12 +28,13 @@ Set crop type to "**sides**" and specify pixels or percentage to crop from each 
 
 ### Example 2. Crop random part
 
-Set crop type to "**random part**" and specify min and max percentage range for `width` and `height`. Also you can specify whether to keep the aspect ratio of the image.
+In this example we will crop **random part** of the image with specifiying min and max percentage range for `width` and `height`. 
+Also we will **keep the aspect ratio** of the source image.
 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Random part: 60-65% for width and height. Keep aspect ratio.</strong></td>
+<td style="text-align:center; width:50%"><strong>Random part crop with keeping aspect ratio</strong></td>
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/f29db46e-dc66-415f-a808-6f89a4a112ea" alt="Original image" /> </td>

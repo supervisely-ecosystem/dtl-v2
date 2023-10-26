@@ -1,6 +1,6 @@
-# Bitmap to Lines
+# Mask to Lines
 
-`Bitmap to Lines` layer converts thinned (skeletonized) bitmaps to lines.
+`Mask to Lines` layer converts thinned (skeletonized) bitmaps to lines.
 
 It is extremely useful if you have some raster objects representing lines or edges, maybe forming some tree or net structure, and want to work with vector objects.
 
@@ -14,19 +14,19 @@ Internally the layer builds a graph of 8-connected pixels, determines minimum sp
 - **classes** — Select classes to convert. If no classes are selected, all classes will be ignored.
 - **min\_points\_cnt** — Min number of vertices for each output line. Other lines will be dropped.
 
-### Example. Convert bitmap to lines
+### Example. Convert mask to lines
 
-In this example we will convert bitmap to lines. We will use `Bitmap to Lines` layer to do it.
-But first we need to use `Skeletonize` layer to thin our bitmap. After that we will apply `Bitmap to Lines` layer to get lines. And finally we will apply `Approx Vector` layer to reduce number of vertices and simplify lines.
+In this example we will convert mask to lines. We will use `Mask to Lines` layer to do it.
+But first we need to use `Skeletonize` layer to thin our bitmap. After that we will apply `Mask to Lines` layer to get lines. And finally we will apply `Approx Vector` layer to reduce number of vertices and simplify lines.
 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image (Bitmap)</strong></td>
-<td style="text-align:center; width:50%"><strong>Bitmap to Lines</strong></td>
+<td style="text-align:center; width:50%"><strong>Skeletonize + Mask to Lines</strong></td>
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/e7ad65e5-96ee-4e8e-8883-4948494e8a2f" alt="Original image (Bitmap)"/> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/b1baf468-0891-4d10-b4e6-3fff18817a04" alt="Bitmap to Lines"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/b1baf468-0891-4d10-b4e6-3fff18817a04" alt="Mask to Lines"/> </td>
 </tr>
 </table>
 

@@ -5,22 +5,21 @@
 In machine masks each of listed classes are colored in shades of gray that you specify. Note that black color `[0, 0, 0]` is automatically assigned to the `background` class. In human masks you would get stacked original images with the images having class colors above (see example).
 
 As a result, an archive with Supervisely project structure will be created in `Team Files`.
-It contains the following folders and `meta.json` file:
+It contains the following files and folders:
 
-**ann** — contains json annotations for each image
-
-**img** — contains raw images
-
-**masks\_human** — contains visual representation of generated mask
-
-**masks\_machine** — generated masks
+- `meta.json` file containing all project meta
+- dataset folders with following structure:
+  - **ann** — contains json annotations for each image
+  - **img** — contains raw images
+  - **masks_human** — contains visual representation of generated mask (optional)
+  - **masks_machine** — generated masks (optional)
 
 ### Settings
 
 - **masks_machine** — if `true` machine readable masks are generated.
 - **masks_human** — if `true` human readable masks are generated.
-- **gt\_machine\_color** - specifies colors of generated masks for each class exported.
-- **gt\_human\_color** - specifies colors of generated masks for each class exported used in visual representation
+- **gt_machine_color** - specifies colors of generated masks for each class exported.
+- **gt_human_color** - specifies colors of generated masks for each class exported used in visual representation
 
 ### Example
 
