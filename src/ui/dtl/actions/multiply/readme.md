@@ -6,7 +6,7 @@ This layer is useful when we are going to balance or unbalance data in training 
 
 ### Settings:
 
-- **multiply** - Set the value to multiply by. For example, if you set the value to 2, then the image and annotations will be duplicated twice.
+- **Multiply number** - Set the value to multiply by. For example, if you set the value to 2, then the image and annotations will be duplicated twice.
 
 ## Example. Multiply images
 

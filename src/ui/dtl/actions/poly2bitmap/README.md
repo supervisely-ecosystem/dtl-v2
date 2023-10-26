@@ -8,7 +8,7 @@ Polygons will be drawn filled, considering holes.
 
 ### Settings
 
-- **classes** — Select classes to convert polygons to bitmaps. If no classes are selected, all objects will be preserved.
+- **Classes** — Select classes to convert polygons to bitmaps. If no classes are selected, all objects will be preserved. Only `polygon` shapes are allowed.
 
 ### Example. Convert `road` class polygon to bitmap
 

@@ -4,8 +4,8 @@
 
 ### Settings
 
-- **classes_mapping** — select classes to convert. If no classes are selected, all classes will be ignored.
-- **width** — result `bitmap` width in pixels.
+- **Classes** — Select classes to convert from `Polyline` to `Bitmap`.
+- **Width** — Specify width of the lines of the resulting bitmaps in pixels.
 
 ### Example
 

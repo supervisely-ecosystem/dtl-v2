@@ -4,7 +4,7 @@
 
 ### Settings
 
-- **class** — name of class for merging. You can select only one class.
+- **Class to merge** — Choose class to merge. All masks with selected class will be merged into single mask. Only one class can be selected.
 
 ### Example. Merge masks
 

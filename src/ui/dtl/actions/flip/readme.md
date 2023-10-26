@@ -6,7 +6,7 @@ Supports flipping `bitmap`, `polygon`, `rectangle`, `point`, `polyline`, `graph`
 
 ### Settings:
 
-- **axis** - Choose the direction along which the images with annotations will be flipped (`vertical` or `horizontal`).
+- **Axis** - Choose the direction along which the images with annotations will be flipped (`vertical` or `horizontal`).
 
 ### Example 1. Vertical flip
 

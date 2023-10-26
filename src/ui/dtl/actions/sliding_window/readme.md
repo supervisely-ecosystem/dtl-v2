@@ -4,8 +4,8 @@
 
 ### Settings
 
-- **window** - Set the `width` and `height` (in pixels) of the sliding window.
-- **min_overlap** - Set the minimum overlap (in pixels) of the sliding window along `x` and `y` axis.
+- **Window** - Set the `width` and `height` (in pixels) of the sliding window.
+- **Min overlap** - Set the minimum overlap (in pixels) of the sliding window along `x` and `y` axis.
 
 Here is the graphical description of fields:
 

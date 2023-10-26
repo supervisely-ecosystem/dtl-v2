@@ -2,13 +2,18 @@
 
 `Instances Crop` layer crops objects of specified classes from image with configurable paddings (pixels or percentage from each side).
 
-ℹ️ In case of multiple objects of the same class on the image, each object will be cropped separately. 
+ℹ️ In case of multiple objects of the same class on the image, each object will be cropped separately.
 So from one image there can be produced multiple images, each with one target object. Other objects are removed from crop.
 
 ### Settings:
 
-- **`classes`** - Select classes of objects to crop. It means that all objects of such classes will be cropped from image.
-- **`pad`** - Padding settings (pixels or percentage) for each side of the image (`top`, `left`, `right`, `bottom`). It means how many will be padded from the sides of precise bounding box around object (may be defined in pixels or in percent of bounding box height).
+- **Classes** - Select classes of objects to crop. It means that all objects of such classes will be cropped from image.
+- **Padding** - Specify padding settings for each side of the image (how many pixels or percentage will be padded from the sides of precise bounding box around object):
+  - **Crop unit** - Select padding unit: `pixels` or `percents`.
+  - **Top padding** - Specify top padding value in selected unit.
+  - **Left padding** - Specify left padding value in selected unit.
+  - **Right padding** - Specify right padding value in selected unit.
+  - **Bottom padding** - Specify bottom padding value in selected unit.
 
 Here is the graphical description of fields:
 
@@ -19,7 +24,6 @@ Result of applying the layer from the example above:
 ![instances-crop-02](https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/01df02e3-7076-4961-bf81-7520d2929dba)
 
 As we can see, "car" and "person" objects are cropped separetely. This layer from one input image produced three images with one target object. Other objects are dropped from the resulting images.
-
 
 ### Example. Crop `car` class
 

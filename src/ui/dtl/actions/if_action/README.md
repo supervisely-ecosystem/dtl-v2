@@ -5,13 +5,16 @@ All "true" data will be passed to the first branch (`$if_<id>__true`), all "fals
 
 ### Conditions
 
-Condition for splitting data. Possible following options:
-  - **`probability`** - specify probability percentage to split data
-  - **`min_objects_count`** - input minimum objects count to split data
-  - **`min_height`** - split data by image height
-  - **`tags`** - select tags to split data
-  - **`include_classes`** - select classes to split data
-  - **`name_in_range`** and **`frame_step`** - input names in range and frame step to split data
+- **Condition** for splitting data. Possible following options:
+  - **Probability** - input number of probability percentage to split data
+  - **Min objects count** - input number of minimum objects count to split data
+  - **Min height** - input number of minimum image height to split data
+  - **Tags** - select one or more tags to split data
+  - **Include classes** - select one or more classes to split data
+  - **Name in range** - input names in range to split data:
+    - **Name from** - input name from
+    - **Name to** - input name to
+    - **Step** - input frame step to split data
 
 #### Split data by probability
 

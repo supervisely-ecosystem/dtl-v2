@@ -4,8 +4,8 @@
 
 ### Settings:
 
-- **mean** - Set value to specify the peak of the noise distribution.
-- **std** - Set value to increase the spread of the noise distribution.
+- **Mean** - Set value to specify the peak of the noise distribution.
+- **Spread** - Set value to increase the spread of the noise distribution.
 
 Minimum area (`min_area`) for pixel group to be removed can be provided in pixels (`ex. 10px`) or in percentage (`1%`).
 
