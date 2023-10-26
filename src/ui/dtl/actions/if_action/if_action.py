@@ -67,7 +67,7 @@ class IfAction(OtherAction):
 
         _current_meta = ProjectMeta()
 
-        # probabilty
+        # probability
         _prob_input = InputNumber(min=0, max=100, precision=3)
         _probability_condition_widget = Field(
             title="Probability",
@@ -242,10 +242,7 @@ class IfAction(OtherAction):
             name_from, name_to = condition_json["name_in_range"]
             _names_in_range_inputs["name_from"].set_value(name_from)
             _names_in_range_inputs["name_to"].set_value(name_to)
-            if "frame_step" in condition_json:
-                _names_in_range_inputs["step"].value = condition_json["frame_step"]
-            else:
-                _names_in_range_inputs["step"].value = 1
+            _names_in_range_inputs["step"].value = condition_json["name_in_range"]["frame_step"]
 
         def _get_names_in_range_value():
             return {
