@@ -39,7 +39,7 @@ class RandomColorsAction(AnnotationAction):
         def _set_settings_from_json(settings: dict):
             strength = settings.get("strength", None)
             if strength is not None:
-                color_strength_slider.set_value()
+                color_strength_slider.set_value(strength)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)

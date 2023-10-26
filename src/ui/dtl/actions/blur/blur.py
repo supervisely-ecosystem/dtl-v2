@@ -118,9 +118,9 @@ class BlurAction(PixelLevelAction):
             if name == "median":
                 kernel_input.value = settings.get("kernel", 5)
             else:
-                sigma_min_v = settings.get("sigma", {}).get("min", 3)
-                sigma_max_v = settings.get("sigma", {}).get("max", 50)
-                sigma_slider.set_value = [sigma_min_v, sigma_max_v]
+                sigma_min_v = settings["sigma"].get("min", 3)
+                sigma_max_v = settings["sigma"].get("max", 50)
+                sigma_slider.set_value([sigma_min_v, sigma_max_v])
             _save_settings()
 
         @kernel_input.value_changed

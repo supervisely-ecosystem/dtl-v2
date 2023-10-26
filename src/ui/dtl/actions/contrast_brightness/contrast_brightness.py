@@ -136,6 +136,16 @@ class ContrastBrightnessAction(PixelLevelAction):
                 }
             return settings
 
+        def _update_preview():
+            contrast_min, contrast_max = contrast_slider.get_value()
+            contrast_preview_widget.set(
+                text=f"min: {contrast_min} - max: {contrast_max}", status="text"
+            )
+            brightness_min, brightness_max = brightness_slider.get_value()
+            brightness_preview_widget.set(
+                text=f"min: {brightness_min} - max: {brightness_max}", status="text"
+            )
+
         def _set_settings_from_json(settings: dict):
             # contrast_min_val, contrast_max_val = contrast_slider.get_value()
             if "contrast" in settings:
@@ -171,6 +181,8 @@ class ContrastBrightnessAction(PixelLevelAction):
                     brightness_preview_widget.hide()
                 brightness_slider.set_value([brightness_min_val, brightness_max_val])
 
+            _update_preview()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
             settings_options = [
@@ -199,14 +211,14 @@ class ContrastBrightnessAction(PixelLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(brightness_container),
                 ),
                 NodesFlow.Node.Option(
-                    name="brightness_slider",
-                    option_component=NodesFlow.WidgetOptionComponent(brightness_slider),
-                ),
-                NodesFlow.Node.Option(
                     name="brightness_preview",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=brightness_preview_widget,
                     ),
+                ),
+                NodesFlow.Node.Option(
+                    name="brightness_slider",
+                    option_component=NodesFlow.WidgetOptionComponent(brightness_slider),
                 ),
                 NodesFlow.Node.Option(
                     name="brightness_slider",

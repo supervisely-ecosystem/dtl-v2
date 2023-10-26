@@ -242,7 +242,10 @@ class IfAction(OtherAction):
             name_from, name_to = condition_json["name_in_range"]
             _names_in_range_inputs["name_from"].set_value(name_from)
             _names_in_range_inputs["name_to"].set_value(name_to)
-            _names_in_range_inputs["step"].value = condition_json["frame_step"]
+            if "frame_step" in condition_json:
+                _names_in_range_inputs["step"].value = condition_json["frame_step"]
+            else:
+                _names_in_range_inputs["step"].value = 1
 
         def _get_names_in_range_value():
             return {
