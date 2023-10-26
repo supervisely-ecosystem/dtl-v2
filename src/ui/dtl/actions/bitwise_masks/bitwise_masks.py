@@ -219,6 +219,19 @@ class BitwiseMasksAction(AnnotationAction):
             _save_class_mask_settings()
             # update settings preview
             _set_class_mask_preview()
+
+            # exclude selected class from classes_to_correct_widget
+            obj_classes = [
+                obj_class
+                for obj_class in _current_meta.obj_classes
+                if obj_class.geometry_type in [Bitmap, AnyGeometry]
+            ]
+            classes_to_correct_widget.set(
+                [cls for cls in obj_classes if cls.name != saved_class_mask_settings]
+            )
+            _save_classes_to_correct_settings()
+            _set_classes_to_correct_preview()
+
             class_mask_widget.loading = False
 
             classes_to_correct_widget.loading = True
@@ -236,6 +249,19 @@ class BitwiseMasksAction(AnnotationAction):
         def save_class_mask_btn_cb():
             _save_class_mask_settings()
             _set_class_mask_preview()
+
+            # exclude selected class from classes_to_correct_widget
+            obj_classes = [
+                obj_class
+                for obj_class in _current_meta.obj_classes
+                if obj_class.geometry_type in [Bitmap, AnyGeometry]
+            ]
+            classes_to_correct_widget.set(
+                [cls for cls in obj_classes if cls.name != saved_class_mask_settings]
+            )
+            _save_classes_to_correct_settings()
+            _set_classes_to_correct_preview()
+
             g.updater("metas")
 
         @set_default_class_mask_btn.click
