@@ -79,7 +79,7 @@ class Layer:
         # self._preview_widget = LabeledImage(
         #     enable_zoom=True, empty_message="Click update to show preview image with labels"
         # )
-        self._preview_widget = LabeledImage2(enable_zoom=True)
+        self._preview_widget = LabeledImage2(enable_zoom=True, line_width=1)
         self._preview_widget.hide()
         self._empty_preview_text = Text("Click update to show preview image with labels")
         _preview_container = Container(
