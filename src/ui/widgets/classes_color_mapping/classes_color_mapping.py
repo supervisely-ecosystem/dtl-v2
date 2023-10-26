@@ -6,8 +6,9 @@ from src.ui.widgets.classes_mapping.classes_mapping import type_to_shape_text, C
 
 
 class ClassesColorMapping(Widget):
-    def __init__(self, classes=[], widget_id=None):
+    def __init__(self, classes=[], greyscale=False, widget_id=None):
         self._classes = classes
+        self._greyscale = greyscale
         super().__init__(widget_id=widget_id, file_path=__file__)
 
     def get_json_data(self):

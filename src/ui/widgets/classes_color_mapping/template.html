@@ -52,10 +52,44 @@
 				style="display: table-cell; vertical-align: middle; padding: 3px 30px"
 			>
 				<div class="color-picker-compact">
+					<script>
+						
+					</script>
 					<el-color-picker
 						v-model="state.{{{widget.widget_id}}}.classes_values[idx].value"
 						:disabled="!state.{{{widget.widget_id}}}.classes_values[idx].selected"
+						{% if widget._greyscale %}
+						@change="() => {
+							function hexToRgb(hex) {
+								var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+								hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+									return r + r + g + g + b + b;
+								});
+
+								var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+								return result ? {
+									r: parseInt(result[1], 16),
+									g: parseInt(result[2], 16),
+									b: parseInt(result[3], 16)
+								} : null;
+							}
+							function componentToHex(c) {
+								var hex = c.toString(16);
+								return hex.length == 1 ? '0' + hex : hex;
+							}
+
+							function rgbToHex(r, g, b) {
+								return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+							}
+							const rgb = hexToRgb(state.{{{widget.widget_id}}}.classes_values[idx].value);
+							const grey = Math.round((rgb.r + rgb.g + rgb.b)/3);
+							const greyHex = rgbToHex(grey, grey, grey);
+							state.{{{widget.widget_id}}}.classes_values[idx].value = greyHex;
+							state.{{{widget.widget_id}}}.classes_values[idx].selected = true;
+						}"
+						{% else %}
 						@change="state.{{{widget.widget_id}}}.classes_values[idx].selected = true"
+						{% endif %}
 					>
 					</el-color-picker>
 				</div>

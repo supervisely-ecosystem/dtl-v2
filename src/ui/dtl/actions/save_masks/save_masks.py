@@ -36,7 +36,7 @@ class SaveMasksAction(OutputAction):
         add_machine_masks_checkbox = Checkbox("Add machine masks")
 
         human_classes_colors = ClassesColorMapping()
-        machine_classes_colors = ClassesColorMapping()
+        machine_classes_colors = ClassesColorMapping(greyscale=True)
         human_classes_colors_preview = ClassesMappingPreview()
         machine_classes_colors_preview = ClassesMappingPreview()
 
