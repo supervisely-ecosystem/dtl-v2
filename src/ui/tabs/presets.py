@@ -135,9 +135,8 @@ def preset_name_input_cb(value):
         save_preset_btn.enable()
 
 
-@load_preset_btn.click
-@handle_exception
-def load_json_button_cb():
+def load_json():
+    load_preset_btn.loading = True
     load_notification_select.set_value("empty")
     filename = load_file_selector.get_value()
     if filename is None:
@@ -155,6 +154,8 @@ def load_json_button_cb():
         load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
         load_notification_select.set_value("error")
         raise
+    finally:
+        load_preset_btn.loading = False
     load_notification_select.set_value("loaded")
     load_dialog.hide()
 
@@ -297,7 +298,9 @@ def apply_json(dtl_json):
     nodes_flow.set_edges(nodes_flow_edges)
 
 
-def load_json_cb():
+@load_preset_btn.click
+@handle_exception
+def load_json_button_cb():
     g.updater("load_json")
 
 

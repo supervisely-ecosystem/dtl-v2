@@ -4,7 +4,7 @@ from supervisely import Application
 
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_metas, update_nodes, nodes_flow
-from src.ui.tabs.presets import apply_json
+from src.ui.tabs.presets import load_json
 from src.ui.dtl.actions.data.data import DataAction
 import src.globals as g
 import src.utils as u
@@ -25,7 +25,7 @@ def _update_f():
             continue
         try:
             if "load_json" in updates:
-                apply_json()
+                load_json()
                 continue
             if "metas" in updates:
                 update_metas()
