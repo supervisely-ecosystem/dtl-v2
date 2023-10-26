@@ -4,9 +4,9 @@
 
 ### Settings
 
-- **classes_mapping** — Select classes to convert to polygons. If no classes are selected, all classes will be ignored.
+- **Classes** — Select classes that will be converted to polygons. If no classes are selected, all classes will be ignored.
 
-❗ Selected classes will be replaced. If you want to keep them, use `Duplicate` layer first.
+❗ Selected classes will replace original classes. If you want to keep them, use `Duplicate Objects` layer first.
 
 ### Example. Convert bounding boxes to polygons
 
@@ -24,7 +24,7 @@
 ### JSON view
 
 <details>
-  <summary>JSON vieww</summary>
+  <summary>JSON view</summary>
 <pre>
 {
   "action": "bbox2poly",

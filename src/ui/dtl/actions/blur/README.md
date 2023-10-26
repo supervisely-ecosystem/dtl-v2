@@ -1,21 +1,14 @@
 # Blur
 
-`Blur` layer blurs the image by applying a Gaussian or median filter.
+`Blur` layer blurs the image by applying a Gaussian or Median filter.
 
 ### Settings:
 
-**Blur type** - Choose between Gaussian and Median blur.
-
-`blur_type` - Select between Gaussian and Median blur types:
-
-- **`gaussian`** `blur_type`:
-  - `sigma` - Set `min` and `max` values.
-- **`median`** `blur_type`:
-  - `kernel_size` - Set kernel size (must be **odd** and positive number).
+- **Blur type** - Select between Median and Gaussian blur.
+- **Kernel size** - Set kernel size for Median blur (must be **odd** and positive number).
+- **Sigma** - Set minimal and maximum values for Gaussian blur.
 
 ### Example 1. Gaussian blur
-
-To use gaussian blur (`cv2.GaussianBlur`) set name to `gaussian` and `sigma` to object with two numbers: `min` and `max`.
 
 <table>
 <tr>
@@ -29,8 +22,6 @@ To use gaussian blur (`cv2.GaussianBlur`) set name to `gaussian` and `sigma` to 
 </table>
 
 ### Example 2. Median blur
-
-To use median blur (`cv2.medianBlur`) set name to `median` and `kernel` to **odd** number.
 
 <table>
 <tr>

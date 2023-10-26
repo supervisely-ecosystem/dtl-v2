@@ -11,8 +11,8 @@ Internally the layer builds a graph of 8-connected pixels, determines minimum sp
 
 ### Settings
 
-- **classes** — Select classes to convert. If no classes are selected, all classes will be ignored.
-- **min\_points\_cnt** — Min number of vertices for each output line. Other lines will be dropped.
+- **Classes** — Select classes that will be converted to Lines. Only classes with shape `Bitmap` (Mask) can be selected. If no classes are selected, all classes will be ignored.
+- **Min Points Count** — Minimal number of points (vertices) for each output line. Other lines will be dropped.
 
 ### Example. Convert mask to lines
 

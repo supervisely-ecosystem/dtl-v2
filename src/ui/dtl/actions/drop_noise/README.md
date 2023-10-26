@@ -6,9 +6,9 @@ This can be useful to eliminate noise after running neural network.
 
 ### Settings
 
-- **classes** - list of classes that will be affected.
-- **min_area** - minimal area of connected component to keep. Can be set in `pixels` or `percents`.
-- **src_type** - type of source data. Can be `image` or `bounding box`.
+- **Classes** - List of classes that will be affected. If empty, all classes will be ignored.
+- **Min Area** - Minimal area of connected component to keep. Can be set in `pixels` or `percents`.
+- **Source type** - Type of source data. Can be `image` or `bounding box`.
 
 ### Example
 

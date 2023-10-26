@@ -142,9 +142,7 @@ class ApproxVectorAction(AnnotationAction):
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            saved_classes_settings = classes_list_settings
-
-            if saved_classes_settings != "default":
+            if classes_list_settings != "default":
                 _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()

@@ -4,12 +4,9 @@ Layer for cropping images by specifying pixels or percentage to crop from each s
 
 ### Settings:
 
-- Crop type "**sides**" - crop image by specifying pixels or percentages to crop from each side:
-    - `top`, `left`, `right`, `bottom` - pixels or percentage to crop from each side.
-- Crop type "**random part**" - crop random part of the image:
-    - `width`, `height` - min and max percentage range for width and height.
-    - `keep_aspect_ratio` - specify whether to keep the aspect ratio of the image (should resulting random crop have the same aspect ratio as a source image).
-
+- **Crop type** - Select crop type:
+    - **Sides** - Crop image by specifying pixels or percentages to crop from each side (`top`, `left`, `right`, `bottom`).
+    - **Random part** - Crop random part of the image by specifying min and max percentage range for `width` and `height`. Also you can specify whether to keep the aspect ratio of the image (should resulting random crop have the same aspect ratio as a source image).
 
 ### Example 1. Crop by sides
 
@@ -28,7 +25,7 @@ Set crop type to "**sides**" and specify pixels or percentage to crop from each 
 
 ### Example 2. Crop random part
 
-In this example we will crop **random part** of the image with specifiying min and max percentage range for `width` and `height`. 
+In this example we will crop **random part** of the image with specifying min and max percentage range for `width` and `height`.
 Also we will **keep the aspect ratio** of the source image.
 
 <table>

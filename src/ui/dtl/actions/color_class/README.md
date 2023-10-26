@@ -4,7 +4,7 @@
 
 ### Settings:
 
-- **classes_color_mapping** - Select classes and set new color for them using color picker. If you want to leave some classes unchanged just unselect them.
+- **Classes Colors** - Select classes whose colors you want to change and set new color using color picker. Unselected classes will remain unchanged.
 
 ### Example. Change color of classes `horse` and `person`
 

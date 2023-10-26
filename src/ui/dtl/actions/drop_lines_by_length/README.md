@@ -8,11 +8,11 @@ Lines with more than two points also supported. For multi-lines total length is 
 
 ### Settings
 
-- **lines_class** - class name of target lines.
-- **resolution_compensation** - used for images with different resolution (scales). If `false` - line length calcalute with pixels. If `true` - in relative units.
-- **invert** - invert drop results. This mode can be used to remove lines with length in range.
-- **min_length** - minimal line length.
-- **max_length** - maximal line length.
+- **Classes** - Select classes whose lines you want to drop. Only classes with shape `Line` are available.
+- **Resolution Compensation** - used for images with different resolution (scales). If `false` - line length is calculated with pixels. If `true` - in relative units.
+- **Invert** - Invert drop results. This mode can be used to remove lines with length in range.
+- **Min Length** - Activate to set minimal line length.
+- **Max Length** - Activate to set maximal line length.
 
 **Resolution compensation**:
 

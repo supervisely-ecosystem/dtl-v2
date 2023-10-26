@@ -6,8 +6,8 @@ The operation decreases number of vertices with Douglas-Peucker algorithm.
 
 ### Settings:
 
-- **classes** - Choose classes to apply transformation. Only classes with shape `line` or `polygon` are allowed.
-- **epsilon** - Approximation accuracy, maximum distance between the original curve and its approximation.
+- **Сlasses** - Choose classes to apply transformation. Only classes with shape `line` or `polygon` are allowed.
+- **Epsilon** - Determines how close or far points of interest should be considered for approximating vectors. The smaller the epsilon, the more detailed the result will be. The larger the epsilon, the more general the result will be.
 
 ### Example. Approximate vector figures
 

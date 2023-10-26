@@ -6,7 +6,7 @@
 
 ### Settings
 
-- **classes** — Select classes. All objects of selected classes will be removed.
+- **Сlasses** — Select classes that you want to remove. All objects of selected classes will be removed.
 
 ### Example. Remove objects of selected classes
 

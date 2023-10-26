@@ -7,7 +7,7 @@ from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
-DEFAULT_ASPECT_RATIO = 16 / 9
+# DEFAULT_ASPECT_RATIO = 16 / 9
 
 
 class ResizeAction(SpatialLevelAction):
@@ -25,27 +25,27 @@ class ResizeAction(SpatialLevelAction):
         height_text = Text("Height", status="text", font_size=get_text_font_size())
         height_input = InputNumber(value=512, min=1, step=1, controls=True)
 
-        scale_proportionally_checkbox = Checkbox("Scale proportionally")
+        # scale_proportionally_checkbox = Checkbox("Scale proportionally")
         keep_aspect_ratio_checkbox = Checkbox("Keep aspect ratio")
 
-        @height_input.value_changed
-        def height_input_value_changed(value):
-            if scale_proportionally_checkbox.is_checked():
-                width_input.value = int(ceil(value * DEFAULT_ASPECT_RATIO))
+        # @height_input.value_changed
+        # def height_input_value_changed(value):
+        #     if scale_proportionally_checkbox.is_checked():
+        #         width_input.value = int(ceil(value / DEFAULT_ASPECT_RATIO))
 
-        @width_input.value_changed
-        def width_input_value_changed(value):
-            if scale_proportionally_checkbox.is_checked():
-                height_input.value = int(ceil((value / DEFAULT_ASPECT_RATIO)))
+        # @width_input.value_changed
+        # def width_input_value_changed(value):
+        #     if scale_proportionally_checkbox.is_checked():
+        #         height_input.value = int(ceil((value * DEFAULT_ASPECT_RATIO)))
 
-        @scale_proportionally_checkbox.value_changed
-        def scale_proportionally_checkbox_value_changed(is_checked):
-            if is_checked:
-                height_input.disable()
-                width = width_input.get_value()
-                height_input.value = int(ceil((width / DEFAULT_ASPECT_RATIO)))
-            else:
-                height_input.enable()
+        # @scale_proportionally_checkbox.value_changed
+        # def scale_proportionally_checkbox_value_changed(is_checked):
+        #     if is_checked:
+        #         height_input.disable()
+        #         width = width_input.get_value()
+        #         height_input.value = int(ceil((width / DEFAULT_ASPECT_RATIO)))
+        #     else:
+        #         height_input.enable()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -105,10 +105,10 @@ class ResizeAction(SpatialLevelAction):
                     name="height_input",
                     option_component=NodesFlow.WidgetOptionComponent(height_input),
                 ),
-                NodesFlow.Node.Option(
-                    name="scale_proportionally_checkbox",
-                    option_component=NodesFlow.WidgetOptionComponent(scale_proportionally_checkbox),
-                ),
+                # NodesFlow.Node.Option(
+                #     name="scale_proportionally_checkbox",
+                #     option_component=NodesFlow.WidgetOptionComponent(scale_proportionally_checkbox),
+                # ),
                 NodesFlow.Node.Option(
                     name="keep_aspect_ratio_checkbox",
                     option_component=NodesFlow.WidgetOptionComponent(keep_aspect_ratio_checkbox),

@@ -1,12 +1,12 @@
 # Background
 
-`Background` layer adds background rectangle (size equals to image size) with custom class to image annotations. 
+`Background` layer adds background class with shape `rectangle` (size equals to image size) to image annotation, providing a clear label for the areas of the image that do not contain any specific objects or regions of interest.
 
 This layer can be used to prepare data for semantic segmentation training tasks.
 
 ### Settings:
 
-- **class** (background class name) - name of the class that will be added to image annotations as background rectangle.
+- **Background Class name** - name of the class that will be added to image annotations as background rectangle.
 
 ### Example. Add background class to image annotations
 

@@ -1,21 +1,21 @@
 # Bounding Box
 
-`Bounding Box` layer converts annotations of classes with shapes of other types into classes with bounding boxes.
+`Bounding Box` layer converts classes with shapes of other types into classes with bounding boxes.
 
 Coordinates of bounding boxes are calculated like this:
 
-```
-min_x = min(x_coords);
-max_x = max(x_coords);
-min_y = min(y_coords);
-max_y = max(y_coords);
+```python
+min_x = min(x_coords)
+max_x = max(x_coords)
+min_y = min(y_coords)
+max_y = max(y_coords)
 ```
 
 ### Settings:
 
-- **classes_mapping** - Select classes to convert to bounding boxes. If no classes are selected, no annotations will be converted.
+- **Classes** - Select classes that will be converted to bounding boxes. If no classes are selected, all classes will be ignored.
 
-❗ Selected classes will be replaced. If you want to keep them, use `Duplicate Objects` layer first.
+❗ Selected classes will replace original classes. If you want to keep them, use `Duplicate Objects` layer first.
 
 ### Example. Convert annotations to bounding boxes
 

@@ -4,14 +4,13 @@
 
 ### Settings
 
-- **rule** — Select `Keep original datasets` to keep original dataset names. In this case, input field `name` will be hidden.
-- **name** — Set the name of the resulting dataset. This setting is available only if `Keep original datasets` is disabled.
+- **Keep original datasets** — Keep original datasets names. In this case, input field `name` will be hidden.
+- **Name** — Set the name of the resulting dataset. This setting is available only if `Keep original datasets` is disabled.
 
 ### Example 1. Keep original datasets
 
 For example, we have a project with two datasets: `cats` and `dogs`.
 We will use `Dataset` layer and set `Keep original datasets` rule. As a result, all images will be placed to the same dataset names as they were before (in new project).
-
 
 <table>
 <tr>

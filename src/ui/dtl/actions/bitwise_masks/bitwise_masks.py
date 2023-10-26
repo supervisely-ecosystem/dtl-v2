@@ -89,7 +89,7 @@ class BitwiseMasksAction(AnnotationAction):
             ]
         )
         class_mask_edit_text = Text(
-            "Class Mask. First element of bitwise operation",
+            "Class Mask",
             status="text",
             font_size=get_text_font_size(),
         )

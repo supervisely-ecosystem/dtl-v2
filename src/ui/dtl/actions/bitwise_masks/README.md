@@ -11,9 +11,9 @@ It is possible to make 3 types of bitwise operations:
 
 ### Settings
 
-- **type** — Choose between `and`, `or` and `nor` operations.
-- **class\_mask** — Class name of the mask. **Mask of this class will be unchanged.**
-- **classes\_to\_correct** — List of class names to correct. **Masks of these classes will be corrected.**
+- **Operation type** — Choose between `and`, `or` and `nor` operations.
+- **Class mask** — First element of bitwise operation. Selected class will be used as a mask for bitwise operation. Mask of this class will be unchanged.
+- **Classes to correct** — Select classes that you want to correct.
 
 ### Example 1 – `nor` operation
 

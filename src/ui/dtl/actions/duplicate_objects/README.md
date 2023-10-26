@@ -4,11 +4,11 @@
 
 ### Settings:
 
-- **classes_mapping** - Select classes to duplicate objects.
+- **Classes** - Select classes that you want to duplicate. All objects of selected classes will be duplicated.
 
 ### Example. Duplicate `dog` class objects
 
-Select `dog` class in settings and run the app. 
+Select `dog` class in settings and run the app.
 
 Each figure of class `dog` will be cloned. This will not create new image, so both source and resulting objects will belong to the same image.
 

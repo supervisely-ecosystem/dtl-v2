@@ -4,8 +4,8 @@
 
 ### Settings:
 
-- `src` (Select datasets) - specify datasets that will participate in data transformation process.
-- `classes_mapping` - select classes that will be used in data transformation processes.
+- **Select Project** - Select project and specify datasets that will participate in data transformation process.
+- **Classes** - Select classes that will be used in data transformation processes from selected Project if it have any.
 
 ### Example 1. Select all datasets and classes
 
