@@ -4,7 +4,7 @@
 
 ### Settings
 
-- **classes_mapping** — Select the classes to be renamed and specify the new names for them.
+- **Classes Names** — Select the classes to be renamed and specify the new names for them.
 
 ### Example
 

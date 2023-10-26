@@ -4,8 +4,8 @@
 
 #### Settings:
 
-- **rotate_angles** - Set the range of angles (`min_degrees` and `max_degrees`) to rotate the image.
-- **black_regions** - Set the `mode` to handle black regions (possible values: `keep`, `crop`, `preserve_size`).
+- **Rotate Angles** - Set the range of angles (`Min degrees` and `Max degrees`) to rotate the image.
+- **Black Regions** - Select the `mode` to handle black regions (possible values: `keep`, `crop`, `preserve_size`).
 
 Each image will be rotated by a random angle (around the image center, CCW) with uniform distribution from `min_degrees` to `max_degrees`. You can:
 

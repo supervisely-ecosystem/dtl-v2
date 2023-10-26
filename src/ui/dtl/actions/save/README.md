@@ -15,7 +15,8 @@ It contains the following:
 
 ### Settings
 
-- **visualize** — if `true` visual representations of all annotated objects are generated. `Bitmap` objects are drawn without modifications, `polygons` are filled with color associated with the class, for `rectangles` only borders are drawn.
+- **Archive name** - Input the name for the resulting archive.
+- checkbox **Visualize** — if `true` visual representations of all annotated objects are generated. `Bitmap` objects are drawn without modifications, `polygons` are filled with color associated with the class, for `rectangles` only borders are drawn.
 
 ### Example
 

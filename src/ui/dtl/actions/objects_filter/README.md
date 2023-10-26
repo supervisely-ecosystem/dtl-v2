@@ -4,12 +4,22 @@
 
 ### Settings
 
-- `filter_by`**`names`** - select classes to filter by names
-- `filter_by`**`polygon_sizes`** - select classes to filter by area percentage or bounding box size:
-  - `filtering_classes` - list of classes to apply filter
-  - `action` - action to perform, only "delete" is supported
-  - `comparator` - type of comparison, `less` or `greater`
-  - `area_size` - specify area size (`percent` of image area or `width` and `height` of bounding box).
+- **Filter by** - Select filter type:
+
+  - **Names** - filter by class names:
+    - **Classes** - Select classes to filter by names
+  - **Area percent** - filter by area percentage:
+    - **Classes** - Select classes to filter by area percentage
+    - **Input %** - Specify area percentage of image area
+    - **Comparator** - Select comparison type: `less` or `greater`. If `less` is selected, objects with area less than specified percentage of image area will be deleted. If `greater` is selected, objects with area greater than specified percentage of image area will be deleted.
+  - **Bounding box size** - filter by bounding box size:
+    - **Classes** - Select classes to filter by bounding box size
+    - **Input size** - Specify bounding box size in pixels:
+      - **Width** - Specify width of bounding box
+      - **Height** - Specify height of bounding box
+    - **Comparator** - Select comparison type: `less` or `greater`. If `less` is selected, objects with bounding box size less than specified size will be deleted. If `greater` is selected, objects with bounding box size greater than specified size will be deleted.
+
+- **Action** - It is only possible to delete objects. If you want to keep objects, you can use `Objects Filter` layer with inverted settings.
 
 Objects can be filtered in 3 ways: by class names, by area percentage and by bounding box size.
 Here are examples of how to use each of them.

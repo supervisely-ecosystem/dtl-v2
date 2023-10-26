@@ -4,7 +4,7 @@
 
 ### Settings
 
-**classes** — Select classes to convert. If no classes are selected, all classes will be ignored.
+**Classes** — Select classes to extract contours.
 
 ### Example. Find contours of `squirrel` class object
 

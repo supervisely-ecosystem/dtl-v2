@@ -4,7 +4,7 @@
 
 ### Settings
 
-- **classes_mapping** — Select classes to rasterize. If no classes are selected, all objects will be preserved.
+- **Classes** — Select classes to rasterize. If no classes are selected, all objects will be preserved.
 
 ### Example
 

@@ -16,10 +16,9 @@ It contains the following files and folders:
 
 ### Settings
 
-- **masks_machine** — if `true` machine readable masks are generated.
-- **masks_human** — if `true` human readable masks are generated.
-- **gt_machine_color** - specifies colors of generated masks for each class exported.
-- **gt_human_color** - specifies colors of generated masks for each class exported used in visual representation
+- **Destination** - Input the name for the resulting archive.
+- checkbox **Add human masks** - if `true` human readable masks will be generated.
+- checkbox **Add machine masks** - if `true` machine readable masks will be generated.
 
 ### Example
 

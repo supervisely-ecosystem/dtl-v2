@@ -9,7 +9,7 @@ A = np.eye(3) + np.random.randn(3, 3) * strength / 5
 
 ### Settings
 
-- **strength** — color multiplier strength. min: 0, max: 1. Controls how much image will change its colors.
+- **Strength** — Set the color multiplier strength (min: 0, max: 1). It controls how much image will change its colors.
 
 ### Example. Random change of colors
 

@@ -4,9 +4,8 @@
 
 ### Settings
 
-- **classes** - list of classes to apply transformation. Only classes with shape `bitmap` are allowed.
-- **method** - algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
-
+- **Classes** - Choose classes to apply transformation. Only classes with shape `bitmap` are allowed.
+- **Operation type** - Select algorithm of processing. Available options: `skeletonization`, `medial_axis`, `thinning`.
 
 Each figure of selected classes will be reduced to 1 pixel wide representation. Each source mask (figure of shape "bitmap") produces one resulting mask (shape "bitmap").
 
