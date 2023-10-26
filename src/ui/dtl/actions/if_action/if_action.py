@@ -355,13 +355,12 @@ class IfAction(OtherAction):
             _select_tags_input.loading = False
 
         def _set_settings_from_json(settings: dict):
-            if "condition" not in settings:
-                return
-            condition_json = settings["condition"]
-            condition_name, _ = list(settings["condition"].items())[0]
-            condition = conditions[condition_name]
-            condition.set(condition_json)
-            _save_settings()
+            if "condition" in settings:
+                condition_json = settings["condition"]
+                condition_name, _ = list(settings["condition"].items())[0]
+                condition = conditions[condition_name]
+                condition.set(condition_json)
+                _save_settings()
 
         save_settings_btn.click(_save_settings)
 

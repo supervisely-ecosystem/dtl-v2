@@ -156,6 +156,10 @@ class SkeletonizeAction(AnnotationAction):
             _set_classes_list_preview()
             classes_list_widget.loading = False
 
+            method = settings.get("method", None)
+            if method is not None:
+                skeletonize_methods_selector.set_value(method)
+
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
             _save_classes_list_settings()

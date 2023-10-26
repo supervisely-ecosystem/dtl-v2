@@ -103,23 +103,25 @@ class TagAction(AnnotationAction):
             return {"tag": saved_tag_setting, "action": action_selector.get_value()}
 
         def _set_settings_from_json(settings: dict):
-            if "tag" not in settings:
-                return
-            select_tag_meta.loading = True
-            input_tag.loading = True
-            if isinstance(settings["tag"], str):
-                tag_name = settings["tag"]
-                tag_value = None
-            else:
-                tag_name = settings["tag"]["name"]
-                tag_value = settings["tag"]["value"]
-            tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
-            select_tag_meta.set_name(tag_name)
-            input_tag.set_tag_meta(tag_meta)
-            input_tag.value = tag_value
-            select_tag_meta.loading = False
-            input_tag.loading = False
-            _save_tag()
+            if "tag" in settings:
+                select_tag_meta.loading = True
+                input_tag.loading = True
+                if isinstance(settings["tag"], str):
+                    tag_name = settings["tag"]
+                    tag_value = None
+                else:
+                    tag_name = settings["tag"]["name"]
+                    tag_value = settings["tag"]["value"]
+                tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
+                select_tag_meta.set_name(tag_name)
+                input_tag.set_tag_meta(tag_meta)
+                input_tag.value = tag_value
+                select_tag_meta.loading = False
+                input_tag.loading = False
+                _save_tag()
+            action = settings.get("action", None)
+            if action is not None:
+                action_selector.set_value(action)
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta

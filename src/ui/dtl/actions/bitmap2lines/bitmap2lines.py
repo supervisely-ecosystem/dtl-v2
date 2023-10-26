@@ -164,6 +164,10 @@ class Bitmap2LinesAction(AnnotationAction):
             # update settings preview
             _set_classes_mapping_preview()
 
+            min_points_cnt = settings.get("min_points_cnt", None)
+            if min_points_cnt is not None:
+                min_points_count_input.value = min_points_cnt
+
         @classes_mapping_save_btn.click
         def classes_mapping_save_btn_cb():
             _save_classes_mapping_setting()

@@ -36,7 +36,13 @@ class RandomColorsAction(AnnotationAction):
                 "strength": color_strength_slider.get_value(),
             }
 
+        def _set_settings_from_json(settings: dict):
+            strength = settings.get("strength", None)
+            if strength is not None:
+                color_strength_slider.set_value()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="strength_text",

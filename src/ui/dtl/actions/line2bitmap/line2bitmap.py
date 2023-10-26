@@ -162,6 +162,10 @@ class LineToBitmapAction(AnnotationAction):
             # update settings preview
             _set_classes_mapping_preview()
 
+            width = settings.get("width", None)
+            if width is not None:
+                width_input.value = width
+
         @classes_mapping_save_btn.click
         def classes_mapping_save_btn_cb():
             _save_classes_mapping_setting()

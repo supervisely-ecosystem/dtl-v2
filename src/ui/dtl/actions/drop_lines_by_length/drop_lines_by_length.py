@@ -180,6 +180,40 @@ class DropLinesByLengthAction(AnnotationAction):
             _set_classes_list_preview()
             classes_list_widget.loading = False
 
+            res_comp = settings.get("resolution_compensation", None)
+            if res_comp is not None:
+                if res_comp:
+                    resolution_compensation_checkbox.check()
+                else:
+                    resolution_compensation_checkbox.uncheck()
+
+            invert = settings.get("invert", None)
+            if invert is not None:
+                if invert:
+                    invert_checkbox.check()
+                else:
+                    invert_checkbox.uncheck()
+
+            min_length = settings.get("min_length", None)
+            if min_length is not None:
+                if min_length:
+                    min_length_checkbox.check()
+                    min_length_input.value = min_length
+                    min_length_input.show()
+                else:
+                    min_length_checkbox.uncheck()
+                    min_length_input.hide()
+
+            max_length = settings.get("max_length", None)
+            if max_length is not None:
+                if max_length:
+                    max_length_checkbox.check()
+                    max_length_input.value = max_length
+                    max_length_input.show()
+                else:
+                    max_length_checkbox.uncheck()
+                    max_length_input.hide()
+
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
             _save_classes_list_settings()

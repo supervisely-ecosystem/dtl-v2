@@ -210,6 +210,10 @@ class BitwiseMasksAction(AnnotationAction):
             classes_to_correct_widget.loading = False
 
         def _set_settings_from_json(settings):
+            op_type = settings.get("type", None)
+            if op_type is not None:
+                operation_type_selector.set_value(op_type)
+
             class_mask_widget.loading = True
             classes_list_settings = settings.get("class_mask", "")
             set_classes_list_settings_from_json(

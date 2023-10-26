@@ -180,6 +180,19 @@ class DropNoiseAction(AnnotationAction):
             _set_classes_list_preview()
             classes_list_widget.loading = False
 
+            min_area = settings.get("min_area", None)
+            if min_area is not None:
+                if min_area[-1] == "%":
+                    min_area_input.value = int(min_area[:-1])
+                    measure_unit_selector.set_value("%")
+                else:
+                    min_area_input.value = int(min_area[:-2])
+                    measure_unit_selector.set_value("px")
+
+            source_type = settings.get("src_type", None)
+            if source_type is not None:
+                source_type_selector.set_value(source_type)
+
         source_type_text = Text("Source type", status="text", font_size=get_text_font_size())
         source_type_selector = Select(
             [Select.Item("image", "Image"), Select.Item("bbox", "Bounding Box")],
