@@ -223,6 +223,9 @@ class SaveMasksAction(OutputAction):
                 _set_human_masks_preview()
                 add_human_masks_checkbox.check()
                 human_masks_edit_container.show()
+            else:
+                add_human_masks_checkbox.uncheck()
+                human_masks_edit_container.hide()
 
             if "gt_machine_color" in settings:
                 machine_colors = settings["gt_machine_color"]
@@ -242,6 +245,9 @@ class SaveMasksAction(OutputAction):
                 _set_machine_masks_preview()
                 add_machine_masks_checkbox.check()
                 machine_masks_edit_container.show()
+            else:
+                add_machine_masks_checkbox.uncheck()
+                machine_masks_edit_container.hide()
 
         @human_classes_colors_save_btn.click
         def human_classes_saved():
