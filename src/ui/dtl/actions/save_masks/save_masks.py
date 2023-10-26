@@ -95,27 +95,31 @@ class SaveMasksAction(OutputAction):
         def on_human_masks_checkbox_changed(is_checked):
             if is_checked:
                 human_masks_edit_container.show()
+                human_classes_colors_preview.show()
             else:
                 human_masks_edit_container.hide()
+                human_classes_colors_preview.hide()
 
         @add_machine_masks_checkbox.value_changed
         def on_machine_masks_checkbox_changed(is_checked):
             if is_checked:
                 machine_masks_edit_container.show()
+                machine_classes_colors_preview.show()
             else:
                 machine_masks_edit_container.hide()
+                machine_classes_colors_preview.hide()
 
         def _get_human_classes_colors_value():
             mapping = human_classes_colors.get_mapping()
             values = {
-                name: values["value"] for name, values in mapping.items() if not values["ignore"]
+                name: values["value"] for name, values in mapping.items() if values["selected"]
             }
             return values
 
         def _get_machine_classes_colors_value():
             mapping = machine_classes_colors.get_mapping()
             values = {
-                name: values["value"] for name, values in mapping.items() if not values["ignore"]
+                name: values["value"] for name, values in mapping.items() if values["selected"]
             }
             return values
 
@@ -125,11 +129,18 @@ class SaveMasksAction(OutputAction):
                 cls_name: hex2rgb(value)
                 for cls_name, value in _get_human_classes_colors_value().items()
             }
-            human_classes_colors_preview.set_mapping(
-                {
+
+        def _set_human_masks_preview():
+            human_classes_colors_preview.set(
+                classes=[
+                    cls
+                    for cls in human_classes_colors.get_classes()
+                    if cls.name in saved_human_classes_colors_settings
+                ],
+                mapping={
                     cls_name: rgb2hex(color)
                     for cls_name, color in saved_human_classes_colors_settings.items()
-                }
+                },
             )
 
         def _save_machine_classes_colors():
@@ -138,11 +149,18 @@ class SaveMasksAction(OutputAction):
                 cls_name: hex2rgb(value)
                 for cls_name, value in _get_machine_classes_colors_value().items()
             }
-            machine_classes_colors_preview.set_mapping(
-                {
+
+        def _set_machine_masks_preview():
+            machine_classes_colors_preview.set(
+                classes=[
+                    cls
+                    for cls in machine_classes_colors.get_classes()
+                    if cls.name in saved_machine_classes_colors_settings
+                ],
+                mapping={
                     cls_name: rgb2hex(color)
                     for cls_name, color in saved_machine_classes_colors_settings.items()
-                }
+                },
             )
 
         def get_settings(options_json: dict) -> dict:
@@ -190,29 +208,50 @@ class SaveMasksAction(OutputAction):
             if "gt_human_color" in settings:
                 human_colors = settings["gt_human_color"]
                 current_colors_mapping = human_classes_colors.get_mapping()
-                human_classes_colors.set_colors(
-                    [
-                        human_colors.get(cls, hex2rgb(hex_color))
-                        for cls, hex_color in current_colors_mapping.items()
-                    ]
-                )
+                colors = []
+                classes_to_select = []
+                for cls_name, mapping_value in current_colors_mapping.items():
+                    if cls_name in human_colors:
+                        color_to_set = human_colors[cls_name]
+                        classes_to_select.append(cls_name)
+                    else:
+                        color_to_set = mapping_value["value"]
+                    colors.append(color_to_set)
+                human_classes_colors.select(classes_to_select)
+                human_classes_colors.set_colors(colors)
                 _save_human_classes_colors()
+                _set_human_masks_preview()
                 add_human_masks_checkbox.check()
+                human_masks_edit_container.show()
 
             if "gt_machine_color" in settings:
                 machine_colors = settings["gt_machine_color"]
                 current_colors_mapping = machine_classes_colors.get_mapping()
-                machine_classes_colors.set_colors(
-                    [
-                        machine_colors.get(cls, hex2rgb(hex_color))
-                        for cls, hex_color in current_colors_mapping.items()
-                    ]
-                )
+                colors = []
+                classes_to_select = []
+                for cls_name, mapping_value in current_colors_mapping.items():
+                    if cls_name in machine_colors:
+                        color_to_set = machine_colors[cls_name]
+                        classes_to_select.append(cls_name)
+                    else:
+                        color_to_set = mapping_value["value"]
+                    colors.append(color_to_set)
+                machine_classes_colors.select(classes_to_select)
+                machine_classes_colors.set_colors(colors)
                 _save_machine_classes_colors()
+                _set_machine_masks_preview()
                 add_machine_masks_checkbox.check()
+                machine_masks_edit_container.show()
 
-        human_classes_colors_save_btn.click(_save_human_classes_colors)
-        machine_classes_colors_save_btn.click(_save_machine_classes_colors)
+        @human_classes_colors_save_btn.click
+        def human_classes_saved():
+            _save_human_classes_colors()
+            _set_human_masks_preview()
+
+        @machine_classes_colors_save_btn.click
+        def machine_masks_saved():
+            _save_machine_classes_colors()
+            _set_machine_masks_preview()
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)

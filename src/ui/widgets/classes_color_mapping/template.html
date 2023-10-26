@@ -55,6 +55,7 @@
 					<el-color-picker
 						v-model="state.{{{widget.widget_id}}}.classes_values[idx].value"
 						:disabled="!state.{{{widget.widget_id}}}.classes_values[idx].selected"
+						@change="state.{{{widget.widget_id}}}.classes_values[idx].selected = true"
 					>
 					</el-color-picker>
 				</div>

@@ -1,5 +1,5 @@
 from typing import List, Optional
-from supervisely.imaging.color import rgb2hex
+from supervisely.imaging.color import rgb2hex, hex2rgb
 from supervisely.app.widgets import Widget
 from supervisely.app import StateJson, DataJson
 from src.ui.widgets.classes_mapping.classes_mapping import type_to_shape_text, ClassesMapping
@@ -53,9 +53,12 @@ class ClassesColorMapping(Widget):
     def set_colors(self, classes_colors: List[List[int]]):
         classes_values = StateJson()[self.widget_id]["classes_values"]
         for idx, cls in enumerate(self._classes):
-            rgb_color = classes_colors[idx]
-            classes_values[idx]["value"] = rgb2hex(rgb_color)
-            classes_values[idx]["default"] = tuple(cls.color) == tuple(rgb_color)
+            if classes_colors[idx][0] == "#":
+                hex_color = classes_colors[idx]
+            else:
+                hex_color = rgb2hex(classes_colors[idx])
+            classes_values[idx]["value"] = hex_color
+            classes_values[idx]["default"] = tuple(cls.color) == tuple(hex2rgb(hex_color))
             classes_values[idx]["ignore"] = False
         StateJson()[self.widget_id]["classes_values"] = classes_values
         StateJson().send_changes()
