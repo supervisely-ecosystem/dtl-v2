@@ -187,6 +187,7 @@ def set_classes_mapping_settings_from_json(
     settings: dict,
     missing_in_settings_action: Literal["raise", "ignore"] = "raise",
     missing_in_meta_action: Literal["raise", "ignore"] = "raise",
+    select: Literal["all", "none", "unique", "default", "empty", "skip_select"] = "skip_select",
 ):
     if settings == "default":
         classes_mapping_widget.set_default()
@@ -227,6 +228,36 @@ def set_classes_mapping_settings_from_json(
         else:
             classes_mapping[obj_class.name] = ""
     classes_mapping_widget.set_mapping(classes_mapping)
+
+    if select != "skip_select":
+        if select == "all":
+            classes_mapping_widget.select_all()
+        elif select == "none":
+            classes_mapping_widget.deselect_all()
+        elif select == "unique":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_name != cls_value
+                and cls_value != ""
+                and cls_value != "__default__"
+                and cls_value != "__ignore__"
+            ]
+            classes_mapping_widget.select(to_select)
+        elif select == "empty":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_value == "" or cls_name == "__ignore__"
+            ]
+            classes_mapping_widget.select(to_select)
+        elif select == "default":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_value == cls_name or cls_name == "__default__"
+            ]
+            classes_mapping_widget.select(to_select)
 
 
 # Classes List utils

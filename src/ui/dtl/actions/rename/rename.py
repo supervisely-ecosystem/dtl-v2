@@ -75,7 +75,7 @@ class RenameAction(AnnotationAction):
         def _get_classes_mapping_value():
             return get_classes_mapping_value(
                 classes_mapping_widget,
-                default_action="copy",
+                default_action="skip",
                 ignore_action="skip",
                 other_allowed=False,
                 default_allowed=False,
@@ -86,7 +86,7 @@ class RenameAction(AnnotationAction):
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="copy",
+                default_action="skip",
                 ignore_action="skip",
             )
 
@@ -133,6 +133,7 @@ class RenameAction(AnnotationAction):
                 saved_classes_mapping_settings,
                 missing_in_settings_action="ignore",
                 missing_in_meta_action="ignore",
+                select="unique",
             )
 
             # update settings preview
@@ -150,6 +151,7 @@ class RenameAction(AnnotationAction):
                     classes_mapping_settings,
                     missing_in_settings_action="ignore",
                     missing_in_meta_action="ignore",
+                    select="unique",
                 )
 
             # save settings

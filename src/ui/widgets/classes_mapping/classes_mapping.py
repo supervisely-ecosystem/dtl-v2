@@ -181,3 +181,11 @@ class ClassesMapping(Widget):
             value["selected"] = False
         StateJson()[self.widget_id]["classes_values"] = classes_values
         StateJson().send_changes()
+
+    def select(self, classes):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: list
+        for idx, cls in enumerate(self._classes):
+            classes_values[idx]["selected"] = cls.name in classes
+        StateJson()[self.widget_id]["classes_values"] = classes_values
+        StateJson().send_changes()
