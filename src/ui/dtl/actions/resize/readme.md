@@ -12,7 +12,7 @@ If `aspect_ratio` setting is enabled, the image will be resized with keeping the
 
 ### Example 1. Resize image by specifying width and height
 
-In this exmaple we will resize image **with keeping aspect ratio.**
+In this example we will resize image **with keeping aspect ratio.**
 
 **Original image sizes**: width 3200px and height 5000px.
 **Resized image sizes**: width 1200px and height 1200px. Aspect ratio is kept, empty areas are filled with black color.
