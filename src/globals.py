@@ -47,7 +47,7 @@ def updater(update: str):
 
 
 context_menu_position = None
-
+current_dtl_json = None
 
 error_description = Text()
 error_extra_literal = Text("Extra:")

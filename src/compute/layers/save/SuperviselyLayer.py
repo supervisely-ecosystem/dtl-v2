@@ -10,6 +10,18 @@ from src.exceptions import GraphError
 import src.globals as g
 
 
+def _get_source_projects_ids_from_dtl():
+    source_projects_ids = []
+    for action in g.current_dtl_json:
+        if action["action"] == "data":
+            if len(action["src"]) == 0:
+                continue
+            project_name = action["src"][0].split("/")[0]
+            project_id = g.api.project.get_info_by_name(g.WORKSPACE_ID, project_name).id
+            source_projects_ids.append(project_id)
+    return source_projects_ids
+
+
 class SuperviselyLayer(Layer):
     action = "supervisely"
 
@@ -49,6 +61,12 @@ class SuperviselyLayer(Layer):
             change_name_if_conflict=True,
         )
         g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
+
+        custom_data = {
+            "source_projects": _get_source_projects_ids_from_dtl(),
+            "ml-nodes": g.current_dtl_json,
+        }
+        g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
         self.net_change_images = self.net.may_require_images()
 
     def get_or_create_dataset(self, dataset_name):

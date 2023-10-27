@@ -111,7 +111,7 @@ class ColorClassAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_colors_widget_field
                         ),
-                        sidebar_width=600,
+                        sidebar_width=450,
                     ),
                 ),
                 NodesFlow.Node.Option(

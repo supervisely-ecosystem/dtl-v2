@@ -37,7 +37,7 @@ class TagAction(AnnotationAction):
         rag_preview_widgets_container = Container(
             widgets=[tag_preview_meta, tag_preview_value], gap=1
         )
-        input_tag_edit_text = Text("Tags", status="text", font_size=get_text_font_size())
+        input_tag_edit_text = Text("Tag", status="text", font_size=get_text_font_size())
         input_tag_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

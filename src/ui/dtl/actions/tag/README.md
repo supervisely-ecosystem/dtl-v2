@@ -6,7 +6,7 @@ Tags are used for several things, e.g. to split images by folders in save layers
 
 ### Settings
 
-- **Tags** — choose tag name that will be added or removed.
+- **Tag** — choose tag name that will be added or removed.
 - **Action** — select action that will be performed with tag. Can be `add` or `delete`.
 
 ### Example

@@ -74,6 +74,7 @@ def run():
 
         # Run
         dtl_json = [g.layers[node_id].to_json() for node_id in nodes_state]
+        g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)
         net = compute_dtls(progress)
 
