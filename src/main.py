@@ -9,9 +9,13 @@ from src.ui.dtl.actions.data.data import DataAction
 import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
+import supervisely as sly
+from supervisely.app.widgets import LabeledImage2
+
+# init widget scripts
+LabeledImage2()
 
 u.clean_static_dir(g.STATIC_DIR)
-
 app = Application(layout=layout, static_dir=g.STATIC_DIR, session_info_extra_content=header)
 
 
