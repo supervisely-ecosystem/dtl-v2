@@ -137,6 +137,7 @@ def preset_name_input_cb(value):
 
 def load_json():
     load_preset_btn.loading = True
+    load_file_selector.disable()
     load_notification_select.set_value("empty")
     if g.FILE is not None:
         path = g.FILE
@@ -159,6 +160,7 @@ def load_json():
         raise
     finally:
         load_preset_btn.loading = False
+        load_file_selector.enable()
     load_notification_select.set_value("loaded")
     load_dialog.hide()
 
