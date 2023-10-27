@@ -7,35 +7,29 @@ from src.ui.tabs.presets import (
     save_dialog,
     load_dialog,
 )
-from src.ui.tabs.run import layout as run_layout
+from src.ui.tabs.run import layout as run_layout, circle_progress, show_run_dialog_btn
 from src.globals import error_dialog
 
+
 run_dialog = Dialog(title="Run", content=run_layout)
-run_button = Button(
-    "Run",
-    icon="zmdi zmdi-play",
-    button_size="small",
-    style="border: 1px solid rgb(191, 203, 217); color: black; background-color: white; margin: 10px 10px 10px 40px;",
-)
-
 save_button = Button("save", icon="zmdi zmdi-floppy", button_size="large", button_type="text")
-
 load_button = Button(
     "load",
     icon="zmdi zmdi-cloud-download",
     button_size="large",
     button_type="text",
 )
-
-header = Flexbox(widgets=[run_button, save_button, load_button])
-
+header = Flexbox(
+    widgets=[Flexbox([show_run_dialog_btn, circle_progress]), save_button, load_button],
+    gap=15,
+)
 layout = Container(
     widgets=[error_dialog, run_dialog, save_dialog, load_dialog, configure_tab_layout],
     gap=0,
 )
 
 
-@run_button.click
+@show_run_dialog_btn.click
 def show_run_dialog():
     run_dialog.show()
 

@@ -9,7 +9,6 @@ from supervisely.app.widgets import (
     Empty,
     NotificationBox,
 )
-from supervisely.app import show_dialog
 from supervisely.io.fs import get_file_size
 import supervisely as sly
 
@@ -20,10 +19,19 @@ import src.utils as utils
 import src.ui.utils as ui_utils
 import src.globals as g
 from src.exceptions import CustomException, handle_exception
+from src.ui.widgets import CircleProgress
 
 
+show_run_dialog_btn = Button(
+    "Run",
+    icon="zmdi zmdi-play",
+    button_size="small",
+    style="border: 1px solid rgb(191, 203, 217); color: black; background-color: white; margin: 10px 10px 10px 40px;",
+)
 run_btn = Button("Run", icon="zmdi zmdi-play")
 progress = Progress(hide_on_finish=False)
+circle_progress = CircleProgress(progress)
+circle_progress.hide()
 download_archives_urls = Text("")
 results = ReloadableArea(Empty())
 results.hide()
@@ -37,6 +45,9 @@ layout = Container(widgets=[run_btn, progress, error_notification, download_arch
 @run_btn.click
 @handle_exception
 def run():
+    circle_progress.set_status("none")
+    circle_progress.show()
+
     error_notification.hide()
 
     edges = nodes_flow.get_edges_json()
@@ -100,13 +111,16 @@ def run():
         results.set_content(ui_utils.create_results_widget(file_infos, supervisely_layers))
         results.reload()
         results.show()
+        circle_progress.set_status("success")
     except CustomException as e:
         error_notification.set(title="Error", description=str(e))
         error_notification.show()
+        circle_progress.set_status("exception")
         raise e
     except Exception as e:
         error_notification.set("Error", description=str(e))
         error_notification.show()
+        circle_progress.set_status("exception")
         raise e
     finally:
         progress.hide()
