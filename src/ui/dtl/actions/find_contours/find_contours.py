@@ -27,7 +27,7 @@ import src.globals as g
 
 class FindContoursAction(AnnotationAction):
     name = "find_contours"
-    title = "Find Contours"
+    title = "Mask to Polygon"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/find_contours"
     )

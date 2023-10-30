@@ -1,21 +1,21 @@
-# Find Contours
+# Mask to Polygon
 
-`Find Contours` layer extracts contours from bitmaps and stores results as polygons with same class names.
+`Mask to Polygon` layer extracts contours from masks (bitmaps) and stores results as polygons with the same class names.
 
 ### Settings
 
-**Classes** — Select classes to extract contours.
+**Classes** — Select classes to convert to Polygon shape.
 
-### Example. Find contours of `squirrel` class object
+### Example. Mask to Polygon for `squirrel` class object
 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image (Bitmap)</strong></td>
-<td style="text-align:center; width:50%"><strong>Image with countors (Polygon)</strong></td>
+<td style="text-align:center; width:50%"><strong>Result image (Polygon)</strong></td>
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/5ac14178-2aa3-4da1-8d3f-b780cb5ed519" alt="Original image (Bitmap)" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/3a99af70-52a6-4a21-a45d-1d1bef0d0762" alt="Image with countors (Polygon)" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/3a99af70-52a6-4a21-a45d-1d1bef0d0762" alt="Result image" /> </td>
 </tr>
 </table>
 

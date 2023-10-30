@@ -70,7 +70,7 @@ class ApproxVectorAction(AnnotationAction):
         )
 
         epsilon_text = Text("Epsilon", status="text", font_size=get_text_font_size())
-        episilon_input = InputNumber(value=3, step=1, controls=True, size="small")
+        episilon_input = InputNumber(value=3, min=1, step=1, controls=True, size="small")
 
         saved_classes_settings = "default"
         default_classes_settings = "default"
