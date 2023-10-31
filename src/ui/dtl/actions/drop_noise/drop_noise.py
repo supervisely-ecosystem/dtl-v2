@@ -105,7 +105,7 @@ class DropNoiseAction(AnnotationAction):
             [Select.Item("px", "pixels"), Select.Item("%", "percents")],
             size="small",
         )
-        min_area_input = InputNumber(value=2, min=0, step=1, size="small", controls=True)
+        min_area_input = InputNumber(value=1024, min=1, step=1, size="small", controls=True)
 
         @measure_unit_selector.value_changed
         def measure_unit_selector_cb(value):

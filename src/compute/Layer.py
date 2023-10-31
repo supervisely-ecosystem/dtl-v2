@@ -217,11 +217,6 @@ class Layer:
                                         "new_class": inp_obj_class.to_json(),
                                     },
                                 )
-
-                                # Unreachable code
-                                # raise RuntimeError(
-                                #     f"Trying to add new class ({new_name}) with shape ({new_shape}). Same class with different shape ({existing_cls.geometry_type.geometry_name()}) exists."
-                                # )
                         else:
                             res_meta = res_meta.add_obj_class(inp_obj_class)
 
@@ -275,6 +270,10 @@ class Layer:
 
                 # smth -> __default__
                 elif dst_class == ClassConstants.DEFAULT:
+                    pass
+
+                # smth -> __clone__
+                elif dst_class == ClassConstants.CLONE:
                     pass
 
                 # smth -> __ignore__

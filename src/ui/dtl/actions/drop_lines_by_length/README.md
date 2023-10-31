@@ -16,7 +16,8 @@ Lines with more than two points also supported. For multi-lines total length is 
 
 **Resolution compensation**:
 
-Guess that we have images with width `1000px` and `2000px`. Also guess that we want to remove lines with length less than `10px`.
+Imagine that we have images with width `1000px` and `2000px`. Also we want to remove lines with length less than `10px`.
+
 Resolution compenstation based on images width and calculated as:
 `new_min_length = (image_width / 1000) * min_length`
 If resolution_compensation is enabled, actual minimal line length will be `10px` and `20px` respectively.

@@ -151,7 +151,9 @@ class IfAction(OtherAction):
         )
 
         # tags
-        _select_tags_input = SelectTagMeta(project_meta=ProjectMeta(), multiselect=True)
+        _select_tags_input = SelectTagMeta(
+            project_meta=ProjectMeta(), multiselect=True, size="small"
+        )
         _select_tags_widget = Field(
             title="Tags",
             description="Select tags",
@@ -222,8 +224,8 @@ class IfAction(OtherAction):
 
         # name in range
         _names_in_range_inputs = {
-            "name_from": Input(),
-            "name_to": Input(),
+            "name_from": Input(size="small"),
+            "name_to": Input(size="small"),
             "step": InputNumber(value=1, min=1, max=None),
         }
         _names_in_range_widget = Field(

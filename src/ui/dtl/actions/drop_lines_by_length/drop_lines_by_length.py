@@ -79,30 +79,30 @@ class DropLinesByLengthAction(AnnotationAction):
         resolution_compensation_checkbox = Checkbox("Resolution Compensation")
         invert_checkbox = Checkbox("Invert")
 
-        min_length_checkbox = Checkbox("Min Length")
         min_length_input = InputNumber(value=1, min=0, step=1, size="small")
-        min_length_input.hide()
 
-        max_length_checkbox = Checkbox("Max Length")
         max_length_input = InputNumber(value=1, min=0, step=1, size="small")
-        max_length_input.hide()
 
         saved_classes_settings = "default"
         default_classes_settings = "default"
 
-        @min_length_checkbox.value_changed
-        def min_length_checkbox_cb(is_checked: bool):
-            if is_checked:
-                min_length_input.show()
-            else:
-                min_length_input.hide()
+        # min_length_checkbox = Checkbox("Min Length")
+        # min_length_input.hide()
+        # @min_length_checkbox.value_changed
+        # def min_length_checkbox_cb(is_checked: bool):
+        #     if is_checked:
+        #         min_length_input.show()
+        #     else:
+        #         min_length_input.hide()
 
-        @max_length_checkbox.value_changed
-        def max_length_checkbox_cb(is_checked: bool):
-            if is_checked:
-                max_length_input.show()
-            else:
-                max_length_input.hide()
+        # max_length_checkbox = Checkbox("Max Length")
+        # max_length_input.hide()
+        # @max_length_checkbox.value_changed
+        # def max_length_checkbox_cb(is_checked: bool):
+        #     if is_checked:
+        #         max_length_input.show()
+        #     else:
+        #         max_length_input.hide()
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -161,10 +161,10 @@ class DropLinesByLengthAction(AnnotationAction):
                 "resolution_compensation": resolution_compensation_checkbox.is_checked(),
                 "invert": invert_checkbox.is_checked(),
             }
-            if min_length_checkbox.is_checked():
-                settings["min_length"] = min_length_input.get_value()
-            if max_length_checkbox.is_checked():
-                settings["max_length"] = max_length_input.get_value()
+            # if min_length_checkbox.is_checked():
+            settings["min_length"] = min_length_input.get_value()
+            # if max_length_checkbox.is_checked():
+            settings["max_length"] = max_length_input.get_value()
             return settings
 
         def _set_settings_from_json(settings: dict):
@@ -197,22 +197,22 @@ class DropLinesByLengthAction(AnnotationAction):
             min_length = settings.get("min_length", None)
             if min_length is not None:
                 if min_length:
-                    min_length_checkbox.check()
+                    # min_length_checkbox.check()
                     min_length_input.value = min_length
                     min_length_input.show()
-                else:
-                    min_length_checkbox.uncheck()
-                    min_length_input.hide()
+                # else:
+                # min_length_checkbox.uncheck()
+                # min_length_input.hide()
 
             max_length = settings.get("max_length", None)
             if max_length is not None:
                 if max_length:
-                    max_length_checkbox.check()
+                    # max_length_checkbox.check()
                     max_length_input.value = max_length
                     max_length_input.show()
-                else:
-                    max_length_checkbox.uncheck()
-                    max_length_input.hide()
+                # else:
+                # max_length_checkbox.uncheck()
+                # max_length_input.hide()
 
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
@@ -256,18 +256,18 @@ class DropLinesByLengthAction(AnnotationAction):
                     name="Invert",
                     option_component=NodesFlow.WidgetOptionComponent(invert_checkbox),
                 ),
-                NodesFlow.Node.Option(
-                    name="Min Length",
-                    option_component=NodesFlow.WidgetOptionComponent(min_length_checkbox),
-                ),
+                # NodesFlow.Node.Option(
+                #     name="Min Length",
+                #     option_component=NodesFlow.WidgetOptionComponent(min_length_checkbox),
+                # ),
                 NodesFlow.Node.Option(
                     name="min_length",
                     option_component=NodesFlow.WidgetOptionComponent(min_length_input),
                 ),
-                NodesFlow.Node.Option(
-                    name="Max Length",
-                    option_component=NodesFlow.WidgetOptionComponent(max_length_checkbox),
-                ),
+                # NodesFlow.Node.Option(
+                #     name="Max Length",
+                #     option_component=NodesFlow.WidgetOptionComponent(max_length_checkbox),
+                # ),
                 NodesFlow.Node.Option(
                     name="max_length",
                     option_component=NodesFlow.WidgetOptionComponent(max_length_input),
