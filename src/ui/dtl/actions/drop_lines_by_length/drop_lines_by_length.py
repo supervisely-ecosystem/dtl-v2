@@ -79,12 +79,22 @@ class DropLinesByLengthAction(AnnotationAction):
         resolution_compensation_checkbox = Checkbox("Resolution Compensation")
         invert_checkbox = Checkbox("Invert")
 
-        min_length_input = InputNumber(value=1, min=0, step=1, size="small")
+        min_length_input = InputNumber(value=1, min=1, step=1, size="small")
 
-        max_length_input = InputNumber(value=1, min=0, step=1, size="small")
+        max_length_input = InputNumber(value=1, min=1, step=1, size="small")
 
         saved_classes_settings = "default"
         default_classes_settings = "default"
+
+        @min_length_input.value_changed
+        def min_length_input_cb(value: int):
+            if value > max_length_input.get_value():
+                max_length_input.value = value
+
+        @max_length_input.value_changed
+        def max_length_input_cb(value: int):
+            if value < min_length_input.get_value():
+                min_length_input.value = value
 
         # min_length_checkbox = Checkbox("Min Length")
         # min_length_input.hide()
