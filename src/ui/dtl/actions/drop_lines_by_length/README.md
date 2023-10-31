@@ -32,11 +32,11 @@ In this example we will remove lines with length **less** than `650px` and **mor
 
 <table>
 <tr>
-<td style="text-align:center; width:50%"><strong>Original image (Lines)</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
 <td style="text-align:center; width:50%"><strong>650px < length < 1500px </strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image (Lines)"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image"/> </td>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/509dc340-218a-4a82-825c-161b203e5eb4" alt="Result image"/> </td>
 
 </tr>
@@ -53,11 +53,11 @@ In this example we will remove lines with length **more** than `650px` but **les
 
 <table>
 <tr></tr>
-<td style="text-align:center; width:50%"><strong>Original image (Lines)</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
 <td style="text-align:center; width:50%"><strong>650px > length > 1500px (invert)</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image (Lines)"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image"/> </td>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/197bdd89-3f9b-4ae3-b6a3-8e794f6b9c19" alt="Result image"/> </td>
 </tr>
 </table>
@@ -78,11 +78,11 @@ It is useful when you have a lot of images with different resolution and you wan
 
 <table>
 <tr></tr>
-<td style="text-align:center; width:50%"><strong>Original image (Lines)</strong></td>
-<td style="text-align:center; width:50%"><strong>650px > length > 1500px (invert)</strong></td>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>350px < length and resolution compensation</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image (Lines)"/> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/7d0a2600-6a2b-43a2-91cb-7efadd378db0" alt="Original image"/> </td>
 <td> <img src="https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/a81ea704-7a75-432b-b799-c746868b9bf8" alt="Result image"/> </td>
 </tr>
 </table>
