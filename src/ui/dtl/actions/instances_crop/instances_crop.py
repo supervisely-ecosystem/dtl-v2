@@ -62,7 +62,7 @@ class InstancesCropAction(SpatialLevelAction):
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
@@ -303,7 +303,7 @@ class InstancesCropAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=padding_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(padding_container),
-                        sidebar_width=300,
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(

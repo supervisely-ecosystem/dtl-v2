@@ -50,7 +50,7 @@ class RenameAction(AnnotationAction):
                         classes_mapping_save_btn,
                         classes_mapping_set_default_btn,
                     ],
-                    gap=355,
+                    gap=110,
                 ),
             ]
         )
@@ -187,7 +187,7 @@ class RenameAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),
-                        sidebar_width=630,
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(

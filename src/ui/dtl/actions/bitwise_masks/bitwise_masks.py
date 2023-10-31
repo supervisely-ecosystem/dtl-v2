@@ -72,7 +72,7 @@ class BitwiseMasksAction(AnnotationAction):
                         save_class_mask_btn,
                         set_default_class_mask_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )

@@ -53,7 +53,7 @@ class SplitMasksAction(AnnotationAction):
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )

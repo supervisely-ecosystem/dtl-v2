@@ -63,7 +63,7 @@ class DropNoiseAction(AnnotationAction):
                         save_classes_btn,
                         set_default_classes_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
