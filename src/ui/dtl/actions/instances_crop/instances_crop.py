@@ -1,19 +1,18 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
+from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import (
     NodesFlow,
     InputNumber,
-    Switch,
     Container,
     Field,
     Flexbox,
-    OneOf,
     Button,
     Text,
+    Select,
+    Field,
 )
 
 from src.ui.dtl import SpatialLevelAction
@@ -26,6 +25,10 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -36,36 +39,34 @@ class InstancesCropAction(SpatialLevelAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/instances_crop"
     )
-    description = "This layer (instances_crop) crops objects of specified classes from image with configurable padding. So from one image there can be produced multiple images, each with one target object: other objects are removed from crop."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Crops objects of specified classes from image with configurable padding."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_save_btn = create_save_btn()
+        classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select classes to get cropped images for their objects",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -78,8 +79,8 @@ class InstancesCropAction(SpatialLevelAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -98,70 +99,37 @@ class InstancesCropAction(SpatialLevelAction):
             nonlocal saved_classes_settings
             saved_classes_settings = copy.deepcopy(default_classes_settings)
 
-        padding_top_px = InputNumber(min=0)
-        padding_top_percent = InputNumber(min=0, max=100)
-        padding_top_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=padding_top_px,
-            off_content=padding_top_percent,
+        padding_top = InputNumber(min=0)
+        padding_left = InputNumber(min=0)
+        padding_right = InputNumber(min=0)
+        padding_bot = InputNumber(min=0)
+
+        padding_preview = Text("", status="text", font_size=get_text_font_size())
+        save_padding_btn = create_save_btn()
+
+        padding_unit_selector = Select(
+            items=[
+                Select.Item("px", "pixels"),
+                Select.Item("%", "percents"),
+            ],
+            size="small",
         )
-        padding_left_px = InputNumber(min=0)
-        padding_left_percent = InputNumber(min=0, max=100)
-        padding_left_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=padding_left_px,
-            off_content=padding_left_percent,
-        )
-        padding_right_px = InputNumber(min=0)
-        padding_right_percent = InputNumber(min=0, max=100)
-        padding_right_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=padding_right_px,
-            off_content=padding_right_percent,
-        )
-        padding_bot_px = InputNumber(min=0)
-        padding_bot_percent = InputNumber(min=0, max=100)
-        padding_bot_switch = Switch(
-            switched=True,
-            on_text="px",
-            off_text="%",
-            off_color="#20a0ff",
-            on_content=padding_bot_px,
-            off_content=padding_bot_percent,
-        )
-        padding_preview = Text("")
-        save_padding_btn = Button("Save", icon="zmdi zmdi-floppy")
+
         padding_container = Container(
             widgets=[
                 Field(
-                    title="top",
-                    content=Flexbox(widgets=[OneOf(padding_top_switch), padding_top_switch]),
+                    content=padding_unit_selector,
+                    title="Crop unit",
+                    description="Select measure unit for cropping: pixels or percents",
                 ),
-                Field(
-                    title="left",
-                    content=Flexbox(widgets=[OneOf(padding_left_switch), padding_left_switch]),
-                ),
-                Field(
-                    title="right",
-                    content=Flexbox(widgets=[OneOf(padding_right_switch), padding_right_switch]),
-                ),
-                Field(
-                    title="bottom",
-                    content=Flexbox(widgets=[OneOf(padding_bot_switch), padding_bot_switch]),
-                ),
+                Field(title="Top padding", content=padding_top),
+                Field(title="Left padding", content=padding_left),
+                Field(title="Right padding", content=padding_right),
+                Field(title="Bottom padding", content=padding_bot),
                 save_padding_btn,
             ]
         )
-        padding_edit_text = Text("Padding")
+        padding_edit_text = Text("Padding", status="text", font_size=get_text_font_size())
         padding_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -172,86 +140,65 @@ class InstancesCropAction(SpatialLevelAction):
         )
         padding_edit_container = get_set_settings_container(padding_edit_text, padding_edit_btn)
 
+        def _validate_percent_value(value, input_num_widget):
+            if padding_unit_selector.get_value() == "%":
+                if value > 100:
+                    input_num_widget.value = 100
+
+        @padding_top.value_changed
+        def update_padding_top(value):
+            _validate_percent_value(value, padding_top)
+
+        @padding_left.value_changed
+        def update_padding_left(value):
+            _validate_percent_value(value, padding_left)
+
+        @padding_right.value_changed
+        def update_padding_right(value):
+            _validate_percent_value(value, padding_right)
+
+        @padding_bot.value_changed
+        def update_padding_bot(value):
+            _validate_percent_value(value, padding_bot)
+
+        @padding_unit_selector.value_changed
+        def update_crop_fixed_unit(value):
+            if value == "%":
+                if padding_top.value > 100:
+                    padding_top.value = 100
+                if padding_left.value > 100:
+                    padding_left.value = 100
+                if padding_right.value > 100:
+                    padding_right.value = 100
+                if padding_bot.value > 100:
+                    padding_bot.value = 100
+
         def _get_padding():
             return {
                 "sides": {
-                    "top": f"{padding_top_px.value}px"
-                    if padding_top_switch.is_switched()
-                    else f"{padding_top_percent.value}%",
-                    "left": f"{padding_left_px.value}px"
-                    if padding_left_switch.is_switched()
-                    else f"{padding_left_percent.value}%",
-                    "right": f"{padding_right_px.value}px"
-                    if padding_right_switch.is_switched()
-                    else f"{padding_right_percent.value}%",
-                    "bottom": f"{padding_bot_px.value}px"
-                    if padding_bot_switch.is_switched()
-                    else f"{padding_bot_percent.value}%",
+                    "top": f"{padding_top.get_value()}{padding_unit_selector.get_value()}",
+                    "left": f"{padding_left.get_value()}{padding_unit_selector.get_value()}",
+                    "right": f"{padding_right.get_value()}{padding_unit_selector.get_value()}",
+                    "bottom": f"{padding_bot.get_value()}{padding_unit_selector.get_value()}",
                 }
             }
-
-        def _set_padding(settings: dict):
-            if "pad" not in settings:
-                return
-            padding = settings["pad"].get("sides", {})
-            top_value = padding.get("top", "1px")
-            if top_value.endswith("px"):
-                padding_top_px.value = int(top_value[:-2])
-                padding_top_switch.on()
-            else:
-                padding_top_percent.value = int(top_value[:-1])
-                padding_top_switch.off()
-            left_value = padding.get("left", "1px")
-            if left_value.endswith("px"):
-                padding_left_px.value = int(left_value[:-2])
-                padding_left_switch.on()
-            else:
-                padding_left_percent.value = int(left_value[:-1])
-                padding_left_switch.off()
-            right_value = padding.get("right", "1px")
-            if right_value.endswith("px"):
-                padding_right_px.value = int(right_value[:-2])
-                padding_right_switch.on()
-            else:
-                padding_right_percent.value = int(right_value[:-1])
-                padding_right_switch.off()
-            bot_value = padding.get("bottom", "1px")
-            if bot_value.endswith("px"):
-                padding_bot_px.value = int(bot_value[:-2])
-                padding_bot_switch.on()
-            else:
-                padding_bot_percent.value = int(bot_value[:-1])
-                padding_bot_switch.off()
 
         saved_padding_settings = {}
 
         def _save_padding():
             nonlocal saved_padding_settings
             saved_padding_settings = _get_padding()
-            padding_preview.text = f'Top: {saved_padding_settings["sides"]["top"]} Left: {saved_padding_settings["sides"]["left"]} Right: {saved_padding_settings["sides"]["right"]} Bottom: {saved_padding_settings["sides"]["bottom"]}'
+            padding_preview.text = f'Top: {saved_padding_settings["sides"]["top"]}<br>Left: {saved_padding_settings["sides"]["left"]}<br>Right: {saved_padding_settings["sides"]["right"]}<br>Bottom: {saved_padding_settings["sides"]["bottom"]}'
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes = saved_classes_settings
+            if saved_classes_settings == "default":
+                classes = _get_classes_list_value()
             return {
-                "classes": saved_classes_settings,
+                "classes": classes,
                 "pad": saved_padding_settings,
             }
-
-        def _set_settings_from_json(settings: dict):
-            padding_container.loading = True
-            _set_padding(settings)
-            _save_padding()
-            padding_container.loading = False
-            classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", [])
-            set_classes_list_settings_from_json(
-                classes_list_widget=classes_list_widget, settings=classes_list_settings
-            )
-            # save settings
-            _save_classes_list_settings()
-            # update settings preview
-            _set_classes_list_preview()
-            classes_list_widget.loading = False
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta
@@ -270,6 +217,11 @@ class InstancesCropAction(SpatialLevelAction):
             saved_classes_settings = classes_list_settings_changed_meta(
                 saved_classes_settings, obj_classes
             )
+
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
 
             # update settings preview
             _set_classes_list_preview()
@@ -293,6 +245,42 @@ class InstancesCropAction(SpatialLevelAction):
             _set_classes_list_preview()
             g.updater("metas")
 
+        def _set_padding(settings: dict):
+            if "pad" in settings:
+                top_value = settings["pad"]["sides"]["top"]
+                left_value = settings["pad"]["sides"]["left"]
+                right_value = settings["pad"]["sides"]["right"]
+                bot_value = settings["pad"]["sides"]["bottom"]
+
+                if top_value.endswith("%"):
+                    padding_unit_selector.set_value("%")
+                    crop_unit_slice = -1
+                else:
+                    padding_unit_selector.set_value("px")
+                    crop_unit_slice = -2
+
+                padding_top.value = int(top_value[:crop_unit_slice])
+                padding_left.value = int(left_value[:crop_unit_slice])
+                padding_right.value = int(right_value[:crop_unit_slice])
+                padding_bot.value = int(bot_value[:crop_unit_slice])
+
+        def _set_settings_from_json(settings: dict):
+            padding_container.loading = True
+            _set_padding(settings)
+            _save_padding()
+            padding_container.loading = False
+            classes_list_widget.loading = True
+            classes_list_settings = settings.get("classes", default_classes_settings)
+            set_classes_list_settings_from_json(
+                classes_list_widget=classes_list_widget, settings=classes_list_settings
+            )
+            # save settings
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
+            # update settings preview
+            _set_classes_list_preview()
+            classes_list_widget.loading = False
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
             settings_options = [
@@ -315,7 +303,7 @@ class InstancesCropAction(SpatialLevelAction):
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=padding_edit_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(padding_container),
-                        sidebar_width=300,
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(

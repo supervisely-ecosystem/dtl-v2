@@ -23,6 +23,7 @@ class TagLayer(Layer):
                     "tag": {
                         "maxItems": 1,
                         "oneOf": [
+                            {"type": "null"},
                             {"type": "string"},
                             {
                                 "type": "object",
@@ -40,8 +41,8 @@ class TagLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     @property
     def is_action_add(self):
@@ -53,7 +54,9 @@ class TagLayer(Layer):
 
     @property
     def tag(self):
-        if isinstance(self.settings["tag"], str):
+        if self.settings["tag"] is None:
+            return None
+        elif isinstance(self.settings["tag"], str):
             tag_name = self.settings["tag"]
             tag_value = None
         else:
@@ -86,15 +89,18 @@ class TagLayer(Layer):
         img_desc, ann = data_el
 
         dst_tag = self.tag
-        if self.is_action_add:
-            if dst_tag.name in [t.name for t in ann.img_tags]:
-                ann = ann.clone(
-                    img_tags=[dst_tag if tag.name == dst_tag.name else tag for tag in ann.img_tags]
-                )
-            else:
-                ann = ann.clone(img_tags=[*[t for t in ann.img_tags], dst_tag])
+        if dst_tag is not None:
+            if self.is_action_add:
+                if dst_tag.name in [t.name for t in ann.img_tags]:
+                    ann = ann.clone(
+                        img_tags=[
+                            dst_tag if tag.name == dst_tag.name else tag for tag in ann.img_tags
+                        ]
+                    )
+                else:
+                    ann = ann.clone(img_tags=[*[t for t in ann.img_tags], dst_tag])
 
-        if self.is_action_delete:
-            ann = ann.clone(img_tags=[t for t in ann.img_tags if t.name != dst_tag.name])
+            if self.is_action_delete:
+                ann = ann.clone(img_tags=[t for t in ann.img_tags if t.name != dst_tag.name])
 
         yield img_desc, ann

@@ -9,13 +9,13 @@ from supervisely import Annotation, Label, Bitmap
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
-from src.compute.dtl_utils import apply_to_labels 
+from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 # processes FigureBitmap
 class SkeletonizeLayer(Layer):
-
-    action = 'skeletonize'
+    action = "skeletonize"
 
     layer_settings = {
         "required": ["settings"],
@@ -24,46 +24,44 @@ class SkeletonizeLayer(Layer):
                 "type": "object",
                 "required": ["classes", "method"],
                 "properties": {
-                    "classes": {
-                        "type": "array",
-                        "items": {"type": "string"}
-                    },
+                    "classes": {"type": "array", "items": {"type": "string"}},
                     "method": {
                         "type": "string",
-                        "enum": [
-                            "skeletonization",
-                            "medial_axis",
-                            "thinning"
-                        ]
-                    }
-                }
+                        "enum": ["skeletonization", "medial_axis", "thinning"],
+                    },
+                },
             }
-        }
+        },
     }
 
     method_mapping = {
-        'skeletonization': skeletonize,
-        'medial_axis': medial_axis,
-        'thinning': thin,
+        "skeletonization": skeletonize,
+        "medial_axis": medial_axis,
+        "thinning": thin,
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         super().define_classes_mapping()  # don't change
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
-        method = self.method_mapping.get(self.settings['method'], None)
+        method = self.method_mapping.get(self.settings["method"], None)
         if method is None:
             raise NotImplemented()
 
         def get_skel(label: Label):
-            if label.obj_class.name not in self.settings['classes']:
+            if label.obj_class.name not in self.settings["classes"]:
                 return [label]
             if not isinstance(label.geometry, Bitmap):
-                raise RuntimeError('Input class must be a Bitmap in skeletonize layer.')
+                raise WrongGeometryError(
+                    None,
+                    "Bitmap",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
+                )
 
             origin, mask = label.geometry.origin, label.geometry.data
             mask_u8 = mask.astype(np.uint8)

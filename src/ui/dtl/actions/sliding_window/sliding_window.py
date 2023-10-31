@@ -1,11 +1,11 @@
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Text, Grid, InputNumber
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class SlidingWindowAction(SpatialLevelAction):
@@ -14,84 +14,67 @@ class SlidingWindowAction(SpatialLevelAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/sliding_window"
     )
-    description = "This layer (sliding_window) is used to crop part of image with its annotations by sliding of window from left to rigth, from top to bottom."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Crop part of image with its annotations with sliding window algorithms."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        window_text = Text("Window", status="text", font_size=get_text_font_size())
+        width_text = Text("Width", status="text", font_size=get_text_font_size())
+        height_text = Text("Height", status="text", font_size=get_text_font_size())
+        width_input = InputNumber(value=128, step=1, controls=True)
+        height_input = InputNumber(value=128, step=1, controls=True)
+        window_settings = Grid([width_text, height_text, width_input, height_input], columns=2)
+
+        min_overlap_text = Text("Min Overlap", status="text", font_size=get_text_font_size())
+        x_text = Text("X", status="text", font_size=get_text_font_size())
+        y_text = Text("Y", status="text", font_size=get_text_font_size())
+        x_input = InputNumber(value=32, step=1, controls=True)
+        y_input = InputNumber(value=32, step=1, controls=True)
+        min_overlap_settings = Grid([x_text, y_text, x_input, y_input], columns=2)
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "window": {
-                    "width": options_json["window_width"],
-                    "height": options_json["window_height"],
+                    "width": width_input.get_value(),
+                    "height": height_input.get_value(),
                 },
                 "min_overlap": {
-                    "x": options_json["min_overlap_x"],
-                    "y": options_json["min_overlap_y"],
+                    "x": x_input.get_value(),
+                    "y": y_input.get_value(),
                 },
             }
 
+        def _set_settings_from_json(settings: dict):
+            if "window" in settings:
+                window = settings["window"]
+                width_input.value = window["width"]
+                height_input.value = window["height"]
+
+            if "min_overlap" in settings:
+                min_overlap = settings["min_overlap"]
+                x_input.value = min_overlap["x"]
+                y_input.value = min_overlap["y"]
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            width_val = settings.get("window", {}).get("width", 128)
-            height_val = settings.get("window", {}).get("height", 128)
-            min_overlap_x_val = settings.get("min_overlap", {}).get("x", 32)
-            min_overlap_y_val = settings.get("min_overlap", {}).get("y", 32)
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="window_text",
-                    option_component=NodesFlow.TextOptionComponent("Window"),
+                    option_component=NodesFlow.WidgetOptionComponent(window_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="window_width_text",
-                    option_component=NodesFlow.TextOptionComponent("Width"),
-                ),
-                NodesFlow.Node.Option(
-                    name="window_width",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=width_val
-                    ),
-                ),
-                NodesFlow.Node.Option(
-                    name="window_height_text",
-                    option_component=NodesFlow.TextOptionComponent("Height"),
-                ),
-                NodesFlow.Node.Option(
-                    name="window_height",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=height_val
-                    ),
+                    name="window_settings",
+                    option_component=NodesFlow.WidgetOptionComponent(window_settings),
                 ),
                 NodesFlow.Node.Option(
                     name="min_overlap_text",
-                    option_component=NodesFlow.TextOptionComponent("Min Overlap"),
+                    option_component=NodesFlow.WidgetOptionComponent(min_overlap_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="min_overlap_x_text",
-                    option_component=NodesFlow.TextOptionComponent("X"),
-                ),
-                NodesFlow.Node.Option(
-                    name="min_overlap_x",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=min_overlap_x_val
-                    ),
-                ),
-                NodesFlow.Node.Option(
-                    name="min_overlap_y_text",
-                    option_component=NodesFlow.TextOptionComponent("Y"),
-                ),
-                NodesFlow.Node.Option(
-                    name="min_overlap_y",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=min_overlap_y_val
-                    ),
+                    name="min_overlap_settings",
+                    option_component=NodesFlow.WidgetOptionComponent(min_overlap_settings),
                 ),
             ]
             return {

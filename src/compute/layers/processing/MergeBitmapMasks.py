@@ -7,6 +7,7 @@ from supervisely import Bitmap, Annotation, Label
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.exceptions import WrongGeometryError
 
 
 class MergeMasksLayer(Layer):
@@ -23,8 +24,8 @@ class MergeMasksLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def merge_bitmaps(self, bitmaps: List[Bitmap], img_size):
         base_mask = np.zeros(img_size, bool)
@@ -46,7 +47,12 @@ class MergeMasksLayer(Layer):
         for label in ann.labels:
             if label.obj_class.name == class_mask:
                 if not isinstance(label.geometry, Bitmap):
-                    raise RuntimeError("Input class must be a Bitmap in road_lines layer.")
+                    raise WrongGeometryError(
+                        None,
+                        "Bitmap",
+                        label.geometry.geometry_name(),
+                        extra={"layer": self.action},
+                    )
                 bitmaps_for_merge.append(label.geometry)
                 obj_class = label.obj_class
             else:

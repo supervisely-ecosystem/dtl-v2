@@ -1,50 +1,34 @@
 import json
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
-import requests
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox, Markdown
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class SaveAction(OutputAction):
     name = "save"
-    title = "Save"
+    title = "Export Archive"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save"
-    description = (
-        "Save layer (save) allows to export annotations and images. Annotations are "
-        "stored in .json files. Images are stored in .png or .jpg files (due to format"
-        " of source image). When exporting annotations, meta.json file containing all "
-        "used classes for project is also exported. Moreover, you can get visual "
-        "representations of all annotated objects on top of your images by setting "
-        "visualize to true."
-    )
-    md_description_url = (
-        "https://raw.githubusercontent.com/supervisely/docs/master/data-manipulation/dtl/save.md"
-    )
-    md_description = requests.get(md_description_url).text
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Export annotations and images to Team Files."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
+        save_path_text = Text("Archive name", status="text", font_size=get_text_font_size())
+        save_path_input = Input(value="", placeholder="Enter archive name", size="small")
+        visualize_checkbox = Checkbox("Visualize")
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            visualize = bool(options_json["Visualize"])
             return {
-                "visualize": visualize,
+                "visualize": visualize_checkbox.is_checked(),
             }
 
         def get_dst(options_json: dict) -> dict:
-            dst = options_json.get("dst", None)
+            dst = save_path_input.get_value()
             if dst is None or dst == "":
                 return []
                 # raise ValueError("Destination is not specified")
@@ -54,29 +38,28 @@ class SaveAction(OutputAction):
                 dst = [dst.strip("'\"")]
             return dst
 
-        def create_options(src: list, dst: list, settings: dict) -> dict:
-            try:
-                dst_value = dst[0]
-            except IndexError:
-                dst_value = ""
-            try:
-                visualize_value = settings["visualize"]
-            except KeyError:
-                visualize_value = False
+        def _set_settings_from_json(settings: dict):
+            visualize_setting = settings.get("visualize", False)
+            if visualize_setting:
+                visualize_checkbox.check()
+            else:
+                visualize_checkbox.uncheck()
 
+        def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             dst_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
-                    option_component=NodesFlow.TextOptionComponent("Destination"),
+                    option_component=NodesFlow.WidgetOptionComponent(save_path_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="dst", option_component=NodesFlow.InputOptionComponent(dst_value)
+                    name="dst", option_component=NodesFlow.WidgetOptionComponent(save_path_input)
                 ),
             ]
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Visualize",
-                    option_component=NodesFlow.CheckboxOptionComponent(visualize_value),
+                    option_component=NodesFlow.WidgetOptionComponent(visualize_checkbox),
                 ),
             ]
             return {
@@ -91,6 +74,7 @@ class SaveAction(OutputAction):
             create_options=create_options,
             get_dst=get_dst,
             get_settings=get_settings,
+            need_preview=False,
         )
 
     @classmethod

@@ -1,9 +1,8 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Field
 from supervisely import ProjectMeta
 from supervisely import Bitmap, AnyGeometry
 
@@ -17,6 +16,10 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -27,36 +30,38 @@ class MergeBitmapsAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/merge_masks"
     )
-    description = "This layer (merge_bitmap_masks) takes all bitmap annotations which has same class name and merge it into single bitmap annotation."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = (
+        "Takes all Bitmap labels which has same class name and merge it into single Bitmap label."
+    )
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=False)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_save_btn = create_save_btn()
+        classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Class",
+            description="Select the class for which you want to merge all labels into one",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text(
+            "Class to merge", status="text", font_size=get_text_font_size()
+        )
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -110,6 +115,11 @@ class MergeBitmapsAction(AnnotationAction):
             saved_classes_settings = classes_list_settings_changed_meta(
                 saved_classes_settings, obj_classes
             )
+
+            if saved_classes_settings == "":
+                classes_list_widget.deselect_all()
+            else:
+                classes_list_widget.select(saved_classes_settings)
 
             # update settings preview
             _set_classes_list_preview()

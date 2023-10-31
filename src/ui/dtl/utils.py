@@ -1,7 +1,8 @@
 from typing import List, Literal, Union
+from os.path import join, exists
 
 from supervisely import ObjClass, ObjClassCollection
-from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty
+from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty, ClassesTable
 
 from src.ui.widgets import ClassesMapping, ClassesMappingPreview, ClassesList, ClassesListPreview
 from src.exceptions import BadSettingsError
@@ -64,6 +65,37 @@ def _pack_classes_mapping_settings(
                 del new_mapping[name]
             new_mapping["__other__"] = "__default__"
     return new_mapping
+
+
+def classes_list_to_mapping(
+    selected_classes: list,
+    all_classes: list,
+    other: Literal["skip", "default", "ignore"] = "skip",
+    default_allowed: bool = False,
+):
+    if default_allowed and len(selected_classes) == len(all_classes):
+        return "default"
+    mapping = {}
+    for cls_name in selected_classes:
+        mapping[cls_name] = cls_name
+    if other == "skip":
+        return mapping
+    if len(mapping) < len(all_classes):
+        mapping["__other__"] = f"__{other}__"
+    return mapping
+
+
+def mapping_to_list(mapping: dict, rename: bool = False):
+    """Converts mapping to list"""
+    classes = []
+    for cls_name, cls_value in mapping.items():
+        if cls_value == "__ignore__":
+            continue
+        if rename:
+            classes.append(cls_value if cls_value != "__default__" else cls_name)
+        else:
+            classes.append(cls_name)
+    return classes
 
 
 def get_classes_mapping_value(
@@ -155,6 +187,7 @@ def set_classes_mapping_settings_from_json(
     settings: dict,
     missing_in_settings_action: Literal["raise", "ignore"] = "raise",
     missing_in_meta_action: Literal["raise", "ignore"] = "raise",
+    select: Literal["all", "none", "unique", "default", "empty", "skip_select"] = "skip_select",
 ):
     if settings == "default":
         classes_mapping_widget.set_default()
@@ -196,17 +229,54 @@ def set_classes_mapping_settings_from_json(
             classes_mapping[obj_class.name] = ""
     classes_mapping_widget.set_mapping(classes_mapping)
 
+    if select != "skip_select":
+        if select == "all":
+            classes_mapping_widget.select_all()
+        elif select == "none":
+            classes_mapping_widget.deselect_all()
+        elif select == "unique":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_name != cls_value
+                and cls_value != ""
+                and cls_value != "__default__"
+                and cls_value != "__ignore__"
+            ]
+            classes_mapping_widget.select(to_select)
+        elif select == "empty":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_value == "" or cls_name == "__ignore__"
+            ]
+            classes_mapping_widget.select(to_select)
+        elif select == "default":
+            to_select = [
+                cls_name
+                for cls_name, cls_value in classes_mapping.items()
+                if cls_value == cls_name or cls_name == "__default__"
+            ]
+            classes_mapping_widget.select(to_select)
+
 
 # Classes List utils
 
 
-def get_classes_list_value(classes_list_widget: ClassesList, multiple: bool = True):
+def get_classes_list_value(
+    classes_list_widget: Union[ClassesList, ClassesTable], multiple: bool = True
+):
     selected = classes_list_widget.get_selected_classes()
     if multiple:
-        return [obj_class.name for obj_class in selected]
+        if isinstance(classes_list_widget, ClassesList):
+            return [obj_class.name for obj_class in selected]
+        else:
+            return [obj_class for obj_class in selected]
     else:
         if len(selected) == 0:
             return ""
+        elif isinstance(classes_list_widget, ClassesList):
+            return selected[0].name
         return selected[0].name
 
 
@@ -216,31 +286,63 @@ def classes_list_settings_changed_meta(
 ):
     names = {obj_class.name for obj_class in new_obj_classes}
     if isinstance(settings, str):
+        if settings == "default":
+            return "default"
         return settings if settings in names else ""
     return [class_name for class_name in settings if class_name in names]
 
 
 def set_classes_list_preview(
-    classes_list_widget: ClassesList,
+    classes_list_widget: Union[ClassesList, ClassesMapping, ClassesTable],
     classes_list_preview_widget: ClassesListPreview,
     classes_list_settings: Union[list, str],
 ):
     if isinstance(classes_list_settings, str):
+        if classes_list_settings == "default":
+            if isinstance(classes_list_widget, ClassesMapping):
+                classes_list_preview_widget.set(classes_list_widget.get_classes())
+            elif isinstance(classes_list_widget, ClassesList):
+                classes_list_preview_widget.set(classes_list_widget.get_all_classes())
+            else:
+                classes_list_widget.select_all()
+                meta = classes_list_widget.project_meta
+                if meta is None:
+                    all_calsses = []
+                else:
+                    all_calsses = [obj_class for obj_class in meta.obj_classes]
+                classes_list_preview_widget.set(all_calsses)
+            return
         names = [classes_list_settings]
     else:
         names = classes_list_settings
-    obj_classes = classes_list_widget.get_all_classes()
+
+    if not isinstance(classes_list_widget, ClassesTable):
+        # both ClassesList and ClassesMapping
+        obj_classes = classes_list_widget.get_all_classes()
+    else:
+        if classes_list_widget.project_meta is None:
+            obj_classes = []
+        else:
+            obj_classes = [obj_class for obj_class in classes_list_widget.project_meta.obj_classes]
     classes_list_preview_widget.set(
         [obj_class for obj_class in obj_classes if obj_class.name in names]
     )
 
 
 def set_classes_list_settings_from_json(
-    classes_list_widget: ClassesList, settings: Union[list, str]
+    classes_list_widget: Union[ClassesList, ClassesTable], settings: Union[list, str]
 ):
     if isinstance(settings, str):
+        if settings == "default":
+            classes_list_widget.select_all()
+            return
         settings = [settings]
-    classes_list_widget.select(settings)
+
+    if isinstance(classes_list_widget, ClassesList):
+        classes_list_widget.select(settings)
+    elif isinstance(classes_list_widget, ClassesTable):
+        classes_list_widget.select_classes(settings)
+        return
 
 
 # Options utils
@@ -249,7 +351,7 @@ def set_classes_list_settings_from_json(
 def get_separator(idx: int = 0):
     return NodesFlow.Node.Option(
         name=f"separator {idx}",
-        option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        option_component=NodesFlow.HtmlOptionComponent('<hr style="border-top: 1px solid #ccc;">'),
     )
 
 
@@ -268,3 +370,39 @@ def get_set_settings_container(text: Text, button: Button):
 
 def get_set_settings_button_style():
     return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"
+
+
+# Sidebar action options utils
+
+
+def create_save_btn() -> Button:
+    return Button("Save", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();")
+
+
+def create_set_default_btn() -> Button:
+    return Button("Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh")
+
+
+# Layer docs utils
+
+
+def get_layer_docs(layer_dir: str) -> str:
+    md_description = ""
+    for p in ("readme.md", "README.md"):
+        p = join(layer_dir, p)
+        if exists(p):
+            with open(p) as f:
+                md_description = f.read()
+            break
+    return md_description
+
+
+# Widgets utils
+
+
+def get_slider_style():
+    return "padding: 0 7px"
+
+
+def get_text_font_size():
+    return 13

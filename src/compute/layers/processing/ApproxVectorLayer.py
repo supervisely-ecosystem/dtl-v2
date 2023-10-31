@@ -4,6 +4,7 @@ from supervisely import Polygon, Polyline, Label
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 # processes FigurePolygon or FigureLine
@@ -28,8 +29,8 @@ class ApproxVectorLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         super().define_classes_mapping()  # don't change
@@ -44,8 +45,11 @@ class ApproxVectorLayer(Layer):
             if (not isinstance(label.geometry, Polygon)) and (
                 not isinstance(label.geometry, Polyline)
             ):
-                raise RuntimeError(
-                    "Input class must be a Polygon or a Polyline in approx_vector layer."
+                raise WrongGeometryError(
+                    None,
+                    "Polyline or Polygon",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
                 )
             new_geom = label.geometry.approx_dp(epsilon)
             label = label.clone(geometry=new_geom)

@@ -71,8 +71,8 @@ class CropLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
         # @TODO: check 'sides' params for percents... or not
 

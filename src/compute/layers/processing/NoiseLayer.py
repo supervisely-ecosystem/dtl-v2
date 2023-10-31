@@ -19,8 +19,8 @@ class NoiseLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def requires_image(self):
         return True

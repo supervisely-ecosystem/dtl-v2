@@ -24,29 +24,28 @@ def remove_polylines_inside_polygon(line: Polyline, polygons: List[Polygon]) -> 
             poly = poly.buffer(0.001)
 
         sh_polygons.append(poly)
-    
+
     for poly in sh_polygons:
         sh_line = sh_line.difference(poly)
-    
+
     # ?
-    if sh_line.geom_type == 'GeometryCollection' or sh_line.is_empty:
+    if sh_line.geom_type == "GeometryCollection" or sh_line.is_empty:
         return []
-    
-    if sh_line.geom_type == 'MultiLineString':
+
+    if sh_line.geom_type == "MultiLineString":
         new_lines = []
         for line in sh_line:
             coords = np.transpose(line.coords.xy)
             new_lines.append(Polyline([(c[0], c[1]) for c in coords]))
         return new_lines
 
-    if sh_line.geom_type == 'LineString':
+    if sh_line.geom_type == "LineString":
         coords = np.transpose(sh_line.coords.xy)
         return [Polyline([(c[0], c[1]) for c in coords])]
 
 
 class DropLinesUnderPolygonLayer(Layer):
-
-    action = 'drop_lines_under_polygon'
+    action = "drop_lines_under_polygon"
 
     layer_settings = {
         "required": ["settings"],
@@ -55,27 +54,21 @@ class DropLinesUnderPolygonLayer(Layer):
                 "type": "object",
                 "required": ["lines_class", "polygons_class"],
                 "properties": {
-                    "lines_class": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "polygons_class": {
-                        "type": "string",
-                        "minLength": 1
-                    }
-                }
+                    "lines_class": {"type": "string", "minLength": 1},
+                    "polygons_class": {"type": "string", "minLength": 1},
+                },
             }
-        }
+        },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
-        
-        lines_class = self.settings.get('lines_class')
-        polygons_class = self.settings.get('polygons_class')
+
+        lines_class = self.settings.get("lines_class")
+        polygons_class = self.settings.get("polygons_class")
 
         polygons = []
         for label in ann.labels:

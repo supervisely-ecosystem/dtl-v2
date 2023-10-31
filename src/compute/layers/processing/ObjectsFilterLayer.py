@@ -97,8 +97,8 @@ class ObjectsFilterLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
@@ -146,12 +146,12 @@ class ObjectsFilterLayer(Layer):
 
         if "names" in self.settings["filter_by"]:
             ann = apply_to_labels(ann, filter_by_names)
-            return img_desc, ann
-
-        area_set = self.settings["filter_by"]["polygon_sizes"]["area_size"]
-        if "percent" in area_set:
-            ann = apply_to_labels(ann, filter_delete_percent)
+            yield img_desc, ann
         else:
-            ann = apply_to_labels(ann, filter_delete_size)
+            area_set = self.settings["filter_by"]["polygon_sizes"]["area_size"]
+            if "percent" in area_set:
+                ann = apply_to_labels(ann, filter_delete_percent)
+            else:
+                ann = apply_to_labels(ann, filter_delete_size)
 
-        yield img_desc, ann
+            yield img_desc, ann

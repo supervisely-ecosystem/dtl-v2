@@ -16,6 +16,10 @@ DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
 STATIC_DIR = "static"
+TEAM_FILES_PATH = "ml-nodes"
+PROJECT_ID = sly.env.project_id(raise_not_found=False)
+DATASET_ID = sly.env.dataset_id(raise_not_found=False)
+FILE = sly.env.team_files_file(raise_not_found=False)
 
 api = sly.Api()
 
@@ -43,7 +47,7 @@ def updater(update: str):
 
 
 context_menu_position = None
-
+current_dtl_json = None
 
 error_description = Text()
 error_extra_literal = Text("Extra:")
@@ -70,11 +74,11 @@ error_dialog = Dialog(
     content=Container(
         widgets=[
             Flexbox(widgets=[error_icon, error_description]),
-            error_extra_literal,
-            Container(
-                widgets=[error_extra],
-                style="max-height: 400px; overflow-y: auto;",
-            ),
+            # error_extra_literal,
+            # Container(
+            #     widgets=[error_extra],
+            #     style="max-height: 400px; overflow-y: auto;",
+            # ),
             error_close_btn,
         ],
     ),

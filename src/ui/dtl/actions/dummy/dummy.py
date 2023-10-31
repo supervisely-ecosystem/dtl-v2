@@ -1,24 +1,17 @@
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs
 
 
 class DummyAction(OtherAction):
     name = "dummy"
     title = "Dummy"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/dummy"
-    description = "This layer (dummy) does nothing. Literally. Dummy layer can be useful when you have many destinations of other layers you want to merge into one."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Do nothing. Literally. Use when you want to merge multiple layers into one."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -37,4 +30,5 @@ class DummyAction(OtherAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
+            need_preview=False,
         )

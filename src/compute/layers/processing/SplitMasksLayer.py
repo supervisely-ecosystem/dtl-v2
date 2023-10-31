@@ -8,6 +8,7 @@ from supervisely import Annotation, Bitmap, Label
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
+from src.exceptions import WrongGeometryError
 
 
 class SplitMasksLayer(Layer):
@@ -24,8 +25,8 @@ class SplitMasksLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
@@ -35,7 +36,12 @@ class SplitMasksLayer(Layer):
                 return [label]
 
             if not isinstance(label.geometry, Bitmap):
-                raise RuntimeError("Input class must be a Bitmap in split_masks layer.")
+                raise WrongGeometryError(
+                    None,
+                    "Bitmap",
+                    label.geometry.geometry_name(),
+                    extra={"layer": self.action},
+                )
 
             old_origin, old_mask = label.geometry.origin, label.geometry.data
             ret, masks = connectedComponents(old_mask.astype("uint8"), connectivity=8)

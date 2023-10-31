@@ -10,8 +10,7 @@ from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 
 
 class GenerateHintsLayer(Layer):
-
-    action = 'generate_hints'
+    action = "generate_hints"
 
     layer_settings = {
         "required": ["settings"],
@@ -20,31 +19,25 @@ class GenerateHintsLayer(Layer):
                 "type": "object",
                 "required": ["class", "positive_class", "negative_class", "min_points_number"],
                 "properties": {
-                    "class": {
-                        "type": "string"
-                    },
-                    "positive_class": {
-                        "type": "string"
-                    },
-                    "negative_class": {
-                        "type": "string"
-                    },
-                    "min_points_number": {
-                        "type": "integer"
-                    }
-                }
+                    "class": {"type": "string"},
+                    "positive_class": {"type": "string"},
+                    "negative_class": {"type": "string"},
+                    "min_points_number": {"type": "integer"},
+                },
             }
-        }
+        },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
-        if self.settings['min_points_number'] < 0:
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
+        if self.settings["min_points_number"] < 0:
             raise ValueError("GenerateHintsLayer: min_points_number must not be less than zero")
 
     def define_classes_mapping(self):
-        self.cls_mapping[ClassConstants.NEW] = [{'title': self.settings['positive_class'], 'shape': Point.geometry_name()},
-                                                {'title': self.settings['negative_class'], 'shape': Point.geometry_name()}]
+        self.cls_mapping[ClassConstants.NEW] = [
+            {"title": self.settings["positive_class"], "shape": Point.geometry_name()},
+            {"title": self.settings["negative_class"], "shape": Point.geometry_name()},
+        ]
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
     def generate_points(self, mask, color=1):
@@ -52,12 +45,15 @@ class GenerateHintsLayer(Layer):
         pos_area = mask.sum()
 
         def pt_num(cnt=2):
-            cs = [int(np.random.exponential(2)) + self.settings['min_points_number'] for _ in range(cnt)]
+            cs = [
+                int(np.random.exponential(2)) + self.settings["min_points_number"]
+                for _ in range(cnt)
+            ]
             return cs
 
         n_pos, n_neg = pt_num()
         n_pos = min(n_pos, pos_area)
-        n_neg = min(n_neg, h*w - pos_area)
+        n_neg = min(n_neg, h * w - pos_area)
         positive_points, negative_points = [], []
         if n_pos > 0:
             # @TODO: speed up (np.argwhere, mm); what if pos or neg is missing?
@@ -75,7 +71,7 @@ class GenerateHintsLayer(Layer):
         mask = np.zeros(shape_hw, dtype=np.uint8)
 
         for label in ann.labels:
-            if label.obj_class.name == self.settings['class']:
+            if label.obj_class.name == self.settings["class"]:
                 label.draw(mask, 1)
 
         def add_pt_labels(ann: Annotation, pts, obj_class: ObjClass):
@@ -85,8 +81,8 @@ class GenerateHintsLayer(Layer):
             return ann
 
         positive_points, negative_points = self.generate_points(mask)
-        positive_points_obj_class = ObjClass(self.settings['positive_class'], Point)
-        negative_points_obj_class = ObjClass(self.settings['negative_class'], Point)
+        positive_points_obj_class = ObjClass(self.settings["positive_class"], Point)
+        negative_points_obj_class = ObjClass(self.settings["negative_class"], Point)
         ann = add_pt_labels(ann, positive_points, positive_points_obj_class)
         ann = add_pt_labels(ann, negative_points, negative_points_obj_class)
 

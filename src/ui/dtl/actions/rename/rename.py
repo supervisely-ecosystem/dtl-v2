@@ -1,10 +1,9 @@
 from typing import Optional
 import copy
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Field
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
@@ -16,44 +15,48 @@ from src.ui.dtl.utils import (
     set_classes_mapping_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
 
 class RenameAction(AnnotationAction):
     name = "rename"
-    title = "Rename"
+    title = "Rename Classes"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rename"
-    description = "This layer (rename) re-maps existing classes."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Rename existing classes."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_mapping_widget = ClassesMapping()
         classes_mapping_preview = ClassesMappingPreview()
-        classes_mapping_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_mapping_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_mapping_save_btn = create_save_btn()
+        classes_mapping_set_default_btn = create_set_default_btn()
+        classes_mapping_widget_field = Field(
+            content=classes_mapping_widget,
+            title="Classes",
+            description="Select the classes you want to rename",
+        )
         classes_mapping_widgets_container = Container(
             widgets=[
-                classes_mapping_widget,
+                classes_mapping_widget_field,
                 Flexbox(
                     widgets=[
                         classes_mapping_save_btn,
                         classes_mapping_set_default_btn,
                     ],
-                    gap=355,
+                    gap=110,
                 ),
             ]
         )
-        classes_mapping_edit_text = Text("Classes Mapping")
+        classes_mapping_edit_text = Text(
+            "Classes Names", status="text", font_size=get_text_font_size()
+        )
         classes_mapping_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -72,7 +75,7 @@ class RenameAction(AnnotationAction):
         def _get_classes_mapping_value():
             return get_classes_mapping_value(
                 classes_mapping_widget,
-                default_action="copy",
+                default_action="skip",
                 ignore_action="skip",
                 other_allowed=False,
                 default_allowed=False,
@@ -83,7 +86,7 @@ class RenameAction(AnnotationAction):
                 classes_mapping_widget,
                 classes_mapping_preview,
                 saved_classes_mapping_settings,
-                default_action="copy",
+                default_action="skip",
                 ignore_action="skip",
             )
 
@@ -130,6 +133,7 @@ class RenameAction(AnnotationAction):
                 saved_classes_mapping_settings,
                 missing_in_settings_action="ignore",
                 missing_in_meta_action="ignore",
+                select="unique",
             )
 
             # update settings preview
@@ -147,6 +151,7 @@ class RenameAction(AnnotationAction):
                     classes_mapping_settings,
                     missing_in_settings_action="ignore",
                     missing_in_meta_action="ignore",
+                    select="unique",
                 )
 
             # save settings
@@ -182,7 +187,7 @@ class RenameAction(AnnotationAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             classes_mapping_widgets_container
                         ),
-                        sidebar_width=630,
+                        sidebar_width=380,
                     ),
                 ),
                 NodesFlow.Node.Option(
@@ -202,4 +207,5 @@ class RenameAction(AnnotationAction):
             create_options=create_options,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )

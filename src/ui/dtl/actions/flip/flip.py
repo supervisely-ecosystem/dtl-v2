@@ -1,54 +1,49 @@
-import os
-from pathlib import Path
 from typing import Optional
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, Select, Text
 
 from src.ui.dtl import SpatialLevelAction
 from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 
 class FlipAction(SpatialLevelAction):
     name = "flip"
     title = "Flip"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/flip"
-    description = (
-        "Flip layer (flip) simply flips data (image + annotation) vertically or horizontally."
-    )
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Flips data (image + annotation) vertically or horizontally."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        axis_text = Text("Axis", status="text", font_size=get_text_font_size())
+        axis_selector_items = [
+            Select.Item("vertical", "Vertical"),
+            Select.Item("horizontal", "Horizontal"),
+        ]
+        axis_selector = Select(items=axis_selector_items, size="small")
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
-                "axis": options_json["axis"],
+                "axis": axis_selector.get_value(),
             }
 
-        axis_option_items = [
-            NodesFlow.SelectOptionComponent.Item("vertical", "Vertical"),
-            NodesFlow.SelectOptionComponent.Item("horizontal", "Horizontal"),
-        ]
+        def _set_settings_from_json(settings: dict):
+            axis = settings.get("axis", "vertical")
+            axis_selector.set_value(axis)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
-            axis_val = settings.get("axis", "vertical")
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="axis_text",
-                    option_component=NodesFlow.TextOptionComponent("Axis"),
+                    option_component=NodesFlow.WidgetOptionComponent(axis_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="axis",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        axis_option_items, default_value=axis_val
-                    ),
+                    name="axis_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(axis_selector),
                 ),
             ]
             return {

@@ -1,6 +1,5 @@
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
 from supervisely.app.widgets import (
     NodesFlow,
@@ -13,30 +12,28 @@ from supervisely.app.widgets import (
     OneOf,
     Button,
     Text,
+    Field,
 )
 from supervisely import ProjectMeta
 
 from src.ui.dtl import OtherAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class IfAction(OtherAction):
     name = "if"
     title = "If"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/if"
-    description = (
-        "This layer (if) is used to split input data to several flows with a specified criterion."
-    )
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Split input data to several flows with a specified criterion."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -70,7 +67,7 @@ class IfAction(OtherAction):
 
         _current_meta = ProjectMeta()
 
-        # probabilty
+        # probability
         _prob_input = InputNumber(min=0, max=100, precision=3)
         _probability_condition_widget = Field(
             title="Probability",
@@ -84,7 +81,7 @@ class IfAction(OtherAction):
         def _set_prob_value(condition_json):
             _prob_input.value = condition_json["probability"] * 100
 
-        _prob_preview_widget = Text("")
+        _prob_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _set_prob_preview():
             _prob_preview_widget.text = f"Probability: {_get_prob_value()}"
@@ -110,7 +107,7 @@ class IfAction(OtherAction):
         def _set_min_obj_count_value(condition_json):
             _min_objects_count_input.value = condition_json["min_objects_count"]
 
-        _min_objects_preview_widget = Text("")
+        _min_objects_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _set_min_obj_preview():
             _min_objects_preview_widget.text = (
@@ -138,7 +135,7 @@ class IfAction(OtherAction):
         def _set_min_height_value(condition_json):
             _min_height_input.value = condition_json["min_height"]
 
-        _min_height_preview_widget = Text("")
+        _min_height_preview_widget = Text("", status="text", font_size=get_text_font_size())
 
         def _min_height_preview():
             _min_height_preview_widget.text = f"Min height: {_min_height_input.get_value()}"
@@ -154,7 +151,9 @@ class IfAction(OtherAction):
         )
 
         # tags
-        _select_tags_input = SelectTagMeta(project_meta=ProjectMeta(), multiselect=True)
+        _select_tags_input = SelectTagMeta(
+            project_meta=ProjectMeta(), multiselect=True, size="small"
+        )
         _select_tags_widget = Field(
             title="Tags",
             description="Select tags",
@@ -181,7 +180,13 @@ class IfAction(OtherAction):
             widget=_select_tags_widget,
             get_func=_get_tags_value,
             set_func=_set_tags_value,
-            preview_widget=Container(widgets=[Text("Include Tags"), _tags_preview_widget], gap=1),
+            preview_widget=Container(
+                widgets=[
+                    Text("Include Tags", status="text", font_size=get_text_font_size()),
+                    _tags_preview_widget,
+                ],
+                gap=1,
+            ),
             set_preview_func=_set_tags_preview,
         )
 
@@ -189,7 +194,7 @@ class IfAction(OtherAction):
         _include_classes_input = ClassesList(multiple=True)
         _include_classes_widget = Field(
             title="Include classes",
-            description="Select classes",
+            description="Select the classes that will be the criteria for splitting the data",
             content=_include_classes_input,
         )
 
@@ -208,7 +213,10 @@ class IfAction(OtherAction):
             get_func=lambda: [oc.name for oc in _include_classes_input.get_selected_classes()],
             set_func=_set_include_classes_value,
             preview_widget=Container(
-                widgets=[Text("Include Classes:"), _include_classes_preview_widget],
+                widgets=[
+                    Text("Include Classes:", status="text", font_size=get_text_font_size()),
+                    _include_classes_preview_widget,
+                ],
                 gap=1,
             ),
             set_preview_func=_set_include_classes_preview,
@@ -216,8 +224,8 @@ class IfAction(OtherAction):
 
         # name in range
         _names_in_range_inputs = {
-            "name_from": Input(),
-            "name_to": Input(),
+            "name_from": Input(size="small"),
+            "name_to": Input(size="small"),
             "step": InputNumber(value=1, min=1, max=None),
         }
         _names_in_range_widget = Field(
@@ -236,7 +244,7 @@ class IfAction(OtherAction):
             name_from, name_to = condition_json["name_in_range"]
             _names_in_range_inputs["name_from"].set_value(name_from)
             _names_in_range_inputs["name_to"].set_value(name_to)
-            _names_in_range_inputs["step"].value = condition_json["frame_step"]
+            _names_in_range_inputs["step"].value = condition_json["name_in_range"]["frame_step"]
 
         def _get_names_in_range_value():
             return {
@@ -247,8 +255,8 @@ class IfAction(OtherAction):
                 "frame_step": _names_in_range_inputs["step"].get_value(),
             }
 
-        _names_in_range_preview_range = Text("")
-        _names_in_range_preview_step = Text("")
+        _names_in_range_preview_range = Text("", status="text", font_size=get_text_font_size())
+        _names_in_range_preview_step = Text("", status="text", font_size=get_text_font_size())
         _names_in_range_preview_widget = Container(
             widgets=[_names_in_range_preview_range, _names_in_range_preview_step], gap=1
         )
@@ -283,14 +291,17 @@ class IfAction(OtherAction):
         }
 
         select_condition_items = [condition.item() for condition in conditions.values()]
-        select_condition = Select(items=select_condition_items)
+        select_condition = Select(items=select_condition_items, size="small")
         condition_input = OneOf(select_condition)
 
         preview_items = [condition.preview_item() for condition in conditions.values()]
-        _select_preview = Select(items=preview_items)
+        _select_preview = Select(
+            items=preview_items,
+            size="small",
+        )
         settings_preview = OneOf(_select_preview)
-        save_settings_btn = Button("Save", icon="zmdi zmdi-floppy")
-        settings_edit_text = Text("Condition")
+        save_settings_btn = create_save_btn()
+        settings_edit_text = Text("Condition", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -346,13 +357,12 @@ class IfAction(OtherAction):
             _select_tags_input.loading = False
 
         def _set_settings_from_json(settings: dict):
-            if "condition" not in settings:
-                return
-            condition_json = settings["condition"]
-            condition_name, _ = list(settings["condition"].items())[0]
-            condition = conditions[condition_name]
-            condition.set(condition_json)
-            _save_settings()
+            if "condition" in settings:
+                condition_json = settings["condition"]
+                condition_name, _ = list(settings["condition"].items())[0]
+                condition = conditions[condition_name]
+                condition.set(condition_json)
+                _save_settings()
 
         save_settings_btn.click(_save_settings)
 
@@ -384,6 +394,7 @@ class IfAction(OtherAction):
             create_options=create_options,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )
 
     @classmethod

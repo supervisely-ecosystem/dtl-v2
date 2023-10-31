@@ -82,7 +82,9 @@ def main(progress: Progress):
 
     total = net.get_total_elements()
     if total == 0:
-        raise GraphError("There are no elements to process")
+        raise GraphError(
+            "There are no elements to process. Make sure that you selected input project"
+        )
     elements_generator = net.get_elements_generator()
     results_counter = 0
     with progress(message=f"Processing items...", total=total) as pbar:
@@ -109,51 +111,6 @@ def main(progress: Progress):
                 )
             finally:
                 pbar.update()
-            # progress.iter_done_report()
-            # progress.update()
-
-    # # is_archive = net.is_archive()
-    # results_counter = 0
-    # for pr_name, pr_dir in helper.in_project_dirs.items():
-    #     project = sly.Project(directory=pr_dir, mode=sly.OpenMode.READ)
-    #     # progress = progress_counter.progress_counter_dtl(pr_name, project.total_items)
-    #     for dataset in project:
-    #         dataset: sly.Dataset
-    #         with progress(
-    #             message=f"Processing items in {project.name}/{dataset.name}", total=len(dataset)
-    #         ) as pbar:
-    #             for item_name in dataset:
-    #                 try:
-    #                     img_desc = ImageDescriptor(
-    #                         make_legacy_project_item(project, dataset, item_name),
-    #                         datasets_conflict_map[project.name][dataset.name],
-    #                     )
-    #                     ann_json = json_utils.json_load(dataset.get_ann_path(item_name))
-    #                     ann = sly.Annotation.from_json(ann_json, project.meta)
-    #                     data_el = (img_desc, ann)
-    #                     export_output_generator = net.start(data_el)
-    #                     for res_export in export_output_generator:
-    #                         logger.trace(
-    #                             "image processed",
-    #                             extra={"img_name": res_export[0][0].get_img_name()},
-    #                         )
-    #                         results_counter += 1
-    #                 except Exception as e:
-    #                     extra = {
-    #                         "project_name": project.name,
-    #                         "ds_name": dataset.name,
-    #                         "image_name": item_name,
-    #                         "exc_str": str(e),
-    #                     }
-    #                     logger.warn(
-    #                         "Image was skipped because some error occurred",
-    #                         exc_info=True,
-    #                         extra=extra,
-    #                     )
-    #                 finally:
-    #                     pbar.update()
-    #                 # progress.iter_done_report()
-    #                 # progress.update()
 
     logger.info(
         "DTL finished",

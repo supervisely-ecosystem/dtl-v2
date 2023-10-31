@@ -1,6 +1,5 @@
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
 from supervisely.app.widgets import (
@@ -17,7 +16,13 @@ from supervisely.app.widgets import (
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class ObjectsFilterAction(AnnotationAction):
@@ -26,21 +31,20 @@ class ObjectsFilterAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/objects_filter"
     )
-    description = "This layer (objects_filter) deletes annotations less (or greater) than specified size or percentage of image area."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = (
+        "Deletes labels with less (or greater) than specified size or percentage of image area."
+    )
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes = ClassesList(multiple=True)
-        classes_field = Field(title="Select Classes", content=classes)
+        classes_field = Field(
+            title="Classes",
+            content=classes,
+            description="Select the classes for which you want to set filtering criteria",
+        )
         percent_input = InputNumber(min=0, max=100, value=5)
         percent_input_field = Field(
             title="Input %",
@@ -61,14 +65,18 @@ class ObjectsFilterAction(AnnotationAction):
             content=size_input,
         )
         comparator_select = Select(
-            items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")]
+            items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")],
+            size="small",
         )
         comparator_select_field = Field(title="Comparator", content=comparator_select)
-        action_select = Select(items=[Select.Item("delete", "Delete")])
+        action_select = Select(
+            items=[Select.Item("delete", "Delete")],
+            size="small",
+        )
         action_select_field = Field(title="Action", content=action_select)
         action_select.disable()
         filter_items = [
-            Select.Item("names", "Names", classes),
+            Select.Item("names", "Names", classes_field),
             Select.Item(
                 "area_percent",
                 "Area percent",
@@ -94,15 +102,15 @@ class ObjectsFilterAction(AnnotationAction):
                 ),
             ),
         ]
-        filter_by_select = Select(filter_items)
+        filter_by_select = Select(filter_items, size="small")
         filter_by_inputs = OneOf(filter_by_select)
 
-        filter_by_preview_text = Text("")
-        filter_preview_classes_text = Text("Classes:")
+        filter_by_preview_text = Text("", status="text", font_size=get_text_font_size())
+        filter_preview_classes_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_preview = ClassesListPreview()
-        area_size_preview = Text("")
-        comparator_preview = Text("")
-        action_preview = Text("")
+        area_size_preview = Text("", status="text", font_size=get_text_font_size())
+        comparator_preview = Text("", status="text", font_size=get_text_font_size())
+        action_preview = Text("", status="text", font_size=get_text_font_size())
 
         filter_by_name_preview_container = Container(
             widgets=[filter_by_preview_text, filter_preview_classes_text, classes_preview], gap=1
@@ -123,10 +131,11 @@ class ObjectsFilterAction(AnnotationAction):
             items=[
                 Select.Item("names", "names", filter_by_name_preview_container),
                 Select.Item("polygon_sizes", "polygon_sizes", filter_by_size_preview_container),
-            ]
+            ],
+            size="small",
         )
         settings_preview = OneOf(_settings_preview_select)
-        settings_edit_text = Text("Settings")
+        settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -137,7 +146,7 @@ class ObjectsFilterAction(AnnotationAction):
         )
         settings_edit_container = get_set_settings_container(settings_edit_text, settings_edit_btn)
 
-        settings_save_btn = Button("Save", icon="zmdi zmdi-floppy")
+        settings_save_btn = create_save_btn()
         settings_widgets_container = Container(
             widgets=[
                 Field(title="Filter by", content=filter_by_select),

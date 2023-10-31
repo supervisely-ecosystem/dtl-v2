@@ -4,8 +4,9 @@ from typing import List
 import numpy as np
 
 from supervisely import Bitmap, Label
+from supervisely.sly_logger import logger
 
-from src.exceptions import BadSettingsError
+from src.exceptions import BadSettingsError, WrongGeometryError
 from src.compute.Layer import Layer
 
 
@@ -27,19 +28,16 @@ class BitwiseMasksLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
-    def find_mask_class(self, labels: List[Label], class_mask_name):
+    def find_mask_labels(self, labels: List[Label], class_mask_name):
+        mask_labels = []
         for label in labels:
             if label.obj_class.name == class_mask_name:
-                if not isinstance(label.geometry, Bitmap):
-                    raise RuntimeError(
-                        "Class <{}> must be a Bitmap in bitwise_masks layer.".format(
-                            class_mask_name
-                        )
-                    )
-                return label
+                if isinstance(label.geometry, Bitmap):
+                    mask_labels.append(label)
+        return mask_labels
 
     def bitwise_ops(self, type):
         ops = {
@@ -59,9 +57,20 @@ class BitwiseMasksLayer(Layer):
         bitwise_type = self.settings["type"]
         class_mask_name = self.settings["class_mask"]
 
-        mask_label = self.find_mask_class(ann.labels, class_mask_name)
+        mask_labels = self.find_mask_labels(ann.labels, class_mask_name)
 
-        if mask_label is not None:
+        if len(mask_labels) == 0:
+            extra = {
+                "layer_config": self.config,
+                "project_name": data_el[0].get_pr_name(),
+                "ds_name": data_el[0].get_ds_name(),
+                "image_name": data_el[0].get_img_name(),
+            }
+            logger.warn(
+                "Image was skipped because mask labels not found",
+                extra=extra,
+            )
+        for mask_label in mask_labels:
             target_origin, target_mask = mask_label.geometry.origin, mask_label.geometry.data
             full_target_mask = np.full(imsize, False, bool)
 
@@ -78,10 +87,18 @@ class BitwiseMasksLayer(Layer):
                     or label.obj_class.name == class_mask_name
                 ):
                     new_labels.append(label)
+                elif not isinstance(label.geometry, Bitmap):
+                    new_labels.append(label)
+                    logger.info(
+                        f"Label {label.obj_class.name} has geometry {label.geometry.geometry_name} and will be skipped. Allowed only Bitmap geometry",
+                        extra={
+                            "layer_config": self.config,
+                            "project_name": data_el[0].get_pr_name(),
+                            "ds_name": data_el[0].get_ds_name(),
+                            "image_name": data_el[0].get_img_name(),
+                        },
+                    )
                 else:
-                    if not isinstance(label.geometry, Bitmap):
-                        raise RuntimeError("Input class must be a Bitmap in bitwise_masks layer.")
-
                     origin, mask = label.geometry.origin, label.geometry.data
                     full_size_mask = np.full(imsize, False, bool)
                     full_size_mask[

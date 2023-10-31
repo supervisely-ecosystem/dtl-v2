@@ -1,5 +1,5 @@
 from typing import Optional, Union, List
-from supervisely.app.widgets import Widget, NotificationBox
+from supervisely.app.widgets import Widget, NotificationBox, Button, generate_id
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app import DataJson, StateJson
 
@@ -49,6 +49,33 @@ class ClassesMapping(Widget):
             )
         self.empty_notification = empty_notification
         self._classes = classes
+
+        self._select_all_btn = Button()
+        self._deselect_all_btn = Button()
+
+        self._select_all_btn = Button(
+            "Select all",
+            button_type="text",
+            show_loading=False,
+            icon="zmdi zmdi-check-all",
+            widget_id=generate_id(),
+        )
+        self._deselect_all_btn = Button(
+            "Deselect all",
+            button_type="text",
+            show_loading=False,
+            icon="zmdi zmdi-square-o",
+            widget_id=generate_id(),
+        )
+
+        @self._select_all_btn.click
+        def _select_all_btn_clicked():
+            self.select_all()
+
+        @self._deselect_all_btn.click
+        def _deselect_all_btn_clicked():
+            self.deselect_all()
+
         super().__init__(widget_id=widget_id, file_path=__file__)
 
     def get_json_data(self):
@@ -70,6 +97,7 @@ class ClassesMapping(Widget):
                     "value": cls.name,
                     "default": True,
                     "ignore": False,
+                    "selected": False,
                 }
                 for cls in self._classes
             ]
@@ -88,6 +116,7 @@ class ClassesMapping(Widget):
                     "value": cls.name,
                     "default": False,
                     "ignore": True,
+                    "selected": False,
                 },
             )
             new_mapping_values.append(value)
@@ -102,7 +131,11 @@ class ClassesMapping(Widget):
         if len(classes_values) != len(self._classes):
             self.update_state()
             return self.get_mapping()
-        mapping = {cls.name: classes_values[idx] for idx, cls in enumerate(self._classes)}
+        mapping = {
+            cls.name: classes_values[idx]
+            for idx, cls in enumerate(self._classes)
+            if classes_values[idx]["selected"]
+        }
         return mapping
 
     def ignore(self, indexes: List[int]):
@@ -124,10 +157,35 @@ class ClassesMapping(Widget):
             new_value = mapping.get(cls.name, cur_value)
             new_mapping_values.append(
                 {
-                    "value": new_value,
+                    "value": new_value if new_value != "" else cls.name,
                     "default": new_value == cls.name,
                     "ignore": new_value == "",
+                    "selected": new_value != "",
                 }
             )
         StateJson()[self.widget_id]["classes_values"] = new_mapping_values
+        StateJson().send_changes()
+
+    def select_all(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: dict
+        for value in classes_values:
+            value["selected"] = True
+        StateJson()[self.widget_id]["classes_values"] = classes_values
+        StateJson().send_changes()
+
+    def deselect_all(self):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: dict
+        for value in classes_values:
+            value["selected"] = False
+        StateJson()[self.widget_id]["classes_values"] = classes_values
+        StateJson().send_changes()
+
+    def select(self, classes):
+        classes_values = StateJson()[self.widget_id]["classes_values"]
+        classes_values: list
+        for idx, cls in enumerate(self._classes):
+            classes_values[idx]["selected"] = cls.name in classes
+        StateJson()[self.widget_id]["classes_values"] = classes_values
         StateJson().send_changes()

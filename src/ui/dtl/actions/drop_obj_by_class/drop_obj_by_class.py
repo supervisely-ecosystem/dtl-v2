@@ -1,9 +1,8 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Field
 from supervisely import ProjectMeta
 
 from src.ui.dtl import AnnotationAction
@@ -16,6 +15,10 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -24,36 +27,34 @@ class DropByClassAction(AnnotationAction):
     name = "drop_obj_by_class"
     title = "Drop by Class"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_obj_by_class"
-    description = "This layer (drop_obj_by_class) simply removes annotations of specified classes. You can also use data layer and map unnecessary classes to __ignore__."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Removes annotations of specified classes."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_save_btn = create_save_btn()
+        classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select classes for which all objects will be removed",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

@@ -1,9 +1,7 @@
 from typing import Optional
+from os.path import realpath, dirname
 import copy
-import os
-from pathlib import Path
-
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, InputNumber, Field
 from supervisely import ProjectMeta
 from supervisely import Polygon, Polyline, AnyGeometry
 
@@ -18,6 +16,10 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 
 
@@ -27,36 +29,34 @@ class ApproxVectorAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/approx_vector"
     )
-    description = "This layer (approx_vector) approximates vector figures: lines and polygons. The operation decreases number of vertices with Douglas-Peucker algorithm."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Approximates vector figures: lines and polygons."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_save_btn = create_save_btn()
+        classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select the classes for which the transformation will be applied",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -69,8 +69,11 @@ class ApproxVectorAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        epsilon_text = Text("Epsilon", status="text", font_size=get_text_font_size())
+        episilon_input = InputNumber(value=3, min=1, step=1, controls=True, size="small")
+
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -111,6 +114,11 @@ class ApproxVectorAction(AnnotationAction):
                 saved_classes_settings, obj_classes
             )
 
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
+
             # update settings preview
             _set_classes_list_preview()
 
@@ -118,21 +126,30 @@ class ApproxVectorAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes = saved_classes_settings
+            if classes == "default":
+                classes = [cls.name for cls in classes_list_widget.get_all_classes()]
             return {
-                "classes": saved_classes_settings,
-                "epsilon": options_json["epsilon"],
+                "classes": classes,
+                "epsilon": episilon_input.get_value(),
             }
 
         def _set_settings_from_json(settings: dict):
+            nonlocal saved_classes_settings
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", [])
+            classes_list_settings = settings.get("classes", saved_classes_settings)
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            _save_classes_list_settings()
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
+
+            epsilon_val = settings.get("epsilon", 3)
+            episilon_input.value = epsilon_val
+
             classes_list_widget.loading = False
 
         @classes_list_save_btn.click
@@ -152,9 +169,6 @@ class ApproxVectorAction(AnnotationAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            epsilon_val = settings.get("epsilon", 3)
-            if epsilon_val < 1:
-                raise ValueError("Epsilon must be greater than 0")
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Classes",
@@ -172,13 +186,11 @@ class ApproxVectorAction(AnnotationAction):
                 ),
                 NodesFlow.Node.Option(
                     name="epsilon_text",
-                    option_component=NodesFlow.TextOptionComponent("Epsilon"),
+                    option_component=NodesFlow.WidgetOptionComponent(epsilon_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="epsilon",
-                    option_component=NodesFlow.IntegerOptionComponent(
-                        min=1, default_value=epsilon_val
-                    ),
+                    name="episilon_input",
+                    option_component=NodesFlow.WidgetOptionComponent(episilon_input),
                 ),
             ]
             return {

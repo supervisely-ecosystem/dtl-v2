@@ -1,59 +1,47 @@
 from typing import Optional
-import os
-from pathlib import Path
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text
+from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text, Select
 from supervisely import ProjectMeta, TagMeta, Tag
 from supervisely.annotation.tag_meta import TagValueType
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag, TagMetasPreview
-from src.ui.dtl.utils import get_set_settings_button_style, get_set_settings_container
+from src.ui.dtl.utils import (
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    get_text_font_size,
+)
 
 
 class TagAction(AnnotationAction):
     name = "tag"
-    title = "Tag"
+    title = "Image Tag"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/tag"
-    description = "Tag layer (tag) adds or removes tags from images. Tags are used for several things, e.g. to split images by folders in save layers or to filter images by tag."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Add or remove tags from images."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
 
-        select_tag_meta = SelectTagMeta(project_meta=_current_meta)
         input_tag = InputTag(TagMeta(name="", value_type=TagValueType.NONE))
-        save_tag_btn = Button("Save", icon="zmdi zmdi-floppy")
-        input_tag_widgets_container = Container(widgets=[select_tag_meta, input_tag, save_tag_btn])
         tag_preview_meta = TagMetasPreview()
-        tag_preview_value = Text("")
-        rag_preview_widgets_container = Container(
-            widgets=[tag_preview_meta, tag_preview_value], gap=1
-        )
-        input_tag_edit_text = Text("Classes List")
-        input_tag_edit_btn = Button(
-            text="EDIT",
-            icon="zmdi zmdi-edit",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
-        input_tag_edit_container = get_set_settings_container(
-            input_tag_edit_text, input_tag_edit_btn
+        tag_preview_value = Text("", status="text", font_size=get_text_font_size())
+
+        input_tag_text = Text("Image Tag", status="text", font_size=get_text_font_size())
+        select_tag_meta = SelectTagMeta(project_meta=_current_meta, size="small")
+
+        action_text = Text("Action", status="text", font_size=get_text_font_size())
+        action_selector = Select(
+            [Select.Item("add", "Add to image"), Select.Item("delete", "Delete from image")],
+            size="small",
         )
 
         saved_tag_setting = None
-
         last_tag_meta = None
 
         @select_tag_meta.value_changed
@@ -62,6 +50,7 @@ class TagAction(AnnotationAction):
                 return
             input_tag.loading = True
             input_tag.set_tag_meta(tag_meta)
+            _save_tag()
             input_tag.loading = False
 
         def _get_tag_value():
@@ -96,26 +85,28 @@ class TagAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            return {"tag": saved_tag_setting, "action": options_json["Select Action"]}
+            return {"tag": saved_tag_setting, "action": action_selector.get_value()}
 
         def _set_settings_from_json(settings: dict):
-            if "tag" not in settings:
-                return
-            select_tag_meta.loading = True
-            input_tag.loading = True
-            if isinstance(settings["tag"], str):
-                tag_name = settings["tag"]
-                tag_value = None
-            else:
-                tag_name = settings["tag"]["name"]
-                tag_value = settings["tag"]["value"]
-            tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
-            select_tag_meta.set_name(tag_name)
-            input_tag.set_tag_meta(tag_meta)
-            input_tag.value = tag_value
-            select_tag_meta.loading = False
-            input_tag.loading = False
-            _save_tag()
+            if "tag" in settings:
+                select_tag_meta.loading = True
+                input_tag.loading = True
+                if isinstance(settings["tag"], str):
+                    tag_name = settings["tag"]
+                    tag_value = None
+                else:
+                    tag_name = settings["tag"]["name"]
+                    tag_value = settings["tag"]["value"]
+                tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
+                select_tag_meta.set_name(tag_name)
+                input_tag.set_tag_meta(tag_meta)
+                input_tag.value = tag_value
+                select_tag_meta.loading = False
+                input_tag.loading = False
+                _save_tag()
+            action = settings.get("action", None)
+            if action is not None:
+                action_selector.set_value(action)
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta
@@ -136,39 +127,24 @@ class TagAction(AnnotationAction):
 
             select_tag_meta.loading = False
 
-        save_tag_btn.click(_save_tag)
-
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            action_val = settings.get("action", "add")
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="Input Tag",
-                    option_component=NodesFlow.WidgetOptionComponent(
-                        widget=input_tag_edit_container,
-                        sidebar_component=NodesFlow.WidgetOptionComponent(
-                            input_tag_widgets_container
-                        ),
-                        sidebar_width=340,
-                    ),
+                    name="input_tag_text",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=input_tag_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="tag_preview",
-                    option_component=NodesFlow.WidgetOptionComponent(rag_preview_widgets_container),
+                    name="Input Tag",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=select_tag_meta),
                 ),
                 NodesFlow.Node.Option(
                     name="action_text",
-                    option_component=NodesFlow.TextOptionComponent("Action"),
+                    option_component=NodesFlow.WidgetOptionComponent(action_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="Select Action",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=[
-                            NodesFlow.SelectOptionComponent.Item("add", "Add"),
-                            NodesFlow.SelectOptionComponent.Item("delete", "Delete"),
-                        ],
-                        default_value=action_val,
-                    ),
+                    name="action_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(action_selector),
                 ),
             ]
             return {
@@ -183,4 +159,5 @@ class TagAction(AnnotationAction):
             create_options=create_options,
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
+            need_preview=False,
         )

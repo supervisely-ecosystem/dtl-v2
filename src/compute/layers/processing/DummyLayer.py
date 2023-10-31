@@ -4,17 +4,12 @@ from src.compute.Layer import Layer
 
 
 class DummyLayer(Layer):
-    action = 'dummy'
+    action = "dummy"
 
-    layer_settings = {
-        "required": ["settings"],
-        "properties": {
-            "settings": {}
-        }
-    }
+    layer_settings = {"required": ["settings"], "properties": {"settings": {}}}
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def process(self, data_el):
         yield data_el

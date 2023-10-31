@@ -1,3 +1,4 @@
+import random
 from typing import Callable, List, Optional, Tuple, Union
 from collections import namedtuple
 import json
@@ -23,37 +24,9 @@ LegacyProjectItem = namedtuple(
 )
 
 
-def download_data(
-    project_name: str,
-    dataset_names: Union[str, None],
-    progress_cb: Optional[Union[tqdm, Callable]] = None,
-):
-    """
-    Download Project and Datasets from Supervisely to local storage
-    :param project_name: name of project to download
-    :param dataset_names: name of datasets to download. If None, download all datasets
-    :param progress_cb: progress callback
-    """
-    project_info = get_project_by_name(project_name)
-    if project_info is None:
-        raise RuntimeError(f"Project {project_name} not found")
-    if dataset_names is None:
-        datasets_ids = [ds.id for ds in g.api.dataset.get_list(project_info.id)]
-    else:
-        datasets_ids = []
-        for dataset_name in dataset_names:
-            dataset_info = get_dataset_by_name(dataset_name, project_info.id)
-            if dataset_info is None:
-                raise RuntimeError(f"Dataset {dataset_name} not found in project {project_name}")
-            datasets_ids.append(dataset_info.id)
-    sly.download_project(
-        g.api,
-        project_info.id,
-        f"{g.DATA_DIR}/{project_name}",
-        dataset_ids=datasets_ids,
-        progress_cb=progress_cb,
-        save_images=True,
-    )
+def get_random_image(dataset_id: int):
+    images = g.api.image.get_list(dataset_id)
+    return random.choice(images)
 
 
 def download_preview(project_name, dataset_name) -> Tuple[str, str]:
@@ -70,7 +43,7 @@ def download_preview(project_name, dataset_name) -> Tuple[str, str]:
     preview_project_path = f"{g.PREVIEW_DIR}/{project_name}"
     preview_dataset_path = f"{preview_project_path}/{dataset_name}"
     ensure_dir(preview_dataset_path)
-    image_id = g.api.image.get_list(dataset_info.id, limit=1)[0].id
+    image_id = get_random_image(dataset_info.id).id
     preview_img_path = f"{preview_dataset_path}/preview_image.jpg"
     g.api.image.download(image_id, preview_img_path)
     ann_json = g.api.annotation.download_json(image_id)
@@ -160,7 +133,7 @@ def merge_input_metas(input_metas: List[sly.ProjectMeta]) -> sly.ProjectMeta:
                 full_input_meta = full_input_meta.add_obj_class(inp_obj_class)
             elif existing_obj_class.geometry_type != inp_obj_class.geometry_type:
                 raise RuntimeError(
-                    f"Trying to add new class ({inp_obj_class.name}) with shape ({inp_obj_class.geometry_type.geometry_name()}). Same class with different shape ({existing_obj_class.geometry_type.geometry_name()}) exists."
+                    f"When trying to add a new class '{inp_obj_class.name}' with shape type ({inp_obj_class.geometry_type.geometry_name()}), it is found that a class with the same name and a different shape type ({existing_obj_class.geometry_type.geometry_name()}) exists."
                 )
         for inp_tag_meta in inp_meta.tag_metas:
             existing_tag_meta = full_input_meta.tag_metas.get(inp_tag_meta.name, None)
@@ -168,7 +141,7 @@ def merge_input_metas(input_metas: List[sly.ProjectMeta]) -> sly.ProjectMeta:
                 full_input_meta = full_input_meta.add_tag_meta(inp_tag_meta)
             elif not existing_tag_meta.is_compatible(inp_tag_meta):
                 raise RuntimeError(
-                    f"Trying to add new tag ({inp_tag_meta.name}) with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}). Same tag with different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
+                    f"When trying to add a new tag '{inp_tag_meta.name}' with type ({inp_tag_meta.value_type}) and possible values ({inp_tag_meta.possible_values}), it is found that a tag with the same name and a different type ({existing_tag_meta.value_type}) or possible values ({existing_tag_meta.possible_values}) exists."
                 )
     return full_input_meta
 
@@ -256,3 +229,14 @@ def update_project_info(project_info: sly.ProjectInfo):
     updated = g.api.project.get_info_by_id(project_info.id)
     g.cache["project_info"][project_info.id] = updated
     return updated
+
+
+def clean_static_dir(static_dir):
+    ignore_dir = "css"
+    for item in os.listdir(static_dir):
+        item_path = os.path.join(static_dir, item)
+        if os.path.isdir(item_path):
+            if item != ignore_dir:
+                shutil.rmtree(item_path)
+        else:
+            os.remove(item_path)

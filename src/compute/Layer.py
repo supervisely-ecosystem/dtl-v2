@@ -77,8 +77,9 @@ class Layer:
 
     actions_mapping = {}
 
-    def __init__(self, config):
+    def __init__(self, config, net=None):
         self._config = deepcopy(config)
+        self.net = net
 
         self.srcs = maybe_wrap_in_list(config["src"])
         self.dsts = maybe_wrap_in_list(config["dst"])
@@ -216,9 +217,6 @@ class Layer:
                                         "new_class": inp_obj_class.to_json(),
                                     },
                                 )
-                                raise RuntimeError(
-                                    f"Trying to add new class ({new_name}) with shape ({new_shape}). Same class with different shape ({existing_cls.geometry_type.geometry_name()}) exists."
-                                )
                         else:
                             res_meta = res_meta.add_obj_class(inp_obj_class)
 
@@ -228,6 +226,8 @@ class Layer:
                         raise RuntimeError("Internal class mapping error in layer (CLONE spec).")
 
                     for src_title, dst_title in dst_class.items():
+                        if src_title == "__other__":
+                            continue
                         real_src_cls = res_meta.obj_classes.get(src_title, None)
                         if real_src_cls is None:
                             raise CreateMetaError(
@@ -270,6 +270,10 @@ class Layer:
 
                 # smth -> __default__
                 elif dst_class == ClassConstants.DEFAULT:
+                    pass
+
+                # smth -> __clone__
+                elif dst_class == ClassConstants.CLONE:
                     pass
 
                 # smth -> __ignore__

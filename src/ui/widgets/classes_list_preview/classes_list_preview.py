@@ -2,7 +2,7 @@ from typing import Optional, Union, List
 
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app import StateJson
-from supervisely.app.widgets import Widget
+from supervisely.app.widgets import Widget, ObjectClassView
 
 
 class ClassesListPreview(Widget):
@@ -22,10 +22,10 @@ class ClassesListPreview(Widget):
         }
 
     def get_json_state(self):
-        return {"classes": [cls.to_json() for cls in self._classes]}
+        return {"classes": [cls for cls in self._classes]}
 
     def set(self, classes: Union[List[ObjClass], ObjClassCollection]):
-        self._classes = classes
+        self._classes = [ObjectClassView(cls, True, True).get_json_data() for cls in classes]
         StateJson()[self.widget_id] = self.get_json_state()
         StateJson().send_changes()
 

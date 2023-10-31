@@ -1,9 +1,8 @@
 import copy
-import os
-from pathlib import Path
 from typing import Optional
+from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text
+from supervisely.app.widgets import NodesFlow, Button, Container, Flexbox, Text, Select, Field
 from supervisely import ProjectMeta, Bitmap, AnyGeometry
 
 from src.ui.dtl.Action import AnnotationAction
@@ -16,6 +15,10 @@ from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_layer_docs,
+    create_save_btn,
+    create_set_default_btn,
+    get_text_font_size,
 )
 import src.globals as g
 
@@ -26,36 +29,34 @@ class SkeletonizeAction(AnnotationAction):
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/skeletonize"
     )
-    description = "This layer (skeletonize) extracts skeletons from bitmap figures."
-
-    md_description = ""
-    for p in ("readme.md", "README.md"):
-        p = Path(os.path.realpath(__file__)).parent.joinpath(p)
-        if p.exists():
-            with open(p) as f:
-                md_description = f.read()
-            break
+    description = "Extracts skeletons from Bitmap."
+    md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         _current_meta = ProjectMeta()
         classes_list_widget = ClassesList(multiple=True)
         classes_list_preview = ClassesListPreview()
-        classes_list_save_btn = Button("Save", icon="zmdi zmdi-floppy")
-        classes_list_set_default_btn = Button("Set Default", icon="zmdi zmdi-refresh")
+        classes_list_save_btn = create_save_btn()
+        classes_list_set_default_btn = create_set_default_btn()
+        classes_list_widget_field = Field(
+            content=classes_list_widget,
+            title="Classes",
+            description="Select classes for which you want to extract skeletons",
+        )
         classes_list_widgets_container = Container(
             widgets=[
-                classes_list_widget,
+                classes_list_widget_field,
                 Flexbox(
                     widgets=[
                         classes_list_save_btn,
                         classes_list_set_default_btn,
                     ],
-                    gap=105,
+                    gap=110,
                 ),
             ]
         )
-        classes_list_edit_text = Text("Classes List")
+        classes_list_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
         classes_list_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -68,15 +69,20 @@ class SkeletonizeAction(AnnotationAction):
             classes_list_edit_text, classes_list_edit_btn
         )
 
-        saved_classes_settings = []
-        default_classes_settings = []
+        skeletonize_methods_text = Text(
+            "Operation type", status="text", font_size=get_text_font_size()
+        )
+        skeletonize_methods_selector = Select(
+            [
+                Select.Item("skeletonization", "Skeletonization"),
+                Select.Item("medial_axis", "Medial axis"),
+                Select.Item("thinning", "Thinning"),
+            ],
+            size="small",
+        )
 
-        methods = [
-            ("skeletonization", "Skeletonization"),
-            ("medial_axis", "Medial axis"),
-            ("thinning", "Thinning"),
-        ]
-        items = [NodesFlow.SelectOptionComponent.Item(*method) for method in methods]
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -117,6 +123,11 @@ class SkeletonizeAction(AnnotationAction):
                 saved_classes_settings, obj_classes
             )
 
+            classes_names = saved_classes_settings
+            if classes_names == "default":
+                classes_names = [cls.name for cls in obj_classes]
+            classes_list_widget.select(classes_names)
+
             # update settings preview
             _set_classes_list_preview()
 
@@ -124,22 +135,30 @@ class SkeletonizeAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
+            classes = saved_classes_settings
+            if saved_classes_settings == "default":
+                classes = _get_classes_list_value()
             return {
-                "classes": saved_classes_settings,
-                "method": options_json["method"],
+                "classes": classes,
+                "method": skeletonize_methods_selector.get_value(),
             }
 
         def _set_settings_from_json(settings: dict):
             classes_list_widget.loading = True
-            classes_list_settings = settings.get("classes", [])
+            classes_list_settings = settings.get("classes", default_classes_settings)
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_list_widget, settings=classes_list_settings
             )
             # save settings
-            _save_classes_list_settings()
+            if classes_list_settings != "default":
+                _save_classes_list_settings()
             # update settings preview
             _set_classes_list_preview()
             classes_list_widget.loading = False
+
+            method = settings.get("method", None)
+            if method is not None:
+                skeletonize_methods_selector.set_value(method)
 
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
@@ -175,14 +194,12 @@ class SkeletonizeAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(classes_list_preview),
                 ),
                 NodesFlow.Node.Option(
-                    name="method_text",
-                    option_component=NodesFlow.TextOptionComponent("Method"),
+                    name="skeletonize_methods_text",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="method",
-                    option_component=NodesFlow.SelectOptionComponent(
-                        items=items, default_value=method_val
-                    ),
+                    name="skeletonize_methods_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(skeletonize_methods_selector),
                 ),
             ]
             return {

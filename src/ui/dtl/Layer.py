@@ -1,14 +1,18 @@
+import os
+import copy
 import time
 from typing import Optional
 import random
 
-from supervisely import Annotation
+from supervisely import Annotation, ProjectMeta
 from supervisely.app.widgets import (
     LabeledImage,
+    LabeledImage2,
     NodesFlow,
     Markdown,
     Button,
     Text,
+    Container,
 )
 from supervisely.imaging.image import write as write_image
 
@@ -31,7 +35,9 @@ class Layer:
         get_settings: Optional[callable] = None,
         get_dst: Optional[callable] = None,
         meta_changed_cb: Optional[callable] = None,
+        need_preview: bool = True,
         id: Optional[str] = None,
+        custom_update_btn: Button = None,
     ):
         self.action = action
         self.id = id
@@ -43,6 +49,7 @@ class Layer:
         self._get_src = get_src
         self._get_dst = get_dst
         self._meta_changed_cb = meta_changed_cb
+        self._need_preview = need_preview
 
         self._src = []
         self._settings = {}
@@ -58,42 +65,79 @@ class Layer:
         self._info_option = NodesFlow.Node.Option(
             name="sidebarNodeInfo",
             option_component=NodesFlow.SidebarNodeInfoOptionComponent(
-                sidebar_template=Markdown(md_description).to_html(),
+                sidebar_template=Markdown(md_description, show_border=False).to_html(),
                 sidebar_width=600,
             ),
         )
         # preview option
+        self._preview_img_path = f"{g.STATIC_DIR}/{self.id}.jpg"
         self._preview_img_url = f"static/{self.id}.jpg"
         self._ann = None
+        self._res_ann = None
         self._img_desc = None
-        self._preview_widget = LabeledImage(enable_zoom=True)
-        self._update_preview_button = Button(
-            text="Update",
-            icon="zmdi zmdi-refresh",
-            button_type="text",
-            button_size="small",
-            style=get_set_settings_button_style(),
+        self._res_img_desc = None
+        # self._preview_widget = LabeledImage(
+        #     enable_zoom=True, empty_message="Click update to show preview image with labels"
+        # )
+        self._preview_widget = LabeledImage2(enable_zoom=True, line_width=1)
+        self._preview_widget.hide()
+        self._empty_preview_text = Text("Click update to show preview image with labels")
+        _preview_container = Container(
+            widgets=[self._empty_preview_text, self._preview_widget], gap=0
         )
 
-        @self._update_preview_button.click
-        def _update_preview_btn_click_cb():
-            g.updater("nodes")
+        if self._need_preview:
+            if custom_update_btn is not None:
+                self._update_preview_button = custom_update_btn
+            else:
+                self._update_preview_button = Button(
+                    text="Update",
+                    icon="zmdi zmdi-refresh",
+                    button_type="text",
+                    button_size="small",
+                    style=get_set_settings_button_style(),
+                )
 
-        self._preview_options = [
-            # NodesFlow.Node.Option(
-            #     name="preview_text", option_component=NodesFlow.TextOptionComponent("Preview")
-            # ),
-            NodesFlow.Node.Option(
-                name="update_preview_btn",
-                option_component=NodesFlow.WidgetOptionComponent(
-                    widget=get_set_settings_container(Text("Preview"), self._update_preview_button)
+            if self.action.name == "data":
+                if not isinstance(self.output_meta, ProjectMeta):
+                    self._update_preview_button.disable()
+
+            @self._update_preview_button.click
+            def _update_preview_btn_click_cb():
+                g.updater(("nodes", self.id))
+
+        self._preview_options = []
+        if self._need_preview:
+            if self.action.name == "data":
+                preview_text = NodesFlow.Node.Option(
+                    name="update_preview_btn",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=get_set_settings_container(
+                            Text("Preview Random Image"), self._update_preview_button
+                        )
+                    ),
+                )
+            else:
+                preview_text = NodesFlow.Node.Option(
+                    name="update_preview_btn",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=get_set_settings_container(
+                            Text("Preview"), self._update_preview_button
+                        )
+                    ),
+                )
+
+            self._preview_options = [
+                preview_text,
+                # NodesFlow.Node.Option(
+                #     name="preview",
+                #     option_component=NodesFlow.WidgetOptionComponent(widget=_preview_container),
+                # ),
+                NodesFlow.Node.Option(
+                    name="preview",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=_preview_container),
                 ),
-            ),
-            NodesFlow.Node.Option(
-                name="preview",
-                option_component=NodesFlow.WidgetOptionComponent(widget=self._preview_widget),
-            ),
-        ]
+            ]
 
     def get_src(self) -> list:
         return self._src
@@ -110,7 +154,7 @@ class Layer:
             "action": self.action.name,
             "src": self._src,  # always list
             "dst": self._dst[0] if len(self._dst) == 1 else self._dst,  # can be str if only one dst
-            "settings": self._settings,
+            "settings": copy.deepcopy(self._settings),
         }
 
     def from_json(self, json_data: dict = {}) -> None:
@@ -177,25 +221,61 @@ class Layer:
         self._src.append(src_name)
 
     def clear_preview(self):
-        self._preview_widget.clean_up()
+        self._img_desc = None
+        self._ann = None
+        self._res_img_desc = None
+        self._res_ann = None
+        if self._need_preview:
+            self._preview_widget.clean_up()
+            self._preview_widget.hide()
+            self._empty_preview_text.show()
 
-    def get_preview_img_desc(self):
+    def set_src_img_desc(self, img_desc):
+        self._img_desc = img_desc
+
+    def set_src_ann(self, ann):
+        self._ann = ann
+
+    def get_src_img_desc(self):
         return self._img_desc
 
+    def get_src_ann(self):
+        return self._ann
+
+    def get_preview_img_desc(self):
+        if self._need_preview:
+            return self._res_img_desc
+
     def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
-        self._img_desc = img_desc
-        write_image(self._preview_img_url, img_desc.read_image())
-        self._ann = ann
+        if not self._need_preview:
+            return
+        self._res_img_desc = img_desc
+        write_image(self._preview_img_path, self._res_img_desc.read_image())
+        self._res_ann = ann
+        # self._preview_widget.set(
+        #     title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
+        # )
         self._preview_widget.set(
-            title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._ann
+            image_url=f"{self._preview_img_url}?{time.time()}",
+            ann=self._res_ann,
+            project_meta=self.output_meta,
         )
+        if self._preview_widget.is_empty():
+            self._preview_widget.hide()
+            self._empty_preview_text.show()
+        else:
+            self._preview_widget.show()
+            self._empty_preview_text.hide()
+        os.environ["_SUPERVISELY_OFFLINE_FILES_UPLOADED"] = "False"
 
     def set_preview_loading(self, val: bool):
+        if not self._need_preview:
+            return
         self._preview_widget.loading = val
         self._update_preview_button.loading = val
 
     def get_ann(self):
-        return self._ann
+        return self._res_ann
 
     def update_project_meta(self, project_meta):
         if self._meta_changed_cb is not None:

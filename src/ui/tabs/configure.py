@@ -8,16 +8,15 @@ from supervisely.app.widgets import (
     NodesFlow,
     Field,
     Text,
-    Empty,
     Sidebar,
     Input,
-    Draggable,
+    Markdown,
+    OneOf,
 )
 from supervisely.app import show_dialog
-from supervisely import ProjectMeta
 
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl import actions, actions_list
+from src.ui.dtl import actions_dict, actions_list
 from src.ui.dtl import SOURCE_ACTIONS
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -34,7 +33,7 @@ select_action_name = Select(
         Select.Group(
             group_name,
             items=[
-                Select.Item(action_name, actions[action_name].title)
+                Select.Item(action_name, actions_dict[action_name].title)
                 for action_name in group_actions
             ],
         )
@@ -57,7 +56,7 @@ context_menu_items = [
         {
             "label": group_name,
             "items": [
-                {"key": action_name, "label": actions[action_name].title}
+                {"key": action_name, "label": actions_dict[action_name].title}
                 for action_name in group_actions
             ],
             "divided": group_name == SOURCE_ACTIONS,
@@ -70,36 +69,32 @@ context_menu_items = [
 nodes_flow = NodesFlow(
     height="calc(100vh - 73px)",
     context_menu=context_menu_items,
-    color_theme="white",
+    color_theme="light",
     show_save=False,
 )
 
-
-# sidebar
-# add_specific_layer_buttons = {
-#     action_name: Button(
-#         "Add", icon="zmdi zmdi-plus", style="align-self: start;", button_size="small"
-#     )
-#     for _, group_actions in actions_list.items()
-#     for action_name in group_actions
-# }
-
-
-# def add_specific_layer_func_factory(action_name: str):
-#     def add_specific_layer_func():
-#         add_layer(action_name)
-
-#     return add_specific_layer_func
-
-
-# for action_name, button in add_specific_layer_buttons.items():
-#     button.click(add_specific_layer_func_factory(action_name))
+select_items = [
+    Select.Item(
+        value=action_name,
+        label=action_name,
+        content=Markdown(action.md_description, show_border=False),
+    )
+    for action_name, action in actions_dict.items()
+]
+select_widget = Select(items=select_items)
+oneof_widget = OneOf(conditional_widget=select_widget)
+dialog_widgets = Dialog(title="Node Documentation", content=oneof_widget)
 
 add_specific_layer_buttons = {
     action_name: LayerCard(
-        name=action.title, key=action_name, icon=action.icon, color=action.header_color
+        name=action.title,
+        key=action_name,
+        icon=action.icon,
+        dialog_widget=dialog_widgets,
+        selector_widget=select_widget,
+        color=action.header_color,
     )
-    for action_name, action in actions.items()
+    for action_name, action in actions_dict.items()
 }
 
 
@@ -113,26 +108,12 @@ def add_specific_layer_func_factory(action_name: str):
 for action_name, layer_card in add_specific_layer_buttons.items():
     layer_card.on_add_button(add_specific_layer_func_factory(action_name))
 
-filter_actions_input = Input(placeholder="Filter...")
+filter_actions_input = Input(placeholder="Start typing layer name...", icon="search")
 filter_actions_field = Field(content=filter_actions_input, title="Filter actions")
 
 left_sidebar_actions_widgets = {
     action_name: add_specific_layer_buttons[action_name]
-    # action_name: Draggable(
-    #     Flexbox(
-    #         widgets=[
-    #             Field(
-    #                 title=action.title,
-    #                 description=action.description,
-    #                 title_url=action.docs_url,
-    #                 content=Empty(),
-    #             ),
-    #             add_specific_layer_buttons[action_name],
-    #         ]
-    #     ),
-    #     key=action_name,
-    # )
-    for action_name, action in actions.items()
+    for action_name, action in actions_dict.items()
 }
 
 left_sidebar_groups_widgets = {
@@ -164,7 +145,7 @@ sidebar = Sidebar(
     height="calc(100vh - 53px)",
 )
 
-layout = Container(widgets=[add_layer_dialog, sidebar], gap=0)
+layout = Container(widgets=[dialog_widgets, add_layer_dialog, sidebar], gap=0)
 
 
 @handle_exception
@@ -200,7 +181,6 @@ def context_menu_clicked_cb(item):
 
 @nodes_flow.item_dropped
 def item_dropped_cb(item):
-    print(item)
     position = item["position"]
     g.context_menu_position = position
     action_name = item["item"]["key"]
@@ -236,7 +216,7 @@ def filter(value):
             for action_name in group_actions:
                 if (
                     action_name.lower().find(value) == -1
-                    and actions[action_name].title.lower().find(value) == -1
+                    and actions_dict[action_name].title.lower().find(value) == -1
                 ):
                     left_sidebar_actions_widgets[action_name].hide()
                 else:
@@ -249,50 +229,59 @@ def filter(value):
 
 
 @handle_exception
-def update_nodes():
+def update_nodes(layer_id: str = None):
     try:
-        for layer in g.layers.values():
-            layer.set_preview_loading(True)
+        if layer_id is None:
+            for layer in g.layers.values():
+                layer.set_preview_loading(True)
 
-        edges = nodes_flow.get_edges_json()
-        nodes_state = nodes_flow.get_nodes_state_json()
+            edges = nodes_flow.get_edges_json()
+            nodes_state = nodes_flow.get_nodes_state_json()
 
-        # Init layers data
-        layers_ids = ui_utils.init_layers(nodes_state)
-        data_layers_ids = layers_ids["data_layers_ids"]
-        all_layers_ids = layers_ids["all_layers_ids"]
+            # Init layers data
+            layers_ids = ui_utils.init_layers(nodes_state)
+            data_layers_ids = layers_ids["data_layers_ids"]
+            all_layers_ids = layers_ids["all_layers_ids"]
 
-        # Call meta changed callbacks for Data layers
-        for layer_id in data_layers_ids:
+            # Init sources
+            ui_utils.init_src(edges)
+
+            utils.delete_results_dir()
+            utils.create_results_dir()
+            dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+            net = Net(dtl_json, g.RESULTS_DIR)
+            net.preview_mode = True
+
+            # Load preview for data layers
+            utils.delete_preview_dir()
+            utils.create_preview_dir()
+
+            # Update preview
+            ui_utils.update_all_previews(net, data_layers_ids, all_layers_ids)
+
+        else:
             layer = g.layers[layer_id]
             layer: Layer
-            src = layer.get_src()
-            layer_input_meta = ProjectMeta()
-            if src:
-                project_name, _ = src[0].split("/")
-                layer_input_meta = utils.get_project_meta(
-                    utils.get_project_by_name(project_name).id
-                )
-            layer.update_project_meta(layer_input_meta)
+            layer.set_preview_loading(True)
 
-        # Init sources
-        ui_utils.init_src(edges)
+            edges = nodes_flow.get_edges_json()
+            nodes_state = nodes_flow.get_nodes_state_json()
 
-        # Calculate output metas for all layers
-        utils.delete_results_dir()
-        utils.create_results_dir()
-        dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-        net = Net(dtl_json, g.RESULTS_DIR)
-        net.preview_mode = True
-        net = ui_utils.init_output_metas(net, all_layers_ids, nodes_state, edges)
+            # Init layers data
+            layers_ids = ui_utils.init_layers(nodes_state)
+            data_layers_ids = layers_ids["data_layers_ids"]
+            all_layers_ids = layers_ids["all_layers_ids"]
 
-        # Load preview for data layers
-        utils.delete_preview_dir()
-        utils.create_preview_dir()
-        ui_utils.set_preview(data_layers_ids)
+            # Init sources
+            ui_utils.init_src(edges)
 
-        # Update preview
-        ui_utils.update_previews(net, data_layers_ids, all_layers_ids)
+            utils.delete_results_dir()
+            utils.create_results_dir()
+            dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+            net = Net(dtl_json, g.RESULTS_DIR)
+            net.preview_mode = True
+
+            ui_utils.update_preview(net, data_layers_ids, all_layers_ids, layer_id)
 
     except CustomException as e:
         ui_utils.show_error("Error updating nodes", e)
@@ -318,19 +307,6 @@ def update_metas():
         all_layers_ids = layers_ids["all_layers_ids"]
         data_layers_ids = layers_ids["data_layers_ids"]
 
-        # Call meta changed callbacks for Data layers
-        for layer_id in data_layers_ids:
-            layer = g.layers[layer_id]
-            layer: Layer
-            src = layer.get_src()
-            layer_input_meta = ProjectMeta()
-            if src:
-                project_name, _ = src[0].split("/")
-                layer_input_meta = utils.get_project_meta(
-                    utils.get_project_by_name(project_name).id
-                )
-            layer.update_project_meta(layer_input_meta)
-
         # Init sources
         ui_utils.init_src(edges)
 
@@ -340,7 +316,7 @@ def update_metas():
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR)
         net.preview_mode = True
-        ui_utils.init_output_metas(net, all_layers_ids, nodes_state, edges)
+        ui_utils.init_output_metas(net, data_layers_ids, all_layers_ids, nodes_state, edges)
 
     except CustomException as e:
         ui_utils.show_error("Error updating nodes", e)
@@ -353,7 +329,7 @@ def update_metas():
 
 
 def update_nodes_cb():
-    g.updater("nodes")
+    g.updater(("nodes", None))
 
 
 def update_metas_cb():

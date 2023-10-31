@@ -30,12 +30,13 @@ class DuplicateObjectsLayer(Layer):
         },
     }
 
-    def __init__(self, config):
-        Layer.__init__(self, config)
+    def __init__(self, config, net):
+        Layer.__init__(self, config, net=net)
 
     def define_classes_mapping(self):
         self.cls_mapping[ClassConstants.CLONE] = self.settings["classes_mapping"]
-        self.cls_mapping[ClassConstants.OTHER] = ClassConstants.IGNORE
+        self.cls_mapping[ClassConstants.OTHER] = ClassConstants.CLONE
+        # self.cls_mapping[ClassConstants.OTHER] = ClassConstants.IGNORE
 
     def class_mapper(self, label: Label):
         curr_class = label.obj_class.name
@@ -47,7 +48,7 @@ class DuplicateObjectsLayer(Layer):
         else:
             raise BadSettingsError("Can not find mapping for class", extra={"class": curr_class})
 
-        if new_class == ClassConstants.IGNORE:
+        if new_class == ClassConstants.IGNORE or new_class == ClassConstants.CLONE:
             return [label]  # don't change
         elif new_class == ClassConstants.DEFAULT:
             return [label, label]  # copy object

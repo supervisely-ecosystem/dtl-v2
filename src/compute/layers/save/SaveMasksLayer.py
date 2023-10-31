@@ -70,10 +70,9 @@ class SaveMasksLayer(Layer):
         return comb_img
 
     def __init__(self, config, output_folder, net):
-        Layer.__init__(self, config)
+        Layer.__init__(self, config, net=net)
 
         self.output_folder = output_folder
-        self.net = net
 
     def is_archive(self):
         return True
@@ -119,6 +118,10 @@ class SaveMasksLayer(Layer):
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         dst = self.dsts[0]
+        if len(self.dsts) == 0:
+            raise GraphError(
+                "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            )
         self.out_project = sly.Project(
             directory=f"{self.output_folder}/{dst}", mode=sly.OpenMode.CREATE
         )
