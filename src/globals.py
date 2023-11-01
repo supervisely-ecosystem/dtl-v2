@@ -3,7 +3,7 @@ import queue
 from dotenv import load_dotenv
 
 import supervisely as sly
-from supervisely.app.widgets import Dialog, Text, Editor, Container, Button, Flexbox
+from supervisely.app.widgets import Dialog, Text, Editor, Container, Button, Flexbox, Checkbox
 
 
 load_dotenv("local.env")
@@ -84,6 +84,12 @@ error_dialog = Dialog(
     ),
     size="tiny",
 )
+
+# Auto-connect to node
+# uncomment to work:
+# src/ui/ui.py line 28
+# src/ui/tabs/configure.py line 158-176
+# connect_node_checkbox = Checkbox("Auto-connect to node", checked=False)
 
 
 @error_close_btn.click

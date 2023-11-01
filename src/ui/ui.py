@@ -1,4 +1,4 @@
-from supervisely.app.widgets import Container, Flexbox, Button, Dialog
+from supervisely.app.widgets import Container, Flexbox, Button, Dialog, Empty
 
 from src.ui.tabs.configure import layout as configure_tab_layout
 from src.ui.tabs.presets import (
@@ -19,8 +19,14 @@ load_button = Button(
     button_size="large",
     button_type="text",
 )
+
 header = Flexbox(
-    widgets=[Flexbox([show_run_dialog_btn, circle_progress]), save_button, load_button],
+    widgets=[
+        Flexbox([show_run_dialog_btn, circle_progress]),
+        save_button,
+        load_button,
+        # Container([Empty(style="padding: 4px;"), connect_node_checkbox]),
+    ],
     gap=15,
 )
 layout = Container(

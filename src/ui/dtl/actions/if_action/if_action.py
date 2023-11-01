@@ -68,10 +68,10 @@ class IfAction(OtherAction):
         _current_meta = ProjectMeta()
 
         # probability
-        _prob_input = InputNumber(min=0, max=100, precision=3)
+        _prob_input = InputNumber(value=20, min=0, max=100, precision=3)
         _probability_condition_widget = Field(
             title="Probability",
-            description="Input probability in percents",
+            description="Set probability percentage to split data",
             content=_prob_input,
         )
 
@@ -100,7 +100,7 @@ class IfAction(OtherAction):
         _min_objects_count_input = InputNumber(min=0, max=None)
         _min_objects_count_condition_widget = Field(
             title="Min objects count",
-            description="Input min objects count",
+            description="Set minimum objects count on the image to split data. Images with objects count less than specified will be sent to the 'False' output",
             content=_min_objects_count_input,
         )
 
@@ -128,7 +128,7 @@ class IfAction(OtherAction):
         _min_height_input = InputNumber(min=0, max=None)
         _min_height_condition_widget = Field(
             title="Min height",
-            description="Input min height",
+            description="Set minimum image height to split data. Images with height less than specified will be sent to the 'False' output",
             content=_min_height_input,
         )
 
@@ -152,11 +152,11 @@ class IfAction(OtherAction):
 
         # tags
         _select_tags_input = SelectTagMeta(
-            project_meta=ProjectMeta(), multiselect=True, size="small"
+            project_meta=ProjectMeta(), multiselect=True, show_label=False, size="small"
         )
         _select_tags_widget = Field(
-            title="Tags",
-            description="Select tags",
+            title="Include Tags",
+            description="Select one or more tags that are assigned to image to split data. Images with selected tags will be sent to the 'True' output, others to the 'False' output",
             content=_select_tags_input,
         )
 
@@ -194,7 +194,7 @@ class IfAction(OtherAction):
         _include_classes_input = ClassesList(multiple=True)
         _include_classes_widget = Field(
             title="Include classes",
-            description="Select the classes that will be the criteria for splitting the data",
+            description="Select one or more classes to split data. Images with selected classes will be sent to the 'True' output, others to the 'False' output",
             content=_include_classes_input,
         )
 
@@ -223,60 +223,60 @@ class IfAction(OtherAction):
         )
 
         # name in range
-        _names_in_range_inputs = {
-            "name_from": Input(size="small"),
-            "name_to": Input(size="small"),
-            "step": InputNumber(value=1, min=1, max=None),
-        }
-        _names_in_range_widget = Field(
-            title="Name in range",
-            description="Input name in range",
-            content=Container(
-                widgets=[
-                    Field(title="Name from", content=_names_in_range_inputs["name_from"]),
-                    Field(title="Name to", content=_names_in_range_inputs["name_to"]),
-                    Field(title="Step", content=_names_in_range_inputs["step"]),
-                ]
-            ),
-        )
+        # _names_in_range_inputs = {
+        #     "name_from": Input(size="small"),
+        #     "name_to": Input(size="small"),
+        #     "step": InputNumber(value=1, min=1, max=None),
+        # }
+        # _names_in_range_widget = Field(
+        #     title="Name in range",
+        #     description="Input name in range",
+        #     content=Container(
+        #         widgets=[
+        #             Field(title="Name from", content=_names_in_range_inputs["name_from"]),
+        #             Field(title="Name to", content=_names_in_range_inputs["name_to"]),
+        #             Field(title="Step", content=_names_in_range_inputs["step"]),
+        #         ]
+        #     ),
+        # )
 
-        def _set_names_in_range_value(condition_json):
-            name_from, name_to = condition_json["name_in_range"]
-            _names_in_range_inputs["name_from"].set_value(name_from)
-            _names_in_range_inputs["name_to"].set_value(name_to)
-            _names_in_range_inputs["step"].value = condition_json["name_in_range"]["frame_step"]
+        # def _set_names_in_range_value(condition_json):
+        #     name_from, name_to = condition_json["name_in_range"]
+        #     _names_in_range_inputs["name_from"].set_value(name_from)
+        #     _names_in_range_inputs["name_to"].set_value(name_to)
+        #     _names_in_range_inputs["step"].value = condition_json["name_in_range"]["frame_step"]
 
-        def _get_names_in_range_value():
-            return {
-                "name_in_range": [
-                    _names_in_range_inputs["name_from"].get_value(),
-                    _names_in_range_inputs["name_to"].get_value(),
-                ],
-                "frame_step": _names_in_range_inputs["step"].get_value(),
-            }
+        # def _get_names_in_range_value():
+        #     return {
+        #         "name_in_range": [
+        #             _names_in_range_inputs["name_from"].get_value(),
+        #             _names_in_range_inputs["name_to"].get_value(),
+        #         ],
+        #         "frame_step": _names_in_range_inputs["step"].get_value(),
+        #     }
 
-        _names_in_range_preview_range = Text("", status="text", font_size=get_text_font_size())
-        _names_in_range_preview_step = Text("", status="text", font_size=get_text_font_size())
-        _names_in_range_preview_widget = Container(
-            widgets=[_names_in_range_preview_range, _names_in_range_preview_step], gap=1
-        )
+        # _names_in_range_preview_range = Text("", status="text", font_size=get_text_font_size())
+        # _names_in_range_preview_step = Text("", status="text", font_size=get_text_font_size())
+        # _names_in_range_preview_widget = Container(
+        #     widgets=[_names_in_range_preview_range, _names_in_range_preview_step], gap=1
+        # )
 
-        def _set_names_in_range_preview():
-            value = _get_names_in_range_value()
-            _names_in_range_preview_range.text = (
-                f"Name in range: from {value['name_in_range'][0]} to {value['name_in_range'][1]}"
-            )
-            _names_in_range_preview_step.text = f"Step: {value['frame_step']}"
+        # def _set_names_in_range_preview():
+        #     value = _get_names_in_range_value()
+        #     _names_in_range_preview_range.text = (
+        #         f"Name in range: from {value['name_in_range'][0]} to {value['name_in_range'][1]}"
+        #     )
+        #     _names_in_range_preview_step.text = f"Step: {value['frame_step']}"
 
-        names_in_range_condition = Condition(
-            name="name_in_range",
-            title="Name in range",
-            widget=_names_in_range_widget,
-            get_func=_get_names_in_range_value,
-            set_func=_set_names_in_range_value,
-            preview_widget=_names_in_range_preview_widget,
-            set_preview_func=_set_names_in_range_preview,
-        )
+        # names_in_range_condition = Condition(
+        #     name="name_in_range",
+        #     title="Name in range",
+        #     widget=_names_in_range_widget,
+        #     get_func=_get_names_in_range_value,
+        #     set_func=_set_names_in_range_value,
+        #     preview_widget=_names_in_range_preview_widget,
+        #     set_preview_func=_set_names_in_range_preview,
+        # )
 
         conditions = {
             condition.name: condition
@@ -286,7 +286,7 @@ class IfAction(OtherAction):
                 min_height_condition,
                 select_tags_condition,
                 select_classes_condition,
-                names_in_range_condition,
+                # names_in_range_condition,
             ]
         }
 
@@ -316,8 +316,12 @@ class IfAction(OtherAction):
 
         widget = Container(
             widgets=[
-                Field(title="Condition", content=select_condition),
-                Field(title="Condition value", content=condition_input),
+                Field(
+                    title="Condition",
+                    description="Select condition to filter data",
+                    content=select_condition,
+                ),
+                Field(title="Condition settings", content=condition_input),
                 save_settings_btn,
             ]
         )
@@ -357,12 +361,14 @@ class IfAction(OtherAction):
             _select_tags_input.loading = False
 
         def _set_settings_from_json(settings: dict):
-            if "condition" in settings:
-                condition_json = settings["condition"]
-                condition_name, _ = list(settings["condition"].items())[0]
-                condition = conditions[condition_name]
-                condition.set(condition_json)
-                _save_settings()
+            if not "condition" in settings:
+                settings = {"condition": {"probability": 0.2}}
+
+            condition_json = settings["condition"]
+            condition_name, _ = list(settings["condition"].items())[0]
+            condition = conditions[condition_name]
+            condition.set(condition_json)
+            _save_settings()
 
         save_settings_btn.click(_save_settings)
 

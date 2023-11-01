@@ -1,6 +1,6 @@
 <div align="center" markdown>
 
-# DTL
+# Data Nodes
   
 <p align="center">
   <a href="#Overview">Overview</a> •
@@ -14,7 +14,7 @@
 
 # Overview
 
-This application allows you to create and manage Data Transport Pipelines 
+This application allows you to create and manage Data transformation workflows.
 
 # How To Run
 
@@ -25,5 +25,3 @@ This application allows you to create and manage Data Transport Pipelines
 Once the app is started, new task appear in workspace tasks. Wait for the message `Application is started ...` and then press `Open` button.
 
 **Step 3:** Open the app.
-
-

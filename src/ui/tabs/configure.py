@@ -1,4 +1,6 @@
 import time
+
+# import random
 from supervisely.app.widgets import (
     Select,
     Container,
@@ -153,6 +155,27 @@ def add_layer(action_name: str, position: dict = None):
     try:
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
+
+        # if g.connect_node_checkbox.is_checked() and not layer.id.startswith("data_"):
+        #     nodes_state = nodes_flow.get_nodes_state_json()
+        #     if len(nodes_state) > 0:
+        #         layer_id = list(nodes_state)[-1]
+        #         edges = nodes_flow.get_edges_json()
+        #         edges.append(
+        #             {
+        #                 "id": random.randint(10000000000000, 99999999999999),
+        #                 "output": {
+        #                     "node": layer_id,
+        #                     "interface": "destination",
+        #                 },
+        #                 "input": {
+        #                     "node": layer.id,
+        #                     "interface": "source",
+        #                 },
+        #             }
+        #         )
+        #         nodes_flow.set_edges(edges)
+
         nodes_flow.add_node(node)
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)

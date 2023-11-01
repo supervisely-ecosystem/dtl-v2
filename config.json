@@ -5,6 +5,8 @@
 	"entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
 	"headless": false,
 	"docker_image": "supervisely/base-py-sdk:6.72.111",
+	"icon": "https://icons8.com/icon/13542/hierarchy",
+	"poster": "",
 	"context_menu": {
 		"target": ["images_project", "images_dataset", "ecosystem", "files_file"]
 	}
