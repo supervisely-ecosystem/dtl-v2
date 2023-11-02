@@ -21,8 +21,8 @@
 
 This application is a versatile tool designed for data transformation tasks (like filtering and augmentation). It allows you to create and manage Data transformation workflows by leveraging graphical nodes with settings.
 
-<details>
-<summary>Click to expand the list of available nodes</summary>
+<details open>
+<summary><b>Available nodes</b></summary>
 
 Input:
 
