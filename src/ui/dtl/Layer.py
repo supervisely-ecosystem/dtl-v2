@@ -112,7 +112,7 @@ class Layer:
                     name="update_preview_btn",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=get_set_settings_container(
-                            Text("Preview Random Image"), self._update_preview_button
+                            Text("Preview Random Image", font_size=13), self._update_preview_button
                         )
                     ),
                 )
