@@ -1,5 +1,7 @@
 <div align="center" markdown>
 
+<img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/73838fba-d57b-4405-9db5-80e3514f9983"/>
+
 # Data Nodes
   
 <p align="center">
