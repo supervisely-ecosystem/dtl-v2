@@ -380,6 +380,13 @@ class DataAction(SourceAction):
 
         @src_save_btn.click
         def src_save_btn_cb():
+            selected_dataset_ids = select_datasets.get_selected_ids()
+            if (
+                selected_dataset_ids is None
+                or len(selected_dataset_ids) == 0
+                or selected_dataset_ids[0] is None  # ?
+            ):
+                return
             _temp_info = _current_info
             _save_src()
             _set_src_preview()
