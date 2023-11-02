@@ -97,12 +97,10 @@ class DataAction(SourceAction):
         _current_meta = ProjectMeta()
 
         # add to sidebar when no project selected
-        empty_src_notification = NotificationBox(
-            title="No classes",
-            description="Choose datasets and ensure that source project have classes.",
-        )
-
-        empty_classes_in_project_notification = Text("", status="text")
+        # empty_src_notification = NotificationBox(
+        #     title="No classes",
+        #     description="Choose datasets and ensure that source project have classes.",
+        # )
 
         classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
