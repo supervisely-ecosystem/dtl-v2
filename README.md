@@ -26,60 +26,60 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 Input:
 
-- [Images Project](/src/ui/dtl/actions/data/README.md#images-project)
+- [Images Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/data/README.md#images-project)
 
 Pixel-level transformations:
 
-- [Blur](/src/ui/dtl/actions/blur/README.md#blur)
-- [Contrast Brightness](/src/ui/dtl/actions/contrast_brightness/README.md#contrast-and-brightness)
-- [Noise](/src/ui/dtl/actions/noise/README.md#noise)
+- [Blur](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/blur/README.md#blur)
+- [Contrast Brightness](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/contrast_brightness/README.md#contrast-and-brightness)
+- [Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/noise/README.md#noise)
 
 Spatial-level transformations:
 
-- [Crop](/src/ui/dtl/actions/crop/README.md#crop)
-- [Flip](/src/ui/dtl/actions/flip/README.md#flip)
-- [Instances Crop](/src/ui/dtl/actions/instances_crop/README.md#instances-crop)
-- [Multiply](/src/ui/dtl/actions/multiply/README.md#multiply)
-- [Resize](/src/ui/dtl/actions/resize/README.md#resize)
-- [Rotate](/src/ui/dtl/actions/rotate/README.md#rotate)
-- [Sliding Window](/src/ui/dtl/actions/sliding_window/README.md#sliding-window)
+- [Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/crop/README.md#crop)
+- [Flip](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/flip/README.md#flip)
+- [Instances Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/instances_crop/README.md#instances-crop)
+- [Multiply](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/multiply/README.md#multiply)
+- [Resize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/resize/README.md#resize)
+- [Rotate](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rotate/README.md#rotate)
+- [Sliding Window](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/sliding_window/README.md#sliding-window)
 
 Annotation-level transformations:
 
-- [Approx Vector](/src/ui/dtl/actions/approx_vector/README.md#approx-vector)
-- [Background](/src/ui/dtl/actions/background/README.md#background)
-- [BBox](/src/ui/dtl/actions/bbox/README.md#bounding-box)
-- [Mask to Lines](/src/ui/dtl/actions/bitmap2lines/README.md#mask-to-lines)
-- [Bbox to Polygon](/src/ui/dtl/actions/bbox2poly/README.md#bbox-to-polygon)
-- [Bitwise Masks](/src/ui/dtl/actions/bitwise_masks/README.md#bitwise-masks)
-- [Change Classes Colors](/src/ui/dtl/actions/color_class/README.md#change-classes-colors)
-- [Drop By Class](/src/ui/dtl/actions/drop_obj_by_class/README.md#drop-by-class)
-- [Drop Lines By Length](/src/ui/dtl/actions/drop_lines_by_length/README.md#drop-lines-by-length)
-- [Drop Noise](/src/ui/dtl/actions/drop_noise/README.md#drop-noise)
-- [Duplicate Objects](/src/ui/dtl/actions/duplicate_objects/README.md#duplicate-objects)
-- [Mask to Polygon](/src/ui/dtl/actions/find_contours/README.md#mask-to-polygon)
-- [Line to Mask](/src/ui/dtl/actions/line2bitmap/README.md#line-to-mask)
-- [Merge Masks](/src/ui/dtl/actions/merge_bitmaps/README.md#merge-masks)
-- [ObjectsFilter](/src/ui/dtl/actions/objects_filter/README.md#objects-filter)
-- [Polygon to Mask](/src/ui/dtl/actions/poly2bitmap/README.md#polygon-to-mask)
-- [Random Colors](/src/ui/dtl/actions/random_color/README.md#random_color)
-- [Rasterize](/src/ui/dtl/actions/rasterize/README.md#rasterize)
-- [Rename](/src/ui/dtl/actions/rename/README.md#rename)
-- [Skeletonize](/src/ui/dtl/actions/skeletonize/README.md#skeletonize)
-- [Split Masks](/src/ui/dtl/actions/split_masks/README.md#split-masks)
-- [Tag](/src/ui/dtl/actions/tag/README.md#tag)
+- [Approx Vector](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/approx_vector/README.md#approx-vector)
+- [Background](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/background/README.md#background)
+- [BBox](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/bbox/README.md#bounding-box)
+- [Mask to Lines](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/bitmap2lines/README.md#mask-to-lines)
+- [Bbox to Polygon](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/bbox2poly/README.md#bbox-to-polygon)
+- [Bitwise Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/bitwise_masks/README.md#bitwise-masks)
+- [Change Classes Colors](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/color_class/README.md#change-classes-colors)
+- [Drop By Class](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/drop_obj_by_class/README.md#drop-by-class)
+- [Drop Lines By Length](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/drop_lines_by_length/README.md#drop-lines-by-length)
+- [Drop Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/drop_noise/README.md#drop-noise)
+- [Duplicate Objects](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/duplicate_objects/README.md#duplicate-objects)
+- [Mask to Polygon](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/find_contours/README.md#mask-to-polygon)
+- [Line to Mask](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/line2bitmap/README.md#line-to-mask)
+- [Merge Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/merge_bitmaps/README.md#merge-masks)
+- [ObjectsFilter](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/objects_filter/README.md#objects-filter)
+- [Polygon to Mask](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/poly2bitmap/README.md#polygon-to-mask)
+- [Random Colors](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/random_color/README.md#random_color)
+- [Rasterize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rasterize/README.md#rasterize)
+- [Rename](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rename/README.md#rename)
+- [Skeletonize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/skeletonize/README.md#skeletonize)
+- [Split Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/split_masks/README.md#split-masks)
+- [Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/tag/README.md#tag)
 
 Other:
 
-- [Dataset](/src/ui/dtl/actions/dataset/README.md#dataset)
-- [Dummy](/src/ui/dtl/actions/dummy/README.md#dummy)
-- [If](/src/ui/dtl/actions/if_action/README.md#if-action)
+- [Dataset](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dataset/README.md#dataset)
+- [Dummy](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dummy/README.md#dummy)
+- [If](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/if_action/README.md#if-action)
 
 Output:
 
-- [Export Archive](/src/ui/dtl/actions/save/README.md#export-archive)
-- [Export Archive with Masks](/src/ui/dtl/actions/save_masks/README.md#export-archive-with-masks)
-- [New Project](/src/ui/dtl/actions/supervisely/README.md#new-project)
+- [Export Archive](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save/README.md#export-archive)
+- [Export Archive with Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save_masks/README.md#export-archive-with-masks)
+- [New Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/supervisely/README.md#new-project)
 
 </details>
 
