@@ -194,7 +194,12 @@ class IfAction(OtherAction):
         _include_classes_input = ClassesList(multiple=True)
         _include_classes_widget = Field(
             title="Include classes",
-            description="Select one or more classes to split data. Images with selected classes will be sent to the 'True' output, others to the 'False' output",
+            description=(
+                "Select one or more classes to split data. "
+                "Images that have at least one object of the selected classes "
+                "will go to the True output branch, "
+                "other images will go to the 'False' output branch"
+            ),
             content=_include_classes_input,
         )
 

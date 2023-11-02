@@ -274,7 +274,11 @@ class DataAction(SourceAction):
                 )
 
             if isinstance(_current_meta, ProjectMeta):
-                classes_mapping_edit_btn.enable()
+                if len(_current_meta.obj_classes) > 0:
+                    classes_mapping_edit_btn.enable()
+                else:
+                    classes_mapping_edit_btn.disable()
+
                 update_preview_btn.enable()
 
             set_classes_list_settings_from_json(
@@ -370,6 +374,7 @@ class DataAction(SourceAction):
             _set_src_preview()
             g.updater("metas")
             if _current_info != _temp_info:
+                update_preview_btn.enable()
                 g.updater(("nodes", layer_id))
 
         @classes_mapping_save_btn.click
