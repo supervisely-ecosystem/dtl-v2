@@ -17,7 +17,7 @@
 
 ## Overview
 
-This application is a versatile tool designed for data transformation tasks. It allows you to create and manage Data transformation workflows by leveraging graphical nodes with settings.
+This application is a versatile tool designed for data transformation tasks (like filtering and augmentation). It allows you to create and manage Data transformation workflows by leveraging graphical nodes with settings.
 
 <details>
 <summary>Click to expand the list of available nodes</summary>
@@ -91,7 +91,7 @@ Output:
 
 - **Object-Level Manipulation:** Perform operations on individual objects or instances within images, such as cropping, duplicating, or changing their color classes.
 
-  ![object-transforms](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/4058b6d9-b26e-49cc-bb0c-da4d396496b5)
+  ![object-transforms](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/b16b6767-403b-49f4-be9e-6aa0dcbb0c2d)
 
 - **Customize Workflows:** Create complex data transformation workflows by combining multiple transformation nodes to meet your specific requirements.
 
