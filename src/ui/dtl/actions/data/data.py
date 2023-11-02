@@ -102,6 +102,8 @@ class DataAction(SourceAction):
             description="Choose datasets and ensure that source project have classes.",
         )
 
+        empty_classes_in_project_notification = Text("", status="text")
+
         classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button(
@@ -141,7 +143,9 @@ class DataAction(SourceAction):
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
         )
-        classes_mapping_edit_btn.disable()
+
+        if g.PROJECT_ID is None:
+            classes_mapping_edit_btn.disable()
 
         classes_mapping_edit_contaniner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
@@ -245,6 +249,13 @@ class DataAction(SourceAction):
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_info, _current_meta
+
+            if _current_info is not None and len(project_meta.obj_classes) == 0:
+                classes_mapping_edit_text.set("Project has no object classes", "text")
+                classes_mapping_edit_btn.disable()
+            else:
+                classes_mapping_edit_text.set("Classes", "text")
+
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
@@ -273,14 +284,6 @@ class DataAction(SourceAction):
                     default_allowed=False,
                 )
 
-            if isinstance(_current_meta, ProjectMeta):
-                if len(_current_meta.obj_classes) > 0:
-                    classes_mapping_edit_btn.enable()
-                else:
-                    classes_mapping_edit_btn.disable()
-
-                update_preview_btn.enable()
-
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
                 settings=new_names
@@ -289,6 +292,16 @@ class DataAction(SourceAction):
             )
             # update settings preview
             _set_classes_mapping_preview()
+
+            if isinstance(_current_meta, ProjectMeta):
+                if len(_current_meta.obj_classes) > 0:
+                    classes_mapping_edit_btn.enable()
+                    # classes_mapping_edit_text.set("Classes", "text")
+                # else:
+                #     classes_mapping_edit_text.set("Project has no object classes", "text")
+                #     classes_mapping_edit_btn.disable()
+                update_preview_btn.enable()
+
             classes_mapping_widget.loading = False
 
         def get_src(options_json: dict) -> List[str]:
