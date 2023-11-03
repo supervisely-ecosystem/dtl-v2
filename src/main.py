@@ -16,7 +16,12 @@ from supervisely.app.widgets import ImageAnnotationPreview
 ImageAnnotationPreview()
 
 u.clean_static_dir(g.STATIC_DIR)
-app = Application(layout=layout, static_dir=g.STATIC_DIR, session_info_extra_content=header)
+app = Application(
+    layout=layout,
+    static_dir=g.STATIC_DIR,
+    session_info_extra_content=header,
+    session_info_solid=True,
+)
 
 
 def _update_f():
