@@ -76,3 +76,9 @@ class OtherAction(Action):
 class OutputAction(Action):
     node_color = "#ff5e90"
     icon = "zmdi zmdi-floppy"
+
+
+class FilterAndConditionAction(Action):
+    header_color = "#f7782f"
+    header_text_color = "#000000"
+    icon = "zmdi zmdi-arrow-split"

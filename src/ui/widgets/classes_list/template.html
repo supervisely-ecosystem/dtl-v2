@@ -21,15 +21,30 @@
 		<el-checkbox
 			v-model="state.{{{widget.widget_id}}}.selected[idx]"
 			style="margin-right: 10px"
-			{%
-			if
-			not
-			widget._multiple
-			%}
-			@change="if ($event.target.checked) {state.{{{widget.widget_id}}}.selected = state.{{{widget.widget_id}}}.selected.map((_, i) => i == idx);}"
-			{%
-			endif
-			%}
+			{% if widget._checkboxes_handled %}
+				{% if not widget._multiple %}
+					@change="() => {
+						if ($event.target.checked) {
+							state.{{{widget.widget_id}}}.selected = state.{{{widget.widget_id}}}.selected.map((_, i) => i == idx);
+						}
+						post('/{{{widget.widget_id}}}/checkbox_cb');
+					}"
+				{% else %}
+					@change="() => {
+						post('/{{{widget.widget_id}}}/checkbox_cb');
+					}"
+				{% endif %}
+			{% else %}
+				{%
+				if
+				not
+				widget._multiple
+				%}
+				@change="if ($event.target.checked) {state.{{{widget.widget_id}}}.selected = state.{{{widget.widget_id}}}.selected.map((_, i) => i == idx);}"
+				{%
+				endif
+				%}
+			{% endif %}
 		>
 		</el-checkbox>
 		<span class="icon-text-line classes-list-preview-sidebar">

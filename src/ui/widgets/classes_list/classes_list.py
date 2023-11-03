@@ -37,6 +37,9 @@ type_to_shape_text = {
 
 
 class ClassesList(Widget):
+    class Routes:
+        CHECKBOX_CHANGED = "checkbox_cb"
+
     def __init__(
         self,
         classes: Optional[Union[List[ObjClass], ObjClassCollection]] = [],
@@ -119,5 +122,25 @@ class ClassesList(Widget):
         StateJson()[self.widget_id]["selected"] = selected
         StateJson().send_changes()
 
+    def deselect(self, names: List[str]):
+        selected = StateJson()[self.widget_id]["selected"]
+        for idx, cls in enumerate(self._classes):
+            if cls.name in names:
+                selected[idx] = False
+        StateJson()[self.widget_id]["selected"] = selected
+        StateJson().send_changes()
+
     def get_all_classes(self):
         return self._classes
+
+    def selection_changed(self, func):
+        route_path = self.get_route_path(ClassesList.Routes.CHECKBOX_CHANGED)
+        server = self._sly_app.get_server()
+        self._checkboxes_handled = True
+
+        @server.post(route_path)
+        def _click():
+            selected = self.get_selected_classes()
+            func(selected)
+
+        return _click
