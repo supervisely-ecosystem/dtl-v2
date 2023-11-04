@@ -190,6 +190,8 @@ class Layer:
 
             if len(options["settings"]) > 0:
                 result_options.extend(options["settings"])
+
+            if self._preview_options:
                 result_options.append(get_separator(3))
 
             return [
