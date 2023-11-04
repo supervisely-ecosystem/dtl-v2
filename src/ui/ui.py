@@ -12,22 +12,34 @@ from src.globals import error_dialog
 
 
 run_dialog = Dialog(title="Run", content=run_layout)
-save_button = Button("save", icon="zmdi zmdi-floppy", button_size="large", button_type="text")
+save_button = Button(
+    "save",
+    icon="zmdi zmdi-floppy",
+    button_size="large",
+    button_type="text",
+    style="border: 1px solid rgb(191, 203, 217); color: black; margin: 10px 0 0; background-color: white; padding: 9px 13px; border-radius: 6px; font-size: 12px; text-transform: uppercase; font-weight: 500; height: 32px;",
+)
 load_button = Button(
     "load",
     icon="zmdi zmdi-cloud-download",
     button_size="large",
     button_type="text",
+    style="border: 1px solid rgb(191, 203, 217); color: black; margin: 10px 0 0; background-color: white; padding: 9px 13px; border-radius: 6px; font-size: 12px; text-transform: uppercase; font-weight: 500; height: 32px;",
 )
 
-header = Flexbox(
-    widgets=[
-        Flexbox([show_run_dialog_btn, circle_progress]),
-        save_button,
-        load_button,
-        # Container([Empty(style="padding: 4px;"), connect_node_checkbox]),
+header = Container(
+    [
+        Flexbox(
+            widgets=[
+                Flexbox([show_run_dialog_btn, circle_progress]),
+                save_button,
+                load_button,
+                # Container([Empty(style="padding: 4px;"), connect_node_checkbox]),
+            ],
+            gap=7,
+        )
     ],
-    gap=15,
+    style="height: 55px;",
 )
 layout = Container(
     widgets=[error_dialog, run_dialog, save_dialog, load_dialog, configure_tab_layout],
