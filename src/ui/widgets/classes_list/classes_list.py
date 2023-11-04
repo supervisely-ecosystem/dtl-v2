@@ -57,31 +57,6 @@ class ClassesList(Widget):
         self.empty_notification = empty_notification
         super().__init__(widget_id=widget_id, file_path=__file__)
 
-        self._select_all_btn = Button(
-            "Select all",
-            button_type="text",
-            show_loading=False,
-            icon="zmdi zmdi-check-all",
-            widget_id=generate_id(),
-        )
-        self._deselect_all_btn = Button(
-            "Deselect all",
-            button_type="text",
-            show_loading=False,
-            icon="zmdi zmdi-square-o",
-            widget_id=generate_id(),
-        )
-
-        @self._select_all_btn.click
-        def _select_all_btn_clicked():
-            self.select_all()
-            self.update_state()
-
-        @self._deselect_all_btn.click
-        def _deselect_all_btn_clicked():
-            self.deselect_all()
-            self.update_state()
-
     def get_json_data(self):
         return {
             "classes": [

@@ -3,7 +3,16 @@ from typing import Optional
 from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
-from supervisely.app.widgets import NodesFlow, Flexbox, Container, Field, Text, Button, Switch
+from supervisely.app.widgets import (
+    NodesFlow,
+    Flexbox,
+    Container,
+    Field,
+    Text,
+    Button,
+    Switch,
+    Empty,
+)
 
 from src.ui.dtl.Action import FilterAndConditionAction
 from src.ui.dtl.Layer import Layer
@@ -41,8 +50,8 @@ class FilterImageByObject(FilterAndConditionAction):
         include_classes_list_widget = ClassesList(multiple=True)
         include_switch = Switch(switched=True)
         include_classes_list_field = Field(
-            title="With classes",
-            description="Images with at least one object of the selected classes will be passed to the true branch. Other images will be passed to the false branch.",
+            title="Image have objects of classes below",
+            description="Please, select classes that have to be presented on the image",
             content=include_switch,
         )
 
@@ -65,8 +74,8 @@ class FilterImageByObject(FilterAndConditionAction):
                 exclude_classes_list_widget.hide()
 
         exclude_classes_list_field = Field(
-            title="Without classes",
-            description="Images without objects of the selected classes will be passed to the true branch. Other images will be passed to the false branch.",
+            title="Image have no objects of classes below",
+            description="Please, select classes that should not be presented on the image",
             content=exclude_switch,
         )
 
@@ -78,7 +87,10 @@ class FilterImageByObject(FilterAndConditionAction):
         def exclude_classes_list_selection_changed(selected):
             include_classes_list_widget.deselect([cls.name for cls in selected])
 
-        description = Text("Images that satisfy both conditions will be passed to the true branch.")
+        description = Container(
+            widgets=[Empty(), Text("Image will be passed to the True branch if:")],
+            gap=25,
+        )
         settings_save_btn = create_save_btn()
         settings_set_default_btn = create_set_default_btn()
         settings_widgets_container = Container(
@@ -86,6 +98,7 @@ class FilterImageByObject(FilterAndConditionAction):
                 description,
                 include_classes_list_field,
                 include_classes_list_widget,
+                Text("<el-tag type='gray'>AND</el-tag>"),
                 exclude_classes_list_field,
                 exclude_classes_list_widget,
                 Flexbox(
