@@ -26,7 +26,7 @@ show_run_dialog_btn = Button(
     "Run",
     icon="zmdi zmdi-play",
     button_size="small",
-    style="border: 1px solid rgb(191, 203, 217); color: black; background-color: white; margin: 10px 10px 10px 40px;",
+    style="border: 1px solid rgb(191, 203, 217); margin: 10px 0px 0px 25px; padding: 9px 13px; border-radius: 6px; font-size: 12px; text-transform: uppercase; font-weight: 500; background-color: #448dff; color: white; border-color: transparent; height: 32px;",
 )
 run_btn = Button("Run", icon="zmdi zmdi-play")
 progress = Progress(hide_on_finish=False)
