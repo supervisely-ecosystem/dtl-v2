@@ -8,6 +8,7 @@ from .Action import (
     OutputAction,
 )
 from .actions.data.data import DataAction
+from .actions.anonymize.anonymize import AnonymizeAction
 from .actions.approx_vector.approx_vector import ApproxVectorAction
 from .actions.background.background import BackgroundAction
 from .actions.bbox.bbox import BBoxAction
@@ -60,6 +61,7 @@ SAVE_ACTIONS = "Output"
 actions_list = {
     SOURCE_ACTIONS: [DataAction.name],
     PIXEL_LEVEL_TRANSFORMS: [
+        AnonymizeAction.name,
         BlurAction.name,
         ContrastBrightnessAction.name,
         NoiseAction.name,
@@ -113,6 +115,7 @@ actions_dict = {
     # Data layers
     DataAction.name: DataAction,
     # Pixel-level transforms layers
+    AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,
     ContrastBrightnessAction.name: ContrastBrightnessAction,
     NoiseAction.name: NoiseAction,

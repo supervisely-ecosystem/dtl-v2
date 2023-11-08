@@ -10,10 +10,12 @@ class ClassesListPreview(Widget):
         self,
         classes: Optional[Union[List[ObjClass], ObjClassCollection]] = [],
         max_height: str = "128px",
+        empty_text: str = None,
         widget_id: Optional[str] = None,
     ):
         self._classes = classes
         self._max_height = max_height
+        self._empty_text = empty_text
         super().__init__(widget_id=widget_id, file_path=__file__)
 
     def get_json_data(self):

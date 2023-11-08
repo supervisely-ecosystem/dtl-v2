@@ -126,3 +126,11 @@
 .sly-nodes-flow-widget.white .node-editor .node .__options .node-option:last-child span {
     font-size: 13px !important;
 }
+
+/* Color picker */
+
+.sly-nodes-flow-widget.white .node-editor .node .__options .node-option .el-color-picker .el-color-picker__trigger {
+    height: 30px;
+    padding: 3px;
+    margin-left: 10px;
+}
