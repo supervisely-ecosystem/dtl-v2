@@ -351,7 +351,7 @@ def set_classes_list_settings_from_json(
 def get_separator(idx: int = 0):
     return NodesFlow.Node.Option(
         name=f"separator {idx}",
-        option_component=NodesFlow.HtmlOptionComponent('<hr style="border-top: 1px solid #ccc;">'),
+        option_component=NodesFlow.HtmlOptionComponent("<hr>"),
     )
 
 

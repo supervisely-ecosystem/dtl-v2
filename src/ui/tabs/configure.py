@@ -94,7 +94,7 @@ add_specific_layer_buttons = {
         icon=action.icon,
         dialog_widget=dialog_widgets,
         selector_widget=select_widget,
-        color=action.header_color,
+        color=action.node_color,
     )
     for action_name, action in actions_dict.items()
 }
@@ -111,8 +111,14 @@ for action_name, layer_card in add_specific_layer_buttons.items():
     layer_card.on_add_button(add_specific_layer_func_factory(action_name))
 
 filter_actions_input = Input(placeholder="Start typing layer name...", icon="search")
-filter_actions_field = Field(content=filter_actions_input, title="Filter actions")
-
+collapse_sidebar_btn = Button(
+    "",
+    icon="zmdi zmdi-chevron-left",
+    button_size="small",
+    plain=True,
+    show_loading=False,
+    style="padding: 9px 11px 9px 14px",
+)
 left_sidebar_actions_widgets = {
     action_name: add_specific_layer_buttons[action_name]
     for action_name, action in actions_dict.items()
@@ -136,7 +142,7 @@ left_sidebar_groups_widgets = {
 
 
 left_sidebar_widgets = [
-    filter_actions_field,
+    Flexbox(widgets=[collapse_sidebar_btn, filter_actions_input]),
     *[left_sidebar_groups_widgets[group_name] for group_name in actions_list.keys()],
 ]
 sidebar = Sidebar(
@@ -145,9 +151,17 @@ sidebar = Sidebar(
     width_percent=20,
     standalone=True,
     height="calc(100vh - 57px)",
+    clear_main_panel_paddings=True,
+    show_close=False,
+    align_sidebar_to_header=True,
 )
 
 layout = Container(widgets=[dialog_widgets, add_layer_dialog, sidebar], gap=0)
+
+
+@collapse_sidebar_btn.click
+def collapse_sidebar():
+    sidebar.collapse()
 
 
 @handle_exception
