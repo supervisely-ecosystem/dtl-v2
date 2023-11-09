@@ -82,7 +82,9 @@ class Layer:
         self._preview_widget.hide()
         self._empty_preview_text = Text("Click update to show preview image with labels")
         _preview_container = Container(
-            widgets=[self._empty_preview_text, self._preview_widget], gap=0
+            widgets=[self._empty_preview_text, self._preview_widget],
+            gap=0,
+            style="background: #f1f4f7; margin: 9px -5px -5px; padding: 15px 12px; border-radius: 8px;",
         )
 
         if self._need_preview:
@@ -207,8 +209,10 @@ class Layer:
             inputs=self._inputs,
             outputs=self._outputs,
             inputs_up=True,
-            header_color=self.action.header_color,
-            header_text_color=self.action.header_text_color,
+            header_color=None,
+            header_text_color=None,
+            icon=self.action.icon,
+            icon_background_color=self.action.node_color,
         )
 
     def parse_options(self, node_options: dict):

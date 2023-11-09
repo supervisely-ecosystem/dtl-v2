@@ -4,24 +4,6 @@
     border-color: #909dac !important;
 }
 
-/* Container (global height etc) */
-
-.sly-sidebar-widget .split-panel.main-panel .panel-wrapper {
-    padding: 0px !important;
-}
-
-/* Left Sidebar */
-
-.sly-sidebar-widget .sidebar-panel {
-    padding-left: 15px;
-    position: relative;
-    z-index: 3;
-}
-
-.sly-sidebar-widget>.split .split-panel .ps .panel-wrapper {
-    padding-right: 20px;
-}
-
 .sly-sidebar-widget .sidebar-panel .container {
     padding-top: 0 !important;
 }
@@ -50,79 +32,12 @@
     font-size: 16px;
 }
 
-/* Nodes */
-.sly-nodes-flow-widget.white .node-editor .node {
-    background: white;
-    filter: none;
-    box-shadow: #ccd6db 0px 0px 0px 1px, rgba(0, 0, 0, 0.08) 0px 10px 15px -5px, rgba(0, 0, 0, 0.06) 0px 4px 5px -3px;
-    border-radius: 8px;
-    border: 2px solid transparent;
-}
-
-.sly-nodes-flow-widget .node.\--selected {
-    border: 2px solid #448dff !important;
-    box-shadow: rgba(0, 0, 0, 0.08) 0px 10px 15px -5px, rgba(0, 0, 0, 0.06) 0px 4px 5px -3px;
-}
-
-.sly-nodes-flow-widget .node-option hr {
-    background: #d8e2e9;
-    height: 1px;
-    border: none !important;
-}
+/* Image Preview */
 
 .sly-nodes-flow-widget .node-option .sly-py-labeled-image {
     margin-top: -12px;
 }
 
-/* Node Connectors */
-.sly-nodes-flow-widget .node-interface .__port {
-    border: 2px solid black;
-}
-
-.sly-nodes-flow-widget .node-interface.\--input .__port {
-    left: -1.3em;
-}
-
-.sly-nodes-flow-widget .node-interface.\--output .__port {
-    right: -1.3em;
-}
-
-.sly-nodes-flow-widget .node-interface.\--input {
-    padding-left: 0;
-}
-
-.sly-nodes-flow-widget .node-interface.\--output {
-    padding-right: 0;
-}
-
-/* Node Title */
-.sly-nodes-flow-widget .node>.__title {
-    background: transparent !important;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 12px .70em 0;
-    margin-bottom: -5px;
-}
-
-/* Nodes Global */
-.sly-nodes-flow-widget.white .node-editor .background {
-    background-image: radial-gradient(circle at 1px 1px, #c1c7d8 1px, transparent 0px) !important;
-    background-size: 25px 25px !important;
-}
-
-.sly-nodes-flow-widget .node-editor {
-    font-family: Roboto, sans-serif;
-}
-
-/* Node Bottom Panel */
-
-.sly-nodes-flow-widget.white .node-editor .node .__options .node-option:last-child {
-    background: #f1f4f7;
-    margin: 9px -5px -5px;
-    padding: 15px 12px;
-    border-radius: 8px;
-}
-
-.sly-nodes-flow-widget.white .node-editor .node .__options .node-option:last-child span {
+.sly-nodes-flow-widget.white .node-editor .node .__options .node-option .sly-py-labeled-image span {
     font-size: 13px !important;
 }

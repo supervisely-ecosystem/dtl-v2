@@ -13,7 +13,7 @@ class Action:
     description = None
     md_description = ""
     width = 340
-    header_color = "#cfcfcf"
+    node_color = "#cfcfcf"
     header_text_color = "#000000"
     icon = "zmdi zmdi-folder"
 
@@ -49,36 +49,30 @@ class Action:
 
 
 class SourceAction(Action):
-    header_color = "#13ce66"
-    header_text_color = "#000000"
+    node_color = "#13ce66"
     icon = "zmdi zmdi-folder"
 
 
 class PixelLevelAction(Action):
-    header_color = "#c9a5fa"
-    header_text_color = "#000000"
+    node_color = "#c9a5fa"
     icon = "zmdi zmdi-image-o"
 
 
 class SpatialLevelAction(Action):
-    header_color = "#fcd068"
-    header_text_color = "#000000"
+    node_color = "#fcd068"
     icon = "zmdi zmdi-collection-bookmark"
 
 
 class AnnotationAction(Action):
-    header_color = "#90ddf5"
-    header_text_color = "#000000"
+    node_color = "#90ddf5"
     icon = "zmdi zmdi-shape"
 
 
 class OtherAction(Action):
-    header_color = "#cfcfcf"
-    header_text_color = "#000000"
+    node_color = "#cfcfcf"
     icon = "zmdi zmdi-apps"
 
 
 class OutputAction(Action):
-    header_color = "#ff5e90"
-    header_text_color = "#000000"
+    node_color = "#ff5e90"
     icon = "zmdi zmdi-floppy"
