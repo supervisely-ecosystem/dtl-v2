@@ -20,6 +20,7 @@ from src.ui.dtl.utils import (
     get_separator,
     get_set_settings_button_style,
     get_set_settings_container,
+    get_text_font_size,
 )
 import src.globals as g
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
@@ -123,7 +124,8 @@ class Layer:
                     name="update_preview_btn",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=get_set_settings_container(
-                            Text("Preview"), self._update_preview_button
+                            Text("Preview", font_size=get_text_font_size()),
+                            self._update_preview_button,
                         )
                     ),
                 )

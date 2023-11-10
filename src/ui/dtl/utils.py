@@ -369,7 +369,7 @@ def get_set_settings_container(text: Text, button: Button):
 
 
 def get_set_settings_button_style():
-    return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white"
+    return "flex: auto; border: 1px solid #bfcbd9; color: black; background-color: white;"
 
 
 # Sidebar action options utils

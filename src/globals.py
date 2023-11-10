@@ -16,7 +16,7 @@ DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
 STATIC_DIR = "static"
-TEAM_FILES_PATH = "ml-nodes"
+TEAM_FILES_PATH = "data-nodes"
 PROJECT_ID = sly.env.project_id(raise_not_found=False)
 DATASET_ID = sly.env.dataset_id(raise_not_found=False)
 FILE = sly.env.team_files_file(raise_not_found=False)
