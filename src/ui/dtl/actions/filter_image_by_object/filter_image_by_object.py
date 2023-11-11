@@ -12,6 +12,7 @@ from supervisely.app.widgets import (
     Button,
     Switch,
     Empty,
+    NotificationBox,
 )
 
 from src.ui.dtl.Action import FilterAndConditionAction
@@ -98,7 +99,7 @@ class FilterImageByObject(FilterAndConditionAction):
                 description,
                 include_classes_list_field,
                 include_classes_list_widget,
-                Text("<el-tag type='gray'>AND</el-tag>"),
+                Text("<b>AND</b>"),
                 exclude_classes_list_field,
                 exclude_classes_list_widget,
                 Flexbox(
@@ -123,13 +124,24 @@ class FilterImageByObject(FilterAndConditionAction):
 
         include_preview = ClassesListPreview()
         exclude_preview = ClassesListPreview()
-        settings_preview = Container(
+        with_container = Container(
             widgets=[
                 Text("With classes:"),
                 include_preview,
+            ]
+        )
+        without_container = Container(
+            widgets=[
                 Text("Without classes:"),
                 exclude_preview,
             ]
+        )
+        and_text = Text('<span style="display: block; padding: 10px 0px 5px 2px;">AND</span>')
+        no_condition_text = NotificationBox(
+            title="No condition", description="Select filtering classes"
+        )
+        settings_preview = Container(
+            widgets=[with_container, and_text, without_container, no_condition_text], gap=0
         )
 
         def _get_include_classes_value():
@@ -156,15 +168,37 @@ class FilterImageByObject(FilterAndConditionAction):
             set_classes_list_preview(
                 include_classes_list_widget,
                 include_preview,
-                "default" if saved_include_classes == "default" else _get_include_classes_value(),
+                saved_include_classes,
             )
 
         def _set_exclude_preview():
             set_classes_list_preview(
                 exclude_classes_list_widget,
                 exclude_preview,
-                "default" if saved_exclude_classes == "default" else _get_exclude_classes_value(),
+                saved_exclude_classes,
             )
+
+        def _set_previews():
+            _set_include_preview()
+            _set_exclude_preview()
+            include_classes = include_preview.get()
+            exclude_classes = exclude_preview.get()
+            if include_classes:
+                with_container.show()
+            else:
+                with_container.hide()
+            if exclude_classes:
+                without_container.show()
+            else:
+                without_container.hide()
+            if include_classes and exclude_classes:
+                and_text.show()
+            else:
+                and_text.hide()
+            if include_classes or exclude_classes:
+                no_condition_text.hide()
+            else:
+                no_condition_text.show()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -212,16 +246,14 @@ class FilterImageByObject(FilterAndConditionAction):
             )
 
             # update settings preview
-            _set_include_preview()
-            _set_exclude_preview()
+            _set_previews()
             settings_widgets_container.loading = False
 
         @settings_save_btn.click
         def save_settings_handler():
             _save_include_classes_setting()
             _save_exclude_classes_setting()
-            _set_include_preview()
-            _set_exclude_preview()
+            _set_previews()
             g.updater("metas")
 
         @settings_set_default_btn.click
@@ -229,8 +261,7 @@ class FilterImageByObject(FilterAndConditionAction):
             nonlocal saved_include_classes, saved_exclude_classes
             saved_include_classes = copy.deepcopy(default_include_classes)
             saved_exclude_classes = copy.deepcopy(default_exclude_classes)
-            _set_include_preview()
-            _set_exclude_preview()
+            _set_previews()
             g.updater("metas")
 
         def _set_settings_from_json(settings):
@@ -285,6 +316,7 @@ class FilterImageByObject(FilterAndConditionAction):
                 "settings": settings_options,
             }
 
+        _set_previews()
         return Layer(
             action=cls,
             id=layer_id,
