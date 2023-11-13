@@ -139,6 +139,10 @@ class TagAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(widget=select_tag_meta),
                 ),
                 NodesFlow.Node.Option(
+                    name="input_tag_value",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=input_tag),
+                ),
+                NodesFlow.Node.Option(
                     name="action_text",
                     option_component=NodesFlow.WidgetOptionComponent(action_text),
                 ),
