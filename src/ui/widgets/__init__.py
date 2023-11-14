@@ -9,3 +9,4 @@ from .tag_metas_preview import TagMetasPreview
 from .layer_card import LayerCard
 from .circle_progress import CircleProgress
 from .apply_css import ApplyCss
+from .tag_metas_list import TagMetasList

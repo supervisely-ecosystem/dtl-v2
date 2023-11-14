@@ -27,6 +27,7 @@ from .actions.drop_noise.drop_noise import DropNoiseAction
 from .actions.dummy.dummy import DummyAction
 from .actions.duplicate_objects.duplicate_objects import DuplicateObjectsAction
 from .actions.filter_image_by_object.filter_image_by_object import FilterImageByObject
+from .actions.filter_image_by_tag.filter_image_by_tag import FilterImageByTag
 from .actions.find_contours.find_contours import FindContoursAction
 from .actions.flip.flip import FlipAction
 from .actions.if_action.if_action import IfAction
@@ -104,6 +105,7 @@ actions_list = {
     ],
     FILTERS_AND_CONDITIONS: [
         FilterImageByObject.name,
+        FilterImageByTag.name,
         IfAction.name,
     ],
     OTHER: [
@@ -158,6 +160,7 @@ actions_dict = {
     TagAction.name: TagAction,
     # Filters and conditions
     FilterImageByObject.name: FilterImageByObject,
+    FilterImageByTag.name: FilterImageByTag,
     IfAction.name: IfAction,
     # Other layers
     DatasetAction.name: DatasetAction,
