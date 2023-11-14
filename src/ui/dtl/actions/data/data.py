@@ -65,6 +65,10 @@ class DataAction(SourceAction):
             emit_on_click="openSidebar",
             style=get_set_settings_button_style(),
         )
+        empty_dataset_notification = NotificationBox(
+            title="No datasets selected", description="Select at lease one dataset"
+        )
+        empty_dataset_notification.hide()
         select_datasets_container = get_set_settings_container(
             select_datasets_text, select_datasets_btn
         )
@@ -78,7 +82,9 @@ class DataAction(SourceAction):
         src_preview_widget = Container(
             widgets=[src_preview_widget_thumbnail, src_preview_widget_text]
         )
-        src_widgets_container = Container(widgets=[select_datasets, src_save_btn])
+        src_widgets_container = Container(
+            widgets=[select_datasets, empty_dataset_notification, src_save_btn]
+        )
 
         saved_src = []
 
@@ -414,6 +420,16 @@ class DataAction(SourceAction):
 
             _set_classes_mapping_preview()
             g.updater("metas")
+
+        @select_datasets.value_changed
+        def select_dataset_changed_handler(args):
+            selected = select_datasets.get_selected_ids()
+            if selected is None or len(selected) == 0:
+                src_save_btn.disable()
+                empty_dataset_notification.show()
+            else:
+                src_save_btn.enable()
+                empty_dataset_notification.hide()
 
         def create_options(src: List[str], dst: List[str], settings: dict) -> dict:
             _set_src_from_json(src)
