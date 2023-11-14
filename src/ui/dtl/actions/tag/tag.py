@@ -1,18 +1,15 @@
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import NodesFlow, SelectTagMeta, Container, Button, Text, Select
+from supervisely.app.widgets import NodesFlow, SelectTagMeta, Text, Select
 from supervisely import ProjectMeta, TagMeta, Tag
 from supervisely.annotation.tag_meta import TagValueType
 
 from src.ui.dtl import AnnotationAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import InputTag, TagMetasPreview
+from src.ui.widgets import InputTag
 from src.ui.dtl.utils import (
-    get_set_settings_button_style,
-    get_set_settings_container,
     get_layer_docs,
-    create_save_btn,
     get_text_font_size,
 )
 
@@ -27,10 +24,9 @@ class TagAction(AnnotationAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
+        _empty_tag_meta = TagMeta(name="", value_type=TagValueType.NONE)
 
-        input_tag = InputTag(TagMeta(name="", value_type=TagValueType.NONE))
-        tag_preview_meta = TagMetasPreview()
-        tag_preview_value = Text("", status="text", font_size=get_text_font_size())
+        input_tag = InputTag(_empty_tag_meta)
 
         input_tag_text = Text("Image Tag", status="text", font_size=get_text_font_size())
         select_tag_meta = SelectTagMeta(project_meta=_current_meta, size="small")
@@ -41,89 +37,78 @@ class TagAction(AnnotationAction):
             size="small",
         )
 
-        saved_tag_setting = None
-        last_tag_meta = None
-
         @select_tag_meta.value_changed
         def select_tag_meta_value_changed(tag_meta: TagMeta):
-            if last_tag_meta == tag_meta:
-                return
             input_tag.loading = True
+            if tag_meta is None:
+                tag_meta = _empty_tag_meta
             input_tag.set_tag_meta(tag_meta)
-            _save_tag()
             input_tag.loading = False
 
-        def _get_tag_value():
+        def _get_tag():
             selected_tag = input_tag.get_tag()
             selected_tag: Tag
             if selected_tag is None:
-                tag = None
-            elif selected_tag.meta.value_type == str(TagValueType.NONE):
-                tag = selected_tag.meta.name
-            else:
-                tag = {
-                    "name": selected_tag.meta.name,
-                    "value": selected_tag.value,
-                }
-            return tag
-
-        def _save_tag():
-            nonlocal saved_tag_setting
-            saved_tag_setting = _get_tag_value()
-            tag_preview_value.text = (
-                ""
-                if isinstance(saved_tag_setting, str) or saved_tag_setting is None
-                else str(saved_tag_setting["value"])
-            )
-            if saved_tag_setting is not None:
-                if isinstance(saved_tag_setting, str):
-                    tag_name = saved_tag_setting
-                else:
-                    tag_name = saved_tag_setting["name"]
-                tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
-                tag_preview_meta.set([tag_meta])
+                return None
+            if selected_tag.meta == _empty_tag_meta:
+                return None
+            return {
+                "name": selected_tag.meta.name,
+                "value": selected_tag.value,
+            }
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            return {"tag": saved_tag_setting, "action": action_selector.get_value()}
+            return {"tag": _get_tag(), "action": action_selector.get_value()}
 
         def _set_settings_from_json(settings: dict):
-            if "tag" in settings:
+            tag = settings.get("tag", None)
+            if tag is not None:
                 select_tag_meta.loading = True
                 input_tag.loading = True
-                if isinstance(settings["tag"], str):
-                    tag_name = settings["tag"]
-                    tag_value = None
-                else:
-                    tag_name = settings["tag"]["name"]
-                    tag_value = settings["tag"]["value"]
+
+                tag_name = settings["tag"]["name"]
+                tag_value = settings["tag"]["value"]
                 tag_meta = select_tag_meta.get_tag_meta_by_name(tag_name)
                 select_tag_meta.set_name(tag_name)
+
                 input_tag.set_tag_meta(tag_meta)
-                input_tag.value = tag_value
+                input_tag.set_value(tag_value)
+
                 select_tag_meta.loading = False
                 input_tag.loading = False
-                _save_tag()
+
             action = settings.get("action", None)
             if action is not None:
                 action_selector.set_value(action)
 
         def meta_changed_cb(project_meta: ProjectMeta):
-            nonlocal _current_meta
+            nonlocal _current_meta, _empty_tag_meta
             if _current_meta == project_meta:
                 return
-            _current_meta = project_meta
+
             select_tag_meta.loading = True
             current_tag_meta = select_tag_meta.get_selected_item()
             current_tag_value = input_tag.get_value()
+
             select_tag_meta.set_project_meta(project_meta)
 
-            # to preserve selected tag meta and value
-            if current_tag_meta is not None and current_tag_meta.name in [
-                tm.name for tm in project_meta.tag_metas
+            tag_metas = [tm for tm in project_meta.tag_metas]
+            if len(tag_metas) == 0:
+                input_tag.set_tag_meta(_empty_tag_meta)
+            elif current_tag_meta is not None and current_tag_meta.name in [
+                tm.name for tm in tag_metas
             ]:
+                # to preserve selected tag meta and value
+                tag_meta = [tm for tm in tag_metas if tm.name == current_tag_meta.name][0]
                 select_tag_meta.set_name(current_tag_meta.name)
+                input_tag.set_tag_meta(tag_meta)
                 input_tag.set_value(current_tag_value)
+            else:
+                select_tag_meta.set_name(tag_metas[0].name)
+                input_tag.set_tag_meta(tag_metas[0])
+
+            _current_meta = project_meta
 
             select_tag_meta.loading = False
 
