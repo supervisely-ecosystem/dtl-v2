@@ -5,7 +5,7 @@ from supervisely.app.widgets import NodesFlow, SelectTagMeta, Text, Select
 from supervisely import ProjectMeta, TagMeta, Tag
 from supervisely.annotation.tag_meta import TagValueType
 
-from src.ui.dtl import AnnotationAction
+from src.ui.dtl import FilterAndConditionAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import InputTag
 from src.ui.dtl.utils import (
@@ -14,11 +14,11 @@ from src.ui.dtl.utils import (
 )
 
 
-class TagAction(AnnotationAction):
-    name = "tag"
-    title = "Image Tag"
-    docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/tag"
-    description = "Add or remove tags from images."
+class FilterImageByTag(FilterAndConditionAction):
+    name = "filter_image_by_tag"
+    title = "Filter Images by tag"
+    docs_url = ""
+    description = "Filter Images based on the presence of specified tags."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -31,9 +31,9 @@ class TagAction(AnnotationAction):
         input_tag_text = Text("Image Tag", status="text", font_size=get_text_font_size())
         select_tag_meta = SelectTagMeta(project_meta=_current_meta, size="small")
 
-        action_text = Text("Action", status="text", font_size=get_text_font_size())
-        action_selector = Select(
-            [Select.Item("add", "Add to image"), Select.Item("delete", "Delete from image")],
+        condition_text = Text("Condition", status="text", font_size=get_text_font_size())
+        condition_selector = Select(
+            [Select.Item("with", "With tag"), Select.Item("without", "Without tag")],
             size="small",
         )
 
@@ -50,8 +50,6 @@ class TagAction(AnnotationAction):
             selected_tag: Tag
             if selected_tag is None:
                 return None
-            if selected_tag.meta == _empty_tag_meta:
-                return None
             return {
                 "name": selected_tag.meta.name,
                 "value": selected_tag.value,
@@ -59,7 +57,7 @@ class TagAction(AnnotationAction):
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
-            return {"tag": _get_tag(), "action": action_selector.get_value()}
+            return {"tag": _get_tag(), "condition": condition_selector.get_value()}
 
         def _set_settings_from_json(settings: dict):
             tag = settings.get("tag", None)
@@ -78,9 +76,9 @@ class TagAction(AnnotationAction):
                 select_tag_meta.loading = False
                 input_tag.loading = False
 
-            action = settings.get("action", None)
-            if action is not None:
-                action_selector.set_value(action)
+            condition = settings.get("condition", None)
+            if condition is not None:
+                condition_selector.set_value(condition)
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta, _empty_tag_meta
@@ -128,12 +126,12 @@ class TagAction(AnnotationAction):
                     option_component=NodesFlow.WidgetOptionComponent(widget=input_tag),
                 ),
                 NodesFlow.Node.Option(
-                    name="action_text",
-                    option_component=NodesFlow.WidgetOptionComponent(action_text),
+                    name="condition_text",
+                    option_component=NodesFlow.WidgetOptionComponent(condition_text),
                 ),
                 NodesFlow.Node.Option(
-                    name="action_selector",
-                    option_component=NodesFlow.WidgetOptionComponent(action_selector),
+                    name="condition_selector",
+                    option_component=NodesFlow.WidgetOptionComponent(condition_selector),
                 ),
             ]
             return {
@@ -150,3 +148,10 @@ class TagAction(AnnotationAction):
             meta_changed_cb=meta_changed_cb,
             need_preview=False,
         )
+
+    @classmethod
+    def create_outputs(cls):
+        return [
+            NodesFlow.Node.Output("destination_true", "Output True"),
+            NodesFlow.Node.Output("destination_false", "Output False"),
+        ]

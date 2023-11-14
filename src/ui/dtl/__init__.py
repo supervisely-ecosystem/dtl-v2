@@ -6,6 +6,7 @@ from .Action import (
     AnnotationAction,
     OtherAction,
     OutputAction,
+    FilterAndConditionAction,
 )
 from .actions.data.data import DataAction
 from .actions.anonymize.anonymize import AnonymizeAction
@@ -25,6 +26,8 @@ from .actions.drop_lines_by_length.drop_lines_by_length import DropLinesByLength
 from .actions.drop_noise.drop_noise import DropNoiseAction
 from .actions.dummy.dummy import DummyAction
 from .actions.duplicate_objects.duplicate_objects import DuplicateObjectsAction
+from .actions.filter_image_by_object.filter_image_by_object import FilterImageByObject
+from .actions.filter_image_by_tag.filter_image_by_tag import FilterImageByTag
 from .actions.find_contours.find_contours import FindContoursAction
 from .actions.flip.flip import FlipAction
 from .actions.if_action.if_action import IfAction
@@ -56,6 +59,7 @@ SPATIAL_LEVEL_TRANSFORMS = "Spatial-level transforms"
 ANNOTATION_TRANSFORMS = "Annotation transforms"
 OTHER = "Other"
 SAVE_ACTIONS = "Output"
+FILTERS_AND_CONDITIONS = "Filters and conditions"
 
 
 actions_list = {
@@ -99,10 +103,14 @@ actions_list = {
         SplitMasksAction.name,
         TagAction.name,
     ],
+    FILTERS_AND_CONDITIONS: [
+        FilterImageByObject.name,
+        FilterImageByTag.name,
+        IfAction.name,
+    ],
     OTHER: [
         DatasetAction.name,
         DummyAction.name,
-        IfAction.name,
     ],
     SAVE_ACTIONS: [
         SaveAction.name,
@@ -150,10 +158,13 @@ actions_dict = {
     SkeletonizeAction.name: SkeletonizeAction,
     SplitMasksAction.name: SplitMasksAction,
     TagAction.name: TagAction,
+    # Filters and conditions
+    FilterImageByObject.name: FilterImageByObject,
+    FilterImageByTag.name: FilterImageByTag,
+    IfAction.name: IfAction,
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
-    IfAction.name: IfAction,
     # Save layers
     SaveAction.name: SaveAction,
     SaveMasksAction.name: SaveMasksAction,

@@ -30,7 +30,7 @@ class TagLayer(Layer):
                                 "required": ["name"],
                                 "properties": {
                                     "name": {"type": "string"},
-                                    "value": {"type": "string"},
+                                    "value": {},
                                 },
                             },
                         ],

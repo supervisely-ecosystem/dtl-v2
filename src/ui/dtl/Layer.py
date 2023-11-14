@@ -81,7 +81,9 @@ class Layer:
         # )
         self._preview_widget = ImageAnnotationPreview(enable_zoom=True, line_width=1)
         self._preview_widget.hide()
-        self._empty_preview_text = Text("Click update to show preview image with labels")
+        self._empty_preview_text = Text(
+            "Click update to show preview image with labels", font_size=get_text_font_size()
+        )
         _preview_container = Container(
             widgets=[self._empty_preview_text, self._preview_widget],
             gap=0,

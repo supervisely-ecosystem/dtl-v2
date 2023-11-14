@@ -16,7 +16,7 @@ from supervisely.app.widgets import (
 )
 from supervisely import ProjectMeta
 
-from src.ui.dtl import OtherAction
+from src.ui.dtl import FilterAndConditionAction
 from src.ui.dtl.Layer import Layer
 from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
 from src.ui.dtl.utils import (
@@ -28,7 +28,7 @@ from src.ui.dtl.utils import (
 )
 
 
-class IfAction(OtherAction):
+class IfAction(FilterAndConditionAction):
     name = "if"
     title = "If"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/if"
