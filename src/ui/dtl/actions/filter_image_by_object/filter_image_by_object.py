@@ -89,8 +89,8 @@ class FilterImageByObject(FilterAndConditionAction):
             include_classes_list_widget.deselect([cls.name for cls in selected])
 
         description = Container(
-            widgets=[Empty(), Text("Image will be passed to the True branch if:")],
-            gap=25,
+            widgets=[Text("Image will be passed to the True branch if:")],
+            style="margin-top: 25px;",
         )
         settings_save_btn = create_save_btn()
         settings_set_default_btn = create_set_default_btn()
@@ -203,7 +203,7 @@ class FilterImageByObject(FilterAndConditionAction):
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             nonlocal saved_include_classes, saved_exclude_classes
-            include = saved_exclude_classes
+            include = saved_include_classes
             if saved_include_classes == "default":
                 include = _get_include_classes_value()
             exclude = saved_exclude_classes
