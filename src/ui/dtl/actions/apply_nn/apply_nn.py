@@ -269,7 +269,6 @@ class ApplyNNAction(NeuralNetworkAction):
             # _set_classes_list_preview()
 
             classes_list_widget.loading = False
-            _current_meta = project_meta
 
         def unpack_selected_model_classes(saved_classes_settings):
             nonlocal _model_meta
