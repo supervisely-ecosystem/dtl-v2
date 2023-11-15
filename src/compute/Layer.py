@@ -296,9 +296,12 @@ class Layer:
                     if new_color is not None and new_color[0] == "#":
                         new_color = hex2rgb(new_color)
                     obj_cls = res_meta.get_obj_class(src_class_title)
-                    obj_cls = obj_cls.clone(
-                        name=new_name, geometry_type=new_geometry_type, color=new_color
-                    )
+                    if obj_cls is None:
+                        obj_cls = ObjClass(new_name, new_geometry_type, new_color)
+                    else:
+                        obj_cls = obj_cls.clone(
+                            name=new_name, geometry_type=new_geometry_type, color=new_color
+                        )
                     res_meta = res_meta.delete_obj_class(src_class_title)
                     res_meta = res_meta.add_obj_class(obj_cls)
 

@@ -12,6 +12,8 @@ from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from supervisely.nn.inference import Session
 from src.compute.classes_utils import ClassConstants
 import src.globals as g
+from supervisely.io.fs import silent_remove
+import supervisely as sly
 
 
 class ApplyNN(Layer):
@@ -35,6 +37,14 @@ class ApplyNN(Layer):
                             "properties": {
                                 "name": {"type": "string"},
                                 "shape": {"type": "string"},
+                                "color": {
+                                    "type": "array",
+                                    "items": {"type": "integer"},
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "default": [0, 0, 0],
+                                    "description": "RGB color",
+                                },
                             },
                         },
                     },
@@ -54,6 +64,7 @@ class ApplyNN(Layer):
             self.cls_mapping[new_class["name"]] = {
                 "title": new_class["name"],
                 "shape": new_class["shape"],
+                "color": new_class["color"],
             }
             self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
@@ -62,14 +73,31 @@ class ApplyNN(Layer):
         img = img_desc.read_image()
         img = img.astype(np.uint8)
 
-        img_path = img_desc.info.img_path
+        if self.settings["session_id"] is None:
+            yield img_desc, ann
+        else:
+            img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
+            sly.image.write(img_path, img)
 
-        apply_method = self.settings["apply_method"]
-        if apply_method == "image":
-            session = Session(g.api, self.settings["session_id"])
-            ann = session.inference_image_path(img_path)
-        elif apply_method == "roi":
-            pass
+            apply_method = self.settings["apply_method"]
+            if apply_method == "image":
+                session = Session(g.api, self.settings["session_id"])
+                ann = session.inference_image_path(img_path)
 
-        new_img_desc = img_desc.clone_with_img(img)
-        yield new_img_desc, ann
+                # remove tags for now
+                labels = []
+                for label in ann.labels:
+                    label = label.clone(tags=[])
+                    labels.append(label)
+                ann = ann.clone(img_tags=[], labels=labels)
+
+                # make inference_image_np method
+                silent_remove(img_path)
+            elif apply_method == "roi":
+                pass
+
+            new_img_desc = img_desc.clone_with_img(img)
+            yield new_img_desc, ann
+
+    def requires_image(self):
+        return True

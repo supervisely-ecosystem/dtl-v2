@@ -131,6 +131,10 @@ class ApplyNNAction(NeuralNetworkAction):
                 description="Connect node and ensure that source node produces classes of type needed for this node.",
             )
             set_model_classes_to_widget(_model_meta)
+            classes_list_widget.select_all()
+            # classes_list_save_btn.click()
+            _save_classes_list_settings()
+            # _set_classes_list_preview()
 
         def set_model_classes_to_widget(_model_meta):
             classes_list_widget.loading = True
@@ -257,7 +261,7 @@ class ApplyNNAction(NeuralNetworkAction):
             obj_classes = [cls for cls in project_meta.obj_classes]
 
             # set classes to widget
-            classes_list_widget.set(obj_classes)
+            # classes_list_widget.set(obj_classes)
 
             # update settings according to new meta
             nonlocal saved_classes_settings
@@ -265,6 +269,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 saved_classes_settings, obj_classes, True
             )
 
+            # comment to hide classes preview on node link
             # update settings preview
             # _set_classes_list_preview()
 
@@ -276,7 +281,11 @@ class ApplyNNAction(NeuralNetworkAction):
             for obj_class in _model_meta.obj_classes:
                 if obj_class.name in saved_classes_settings:
                     selected_model_classes.append(
-                        {"name": obj_class.name, "shape": obj_class.geometry_type.__name__.lower()}
+                        {
+                            "name": obj_class.name,
+                            "shape": obj_class.geometry_type.__name__.lower(),
+                            "color": obj_class.color,
+                        }
                     )
 
             return selected_model_classes
