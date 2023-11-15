@@ -1,11 +1,12 @@
 # coding: utf-8
 
-from typing import Tuple
+from typing import List, Tuple, Union
 
 from supervisely import Annotation
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from supervisely import Tag, TagCollection
 
 
 class FilterImageByTagLayer(Layer):
@@ -16,14 +17,17 @@ class FilterImageByTagLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["tag", "condition"],
+                "required": ["tags", "condition"],
                 "properties": {
-                    "tag": {
-                        "type": "object",
-                        "required": ["name", "value"],
-                        "properties": {
-                            "name": {"type": "string"},
-                            "value": {},
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["name", "value"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "value": {},
+                            },
                         },
                     },
                     "condition": {"type": "string", "enum": ["with", "without"]},
@@ -40,8 +44,14 @@ class FilterImageByTagLayer(Layer):
 
         satisfies_cond = False
         condition = self.settings["condition"]
-        tag_name = self.settings["tag"]["name"]
-        tag_value = self.settings["tag"]["value"]
+
+        def has_tags(img_tags: Union[List[Tag], TagCollection], filter_tags: List[dict]):
+            has_filters = [False for _ in filter_tags]
+            for img_tag in img_tags:
+                for i, f_tag in enumerate(filter_tags):
+                    if img_tag.name == f_tag["name"] and img_tag.value == f_tag["value"]:
+                        has_filters[i] = True
+            return all(has_filters)
 
         if condition == "with":
             satisfies_cond = False
@@ -50,10 +60,8 @@ class FilterImageByTagLayer(Layer):
         else:
             raise NotImplementedError()
 
-        for img_tag in ann.img_tags:
-            if img_tag.name == tag_name and img_tag.value == tag_value:
-                satisfies_cond = not satisfies_cond
-                break
+        if has_tags(ann.img_tags, self.settings["tags"]):
+            satisfies_cond = not satisfies_cond
 
         if satisfies_cond:
             yield data_el + tuple([0])  # branch 0
