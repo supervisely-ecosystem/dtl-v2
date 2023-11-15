@@ -108,7 +108,7 @@ class AnonymizeAction(PixelLevelAction):
         anonymize_type_text = Text("Anonymization method", font_size=get_text_font_size())
         anonymize_type_select = Select(items=anon_items, size="small")
         anonymize_type_oneof = OneOf(anonymize_type_select)
-        anonymize_type_conatiner = Container(
+        anonymize_type_container = Container(
             widgets=[
                 anonymize_type_text,
                 Flexbox(
@@ -205,7 +205,7 @@ class AnonymizeAction(PixelLevelAction):
                 ),
                 NodesFlow.Node.Option(
                     "anonymize_type",
-                    option_component=NodesFlow.WidgetOptionComponent(anonymize_type_conatiner),
+                    option_component=NodesFlow.WidgetOptionComponent(anonymize_type_container),
                 ),
             ]
             return {

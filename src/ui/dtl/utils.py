@@ -283,13 +283,21 @@ def get_classes_list_value(
 def classes_list_settings_changed_meta(
     settings: Union[list, str],
     new_obj_classes: Union[List[ObjClass], ObjClassCollection],
+    is_nn_layer: bool = False,
 ):
     names = {obj_class.name for obj_class in new_obj_classes}
     if isinstance(settings, str):
         if settings == "default":
             return "default"
         return settings if settings in names else ""
+    if is_nn_layer:
+        return [class_name.name for class_name in new_obj_classes]
     return [class_name for class_name in settings if class_name in names]
+
+
+import supervisely as sly
+
+sly.Progress
 
 
 def set_classes_list_preview(
