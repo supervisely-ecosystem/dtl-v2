@@ -69,7 +69,7 @@ context_menu_items = [
 ]
 
 nodes_flow = NodesFlow(
-    height="calc(100vh - 78px)",
+    height="calc(100vh - 58px)",
     context_menu=context_menu_items,
     color_theme="light",
     show_save=False,
@@ -153,7 +153,7 @@ sidebar = Sidebar(
     height="calc(100vh - 57px)",
     clear_main_panel_paddings=True,
     show_close=False,
-    align_sidebar_to_header=True,
+    sidebar_left_padding="20px",
 )
 
 layout = Container(widgets=[dialog_widgets, add_layer_dialog, sidebar], gap=0)
