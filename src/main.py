@@ -10,7 +10,6 @@ import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
 from src.ui.widgets import ApplyCss
-import supervisely as sly
 from supervisely.app.widgets import ImageAnnotationPreview
 
 # init widget scripts

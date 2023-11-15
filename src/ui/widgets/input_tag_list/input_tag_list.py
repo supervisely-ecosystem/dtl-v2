@@ -1,21 +1,37 @@
 from typing import List, Union, Dict
 
 from supervisely.app.widgets import Widget
-from supervisely import TagMeta, TagMetaCollection
+from supervisely import TagMeta, TagMetaCollection, Tag
 from supervisely.annotation.tag_meta import TagValueType
 from supervisely.app.content import DataJson, StateJson
 from supervisely.imaging.color import rgb2hex
 
 
-VALUE_TYPE_NAME = {
-    str(TagValueType.NONE): "NONE",
-    str(TagValueType.ANY_STRING): "TEXT",
-    str(TagValueType.ONEOF_STRING): "ONE OF",
-    str(TagValueType.ANY_NUMBER): "NUMBER",
-}
+class InputTagList(Widget):
+    class VALUE_TYPES:
+        none = str(TagValueType.NONE)
+        any_string = str(TagValueType.ANY_STRING)
+        one_of = str(TagValueType.ONEOF_STRING)
+        number = str(TagValueType.ANY_NUMBER)
 
+    VALUE_TYPE_NAME = {
+        str(TagValueType.NONE): "NONE",
+        str(TagValueType.ANY_STRING): "TEXT",
+        str(TagValueType.ONEOF_STRING): "ONE OF",
+        str(TagValueType.ANY_NUMBER): "NUMBER",
+    }
 
-class TagMetasList(Widget):
+    def get_default_value(self, tag_meta: TagMeta):
+        DEFAULT_VALUES = {
+            str(TagValueType.NONE): None,
+            str(TagValueType.ANY_STRING): "",
+            str(TagValueType.ANY_NUMBER): 0,
+        }
+        if tag_meta.value_type == str(TagValueType.ONEOF_STRING):
+            return tag_meta.possible_values[0]
+        else:
+            return DEFAULT_VALUES[tag_meta.value_type]
+
     class Routes:
         CHECKBOX_CHANGED = "checkbox_cb"
 
@@ -42,9 +58,11 @@ class TagMetasList(Widget):
             "maxWidth": self._max_width,
             "tags": [
                 {
-                    "name": f"<b>{tag_meta.name}</b>",
-                    "valueType": VALUE_TYPE_NAME[tag_meta.value_type],
+                    "name": tag_meta.name,
+                    "valueType": tag_meta.value_type,
+                    "valueTypeText": self.VALUE_TYPE_NAME[tag_meta.value_type],
                     "color": rgb2hex(tag_meta.color),
+                    "possible_values": tag_meta.possible_values,
                 }
                 for tag_meta in self._tag_metas
             ],
@@ -53,6 +71,7 @@ class TagMetasList(Widget):
     def get_json_state(self) -> Dict:
         return {
             "selected": [False for _ in self._tag_metas],
+            "values": [self.get_default_value(tm) for tm in self._tag_metas],
         }
 
     def get_selected_tag_metas(self):
@@ -62,14 +81,39 @@ class TagMetasList(Widget):
             if selected
         ]
 
+    def get_selected_tags(self):
+        return [
+            Tag(meta=tm, value=value)
+            for selected, value, tm in zip(
+                StateJson()[self.widget_id]["selected"],
+                StateJson()[self.widget_id]["values"],
+                self._tag_metas,
+            )
+            if selected
+        ]
+
+    def get_all_tags(self):
+        return [
+            Tag(meta=tm, value=value)
+            for value, tm in zip(
+                StateJson()[self.widget_id]["values"],
+                self._tag_metas,
+            )
+        ]
+
     def set(self, tag_metas: Union[List[TagMeta], TagMetaCollection]):
-        selected_names = [tm.name for tm in self.get_selected_tag_metas()]
         self._tag_metas = tag_metas
         DataJson()[self.widget_id] = self.get_json_data()
         DataJson().send_changes()
-        StateJson()[self.widget_id]["selected"] = [
-            tm.name in selected_names for tm in self._tag_metas
+        StateJson()[self.widget_id] = self.get_json_state()
+        StateJson().send_changes()
+
+    def set_values(self, values_dict: dict):
+        current_values = StateJson()[self.widget_id]["values"]
+        values = [
+            values_dict.get(tm.name, current_values[idx]) for idx, tm in enumerate(self._tag_metas)
         ]
+        StateJson()[self.widget_id]["values"] = values
         StateJson().send_changes()
 
     def select_all(self):
@@ -97,7 +141,7 @@ class TagMetasList(Widget):
         return self._tag_metas
 
     def selection_changed(self, func):
-        route_path = self.get_route_path(TagMetasList.Routes.CHECKBOX_CHANGED)
+        route_path = self.get_route_path(InputTagList.Routes.CHECKBOX_CHANGED)
         server = self._sly_app.get_server()
         self._checkboxes_handled = True
 
