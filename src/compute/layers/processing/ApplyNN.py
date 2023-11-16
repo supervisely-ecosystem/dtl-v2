@@ -11,6 +11,7 @@ from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from supervisely.nn.inference import Session
 from src.compute.classes_utils import ClassConstants
+from src.compute.tags_utils import TagConstants
 import src.globals as g
 from supervisely.io.fs import silent_remove
 import supervisely as sly
@@ -85,7 +86,16 @@ class ApplyNN(Layer):
                 "shape": new_class["shape"],
                 "color": new_class["color"],
             }
-            self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
+        self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
+
+    def define_tags_mapping(self):
+        for new_tag in self.settings["tags"]:
+            self.tag_mapping[new_tag["name"]] = {
+                "title": new_tag["name"],
+                "value_type": new_tag["value_type"],
+                "color": new_tag["color"],
+            }
+        self.tag_mapping[TagConstants.OTHER] = TagConstants.DEFAULT
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
@@ -109,8 +119,9 @@ class ApplyNN(Layer):
                 #     label = label.clone(tags=[])
                 #     labels.append(label)
                 # ann = ann.clone(img_tags=[], labels=labels)
-                if exists(img_path):
-                    silent_remove(img_path)
+
+                # if exists(img_path):
+                # silent_remove(img_path)
 
             elif apply_method == "roi":
                 pass

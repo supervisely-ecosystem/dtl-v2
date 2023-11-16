@@ -357,6 +357,7 @@ def set_classes_list_settings_from_json(
 
 
 # tags
+
 def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union[list, str]):
     if isinstance(settings, str):
         if settings == "default":
