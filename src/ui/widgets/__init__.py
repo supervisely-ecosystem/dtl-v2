@@ -10,3 +10,4 @@ from .layer_card import LayerCard
 from .circle_progress import CircleProgress
 from .apply_css import ApplyCss
 from .input_tag_list import InputTagList
+from .tags_list import TagsList

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from typing import Tuple
-
+from os.path import exists
 import cv2
 import numpy as np
 
@@ -25,7 +25,7 @@ class ApplyNN(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["session_id", "model_info", "classes", "apply_method"],
+                "required": ["session_id", "model_info", "classes", "tags", "apply_method"],
                 "properties": {
                     "session_id": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
                     "model_info": {"type": "object"},
@@ -37,6 +37,25 @@ class ApplyNN(Layer):
                             "properties": {
                                 "name": {"type": "string"},
                                 "shape": {"type": "string"},
+                                "color": {
+                                    "type": "array",
+                                    "items": {"type": "integer"},
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "default": [0, 0, 0],
+                                    "description": "RGB color",
+                                },
+                            },
+                        },
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["name", "value_type"],
+                            "properties": {
+                                "name": {"type": "string"},
+                                "value_type": {"type": "string"},
                                 "color": {
                                     "type": "array",
                                     "items": {"type": "integer"},
@@ -77,22 +96,22 @@ class ApplyNN(Layer):
             yield img_desc, ann
         else:
             img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
-            sly.image.write(img_path, img)
 
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
+                sly.image.write(img_path, img)
                 session = Session(g.api, self.settings["session_id"])
                 ann = session.inference_image_path(img_path)
 
                 # remove tags for now
-                labels = []
-                for label in ann.labels:
-                    label = label.clone(tags=[])
-                    labels.append(label)
-                ann = ann.clone(img_tags=[], labels=labels)
+                # labels = []
+                # for label in ann.labels:
+                #     label = label.clone(tags=[])
+                #     labels.append(label)
+                # ann = ann.clone(img_tags=[], labels=labels)
+                if exists(img_path):
+                    silent_remove(img_path)
 
-                # make inference_image_np method
-                silent_remove(img_path)
             elif apply_method == "roi":
                 pass
 

@@ -13,15 +13,16 @@ from supervisely.app.widgets import (
     ModelInfo,
     SelectAppSession,
     MatchObjClasses,
+    MatchTagMetas,
     NotificationBox,
 )
 from supervisely import ProjectMeta
 from supervisely.nn.inference import Session, SessionJSON
 from supervisely.imaging.color import hex2rgb, rgb2hex
-
+from supervisely import TagMeta, ObjClass
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesList, ClassesListPreview
+from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagMetasPreview
 from src.ui.dtl.utils import (
     classes_list_settings_changed_meta,
     get_classes_list_value,
@@ -33,6 +34,7 @@ from src.ui.dtl.utils import (
     create_save_btn,
     create_set_default_btn,
     get_text_font_size,
+    set_tags_list_settings_from_json,
 )
 import src.globals as g
 
@@ -63,6 +65,7 @@ class ApplyNNAction(NeuralNetworkAction):
         _model_meta = ProjectMeta()
         _model_info = {}
 
+        ### CONNECT TO MODEL
         connect_nn_text = Text("Connect to Model", "text", font_size=get_text_font_size())
         connect_nn_model_preview = Text("No model selected", "text", font_size=get_text_font_size())
         connect_nn_edit_btn = Button(
@@ -101,6 +104,7 @@ class ApplyNNAction(NeuralNetworkAction):
         def set_nn_model_classes():
             nonlocal _current_meta, _model_meta, _model_info
             match_obj_classes_widget.hide()
+            match_tag_metas_widget.hide()
 
             session_id = connect_nn_model_info._session_id
             if session_id is None:
@@ -115,44 +119,87 @@ class ApplyNNAction(NeuralNetworkAction):
             model_name = _model_info["app_name"]
             connect_nn_model_preview.set(model_name, "text")
 
-            # use MatchObjClasses
             original_classes, conflict_classes = get_conflict_classes(_current_meta, _model_meta)
             if len(conflict_classes) > 0:
                 match_obj_classes_widget.set(original_classes, conflict_classes)
-                match_obj_classes_widget.show()
                 classes_list_widget_notification.set(
                     title="Classes conflict",
                     description="Project meta and model meta have classes with the same names, but different shapes. Disable conflicting classes in previous nodes or select other model.",
                 )
+                match_obj_classes_widget.show()
                 return
 
             classes_list_widget_notification.set(
                 title="No classes",
-                description="Connect node and ensure that source node produces classes of type needed for this node.",
+                description="Connect to deployed model to display classes.",
             )
-            set_model_classes_to_widget(_model_meta)
-            classes_list_widget.select_all()
-            # classes_list_save_btn.click()
-            _save_classes_list_settings()
-            # _set_classes_list_preview()
 
-        def set_model_classes_to_widget(_model_meta):
+            if len(_model_meta.obj_classes) == 0:
+                classes_list_widget_notification.show()
+
+            if len(_model_meta.obj_classes) > 0:
+                set_model_classes_to_widget(_model_meta)
+
+            original_tags, conflict_tags = get_conflict_tags(_current_meta, _model_meta)
+            if len(conflict_classes) > 0:
+                match_tag_metas_widget.set(original_tags, conflict_tags)
+                conflict_stat = match_tag_metas_widget.get_stat()
+                if (
+                    conflict_stat["different_value_type"] > 0
+                    or conflict_stat["different_one_of_options"] > 0
+                    or conflict_stat["different_value_type_suffix"] > 0
+                    or conflict_stat["different_one_of_options_suffix"] > 0
+                ):
+                    tags_list_widget_notification.set(
+                        title="Tags conflict",
+                        description="Project meta and model meta have tag metas with the same names, but different values. Disable conflicting tags in previous nodes or select other model.",
+                    )
+                    match_tag_metas_widget.show()
+                    return
+
+            tags_list_widget_notification.set(
+                title="No tags",
+                description="Connect to deployed model to display tags.",
+            )
+            if len(_model_meta.tag_metas) == 0:
+                tags_list_widget_notification.show()
+
+            if len(_model_meta.tag_metas) > 0:
+                set_model_tags_to_widget(_model_meta)
+
+        def set_model_classes_to_widget(_model_meta: ProjectMeta):
             classes_list_widget.loading = True
-            obj_classes = [cls for cls in _model_meta.obj_classes]
+            obj_classes = _model_meta.obj_classes
 
             # set classes to widget
             classes_list_widget.set(obj_classes)
 
             # update settings according to new meta
             nonlocal saved_classes_settings
-            saved_classes_settings = classes_list_settings_changed_meta(
-                saved_classes_settings, obj_classes, True
-            )
+            saved_classes_settings = obj_classes
             # update settings preview
             _set_classes_list_preview()
             classes_list_widget.loading = False
+            classes_list_widget.select_all()
+            classes_list_preview.set(obj_classes)
 
-        def get_conflict_classes(current_meta, model_meta):
+        def set_model_tags_to_widget(_model_meta: ProjectMeta):
+            tags_list_widget.loading = True
+            tag_metas = _model_meta.tag_metas
+
+            # set classes to widget
+            tags_list_widget.set(tag_metas)
+
+            # update settings according to new meta
+            nonlocal saved_tags_settings
+            saved_tags_settings = tag_metas
+            # update settings preview
+            _set_tags_list_preview()
+            tags_list_widget.loading = False
+            tags_list_widget.select_all()
+            tags_list_preview.set(tag_metas)
+
+        def get_conflict_classes(current_meta: ProjectMeta, model_meta: ProjectMeta):
             original_classess = []
             conflict_classes = []
             for curr_obj_class in current_meta.obj_classes:
@@ -163,12 +210,25 @@ class ApplyNNAction(NeuralNetworkAction):
                         conflict_classes.append(model_obj_class)
             return original_classess, conflict_classes
 
+        def get_conflict_tags(current_meta: ProjectMeta, model_meta: ProjectMeta):
+            original_tags = []
+            conflict_tags = []
+            for curr_tag_meta in current_meta.tag_metas:
+                model_tag_meta = model_meta.get_tag_meta(curr_tag_meta.name)
+                if model_tag_meta is not None:
+                    original_tags.append(curr_tag_meta)
+                    conflict_tags.append(model_tag_meta)
+            return original_tags, conflict_tags
+
+        ### -----------------------------
+
+        ### CLASSES
         match_obj_classes_widget = MatchObjClasses()
         match_obj_classes_widget.hide()
 
         classes_list_widget_notification = NotificationBox(
             title="No classes",
-            description="Connect node and ensure that source node produces classes of type needed for this node.",
+            description="Connect to deployed model to display classes.",
         )
         classes_list_widget = ClassesList(
             multiple=True, empty_notification=classes_list_widget_notification
@@ -195,6 +255,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 ),
             ]
         )
+
         classes_list_edit_text = Text(
             "Model Classes", status="text", font_size=get_text_font_size()
         )
@@ -209,27 +270,55 @@ class ApplyNNAction(NeuralNetworkAction):
         classes_list_edit_container = get_set_settings_container(
             classes_list_edit_text, classes_list_edit_btn
         )
+        ### -----------------------------
 
-        saved_classes_settings = "default"
-        default_classes_settings = "default"
+        ### TAGS
+        match_tag_metas_widget = MatchTagMetas()
+        match_tag_metas_widget.hide()
 
-        def _get_classes_list_value():
-            return get_classes_list_value(classes_list_widget, multiple=True)
+        tags_list_widget_notification = NotificationBox(
+            title="No tags",
+            description="Connect to deployed model to display tags.",
+        )
+        tags_list_widget = TagsList(multiple=True, empty_notification=tags_list_widget_notification)
+        tags_list_preview = TagMetasPreview(empty_text="No tags selected")
+        tags_list_save_btn = create_save_btn()
+        tags_list_set_default_btn = create_set_default_btn()
 
-        def _set_classes_list_preview():
-            set_classes_list_preview(
-                classes_list_widget, classes_list_preview, saved_classes_settings
-            )
+        tags_list_widget_field = Field(
+            content=tags_list_widget,
+            title="Model Tags",
+            description="Select tags from model",
+        )
+        tags_list_widgets_container = Container(
+            widgets=[
+                tags_list_widget_field,
+                match_tag_metas_widget,
+                Flexbox(
+                    widgets=[
+                        tags_list_save_btn,
+                        tags_list_set_default_btn,
+                    ],
+                    gap=110,
+                ),
+            ]
+        )
 
-        def _save_classes_list_settings():
-            nonlocal saved_classes_settings
-            saved_classes_settings = _get_classes_list_value()
+        tags_list_edit_text = Text("Model Tags", status="text", font_size=get_text_font_size())
+        tags_list_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+        tags_list_edit_container = get_set_settings_container(
+            tags_list_edit_text, tags_list_edit_btn
+        )
+        ### -----------------------------
 
-        def _set_default_classes_list_setting():
-            # save setting to var
-            nonlocal saved_classes_settings
-            saved_classes_settings = copy.deepcopy(default_classes_settings)
-
+        ### APPLY METHOD
         apply_nn_selector_methods = [
             Select.Item("image", "Full Image"),
             Select.Item("roi", "ROI defined by object BBox"),
@@ -239,7 +328,7 @@ class ApplyNNAction(NeuralNetworkAction):
 
         apply_nn_methods_selector.disable()  # disable ROI
 
-        anonymize_type_container = Container(
+        apply_nn_method_container = Container(
             widgets=[
                 apply_nn_method_text,
                 Flexbox(
@@ -249,6 +338,45 @@ class ApplyNNAction(NeuralNetworkAction):
             style="margin-top: 15px;",
             gap=4,
         )
+        ### -----------------------------
+
+        saved_classes_settings = "default"
+        default_classes_settings = "default"
+
+        saved_tags_settings = "default"
+        default_tags_settings = "default"
+
+        def _get_classes_list_value():
+            return get_classes_list_value(classes_list_widget, multiple=True)
+
+        def _get_tags_list_value():
+            return [tag_meta for tag_meta in tags_list_widget.get_selected_tags()]
+
+        def _set_classes_list_preview():
+            set_classes_list_preview(
+                classes_list_widget, classes_list_preview, saved_classes_settings
+            )
+
+        def _set_tags_list_preview():
+            tags_list_preview.set([tag_meta for tag_meta in tags_list_widget.get_selected_tags()])
+
+        def _save_classes_list_settings():
+            nonlocal saved_classes_settings
+            saved_classes_settings = _get_classes_list_value()
+
+        def _save_tags_list_settings():
+            nonlocal saved_tags_settings
+            saved_tags_settings = _get_tags_list_value()
+
+        def _set_default_classes_list_setting():
+            # save setting to var
+            nonlocal saved_classes_settings
+            saved_classes_settings = copy.deepcopy(default_classes_settings)
+
+        def _set_default_tags_list_setting():
+            # save setting to var
+            nonlocal saved_tags_settings
+            saved_tags_settings = copy.deepcopy(default_tags_settings)
 
         def meta_changed_cb(project_meta: ProjectMeta):
             nonlocal _current_meta
@@ -258,16 +386,14 @@ class ApplyNNAction(NeuralNetworkAction):
             _current_meta = project_meta
 
             classes_list_widget.loading = True
-            obj_classes = [cls for cls in project_meta.obj_classes]
+            obj_classes = project_meta.obj_classes
 
             # set classes to widget
             # classes_list_widget.set(obj_classes)
 
             # update settings according to new meta
             nonlocal saved_classes_settings
-            saved_classes_settings = classes_list_settings_changed_meta(
-                saved_classes_settings, obj_classes, True
-            )
+            saved_classes_settings = obj_classes
 
             # comment to hide classes preview on node link
             # update settings preview
@@ -290,14 +416,31 @@ class ApplyNNAction(NeuralNetworkAction):
 
             return selected_model_classes
 
+        def unpack_selected_model_tags(saved_tags_settings):
+            nonlocal _model_meta
+            selected_model_classes = []
+            for tag_meta in _model_meta.tag_metas:
+                if tag_meta.name in saved_tags_settings:
+                    selected_model_classes.append(
+                        {
+                            "name": tag_meta.name,
+                            "value_type": tag_meta.value_type,
+                            "color": tag_meta.color,
+                        }
+                    )
+
+            return selected_model_classes
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             apply_method = apply_nn_methods_selector.get_value()
             selected_model_classes = unpack_selected_model_classes(saved_classes_settings)
+            selected_model_tags = unpack_selected_model_tags(saved_tags_settings)
             settings = {
                 "session_id": connect_nn_model_info._session_id,
                 "model_info": _model_info,
                 "classes": selected_model_classes,
+                "tags": selected_model_tags,
                 "apply_method": apply_method,
             }
             return settings
@@ -332,6 +475,21 @@ class ApplyNNAction(NeuralNetworkAction):
             _set_classes_list_preview()
             g.updater("metas")
 
+        @tags_list_save_btn.click
+        def tags_list_save_btn_cb():
+            _save_tags_list_settings()
+            _set_tags_list_preview()
+            g.updater("metas")
+
+        @tags_list_set_default_btn.click
+        def tags_list_set_default_btn_cb():
+            _set_default_tags_list_setting()
+            set_tags_list_settings_from_json(
+                tags_list_widget=classes_list_widget, settings=saved_tags_settings
+            )
+            _set_tags_list_preview()
+            g.updater("metas")
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
             settings_options = [
@@ -364,8 +522,22 @@ class ApplyNNAction(NeuralNetworkAction):
                     option_component=NodesFlow.WidgetOptionComponent(classes_list_preview),
                 ),
                 NodesFlow.Node.Option(
+                    name="Select Tags",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=tags_list_edit_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(
+                            tags_list_widgets_container
+                        ),
+                        sidebar_width=600,
+                    ),
+                ),
+                NodesFlow.Node.Option(
+                    "tags_preview",
+                    option_component=NodesFlow.WidgetOptionComponent(tags_list_preview),
+                ),
+                NodesFlow.Node.Option(
                     "anonymize_type",
-                    option_component=NodesFlow.WidgetOptionComponent(anonymize_type_container),
+                    option_component=NodesFlow.WidgetOptionComponent(apply_nn_method_container),
                 ),
             ]
             return {

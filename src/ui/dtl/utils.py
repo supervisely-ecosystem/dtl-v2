@@ -4,7 +4,13 @@ from os.path import join, exists
 from supervisely import ObjClass, ObjClassCollection
 from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty, ClassesTable
 
-from src.ui.widgets import ClassesMapping, ClassesMappingPreview, ClassesList, ClassesListPreview
+from src.ui.widgets import (
+    ClassesMapping,
+    ClassesMappingPreview,
+    ClassesList,
+    ClassesListPreview,
+    TagsList,
+)
 from src.exceptions import BadSettingsError
 
 
@@ -283,15 +289,12 @@ def get_classes_list_value(
 def classes_list_settings_changed_meta(
     settings: Union[list, str],
     new_obj_classes: Union[List[ObjClass], ObjClassCollection],
-    is_nn_layer: bool = False,
 ):
     names = {obj_class.name for obj_class in new_obj_classes}
     if isinstance(settings, str):
         if settings == "default":
             return "default"
         return settings if settings in names else ""
-    if is_nn_layer:
-        return [class_name.name for class_name in new_obj_classes]
     return [class_name for class_name in settings if class_name in names]
 
 
@@ -350,6 +353,18 @@ def set_classes_list_settings_from_json(
         classes_list_widget.select(settings)
     elif isinstance(classes_list_widget, ClassesTable):
         classes_list_widget.select_classes(settings)
+        return
+
+
+# tags
+def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union[list, str]):
+    if isinstance(settings, str):
+        if settings == "default":
+            tags_list_widget.select_all()
+            return
+        settings = [settings]
+    if isinstance(tags_list_widget, TagsList):
+        tags_list_widget.select(settings)
         return
 
 
