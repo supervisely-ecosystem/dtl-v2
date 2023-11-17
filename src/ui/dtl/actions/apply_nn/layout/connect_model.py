@@ -16,7 +16,7 @@ import src.globals as g
 
 SESSION_TAGS = [
     "deployed_nn",
-    "deployed_nn_cls",
+    # "deployed_nn_cls",
     # "deployed_nn_3d",
     # "sly_video_tracking",
     # "sly_smart_annotation",
@@ -27,8 +27,11 @@ SESSION_TAGS = [
     # "sly_interpolation",
 ]
 
+
 connect_nn_text = Text("Connect to Model", "text", font_size=get_text_font_size())
 connect_nn_model_preview = Text("No model selected", "text", font_size=get_text_font_size())
+connect_nn_model_preview.hide()
+
 connect_nn_edit_btn = Button(
     text="CONNECT",
     icon="zmdi zmdi-router",

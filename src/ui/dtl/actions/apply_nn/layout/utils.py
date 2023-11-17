@@ -5,7 +5,6 @@ from supervisely.nn.inference.session import Session, SessionJSON
 from src.ui.dtl.actions.apply_nn.layout.connect_model import *
 from src.ui.dtl.actions.apply_nn.layout.select_classes import *
 from src.ui.dtl.actions.apply_nn.layout.select_tags import *
-from src.ui.dtl.actions.apply_nn.layout.apply_method import *
 from src.ui.dtl.actions.apply_nn.layout.node_layout import *
 
 from src.ui.dtl.utils import (
@@ -128,38 +127,6 @@ def set_model_tags_preview(saved_tags_settings: List[str]):
 ### -----------------------------
 
 
-# CREATE NODE OUTPUT SETTINGS
-def unpack_selected_model_classes(saved_classes_settings: List[str], model_meta: ProjectMeta):
-    selected_model_classes = []
-    for obj_class in model_meta.obj_classes:
-        if obj_class.name in saved_classes_settings:
-            selected_model_classes.append(
-                {
-                    "name": obj_class.name,
-                    "shape": obj_class.geometry_type.__name__.lower(),
-                    "color": obj_class.color,
-                }
-            )
-    return selected_model_classes
-
-
-def unpack_selected_model_tags(saved_tags_settings: List[str], model_meta: ProjectMeta):
-    selected_model_tags = []
-    for tag_meta in model_meta.tag_metas:
-        if tag_meta.name in saved_tags_settings:
-            selected_model_tags.append(
-                {
-                    "name": tag_meta.name,
-                    "value_type": tag_meta.value_type,
-                    "color": tag_meta.color,
-                }
-            )
-    return selected_model_tags
-
-
-### -----------------------------
-
-
 ### CHECK CURRENT AND MODEL META CONFLICTS | WON'T USE
 def check_conflict_classes(current_meta: ProjectMeta, model_meta: ProjectMeta) -> bool:
     match_obj_classes_widget.hide()
@@ -238,6 +205,21 @@ def check_conflict_tags(current_meta: ProjectMeta, model_meta: ProjectMeta) -> b
     else:
         set_model_tags(ProjectMeta())
     return has_tags_conflict
+
+
+### -----------------------------
+
+
+### OTHER
+
+
+def show_node_gui():
+    connect_nn_model_preview.show()
+    classes_list_edit_container.show()
+    classes_list_preview.show()
+    tags_list_edit_container.show()
+    tags_list_preview.show()
+    inf_settings_edit_container.show()
 
 
 ### -----------------------------

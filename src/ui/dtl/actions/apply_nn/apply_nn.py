@@ -17,7 +17,8 @@ import src.globals as g
 from src.ui.dtl.actions.apply_nn.layout.connect_model import *
 from src.ui.dtl.actions.apply_nn.layout.select_classes import *
 from src.ui.dtl.actions.apply_nn.layout.select_tags import *
-from src.ui.dtl.actions.apply_nn.layout.apply_method import *
+from src.ui.dtl.actions.apply_nn.layout.inference_settings import *
+
 from src.ui.dtl.actions.apply_nn.layout.node_layout import *
 from src.ui.dtl.actions.apply_nn.layout.utils import *
 
@@ -48,9 +49,8 @@ class ApplyNNAction(NeuralNetworkAction):
             nonlocal _current_meta, _model_meta, _model_info, _model_settings
             nonlocal saved_classes_settings, saved_tags_settings
 
+            connect_notification.loading = True
             update_preview_btn.disable()
-            match_obj_classes_widget.hide()
-            match_tag_metas_widget.hide()
 
             session_id = connect_nn_model_info._session_id
             if session_id is None:
@@ -66,6 +66,10 @@ class ApplyNNAction(NeuralNetworkAction):
             saved_tags_settings = set_model_tags(_model_meta)
             set_model_tags_preview(saved_tags_settings)
 
+            connect_notification.hide()
+            connect_notification.loading = False
+
+            show_node_gui()
             update_preview_btn.enable()
             g.updater("metas")
 
@@ -107,52 +111,49 @@ class ApplyNNAction(NeuralNetworkAction):
                 return
             _current_meta = project_meta
 
-            if connect_nn_model_info.session_id is None:
-                return
-
-            classes_list_widget.loading = True
-            tags_list_widget.loading = True
-
-            # update settings according to new meta
-            nonlocal saved_classes_settings
-            saved_classes_settings = [obj_class.name for obj_class in project_meta.obj_classes]
-
-            nonlocal saved_tags_settings
-            saved_tags_settings = [tag_meta.name for tag_meta in project_meta.tag_metas]
-
-            classes_list_widget.loading = False
-            tags_list_widget.loading = False
-
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             nonlocal saved_classes_settings, saved_tags_settings
-            nonlocal _model_meta, _model_info
+            nonlocal _model_meta, _model_info, _model_settings
 
+            session_id = connect_nn_model_info._session_id
             apply_method = apply_nn_methods_selector.get_value()
-            selected_model_classes = unpack_selected_model_classes(
-                saved_classes_settings, _model_meta
-            )
-            selected_model_tags = unpack_selected_model_tags(saved_tags_settings, _model_meta)
+            model_suffix = model_suffix_input.get_value()
+            use_model_suffix = always_add_suffix_checkbox.is_checked()
+            model_conflict_method = resolve_conflict_method_selector.get_value()
+
             settings = {
-                "session_id": connect_nn_model_info._session_id,
+                "current_meta": _current_meta.to_json(),
+                "session_id": session_id,
                 "model_info": _model_info,
-                "classes": selected_model_classes,
-                "tags": selected_model_tags,
+                "model_meta": _model_meta.to_json(),
+                "model_settings": _model_settings,
+                "model_suffix": model_suffix,
+                "model_conflict": model_conflict_method,
+                "use_model_suffix": use_model_suffix,
                 "apply_method": apply_method,
+                "classes": saved_classes_settings,
+                "tags": saved_tags_settings,
             }
             return settings
 
         def _set_settings_from_json(settings: dict):
             apply_method = settings.get("type", "image")
             apply_nn_methods_selector.set_value(apply_method)
+            # @TODO: set other settings
+            # session_id
+            # model_info
+            # model_meta
+            # model_settings
+            # model_suffix
+            # model_conflict
+            # use_model_suffix
 
             # classes
             classes_list_widget.loading = True
             classes_list_settings = settings.get("classes", [])
             set_classes_list_settings_from_json(classes_list_widget, classes_list_settings)
-            # save settings
             _save_classes_list_settings()
-            # update settings preview
             set_model_classes_preview(saved_classes_settings)
             classes_list_widget.loading = False
             # -----------------------
@@ -161,9 +162,7 @@ class ApplyNNAction(NeuralNetworkAction):
             tags_list_widget.loading = True
             tags_list_settings = settings.get("tags", [])
             set_tags_list_settings_from_json(tags_list_widget, tags_list_settings)
-            # save settings
             _save_tags_list_settings()
-            # update settings preview
             set_tags_list_preview(tags_list_widget, tags_list_preview, tags_list_settings)
             tags_list_widget.loading = False
             # -----------------------

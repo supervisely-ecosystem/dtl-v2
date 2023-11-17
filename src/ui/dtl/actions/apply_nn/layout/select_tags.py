@@ -24,6 +24,8 @@ tags_list_widget_notification = NotificationBox(
 )
 tags_list_widget = TagsList(multiple=True, empty_notification=tags_list_widget_notification)
 tags_list_preview = TagMetasPreview(empty_text="No tags selected")
+tags_list_preview.hide()
+
 tags_list_save_btn = create_save_btn()
 tags_list_set_default_btn = create_set_default_btn()
 tags_list_widget_field = Field(
@@ -55,3 +57,4 @@ tags_list_edit_btn = Button(
     style=get_set_settings_button_style(),
 )
 tags_list_edit_container = get_set_settings_container(tags_list_edit_text, tags_list_edit_btn)
+tags_list_edit_container.hide()

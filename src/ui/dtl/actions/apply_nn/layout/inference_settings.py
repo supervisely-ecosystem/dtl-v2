@@ -18,17 +18,16 @@ from src.ui.dtl.utils import (
 )
 
 ### SIDEBAR LAYOUT
-suffix_input = Input(value="model", size="small")
-suffix_field = Field(
+model_suffix_input = Input(value="model", size="small")
+model_suffix_field = Field(
     title="Class / Tag name suffix",
     description="Add suffix to model class / tag name, if it has conflicts with existing one",
-    content=suffix_input,
+    content=model_suffix_input,
 )
 
 always_add_suffix_checkbox = Checkbox(
     content=Text("<b>Always add suffix to model predictions</b>", "text")
 )
-
 
 resolve_conflict_methods = [
     Select.Item(value="merge", label="Merge"),
@@ -56,12 +55,27 @@ inf_settings_editor_field = Field(
 inf_settings_save_btn = create_save_btn()
 inf_settings_set_default_btn = create_set_default_btn()
 
+apply_nn_selector_methods = [
+    Select.Item("image", "Full Image"),
+    Select.Item("roi", "ROI defined by object BBox (Coming Soon)", disabled=True),
+    Select.Item("sliding_window", "Sliding Window (Coming Soon)", disabled=True),
+]
+
+apply_nn_method_text = Text("Apply Method", font_size=get_text_font_size())
+apply_nn_methods_selector = Select(items=apply_nn_selector_methods, size="small")
+apply_nn_methods_field = Field(
+    title="Apply Method",
+    description="Select how you want to apply the model: to the images, to the ROI defined by object BBox or by using sliding window approach",
+    content=apply_nn_methods_selector,
+)
+
 inf_settings_widgets_container = Container(
     widgets=[
-        suffix_field,
+        model_suffix_field,
         always_add_suffix_checkbox,
         resolve_conflict_method_field,
         inf_settings_editor_field,
+        apply_nn_methods_field,
         Flexbox(
             widgets=[
                 inf_settings_save_btn,
@@ -71,6 +85,7 @@ inf_settings_widgets_container = Container(
         ),
     ]
 )
+
 ### ------------------------------------------------------
 
 ### NODE LAYOUT
@@ -86,5 +101,7 @@ inf_settings_edit_btn = Button(
 inf_settings_edit_container = get_set_settings_container(
     inf_settings_edit_text, inf_settings_edit_btn
 )
+inf_settings_edit_container.hide()
+### ------------------------------------------------------
 
 # @TODO: add settings preview

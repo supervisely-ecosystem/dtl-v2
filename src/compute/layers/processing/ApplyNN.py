@@ -1,20 +1,160 @@
 # coding: utf-8
 
 from typing import Tuple
-from os.path import exists
-import cv2
 import numpy as np
-
-from supervisely import Annotation
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
 from supervisely.nn.inference import Session
 from src.compute.classes_utils import ClassConstants
 from src.compute.tags_utils import TagConstants
-import src.globals as g
+from supervisely.collection.key_indexed_collection import KeyIndexedCollection
+from supervisely import ProjectMeta, Annotation, ObjClass, TagMeta, TagCollection
+import supervisely.imaging.image as sly_image
 from supervisely.io.fs import silent_remove
-import supervisely as sly
+import src.globals as g
+
+
+def postprocess(
+    ann: Annotation,
+    project_meta: ProjectMeta,
+    model_meta: ProjectMeta,
+    settings,
+):
+    keep_classes = settings["classes"]
+    keep_tags = settings["tags"]
+    res_project_meta, class_mapping, tag_meta_mapping = merge_metas(
+        project_meta,
+        model_meta,
+        keep_classes,
+        keep_tags,
+        settings["model_suffix"],
+        settings["use_model_suffix"],
+    )
+
+    image_tags = []
+    for tag in ann.img_tags:
+        if tag.meta.name not in keep_tags:
+            continue
+        image_tags.append(tag.clone(meta=tag_meta_mapping[tag.meta.name]))
+
+    new_labels = []
+    for label in ann.labels:
+        if label.obj_class.name not in keep_classes:
+            continue
+        label_tags = []
+        for tag in label.tags:
+            if tag.meta.name not in keep_tags:
+                continue
+            label_tags.append(tag.clone(meta=tag_meta_mapping[tag.meta.name]))
+        new_label = label.clone(
+            obj_class=class_mapping[label.obj_class.name.strip()],
+            tags=TagCollection(label_tags),
+        )
+        new_labels.append(new_label)
+
+    res_ann = ann.clone(labels=new_labels, img_tags=TagCollection(image_tags))
+    return res_ann, res_project_meta
+
+
+def merge_metas(
+    project_meta: ProjectMeta,
+    model_meta: ProjectMeta,
+    keep_model_classes,
+    keep_model_tags,
+    suffix,
+    use_suffix: bool = False,
+):
+    res_meta = project_meta.clone()
+
+    def _merge(keep_names, res_meta, project_collection, model_collection, is_class=False):
+        mapping = {}  # old name to new meta
+        for name in keep_names:
+            model_item = model_collection.get(name)
+            if model_item is None:
+                continue
+            res_item, res_name = find_item(project_collection, model_item, suffix, use_suffix)
+            if res_item is None:
+                res_item = model_item.clone(name=res_name)
+                res_meta = (
+                    res_meta.add_obj_class(res_item)
+                    if is_class
+                    else res_meta.add_tag_meta(res_item)
+                )
+            mapping[model_item.name.strip()] = res_item
+        return res_meta, mapping
+
+    res_meta, class_mapping = _merge(
+        keep_model_classes, res_meta, res_meta.obj_classes, model_meta.obj_classes, is_class=True
+    )
+    res_meta, tag_mapping = _merge(
+        keep_model_tags, res_meta, res_meta.tag_metas, model_meta.tag_metas, is_class=False
+    )
+    return res_meta, class_mapping, tag_mapping
+
+
+def generate_res_name(item, suffix):
+    return f"{item.name}-{suffix}"
+
+
+def create_class_entry(item: ObjClass, suffix: str = None):
+    title = f"{item.name}{suffix}" if suffix else item.name
+    return {
+        "title": title,
+        "shape": item.geometry_type.geometry_name(),
+        "color": item.color,
+    }
+
+
+def create_tag_meta_entry(tag_meta: TagMeta, suffix: str = None):
+    title = f"{tag_meta.name}{suffix}" if suffix else tag_meta.name
+    return {
+        "title": title,
+        "value_type": tag_meta.value_type,
+        "color": tag_meta.color,
+    }
+
+
+def find_item(
+    collection: KeyIndexedCollection,
+    item,
+    suffix,
+    use_suffix: bool = False,
+):
+    index = 0
+    res_name = item.name.strip()
+    while True:
+        existing_item = collection.get(res_name.strip())
+        if existing_item is None:
+            if use_suffix is True:
+                res_name = generate_res_name(item, suffix)
+                existing_item = collection.get(res_name)
+                if existing_item is not None:
+                    return existing_item, None
+            return None, res_name
+        else:
+            if existing_item == item.clone(name=res_name):
+                if use_suffix is True:
+                    res_name = generate_res_name(item, suffix)
+                    existing_item = collection.get(res_name)
+                    if existing_item is None:
+                        return None, res_name
+                    elif existing_item == item.clone(name=res_name):
+                        res_name = generate_res_name(item, suffix)
+                        existing_item = collection.get(res_name)
+                        if existing_item is None:
+                            return None, res_name
+                        return existing_item, None
+                    else:
+                        index += 1
+                        res_name = generate_res_name(item, suffix)
+                        existing_item = collection.get(res_name)
+                        if existing_item is None:
+                            return None, res_name
+                return existing_item, None
+            else:
+                res_name = generate_res_name(item, suffix)
+                index += 1
 
 
 class ApplyNN(Layer):
@@ -25,49 +165,31 @@ class ApplyNN(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["session_id", "model_info", "classes", "tags", "apply_method"],
+                "required": [
+                    "current_meta",
+                    "session_id",
+                    "model_info",
+                    "model_meta",
+                    "model_settings",
+                    "model_suffix",
+                    "use_model_suffix",
+                    "model_conflict",
+                    "apply_method",
+                    "classes",
+                    "tags",
+                ],
                 "properties": {
+                    "current_meta": {"type": "object"},
                     "session_id": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
                     "model_info": {"type": "object"},
-                    "classes": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": ["name", "shape"],
-                            "properties": {
-                                "name": {"type": "string"},
-                                "shape": {"type": "string"},
-                                "color": {
-                                    "type": "array",
-                                    "items": {"type": "integer"},
-                                    "minItems": 3,
-                                    "maxItems": 3,
-                                    "default": [0, 0, 0],
-                                    "description": "RGB color",
-                                },
-                            },
-                        },
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": ["name", "value_type"],
-                            "properties": {
-                                "name": {"type": "string"},
-                                "value_type": {"type": "string"},
-                                "color": {
-                                    "type": "array",
-                                    "items": {"type": "integer"},
-                                    "minItems": 3,
-                                    "maxItems": 3,
-                                    "default": [0, 0, 0],
-                                    "description": "RGB color",
-                                },
-                            },
-                        },
-                    },
-                    "apply_method": {"type": "string", "enum": ["image", "roi"]},
+                    "model_meta": {"type": "object"},
+                    "model_settings": {"type": "object"},
+                    "model_suffix": {"type": "string"},
+                    "use_model_suffix": {"type": "boolean"},
+                    "model_conflict": {"type": "string", "enum": ["merge", "replace"]},
+                    "apply_method": {"type": "string", "enum": ["image", "roi", "sliding_window"]},
+                    "classes": {"type": "array", "items": {"type": "string"}},
+                    "tags": {"type": "array", "items": {"type": "string"}},
                 },
             }
         },
@@ -80,24 +202,59 @@ class ApplyNN(Layer):
         return True
 
     def define_classes_mapping(self):
-        # super().define_classes_mapping()
+        current_meta = ProjectMeta().from_json(self.settings["current_meta"])
+        model_meta = ProjectMeta().from_json(self.settings["model_meta"])
+        classes = self.settings["classes"]
+        suffix = self.settings["model_suffix"]
+        use_suffix = self.settings["use_model_suffix"]
+        model_conflict = self.settings["model_conflict"]
 
-        for new_class in self.settings["classes"]:
-            self.cls_mapping[new_class["name"]] = {
-                "title": new_class["name"],
-                "shape": new_class["shape"],
-                "color": new_class["color"],
-            }
+        new_classes = []
+        model_conflict = self.settings["model_conflict"]
+        if use_suffix is True:
+            for model_class in model_meta.obj_classes:
+                if model_class.name in classes:
+                    new_classes.append(create_class_entry(model_class, f"-{suffix}"))
+
+        elif model_conflict == "replace":
+            for model_class in model_meta.obj_classes:
+                if model_class.name in classes:
+                    curr_class = current_meta.get_obj_class(model_class.name)
+                    if curr_class is None:
+                        new_classes.append(create_class_entry(model_class))
+                    else:
+                        self.cls_mapping[model_class.name] = create_class_entry(model_class)
+
+        elif model_conflict == "merge":
+            for model_class in model_meta.obj_classes:
+                if model_class.name in classes:
+                    curr_class = current_meta.get_obj_class(model_class.name)
+                    if curr_class is not None:
+                        new_classes.append(create_class_entry(model_class, f"-{suffix}"))
+                    else:
+                        new_classes.append(create_class_entry(model_class))
+
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
+        self.cls_mapping[ClassConstants.NEW] = new_classes
 
     def define_tags_mapping(self):
-        for new_tag in self.settings["tags"]:
-            self.tag_mapping[new_tag["name"]] = {
-                "title": new_tag["name"],
-                "value_type": new_tag["value_type"],
-                "color": new_tag["color"],
-            }
+        current_meta = ProjectMeta().from_json(self.settings["current_meta"])
+        model_meta = ProjectMeta().from_json(self.settings["model_meta"])
+        tags = self.settings["tags"]
+        suffix = self.settings["model_suffix"]
+
+        new_tag_metas = []
+        for model_tag_meta in model_meta.tag_metas:
+            if model_tag_meta.name in tags:
+                curr_tag_meta = current_meta.get_tag_meta(model_tag_meta.name)
+                if curr_tag_meta is not None:
+                    pass
+                    # new_tag_metas.append(create_tag_meta_entry(model_tag_meta, f"-{suffix}"))
+                else:
+                    new_tag_metas.append(create_tag_meta_entry(model_tag_meta))
+
         self.tag_mapping[TagConstants.OTHER] = TagConstants.DEFAULT
+        self.tag_mapping[TagConstants.NEW] = new_tag_metas
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
@@ -110,19 +267,15 @@ class ApplyNN(Layer):
             img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
 
             # session.update_inference_settings()
-
+            model_meta = ProjectMeta().from_json(self.settings["model_meta"])
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
-                sly.image.write(img_path, img)
+                sly_image.write(img_path, img)
                 session = Session(g.api, self.settings["session_id"])
-                ann = session.inference_image_path(img_path)
-
-                # remove tags for now
-                # labels = []
-                # for label in ann.labels:
-                #     label = label.clone(tags=[])
-                #     labels.append(label)
-                # ann = ann.clone(img_tags=[], labels=labels)
+                pred_ann = session.inference_image_path(img_path)
+                pred_ann, res_meta = postprocess(
+                    pred_ann, self.output_meta, model_meta, self.settings
+                )
 
                 # if exists(img_path):
                 # silent_remove(img_path)
@@ -131,6 +284,12 @@ class ApplyNN(Layer):
                 pass
             elif apply_method == "sliding_window":
                 pass
+
+            model_conflict = self.settings["model_conflict"]
+            if model_conflict == "merge":
+                ann = ann.merge(pred_ann)
+            elif model_conflict == "replace":
+                ann = pred_ann
 
             new_img_desc = img_desc.clone_with_img(img)
             yield new_img_desc, ann

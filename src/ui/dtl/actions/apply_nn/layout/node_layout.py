@@ -1,9 +1,8 @@
-from supervisely.app.widgets import NodesFlow
+from supervisely.app.widgets import NodesFlow, NotificationBox
 
 from src.ui.dtl.actions.apply_nn.layout.connect_model import *
 from src.ui.dtl.actions.apply_nn.layout.select_classes import *
 from src.ui.dtl.actions.apply_nn.layout.select_tags import *
-from src.ui.dtl.actions.apply_nn.layout.apply_method import *
 from src.ui.dtl.actions.apply_nn.layout.inference_settings import *
 
 ### UPDATE PREVIEW BUTTON
@@ -15,6 +14,14 @@ update_preview_btn = Button(
     style=get_set_settings_button_style(),
 )
 update_preview_btn.disable()
+### -----------------------------
+
+### CONNECT TO MODEL NOTIFICATION
+connect_notification = NotificationBox(
+    title="Connect to deployed model",
+    description="to select classes, tags and inference settings",
+    box_type="info",
+)
 ### -----------------------------
 
 
@@ -31,6 +38,10 @@ def create_layout():
         NodesFlow.Node.Option(
             "model_preview",
             option_component=NodesFlow.WidgetOptionComponent(connect_nn_model_preview),
+        ),
+        NodesFlow.Node.Option(
+            "connect_notification",
+            option_component=NodesFlow.WidgetOptionComponent(connect_notification),
         ),
         NodesFlow.Node.Option(
             name="Select Classes",
@@ -63,10 +74,6 @@ def create_layout():
                 sidebar_component=NodesFlow.WidgetOptionComponent(inf_settings_widgets_container),
                 sidebar_width=380,
             ),
-        ),
-        NodesFlow.Node.Option(
-            "anonymize_type",
-            option_component=NodesFlow.WidgetOptionComponent(apply_nn_method_container),
         ),
     ]
     return settings_options

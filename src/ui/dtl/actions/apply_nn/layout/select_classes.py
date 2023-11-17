@@ -27,6 +27,8 @@ classes_list_widget = ClassesList(
     multiple=True, empty_notification=classes_list_widget_notification
 )
 classes_list_preview = ClassesListPreview(empty_text="No classes selected")
+classes_list_preview.hide()
+
 classes_list_save_btn = create_save_btn()
 classes_list_set_default_btn = create_set_default_btn()
 
@@ -61,3 +63,4 @@ classes_list_edit_btn = Button(
 classes_list_edit_container = get_set_settings_container(
     classes_list_edit_text, classes_list_edit_btn
 )
+classes_list_edit_container.hide()
