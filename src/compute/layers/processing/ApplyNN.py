@@ -20,7 +20,6 @@ import supervisely as sly
 class ApplyNN(Layer):
     action = "apply_nn"
 
-    # jsonschema
     layer_settings = {
         "required": ["settings"],
         "properties": {
@@ -124,6 +123,8 @@ class ApplyNN(Layer):
                 # silent_remove(img_path)
 
             elif apply_method == "roi":
+                pass
+            elif apply_method == "sliding_window":
                 pass
 
             new_img_desc = img_desc.clone_with_img(img)

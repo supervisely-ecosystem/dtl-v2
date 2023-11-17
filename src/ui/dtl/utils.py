@@ -10,6 +10,7 @@ from src.ui.widgets import (
     ClassesList,
     ClassesListPreview,
     TagsList,
+    TagMetasPreview,
 )
 from src.exceptions import BadSettingsError
 
@@ -358,6 +359,7 @@ def set_classes_list_settings_from_json(
 
 # tags
 
+
 def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union[list, str]):
     if isinstance(settings, str):
         if settings == "default":
@@ -367,6 +369,42 @@ def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union
     if isinstance(tags_list_widget, TagsList):
         tags_list_widget.select(settings)
         return
+
+
+def set_tags_list_preview(
+    tags_list_widget: TagsList,
+    tags_list_preview_widget: TagMetasPreview,
+    tags_list_settings: Union[list, str],
+):
+    if isinstance(tags_list_settings, str):
+        if tags_list_settings == "default":
+            if isinstance(tags_list_widget, TagsList):
+                tags_list_preview_widget.set(tags_list_widget.get_all_tags())
+            # TO BE ADDED WHEN TagsMapping IS READY
+            # elif isinstance(tags_list_widget, TagsMapping):
+            #   tags_list_preview_widget.set(tags_list_widget.get_tags())
+            return
+        names = [tags_list_settings]
+    else:
+        names = tags_list_settings
+
+    tag_metas = tags_list_widget.get_all_tags()
+    tags_list_preview_widget.set([tag_meta for tag_meta in tag_metas if tag_meta.name in names])
+
+
+def get_tags_list_value(tags_list_widget: TagsList, multiple: bool = True):
+    selected = tags_list_widget.get_selected_tags()
+    if multiple:
+        if isinstance(tags_list_widget, TagsList):
+            return [tag_meta.name for tag_meta in selected]
+        else:
+            return [tag_meta for tag_meta in selected]
+    else:
+        if len(selected) == 0:
+            return ""
+        elif isinstance(tags_list_widget, TagsList):
+            return selected[0].name
+        return selected[0].name
 
 
 # Options utils
