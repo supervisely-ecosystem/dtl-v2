@@ -1,7 +1,3 @@
-import copy
-from typing import Optional
-from os.path import realpath, dirname
-
 from supervisely.app.widgets import (
     Button,
     Container,

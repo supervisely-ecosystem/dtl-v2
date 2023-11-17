@@ -2,19 +2,15 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely.app.widgets import Button
 from supervisely import ProjectMeta
-from supervisely.nn.inference import Session, SessionJSON
-from supervisely import TagMeta, ObjClass
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_classes_list_value,
     get_tags_list_value,
-    set_classes_list_preview,
     set_classes_list_settings_from_json,
-    get_layer_docs,
     set_tags_list_settings_from_json,
+    get_layer_docs,
 )
 import src.globals as g
 
@@ -38,6 +34,7 @@ class ApplyNNAction(NeuralNetworkAction):
         _current_meta = ProjectMeta()
         _model_meta = ProjectMeta()
         _model_info = {}
+        _model_settings = {}
 
         ### CONNECT TO MODEL BUTTONS
         @connect_nn_model_selector.value_changed
@@ -48,7 +45,7 @@ class ApplyNNAction(NeuralNetworkAction):
 
         @connect_nn_save_btn.click
         def confirm_model():
-            nonlocal _current_meta, _model_meta, _model_info
+            nonlocal _current_meta, _model_meta, _model_info, _model_settings
             nonlocal saved_classes_settings, saved_tags_settings
 
             update_preview_btn.disable()
@@ -59,8 +56,9 @@ class ApplyNNAction(NeuralNetworkAction):
             if session_id is None:
                 return
 
-            _model_meta, _model_info = get_model_settings(session_id)
+            _model_meta, _model_info, _model_settings = get_model_settings(session_id)
             set_model_preview(_model_info)
+            set_model_settings(_model_settings)
 
             saved_classes_settings = set_model_classes(_model_meta)
             set_model_classes_preview(saved_classes_settings)
@@ -68,12 +66,8 @@ class ApplyNNAction(NeuralNetworkAction):
             saved_tags_settings = set_model_tags(_model_meta)
             set_model_tags_preview(saved_tags_settings)
 
-            has_classes_conflict = check_conflict_classes(_current_meta, _model_meta)
-            has_tags_conflict = check_conflict_tags(_current_meta, _model_meta)
-
-            if not has_classes_conflict and not has_tags_conflict:
-                update_preview_btn.enable()
-                g.updater("metas")
+            update_preview_btn.enable()
+            g.updater("metas")
 
         ### -----------------------
 
@@ -122,19 +116,12 @@ class ApplyNNAction(NeuralNetworkAction):
             # update settings according to new meta
             nonlocal saved_classes_settings
             saved_classes_settings = [obj_class.name for obj_class in project_meta.obj_classes]
-            has_classes_conflicts = check_conflict_classes(_current_meta, _model_meta)
 
             nonlocal saved_tags_settings
             saved_tags_settings = [tag_meta.name for tag_meta in project_meta.tag_metas]
-            has_tags_conflicts = check_conflict_tags(_current_meta, _model_meta)
 
             classes_list_widget.loading = False
             tags_list_widget.loading = False
-
-            if has_classes_conflicts or has_tags_conflicts:
-                update_preview_btn.disable()
-            else:
-                update_preview_btn.enable()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

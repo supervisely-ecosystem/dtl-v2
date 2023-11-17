@@ -4,6 +4,7 @@ from src.ui.dtl.actions.apply_nn.layout.connect_model import *
 from src.ui.dtl.actions.apply_nn.layout.select_classes import *
 from src.ui.dtl.actions.apply_nn.layout.select_tags import *
 from src.ui.dtl.actions.apply_nn.layout.apply_method import *
+from src.ui.dtl.actions.apply_nn.layout.inference_settings import *
 
 ### UPDATE PREVIEW BUTTON
 update_preview_btn = Button(
@@ -36,7 +37,7 @@ def create_layout():
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=classes_list_edit_container,
                 sidebar_component=NodesFlow.WidgetOptionComponent(classes_list_widgets_container),
-                sidebar_width=600,
+                sidebar_width=380,
             ),
         ),
         NodesFlow.Node.Option(
@@ -48,12 +49,20 @@ def create_layout():
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=tags_list_edit_container,
                 sidebar_component=NodesFlow.WidgetOptionComponent(tags_list_widgets_container),
-                sidebar_width=600,
+                sidebar_width=380,
             ),
         ),
         NodesFlow.Node.Option(
             "tags_preview",
             option_component=NodesFlow.WidgetOptionComponent(tags_list_preview),
+        ),
+        NodesFlow.Node.Option(
+            name="Inference Settings",
+            option_component=NodesFlow.WidgetOptionComponent(
+                widget=inf_settings_edit_container,
+                sidebar_component=NodesFlow.WidgetOptionComponent(inf_settings_widgets_container),
+                sidebar_width=380,
+            ),
         ),
         NodesFlow.Node.Option(
             "anonymize_type",

@@ -76,6 +76,9 @@ class ApplyNN(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
+    def requires_image(self):
+        return True
+
     def define_classes_mapping(self):
         # super().define_classes_mapping()
 
@@ -106,6 +109,8 @@ class ApplyNN(Layer):
         else:
             img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
 
+            # session.update_inference_settings()
+
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
                 sly.image.write(img_path, img)
@@ -129,6 +134,3 @@ class ApplyNN(Layer):
 
             new_img_desc = img_desc.clone_with_img(img)
             yield new_img_desc, ann
-
-    def requires_image(self):
-        return True
