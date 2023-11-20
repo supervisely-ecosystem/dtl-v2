@@ -75,5 +75,9 @@ def create_layout():
                 sidebar_width=380,
             ),
         ),
+        NodesFlow.Node.Option(
+            "inference_settings_preview",
+            option_component=NodesFlow.WidgetOptionComponent(inf_settings_preview_container),
+        ),
     ]
     return settings_options

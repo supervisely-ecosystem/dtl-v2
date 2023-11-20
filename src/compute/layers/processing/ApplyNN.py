@@ -11,7 +11,7 @@ from src.compute.tags_utils import TagConstants
 from supervisely.collection.key_indexed_collection import KeyIndexedCollection
 from supervisely import ProjectMeta, Annotation, ObjClass, TagMeta, TagCollection
 import supervisely.imaging.image as sly_image
-from supervisely.io.fs import silent_remove
+from supervisely.io.fs import silent_remove, file_exists
 import src.globals as g
 
 
@@ -241,15 +241,17 @@ class ApplyNN(Layer):
         current_meta = ProjectMeta().from_json(self.settings["current_meta"])
         model_meta = ProjectMeta().from_json(self.settings["model_meta"])
         tags = self.settings["tags"]
+        use_suffix = self.settings["use_model_suffix"]
         suffix = self.settings["model_suffix"]
 
         new_tag_metas = []
         for model_tag_meta in model_meta.tag_metas:
             if model_tag_meta.name in tags:
                 curr_tag_meta = current_meta.get_tag_meta(model_tag_meta.name)
-                if curr_tag_meta is not None:
-                    pass
-                    # new_tag_metas.append(create_tag_meta_entry(model_tag_meta, f"-{suffix}"))
+                if use_suffix:
+                    new_tag_metas.append(create_tag_meta_entry(model_tag_meta, f"-{suffix}"))
+                elif curr_tag_meta is not None:
+                    new_tag_metas.append(create_tag_meta_entry(model_tag_meta, f"-{suffix}"))
                 else:
                     new_tag_metas.append(create_tag_meta_entry(model_tag_meta))
 
@@ -266,7 +268,6 @@ class ApplyNN(Layer):
         else:
             img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
 
-            # session.update_inference_settings()
             model_meta = ProjectMeta().from_json(self.settings["model_meta"])
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
@@ -276,9 +277,8 @@ class ApplyNN(Layer):
                 pred_ann, res_meta = postprocess(
                     pred_ann, self.output_meta, model_meta, self.settings
                 )
-
-                # if exists(img_path):
-                # silent_remove(img_path)
+                if file_exists(img_path):
+                    silent_remove(img_path)
 
             elif apply_method == "roi":
                 pass

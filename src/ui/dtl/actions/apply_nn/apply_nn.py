@@ -32,6 +32,7 @@ class ApplyNNAction(NeuralNetworkAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        _session_id = None
         _current_meta = ProjectMeta()
         _model_meta = ProjectMeta()
         _model_info = {}
@@ -46,28 +47,33 @@ class ApplyNNAction(NeuralNetworkAction):
 
         @connect_nn_save_btn.click
         def confirm_model():
-            nonlocal _current_meta, _model_meta, _model_info, _model_settings
+            nonlocal _current_meta, _model_meta
+            nonlocal _model_info, _model_settings, _session_id
             nonlocal saved_classes_settings, saved_tags_settings
 
             connect_notification.loading = True
             update_preview_btn.disable()
 
-            session_id = connect_nn_model_info._session_id
-            if session_id is None:
+            _session_id = connect_nn_model_info._session_id
+            if _session_id is None:
                 return
 
-            _model_meta, _model_info, _model_settings = get_model_settings(session_id)
+            _model_meta, _model_info, _model_settings = get_model_settings(_session_id)
             set_model_preview(_model_info)
             set_model_settings(_model_settings)
 
-            saved_classes_settings = set_model_classes(_model_meta)
+            saved_classes_settings = set_model_classes(
+                [obj_class for obj_class in _model_meta.obj_classes]
+            )
             set_model_classes_preview(saved_classes_settings)
 
-            saved_tags_settings = set_model_tags(_model_meta)
+            saved_tags_settings = set_model_tags([tag_meta for tag_meta in _model_meta.tag_metas])
             set_model_tags_preview(saved_tags_settings)
 
             connect_notification.hide()
             connect_notification.loading = False
+
+            set_model_settings_preview()
 
             show_node_gui()
             update_preview_btn.enable()
@@ -121,13 +127,14 @@ class ApplyNNAction(NeuralNetworkAction):
             model_suffix = model_suffix_input.get_value()
             use_model_suffix = always_add_suffix_checkbox.is_checked()
             model_conflict_method = resolve_conflict_method_selector.get_value()
+            model_settings_json = model_settings_from_yaml(_model_settings)
 
             settings = {
                 "current_meta": _current_meta.to_json(),
                 "session_id": session_id,
                 "model_info": _model_info,
                 "model_meta": _model_meta.to_json(),
-                "model_settings": _model_settings,
+                "model_settings": model_settings_json,
                 "model_suffix": model_suffix,
                 "model_conflict": model_conflict_method,
                 "use_model_suffix": use_model_suffix,
@@ -138,34 +145,54 @@ class ApplyNNAction(NeuralNetworkAction):
             return settings
 
         def _set_settings_from_json(settings: dict):
-            apply_method = settings.get("type", "image")
-            apply_nn_methods_selector.set_value(apply_method)
-            # @TODO: set other settings
-            # session_id
-            # model_info
-            # model_meta
-            # model_settings
-            # model_suffix
-            # model_conflict
-            # use_model_suffix
+            nonlocal _model_meta, _model_info, _model_settings, _session_id
+            connect_notification.loading = True
+            _session_id = set_deployed_model_from_json(settings)
+            if _session_id is None:
+                connect_notification.loading = False
+                return
+
+            connect_notification.hide()
+            connect_notification.loading = False
+            show_node_gui()
+
+            # model
+            _model_info = set_model_info_from_json(settings)
+            set_model_preview(_model_info)
+            _model_meta = set_model_meta_from_json(settings)
+            # -----------------------
 
             # classes
             classes_list_widget.loading = True
             classes_list_settings = settings.get("classes", [])
+            classes_list_widget.set(_model_meta.obj_classes)
             set_classes_list_settings_from_json(classes_list_widget, classes_list_settings)
             _save_classes_list_settings()
-            set_model_classes_preview(saved_classes_settings)
+            set_classes_list_preview(
+                classes_list_widget, classes_list_preview, classes_list_settings
+            )
             classes_list_widget.loading = False
             # -----------------------
 
             # tags
             tags_list_widget.loading = True
             tags_list_settings = settings.get("tags", [])
+            tags_list_widget.set(_model_meta.tag_metas)
             set_tags_list_settings_from_json(tags_list_widget, tags_list_settings)
             _save_tags_list_settings()
             set_tags_list_preview(tags_list_widget, tags_list_preview, tags_list_settings)
             tags_list_widget.loading = False
             # -----------------------
+
+            # model settings
+            set_model_suffix_from_json(settings)
+            set_use_model_suffix_from_json(settings)
+            set_model_conflict_from_json(settings)
+            _model_settings = set_model_settings_from_json(settings)
+            set_model_apply_method_from_json(settings)
+            set_model_settings_preview()
+            # -----------------------
+            update_preview_btn.enable()
 
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
@@ -191,6 +218,22 @@ class ApplyNNAction(NeuralNetworkAction):
             _set_default_tags_list_setting()
             set_tags_list_settings_from_json(tags_list_widget, saved_tags_settings)
             set_tags_list_preview(tags_list_widget, tags_list_preview, saved_tags_settings)
+            g.updater("metas")
+
+        @inf_settings_save_btn.click
+        def inf_settings_save_btn_cb():
+            nonlocal _session_id, _model_settings
+            update_model_inference_settings(_session_id, _model_settings)
+            set_model_settings_preview()
+            g.updater("metas")
+
+        @inf_settings_set_default_btn.click
+        def inf_settings_set_default_btn_cb():
+            nonlocal _session_id
+            if _session_id is None:
+                return
+
+            set_default_model_settings(_session_id)
             g.updater("metas")
 
         def create_options(src: list, dst: list, settings: dict) -> dict:

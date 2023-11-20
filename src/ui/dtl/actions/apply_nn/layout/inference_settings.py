@@ -88,6 +88,29 @@ inf_settings_widgets_container = Container(
 
 ### ------------------------------------------------------
 
+### PREVIEW LAYOUT
+suffix_preview = Text("Suffix: ", "text", font_size=get_text_font_size())
+use_suffix_preview = Text("Always use suffix: ", "text", font_size=get_text_font_size())
+conflict_method_preview = Text("Conflict resolve method: ", "text", font_size=get_text_font_size())
+apply_method_preview = Text("Apply method: ", "text", font_size=get_text_font_size())
+
+suffix_preview.hide()
+use_suffix_preview.hide()
+conflict_method_preview.hide()
+apply_method_preview.hide()
+
+inf_settings_preview_container = Container(
+    [
+        suffix_preview,
+        use_suffix_preview,
+        conflict_method_preview,
+        apply_method_preview,
+    ]
+)
+
+
+### ------------------------------------------------------
+
 ### NODE LAYOUT
 inf_settings_edit_text = Text("Inference Settings", "text", font_size=get_text_font_size())
 inf_settings_edit_btn = Button(

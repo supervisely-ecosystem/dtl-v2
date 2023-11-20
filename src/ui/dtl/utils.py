@@ -299,11 +299,6 @@ def classes_list_settings_changed_meta(
     return [class_name for class_name in settings if class_name in names]
 
 
-import supervisely as sly
-
-sly.Progress
-
-
 def set_classes_list_preview(
     classes_list_widget: Union[ClassesList, ClassesMapping, ClassesTable],
     classes_list_preview_widget: ClassesListPreview,
