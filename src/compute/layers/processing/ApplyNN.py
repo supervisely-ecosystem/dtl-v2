@@ -296,9 +296,6 @@ class ApplyNN(Layer):
                     sly_logger.debug("Could not apply model to image")
                     pred_ann = Annotation(img_size=img.shape[:2])
 
-                pred_ann.draw_pretty(img)
-                sly_image.write("annpred.png", img)
-
                 if file_exists(img_path):
                     silent_remove(img_path)
 
