@@ -38,7 +38,7 @@ def create_inference_settings_widgets():
     resolve_conflict_method_selector = Select(resolve_conflict_methods, size="small")
     resolve_conflict_method_field = Field(
         title="How to add predictions",
-        description="Select how to add predicted annotation to image",
+        description="Select how to add prediction to existing image annotation",
         content=resolve_conflict_method_selector,
     )
 
@@ -94,7 +94,7 @@ def create_inference_settings_widgets():
     suffix_preview = Text("Suffix: ", "text", font_size=get_text_font_size())
     use_suffix_preview = Text("Always use suffix: ", "text", font_size=get_text_font_size())
     conflict_method_preview = Text(
-        "How to add prediction: ", "text", font_size=get_text_font_size()
+        "How to add predictions: ", "text", font_size=get_text_font_size()
     )
     apply_method_preview = Text("Apply method: ", "text", font_size=get_text_font_size())
 

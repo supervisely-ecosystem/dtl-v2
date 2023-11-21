@@ -35,6 +35,7 @@ Supported models:
     	- **ROI (Coming Soon)** - Model will be applied only for ROIs defined by object's bounding box.
       - **Sliding Window (Coming Soon)** - Model will be applied to image using sliding window approach.
 
+
 <table>
 <tr>
 <td style="text-align:center; width:33%"><strong>Original image</strong></td>
@@ -43,8 +44,8 @@ Supported models:
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/9620df11-26ae-4170-8188-1f6f1810971f" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/19731940-f778-4afa-8969-3eee4589bee7" alt="YOLOv5 applied (Object Detection)" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/f8a27865-dd45-4653-9f03-c9c6cc5add0a" alt="YOLOv8 applied (Instance Segmentation)" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/32abd297-107a-4edf-8a70-1545d2967e88" alt="YOLOv5 applied (Object Detection)" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/fdfd2613-8e35-4560-9677-b89aa7e036ac" alt="YOLOv8 applied (Instance Segmentation)" /> </td>
 </tr>
 </table>
 
