@@ -344,7 +344,20 @@ class Layer:
                     for new_tag_dict in dst_tag:
                         new_name = new_tag_dict["title"]
                         new_value_type = new_tag_dict["value_type"]
-                        inp_tag_meta = TagMeta(name=new_name, value_type=new_value_type)
+                        new_color = new_tag_dict.get("color", None)
+                        if new_color is not None and new_color[0] == "#":
+                            new_color = hex2rgb(new_color)
+                        new_possible_values = new_tag_dict.get("possible_values", None)
+                        new_applicable_to = new_tag_dict.get("applicable_to", None)
+                        new_applicable_classes = new_tag_dict.get("applicable_classes", None)
+                        inp_tag_meta = TagMeta(
+                            name=new_name,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
+                        )
                         if res_meta.tag_metas.has_key(new_name):
                             existing_tag_meta = res_meta.tag_metas.get(new_name)
                             if existing_tag_meta.value_type != new_value_type:
@@ -399,11 +412,11 @@ class Layer:
                         new_color = tag_dct.get("color", None)
                         if new_color is not None and new_color[0] == "#":
                             new_color = hex2rgb(new_color)
-                        new_obj_tag = existing_tag.clone(
+                        new_tag_meta = existing_tag.clone(
                             name=title, value_type=new_value_type, color=new_color
                         )
                         res_meta = res_meta.delete_tag_meta(title)
-                        res_meta = res_meta.add_tag_meta(new_obj_tag)
+                        res_meta = res_meta.add_tag_meta(new_tag_meta)
 
                 # smth -> __default__
                 elif dst_tag == TagConstants.DEFAULT:
@@ -419,10 +432,10 @@ class Layer:
 
                 # smth -> new name
                 elif type(dst_tag) is str:
-                    obj_tag = res_meta.get_tag_meta(src_tag_title)
-                    obj_tag = obj_tag.clone(name=dst_tag)
+                    tag_meta = res_meta.get_tag_meta(src_tag_title)
+                    tag_meta = tag_meta.clone(name=dst_tag)
                     res_meta = res_meta.delete_tag_meta(src_tag_title)
-                    res_meta = res_meta.add_tag_meta(obj_tag)
+                    res_meta = res_meta.add_tag_meta(tag_meta)
 
                 # smth -> new tag description
                 elif type(dst_tag) is dict:
@@ -431,29 +444,36 @@ class Layer:
                     new_color = dst_tag.get("color", None)
                     if new_color is not None and new_color[0] == "#":
                         new_color = hex2rgb(new_color)
-                    obj_tag = res_meta.get_tag_meta(src_tag_title)
-                    if obj_tag is None:
-                        obj_tag = TagMeta(name=new_name, value_type=new_value_type, color=new_color)
+                    new_possible_values = dst_tag.get("possible_values", None)
+                    new_applicable_to = dst_tag.get("applicable_to", None)
+                    new_applicable_classes = dst_tag.get("applicable_classes", None)
+                    inp_tag_meta = TagMeta(
+                        name=new_name,
+                        value_type=new_value_type,
+                        possible_values=new_possible_values,
+                        color=new_color,
+                        applicable_to=new_applicable_to,
+                        applicable_classes=new_applicable_classes,
+                    )
+
+                    tag_meta = res_meta.get_tag_meta(src_tag_title)
+                    if tag_meta is None:
+                        tag_meta = TagMeta(
+                            name=new_name, value_type=new_value_type, color=new_color
+                        )
                     else:
-                        obj_tag = obj_tag.clone(
-                            name=new_name, geometry_type=new_geometry_type, color=new_color
+                        tag_meta = tag_meta.clone(
+                            name=new_name,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            new_applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
                         )
                     res_meta = res_meta.delete_tag_meta(src_tag_title)
-                    res_meta = res_meta.add_tag_meta(obj_tag)
+                    res_meta = res_meta.add_tag_meta(tag_meta)
             ### ------------------
 
-            # rm_imtags = [TagMeta.from_json(tag) for tag in self.get_removed_tag_metas()]
-            # res_meta = res_meta.clone(
-            #     tag_metas=[tm for tm in res_meta.tag_metas if tm not in rm_imtags]
-            # )
-            # new_imtags = [TagMeta.from_json(tag) for tag in self.get_added_tag_metas()]
-            # new_imtags_exist = [
-            #     tm for tm in res_meta.tag_metas.intersection(TagMetaCollection(new_imtags))
-            # ]
-            # if len(new_imtags_exist) != 0:
-            #     exist_tag_names = [t.name for t in new_imtags_exist]
-            #     logger.warn("Tags {} already exist.".format(exist_tag_names))
-            # res_meta.clone(tag_metas=new_imtags)
             self.output_meta = res_meta
         except CustomException as e:
             e.extra["layer_config"] = self._config
