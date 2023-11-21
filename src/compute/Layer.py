@@ -393,6 +393,7 @@ class Layer:
                         real_dst_tag = real_src_tag.clone(name=dst_title)
                         res_meta = res_meta.add_tag_meta(real_dst_tag)
 
+                # __update__ -> [ list of tags ]
                 elif src_tag_title == TagConstants.UPDATE:
                     if type(dst_tag) is not list:
                         raise RuntimeError("Internal tag mapping error in layer (NEW spec).")
@@ -412,8 +413,17 @@ class Layer:
                         new_color = tag_dct.get("color", None)
                         if new_color is not None and new_color[0] == "#":
                             new_color = hex2rgb(new_color)
+                        new_possible_values = new_tag_dict.get("possible_values", None)
+                        new_applicable_to = new_tag_dict.get("applicable_to", None)
+                        new_applicable_classes = new_tag_dict.get("applicable_classes", None)
+
                         new_tag_meta = existing_tag.clone(
-                            name=title, value_type=new_value_type, color=new_color
+                            name=title,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
                         )
                         res_meta = res_meta.delete_tag_meta(title)
                         res_meta = res_meta.add_tag_meta(new_tag_meta)

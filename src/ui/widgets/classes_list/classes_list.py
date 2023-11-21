@@ -105,9 +105,6 @@ class ClassesList(Widget):
         StateJson()[self.widget_id]["selected"] = selected
         StateJson().send_changes()
 
-    def set_multiple(self, value: bool):
-        self._multiple = value
-
     def get_all_classes(self):
         return self._classes
 
