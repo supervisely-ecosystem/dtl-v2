@@ -210,7 +210,7 @@ def set_model_settings_preview(
 
     suffix_preview.set(f"Suffix: {model_suffix}", "text")
     use_suffix_preview.set(f"Always use suffix: {str(model_use_suffix)}", "text")
-    conflict_method_preview.set(f"Conflict resolve method: {model_conflict}", "text")
+    conflict_method_preview.set(f"How to add prediction: {model_conflict}", "text")
     apply_method_preview.set(f"Apply method: {apply_method}", "text")
 
     suffix_preview.show()

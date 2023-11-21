@@ -94,7 +94,7 @@ def create_inference_settings_widgets():
     suffix_preview = Text("Suffix: ", "text", font_size=get_text_font_size())
     use_suffix_preview = Text("Always use suffix: ", "text", font_size=get_text_font_size())
     conflict_method_preview = Text(
-        "Conflict resolve method: ", "text", font_size=get_text_font_size()
+        "How to add prediction: ", "text", font_size=get_text_font_size()
     )
     apply_method_preview = Text("Apply method: ", "text", font_size=get_text_font_size())
 
