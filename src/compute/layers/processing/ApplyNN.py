@@ -275,7 +275,7 @@ class ApplyNN(Layer):
         img = img.astype(np.uint8)
 
         if self.settings["session_id"] is None:
-            yield img_desc, ann
+            raise ValueError("Apply NN layer requires model to be connected")
         else:
             img_path = join(
                 f"{g.PREVIEW_DIR}",
@@ -312,3 +312,8 @@ class ApplyNN(Layer):
 
             new_img_desc = img_desc.clone_with_img(img)
             yield new_img_desc, ann
+
+    def validate(self):
+        super().validate()
+        if self.settings["session_id"] is None:
+            raise ValueError("Apply NN layer requires model to be connected")
