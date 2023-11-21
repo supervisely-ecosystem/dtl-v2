@@ -15,7 +15,7 @@ VALUE_TYPE_NAME = {
 }
 
 
-class TagMetasPreview(Widget):
+class TagsListPreview(Widget):
     def __init__(
         self,
         tag_metas: Union[List[TagMeta], TagMetaCollection] = [],

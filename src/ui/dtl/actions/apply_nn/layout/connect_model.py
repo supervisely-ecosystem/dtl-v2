@@ -28,38 +28,54 @@ SESSION_TAGS = [
 ]
 
 
-connect_nn_text = Text("Connect to Model", "text", font_size=get_text_font_size())
-connect_nn_model_preview = Text("No model selected", "text", font_size=get_text_font_size())
-connect_nn_model_preview.hide()
+def create_connect_to_model_widgets() -> tuple:
+    connect_nn_text = Text("Connect to Model", "text", font_size=get_text_font_size())
+    connect_nn_model_preview = Text("No model selected", "text", font_size=get_text_font_size())
+    connect_nn_model_preview.hide()
 
-connect_nn_edit_btn = Button(
-    text="CONNECT",
-    icon="zmdi zmdi-router",
-    button_type="text",
-    button_size="small",
-    emit_on_click="openSidebar",
-    style=get_set_settings_button_style(),
-)
-connect_nn_edit_container = get_set_settings_container(connect_nn_text, connect_nn_edit_btn)
-connect_nn_save_btn = create_save_btn()
-connect_nn_model_selector = SelectAppSession(team_id=g.TEAM_ID, tags=SESSION_TAGS)
+    connect_nn_edit_btn = Button(
+        text="CONNECT",
+        icon="zmdi zmdi-router",
+        button_type="text",
+        button_size="small",
+        emit_on_click="openSidebar",
+        style=get_set_settings_button_style(),
+    )
+    connect_nn_edit_container = get_set_settings_container(connect_nn_text, connect_nn_edit_btn)
+    connect_nn_save_btn = create_save_btn()
+    connect_nn_model_selector = SelectAppSession(team_id=g.TEAM_ID, tags=SESSION_TAGS)
 
-connect_nn_model_field = Field(
-    title="Select deployed model",
-    description="Select deployed model that will be applied for inference",
-    content=connect_nn_model_selector,
-)
+    connect_nn_model_field = Field(
+        title="Select deployed model",
+        description="Select deployed model that will be applied for inference",
+        content=connect_nn_model_selector,
+    )
 
-connect_nn_model_info = ModelInfo()
-connect_nn_model_info_empty_text = Text("Select model to display info", "text")
-connect_nn_model_info_container = Container(
-    [connect_nn_model_info, connect_nn_model_info_empty_text]
-)
-connect_nn_model_info_field = Field(
-    title="Model Info",
-    description="Technical details and configurations for deployed model",
-    content=connect_nn_model_info_container,
-)
-connect_nn_widgets_container = Container(
-    widgets=[connect_nn_model_field, connect_nn_model_info_field, connect_nn_save_btn]
-)
+    connect_nn_model_info = ModelInfo()
+    connect_nn_model_info_empty_text = Text("Select model to display info", "text")
+    connect_nn_model_info_container = Container(
+        [connect_nn_model_info, connect_nn_model_info_empty_text]
+    )
+    connect_nn_model_info_field = Field(
+        title="Model Info",
+        description="Technical details and configurations for deployed model",
+        content=connect_nn_model_info_container,
+    )
+    connect_nn_widgets_container = Container(
+        widgets=[connect_nn_model_field, connect_nn_model_info_field, connect_nn_save_btn]
+    )
+
+    return (
+        connect_nn_text,
+        connect_nn_model_preview,
+        connect_nn_edit_btn,
+        connect_nn_edit_container,
+        connect_nn_save_btn,
+        connect_nn_model_selector,
+        connect_nn_model_field,
+        connect_nn_model_info,
+        connect_nn_model_info_empty_text,
+        connect_nn_model_info_container,
+        connect_nn_model_info_field,
+        connect_nn_widgets_container,
+    )

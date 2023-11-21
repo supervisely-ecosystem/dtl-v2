@@ -10,7 +10,7 @@ from src.ui.widgets import (
     ClassesList,
     ClassesListPreview,
     TagsList,
-    TagMetasPreview,
+    TagsListPreview,
 )
 from src.exceptions import BadSettingsError
 
@@ -368,7 +368,7 @@ def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union
 
 def set_tags_list_preview(
     tags_list_widget: TagsList,
-    tags_list_preview_widget: TagMetasPreview,
+    tags_list_preview_widget: TagsListPreview,
     tags_list_settings: Union[list, str],
 ):
     if isinstance(tags_list_settings, str):

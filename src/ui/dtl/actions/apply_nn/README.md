@@ -51,6 +51,8 @@ Supported models:
 <details>
   <summary>JSON view</summary>
 <pre>
+
+```json
 {
 	"action": "apply_nn",
 	"src": [
@@ -132,16 +134,17 @@ Supported models:
 		"use_model_suffix": true,
 		"apply_method": "image",
 		"classes": [
-			"person",
-            "car",
-            "sheep",
-            "dog",
-            "cat",
+				"person",
+            	"car",
+            	"sheep",
+            	"dog",
+            	"cat",
 		],
 		"tags": [
 			"confidence"
 		]
 	}
 }
+```
 </pre>
 </details>

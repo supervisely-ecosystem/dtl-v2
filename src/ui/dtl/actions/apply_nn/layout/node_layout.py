@@ -1,31 +1,48 @@
-from supervisely.app.widgets import NodesFlow, NotificationBox
-
-from src.ui.dtl.actions.apply_nn.layout.connect_model import *
-from src.ui.dtl.actions.apply_nn.layout.select_classes import *
-from src.ui.dtl.actions.apply_nn.layout.select_tags import *
-from src.ui.dtl.actions.apply_nn.layout.inference_settings import *
-
-### UPDATE PREVIEW BUTTON
-update_preview_btn = Button(
-    text="Update",
-    icon="zmdi zmdi-refresh",
-    button_type="text",
-    button_size="small",
-    style=get_set_settings_button_style(),
-)
-update_preview_btn.disable()
-### -----------------------------
-
-### CONNECT TO MODEL NOTIFICATION
-connect_notification = NotificationBox(
-    title="Connect to deployed model",
-    description="to select classes, tags and inference settings",
-    box_type="info",
-)
-### -----------------------------
+from supervisely.app.widgets import Container, NodesFlow, NotificationBox, Button, Text
+from src.ui.widgets import ClassesListPreview, TagsListPreview
+from src.ui.dtl.utils import get_set_settings_button_style
 
 
-def create_layout():
+def create_preview_button_widget() -> Button:
+    ### UPDATE PREVIEW BUTTON
+    update_preview_btn = Button(
+        text="Update",
+        icon="zmdi zmdi-refresh",
+        button_type="text",
+        button_size="small",
+        style=get_set_settings_button_style(),
+    )
+    update_preview_btn.disable()
+    ### -----------------------------
+    return update_preview_btn
+
+
+def create_connect_notification_widget() -> NotificationBox:
+    ### CONNECT TO MODEL NOTIFICATION
+    connect_notification = NotificationBox(
+        title="Connect to deployed model",
+        description="to select classes, tags and inference settings",
+        box_type="info",
+    )
+    ### -----------------------------
+    return connect_notification
+
+
+def create_layout(
+    connect_nn_edit_container: Container,
+    connect_nn_widgets_container: Container,
+    connect_nn_model_preview: Text,
+    connect_notification: NotificationBox,
+    classes_list_edit_container: Container,
+    classes_list_widgets_container: Container,
+    classes_list_preview: ClassesListPreview,
+    tags_list_edit_container: Container,
+    tags_list_widgets_container: Container,
+    tags_list_preview: TagsListPreview,
+    inf_settings_edit_container: Container,
+    inf_settings_widgets_container: Container,
+    inf_settings_preview_container: Container,
+):
     settings_options = [
         NodesFlow.Node.Option(
             name="Connect to Model",

@@ -18,7 +18,7 @@ from supervisely import ProjectMeta
 
 from src.ui.dtl import FilterAndConditionAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesList, ClassesListPreview, TagMetasPreview
+from src.ui.widgets import ClassesList, ClassesListPreview, TagsListPreview
 from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
@@ -163,7 +163,7 @@ class IfAction(FilterAndConditionAction):
         def _set_tags_value(condition_json):
             _select_tags_input.set_names(condition_json["tags"])
 
-        _tags_preview_widget = TagMetasPreview()
+        _tags_preview_widget = TagsListPreview()
 
         def _set_tags_preview():
             names = _get_tags_value()
