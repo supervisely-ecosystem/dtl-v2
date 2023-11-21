@@ -1,7 +1,8 @@
 # coding: utf-8
-
+from supervisely import logger as sly_logger
 from typing import Tuple
 import numpy as np
+from os.path import join
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.image_descriptor import ImageDescriptor
@@ -188,8 +189,18 @@ class ApplyNN(Layer):
                     "use_model_suffix": {"type": "boolean"},
                     "model_conflict": {"type": "string", "enum": ["merge", "replace"]},
                     "apply_method": {"type": "string", "enum": ["image", "roi", "sliding_window"]},
-                    "classes": {"type": "array", "items": {"type": "string"}},
-                    "tags": {"type": "array", "items": {"type": "string"}},
+                    "classes": {
+                        "oneOf": [
+                            {"type": "string"},
+                            {"type": "array", "items": {"type": "string"}},
+                        ]
+                    },
+                    "tags": {
+                        "oneOf": [
+                            {"type": "string"},
+                            {"type": "array", "items": {"type": "string"}},
+                        ]
+                    },
                 },
             }
         },
@@ -266,17 +277,25 @@ class ApplyNN(Layer):
         if self.settings["session_id"] is None:
             yield img_desc, ann
         else:
-            img_path = f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}"
+            img_path = join(
+                f"{g.PREVIEW_DIR}",
+                f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}",
+            )
 
             model_meta = ProjectMeta().from_json(self.settings["model_meta"])
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
                 sly_image.write(img_path, img)
                 session = Session(g.api, self.settings["session_id"])
-                pred_ann = session.inference_image_path(img_path)
-                pred_ann, res_meta = postprocess(
-                    pred_ann, self.output_meta, model_meta, self.settings
-                )
+                try:
+                    pred_ann = session.inference_image_path(img_path)
+                    pred_ann, res_meta = postprocess(
+                        pred_ann, self.output_meta, model_meta, self.settings
+                    )
+                except:
+                    sly_logger.debug("Could not apply model to image")
+                    pred_ann = Annotation(img_size=img.shape[:2])
+
                 if file_exists(img_path):
                     silent_remove(img_path)
 
