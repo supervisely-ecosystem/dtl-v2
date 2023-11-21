@@ -24,14 +24,16 @@ Supported models:
 - **Class / Tag name suffix** - Suffix that will be added to the class / tag name if it have conflict with existing class / tag in the project. For example, if the input project has existing class with name `person` and the suffix is `model`, the resulting class name will be `person-model`.
 - **Model Settings**
   - **Always use suffix** - If enabled, the suffix will be added to the class / tag name even if there is no conflict.
-  - **Resolve conflict method** - Method that will be used to resolve conflict between existing class / tag and the class / tag that will be added by the layer. Available methods:
-    - **Merge** - Merge predicted annotation with the existing one.
-    - **Replace** - Replace the existing annotation with the one predicted by the model. All existing annotations will be removed.
+  - **How to add predictions** - Select how to add the predicted annotation to the image.
+    - Available methods:
+      - **Merge** - Merge predicted annotation with the existing one.
+      - **Replace** - Replace the existing annotation with the one predicted by the model. All original labels will be removed.
   - **Inference settings** - Model specific settings in `YAML` format
-  - **Apply method** - Method that will be used to apply the model to the data. Available methods:
-    - **Full Image** - Model will be applied to the full image.
-    - **ROI** - Model will be applied only for ROIs defined by object's bounding box (Coming Soon).
-    - **Sliding Window** - Model will be applied to image using sliding window approach (Coming Soon).
+  - **Apply method** - Method that will be used to apply the model to the data. 
+    - Available methods:
+    	- **Full Image** - Model will be applied to the full image.
+    	- **ROI (Coming Soon)** - Model will be applied only for ROIs defined by object's bounding box.
+      - **Sliding Window (Coming Soon)** - Model will be applied to image using sliding window approach.
 
 <table>
 <tr>
@@ -40,9 +42,9 @@ Supported models:
 <td style="text-align:center; width:33%"><strong>YOLOv8 applied (Instance Segmentation)</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/86b76053-a3c4-4d9e-bcbc-c56067c12fdd" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/e75df2ad-90c7-4e89-b8ab-3c10ad48d17b" alt="YOLOv5 applied (Object Detection)" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/9e6cdad4-254b-41f5-a95d-a2e5bea70d15" alt="YOLOv8 applied (Instance Segmentation)" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/9620df11-26ae-4170-8188-1f6f1810971f" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/19731940-f778-4afa-8969-3eee4589bee7" alt="YOLOv5 applied (Object Detection)" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/f8a27865-dd45-4653-9f03-c9c6cc5add0a" alt="YOLOv8 applied (Instance Segmentation)" /> </td>
 </tr>
 </table>
 

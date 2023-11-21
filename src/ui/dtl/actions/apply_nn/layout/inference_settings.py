@@ -37,8 +37,8 @@ def create_inference_settings_widgets():
     ]
     resolve_conflict_method_selector = Select(resolve_conflict_methods, size="small")
     resolve_conflict_method_field = Field(
-        title="Resolve conflict method",
-        description="Select how to resolve conflict between model classes / tags and existing ones",
+        title="How to add predictions",
+        description="Select how to add predicted annotation to image",
         content=resolve_conflict_method_selector,
     )
 

@@ -174,7 +174,7 @@ class ApplyNN(Layer):
                     "model_settings",
                     "model_suffix",
                     "use_model_suffix",
-                    "model_conflict",
+                    "add_pred_ann_method",
                     "apply_method",
                     "classes",
                     "tags",
@@ -187,7 +187,7 @@ class ApplyNN(Layer):
                     "model_settings": {"type": "object"},
                     "model_suffix": {"type": "string"},
                     "use_model_suffix": {"type": "boolean"},
-                    "model_conflict": {"type": "string", "enum": ["merge", "replace"]},
+                    "add_pred_ann_method": {"type": "string", "enum": ["merge", "replace"]},
                     "apply_method": {"type": "string", "enum": ["image", "roi", "sliding_window"]},
                     "classes": {
                         "oneOf": [
@@ -218,16 +218,16 @@ class ApplyNN(Layer):
         classes = self.settings["classes"]
         suffix = self.settings["model_suffix"]
         use_suffix = self.settings["use_model_suffix"]
-        model_conflict = self.settings["model_conflict"]
+        add_pred_ann_method = self.settings["add_pred_ann_method"]
 
         new_classes = []
-        model_conflict = self.settings["model_conflict"]
+        add_pred_ann_method = self.settings["add_pred_ann_method"]
         if use_suffix is True:
             for model_class in model_meta.obj_classes:
                 if model_class.name in classes:
                     new_classes.append(create_class_entry(model_class, f"-{suffix}"))
 
-        elif model_conflict == "replace":
+        elif add_pred_ann_method == "replace":
             for model_class in model_meta.obj_classes:
                 if model_class.name in classes:
                     curr_class = current_meta.get_obj_class(model_class.name)
@@ -236,7 +236,7 @@ class ApplyNN(Layer):
                     else:
                         self.cls_mapping[model_class.name] = create_class_entry(model_class)
 
-        elif model_conflict == "merge":
+        elif add_pred_ann_method == "merge":
             for model_class in model_meta.obj_classes:
                 if model_class.name in classes:
                     curr_class = current_meta.get_obj_class(model_class.name)
@@ -296,6 +296,9 @@ class ApplyNN(Layer):
                     sly_logger.debug("Could not apply model to image")
                     pred_ann = Annotation(img_size=img.shape[:2])
 
+                pred_ann.draw_pretty(img)
+                sly_image.write("annpred.png", img)
+
                 if file_exists(img_path):
                     silent_remove(img_path)
 
@@ -304,10 +307,10 @@ class ApplyNN(Layer):
             elif apply_method == "sliding_window":
                 pass
 
-            model_conflict = self.settings["model_conflict"]
-            if model_conflict == "merge":
+            add_pred_ann_method = self.settings["add_pred_ann_method"]
+            if add_pred_ann_method == "merge":
                 ann = ann.merge(pred_ann)
-            elif model_conflict == "replace":
+            elif add_pred_ann_method == "replace":
                 ann = pred_ann
 
             new_img_desc = img_desc.clone_with_img(img)

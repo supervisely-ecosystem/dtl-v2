@@ -214,7 +214,7 @@ class ApplyNNAction(NeuralNetworkAction):
             apply_method = apply_nn_methods_selector.get_value()
             model_suffix = model_suffix_input.get_value()
             use_model_suffix = always_add_suffix_checkbox.is_checked()
-            model_conflict_method = resolve_conflict_method_selector.get_value()
+            add_pred_ann_method = resolve_conflict_method_selector.get_value()
             model_settings_json = model_settings_from_yaml(_model_settings, inf_settings_editor)
 
             settings = {
@@ -224,7 +224,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 "model_meta": _model_meta.to_json(),
                 "model_settings": model_settings_json,
                 "model_suffix": model_suffix,
-                "model_conflict": model_conflict_method,
+                "add_pred_ann_method": add_pred_ann_method,
                 "use_model_suffix": use_model_suffix,
                 "apply_method": apply_method,
                 "classes": saved_classes_settings,
