@@ -3,12 +3,12 @@ from os.path import realpath, dirname
 
 from supervisely.app.widgets import NodesFlow, Text, Slider
 
-from src.ui.dtl import AnnotationAction
+from src.ui.dtl import PixelLevelAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs, get_slider_style, get_text_font_size
 
 
-class RandomColorsAction(AnnotationAction):
+class RandomColorsAction(PixelLevelAction):
     name = "random_color"
     title = "Random Color"
     docs_url = (

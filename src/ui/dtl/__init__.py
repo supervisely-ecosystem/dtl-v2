@@ -75,6 +75,7 @@ actions_list = {
         BlurAction.name,
         ContrastBrightnessAction.name,
         NoiseAction.name,
+        RandomColorsAction.name,
     ],
     SPATIAL_LEVEL_TRANSFORMS: [
         CropAction.name,
@@ -135,6 +136,7 @@ actions_dict = {
     BlurAction.name: BlurAction,
     ContrastBrightnessAction.name: ContrastBrightnessAction,
     NoiseAction.name: NoiseAction,
+    RandomColorsAction.name: RandomColorsAction,
     # Spatial-level transform layers
     CropAction.name: CropAction,
     FlipAction.name: FlipAction,
@@ -160,7 +162,6 @@ actions_dict = {
     MergeBitmapsAction.name: MergeBitmapsAction,
     ObjectsFilterAction.name: ObjectsFilterAction,
     PolygonToBitmapAction.name: PolygonToBitmapAction,
-    RandomColorsAction.name: RandomColorsAction,
     RasterizeAction.name: RasterizeAction,
     RenameAction.name: RenameAction,
     SkeletonizeAction.name: SkeletonizeAction,

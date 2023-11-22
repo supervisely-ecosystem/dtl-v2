@@ -314,17 +314,18 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
 
     layer = g.layers[layer_id]
 
-    layers_id_chain = None
+    layer.clear_preview()
+    children = get_layer_children_list(layer_id)
+    if children:
+        for l_id in children:
+            g.layers[l_id].clear_preview()
+    net.preview_mode = False
+
+    layers_id_chain = None  # parents chain
     if issubclass(layer.action, SourceAction):
         img_desc, preview_ann = load_preview_for_data_layer(layer)
     # if layer has no sources, clean preview
     elif not layer.get_src():
-        layer.clear_preview()
-        children = get_layer_children_list(layer_id)
-        if children:
-            for l_id in children:
-                g.layers[l_id].clear_preview()
-        net.preview_mode = False
         return
     else:
         img_desc = layer.get_src_img_desc()
