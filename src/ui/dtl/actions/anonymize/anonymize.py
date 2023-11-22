@@ -87,7 +87,10 @@ class AnonymizeAction(PixelLevelAction):
 
         def _set_classes_list_preview():
             set_classes_list_preview(
-                classes_list_widget, classes_list_preview, saved_classes_settings
+                classes_list_widget,
+                classes_list_preview,
+                saved_classes_settings,
+                classes_list_edit_text,
             )
 
         def _save_classes_list_settings():

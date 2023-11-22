@@ -101,8 +101,16 @@ def set_model_classes_preview(
     classes_list_widget: ClassesList,
     classes_list_preview: ClassesListPreview,
     saved_classes_settings: List[str],
+    classes_list_text_preview: Text = None,
+    classes_list_text_preview_title: str = "Classes",
 ) -> None:
-    set_classes_list_preview(classes_list_widget, classes_list_preview, saved_classes_settings)
+    set_classes_list_preview(
+        classes_list_widget,
+        classes_list_preview,
+        saved_classes_settings,
+        classes_list_text_preview,
+        classes_list_text_preview_title,
+    )
 
 
 def set_model_tags(tags_list_widget: TagsList, tag_metas: List[TagMeta]) -> List[str]:

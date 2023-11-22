@@ -92,6 +92,7 @@ class Bitmap2LinesAction(AnnotationAction):
                 "default"
                 if saved_classes_mapping_settings == "default"
                 else mapping_to_list(saved_classes_mapping_settings),
+                classes_mapping_edit_text,
             )
 
         def _save_classes_mapping_setting():

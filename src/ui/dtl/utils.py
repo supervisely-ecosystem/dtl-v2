@@ -303,6 +303,8 @@ def set_classes_list_preview(
     classes_list_widget: Union[ClassesList, ClassesMapping, ClassesTable],
     classes_list_preview_widget: ClassesListPreview,
     classes_list_settings: Union[list, str],
+    classes_list_text_preview: Text = None,
+    classes_list_text_preview_title: str = "Classes",
 ):
     if isinstance(classes_list_settings, str):
         if classes_list_settings == "default":
@@ -314,11 +316,11 @@ def set_classes_list_preview(
                 classes_list_widget.select_all()
                 meta = classes_list_widget.project_meta
                 if meta is None:
-                    all_calsses = []
+                    all_classes = []
                 else:
-                    all_calsses = [obj_class for obj_class in meta.obj_classes]
-                classes_list_preview_widget.set(all_calsses)
-            return
+                    all_classes = [obj_class for obj_class in meta.obj_classes]
+                classes_list_preview_widget.set(all_classes)
+
         names = [classes_list_settings]
     else:
         names = classes_list_settings
@@ -331,9 +333,33 @@ def set_classes_list_preview(
             obj_classes = []
         else:
             obj_classes = [obj_class for obj_class in classes_list_widget.project_meta.obj_classes]
-    classes_list_preview_widget.set(
-        [obj_class for obj_class in obj_classes if obj_class.name in names]
-    )
+
+    if classes_list_settings != "default":
+        classes_list_preview_widget.set(
+            [obj_class for obj_class in obj_classes if obj_class.name in names]
+        )
+
+    # set classes N preview
+    if classes_list_text_preview is not None:
+        if isinstance(classes_list_widget, ClassesList) or isinstance(
+            classes_list_widget, ClassesMapping
+        ):
+            total_classes_n = len(obj_classes)
+            selected_classes_n = len(classes_list_widget.get_selected_classes())
+        else:
+            if classes_list_widget.project_meta is None:
+                total_classes_n = 0
+            else:
+                total_classes_n = len(classes_list_widget.project_meta.obj_classes)
+            if len(names) > 0 and names[0] == "default":
+                selected_classes_n = total_classes_n
+            else:
+                selected_classes_n = len(names)
+
+        classes_list_text_preview.set(
+            f"{classes_list_text_preview_title}: {selected_classes_n} / {total_classes_n}",
+            "text",
+        )
 
 
 def set_classes_list_settings_from_json(
