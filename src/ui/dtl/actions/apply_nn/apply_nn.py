@@ -124,6 +124,7 @@ class ApplyNNAction(NeuralNetworkAction):
 
             _session_id = connect_nn_model_info._session_id
             if _session_id is None:
+                connect_notification.loading = False
                 return
 
             _model_meta, _model_info, _model_settings = get_model_settings(_session_id)
