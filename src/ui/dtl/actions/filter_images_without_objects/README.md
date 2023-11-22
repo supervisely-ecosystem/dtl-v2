@@ -32,28 +32,3 @@
 ```
 
 </details>
-
-<details>
-  <summary>Without Tag with String value type</summary>
-
-```json
-{
-    "action": "filter_image_by_tag",
-    "src": [
-        "$data_1"
-    ],
-    "dst": [
-        "$filter_image_by_tag_2__true",
-        "$filter_image_by_tag_2__false"
-    ],
-    "settings": {
-        "tag": {
-            "name": "object",
-            "value": "car",
-        },
-        "condition": "without"
-    }
-}
-```
-
-</details>

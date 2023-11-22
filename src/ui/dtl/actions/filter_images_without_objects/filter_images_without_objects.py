@@ -82,7 +82,7 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
         exclude_preview = ClassesListPreview()
         without_container = exclude_preview
         no_condition_text = NotificationBox(
-            title="No condition", description="Select filtering classes"
+            title="No classes", description="Select filtering classes"
         )
         settings_preview = Container(widgets=[without_container, no_condition_text], gap=0)
 
