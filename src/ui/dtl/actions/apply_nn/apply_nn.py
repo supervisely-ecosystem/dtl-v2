@@ -134,7 +134,11 @@ class ApplyNNAction(NeuralNetworkAction):
                 classes_list_widget, [obj_class for obj_class in _model_meta.obj_classes]
             )
             set_model_classes_preview(
-                classes_list_widget, classes_list_preview, saved_classes_settings
+                classes_list_widget,
+                classes_list_preview,
+                saved_classes_settings,
+                classes_list_edit_text,
+                "Model Classes",
             )
 
             saved_tags_settings = set_model_tags(
@@ -266,7 +270,11 @@ class ApplyNNAction(NeuralNetworkAction):
             set_classes_list_settings_from_json(classes_list_widget, classes_list_settings)
             _save_classes_list_settings()
             set_classes_list_preview(
-                classes_list_widget, classes_list_preview, classes_list_settings
+                classes_list_widget,
+                classes_list_preview,
+                classes_list_settings,
+                classes_list_edit_text,
+                "Model Classes",
             )
             classes_list_widget.loading = False
             # -----------------------
@@ -304,7 +312,11 @@ class ApplyNNAction(NeuralNetworkAction):
         def classes_list_save_btn_cb():
             _save_classes_list_settings()
             set_model_classes_preview(
-                classes_list_widget, classes_list_preview, saved_classes_settings
+                classes_list_widget,
+                classes_list_preview,
+                saved_classes_settings,
+                classes_list_edit_text,
+                "Model Classes",
             )
             g.updater("metas")
 
@@ -313,7 +325,11 @@ class ApplyNNAction(NeuralNetworkAction):
             _set_default_classes_list_setting()
             set_classes_list_settings_from_json(classes_list_widget, saved_classes_settings)
             set_model_classes_preview(
-                classes_list_widget, classes_list_preview, saved_classes_settings
+                classes_list_widget,
+                classes_list_preview,
+                saved_classes_settings,
+                classes_list_edit_text,
+                "Model Classes",
             )
             g.updater("metas")
 

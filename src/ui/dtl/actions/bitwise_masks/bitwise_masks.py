@@ -130,7 +130,9 @@ class BitwiseMasksAction(AnnotationAction):
 
         def _set_class_mask_preview():
             set_classes_list_preview(
-                class_mask_widget, class_mask_preview, saved_class_mask_settings
+                class_mask_widget,
+                class_mask_preview,
+                saved_class_mask_settings,
             )
 
         def _save_class_mask_settings():
@@ -150,6 +152,7 @@ class BitwiseMasksAction(AnnotationAction):
                 classes_to_correct_widget,
                 classes_to_correct_preview,
                 saved_classes_to_correct_settings,
+                classes_to_correct_edit_text,
             )
 
         def _save_classes_to_correct_settings():

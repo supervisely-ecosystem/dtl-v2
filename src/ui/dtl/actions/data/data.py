@@ -239,6 +239,7 @@ class DataAction(SourceAction):
                 saved_classes_mapping_settings
                 if saved_classes_mapping_settings == "default"
                 else mapping_to_list(saved_classes_mapping_settings),
+                classes_mapping_edit_text,
             )
 
         def _save_classes_mapping_setting():
@@ -257,8 +258,6 @@ class DataAction(SourceAction):
             if _current_info is not None and len(project_meta.obj_classes) == 0:
                 classes_mapping_edit_text.set("Project has no object classes", "text")
                 classes_mapping_edit_btn.disable()
-            else:
-                classes_mapping_edit_text.set("Classes", "text")
 
             if project_meta == _current_meta:
                 return
@@ -300,10 +299,6 @@ class DataAction(SourceAction):
             if isinstance(_current_meta, ProjectMeta):
                 if len(_current_meta.obj_classes) > 0:
                     classes_mapping_edit_btn.enable()
-                    # classes_mapping_edit_text.set("Classes", "text")
-                # else:
-                #     classes_mapping_edit_text.set("Project has no object classes", "text")
-                #     classes_mapping_edit_btn.disable()
                 update_preview_btn.enable()
 
             classes_mapping_widget.loading = False

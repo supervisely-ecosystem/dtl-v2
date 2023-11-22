@@ -182,6 +182,9 @@ class ObjectsFilterAction(AnnotationAction):
                     area_size_preview.text = f"Area size: {saved_settings['filter_by']['polygon_sizes']['area_size']['percent']}%"
                 else:
                     area_size_preview.text = f"Area size: width = {saved_settings['filter_by']['polygon_sizes']['area_size']['width']} x height = {saved_settings['filter_by']['polygon_sizes']['area_size']['height']}"
+            filter_preview_classes_text.set(
+                f"Classes: {len(names)} / {len(classes.get_all_classes())}", "text"
+            )
 
         def _save_settings():
             nonlocal saved_settings
