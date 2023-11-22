@@ -52,6 +52,9 @@ from .actions.save.save import SaveAction
 from .actions.save_masks.save_masks import SaveMasksAction
 from .actions.supervisely.supervisely import SuperviselyAction
 from .actions.apply_nn.apply_nn import ApplyNNAction
+from .actions.filter_images_without_objects.filter_images_without_objects import (
+    FilterImageWithoutObjects,
+)
 
 
 SOURCE_ACTIONS = "Input"
@@ -72,6 +75,7 @@ actions_list = {
         BlurAction.name,
         ContrastBrightnessAction.name,
         NoiseAction.name,
+        RandomColorsAction.name,
     ],
     SPATIAL_LEVEL_TRANSFORMS: [
         CropAction.name,
@@ -109,6 +113,7 @@ actions_list = {
     FILTERS_AND_CONDITIONS: [
         FilterImageByObject.name,
         FilterImageByTag.name,
+        FilterImageWithoutObjects.name,
         IfAction.name,
     ],
     NEURAL_NETWORKS: [ApplyNNAction.name],
@@ -131,6 +136,7 @@ actions_dict = {
     BlurAction.name: BlurAction,
     ContrastBrightnessAction.name: ContrastBrightnessAction,
     NoiseAction.name: NoiseAction,
+    RandomColorsAction.name: RandomColorsAction,
     # Spatial-level transform layers
     CropAction.name: CropAction,
     FlipAction.name: FlipAction,
@@ -156,7 +162,6 @@ actions_dict = {
     MergeBitmapsAction.name: MergeBitmapsAction,
     ObjectsFilterAction.name: ObjectsFilterAction,
     PolygonToBitmapAction.name: PolygonToBitmapAction,
-    RandomColorsAction.name: RandomColorsAction,
     RasterizeAction.name: RasterizeAction,
     RenameAction.name: RenameAction,
     SkeletonizeAction.name: SkeletonizeAction,
@@ -165,6 +170,7 @@ actions_dict = {
     # Filters and conditions
     FilterImageByObject.name: FilterImageByObject,
     FilterImageByTag.name: FilterImageByTag,
+    FilterImageWithoutObjects.name: FilterImageWithoutObjects,
     IfAction.name: IfAction,
     # Neural Networks
     ApplyNNAction.name: ApplyNNAction,

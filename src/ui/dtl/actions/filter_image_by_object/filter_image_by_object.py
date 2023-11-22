@@ -57,7 +57,7 @@ class FilterImageByObject(FilterAndConditionAction):
         )
 
         @include_switch.value_changed
-        def include_swithced(is_switched):
+        def include_switched(is_switched):
             if is_switched:
                 include_classes_list_widget.show()
             else:

@@ -32,7 +32,7 @@ class ApplyNNAction(NeuralNetworkAction):
     name = "apply_nn"
     title = "Apply NN"
     docs_url = ""
-    description = "Connect to deployed model and select apply options."
+    description = "Connect to deployed model and apply it to images."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
