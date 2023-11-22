@@ -82,3 +82,8 @@ class FilterAndConditionAction(Action):
     header_color = "#f7782f"
     header_text_color = "#000000"
     icon = "zmdi zmdi-arrow-split"
+
+
+class NeuralNetworkAction(Action):
+    node_color = "#f7782f"
+    icon = "zmdi zmdi-fire"

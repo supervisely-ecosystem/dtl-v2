@@ -7,6 +7,7 @@ from .Action import (
     OtherAction,
     OutputAction,
     FilterAndConditionAction,
+    NeuralNetworkAction,
 )
 from .actions.data.data import DataAction
 from .actions.anonymize.anonymize import AnonymizeAction
@@ -50,6 +51,7 @@ from .actions.tag.tag import TagAction
 from .actions.save.save import SaveAction
 from .actions.save_masks.save_masks import SaveMasksAction
 from .actions.supervisely.supervisely import SuperviselyAction
+from .actions.apply_nn.apply_nn import ApplyNNAction
 
 
 SOURCE_ACTIONS = "Input"
@@ -60,6 +62,7 @@ ANNOTATION_TRANSFORMS = "Annotation transforms"
 OTHER = "Other"
 SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
+NEURAL_NETWORKS = "Neural networks"
 
 
 actions_list = {
@@ -108,6 +111,7 @@ actions_list = {
         FilterImageByTag.name,
         IfAction.name,
     ],
+    NEURAL_NETWORKS: [ApplyNNAction.name],
     OTHER: [
         DatasetAction.name,
         DummyAction.name,
@@ -162,6 +166,8 @@ actions_dict = {
     FilterImageByObject.name: FilterImageByObject,
     FilterImageByTag.name: FilterImageByTag,
     IfAction.name: IfAction,
+    # Neural Networks
+    ApplyNNAction.name: ApplyNNAction,
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,

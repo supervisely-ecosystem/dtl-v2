@@ -18,6 +18,7 @@ from supervisely.annotation.json_geometries_map import GET_GEOMETRY_FROM_STR
 from supervisely.imaging.color import hex2rgb
 
 from src.compute.classes_utils import ClassConstants
+from src.compute.tags_utils import TagConstants
 from src.exceptions import CustomException, GraphError, CreateMetaError, UnexpectedError
 
 
@@ -87,7 +88,9 @@ class Layer:
         self.settings = config.get("settings", {})
 
         self.cls_mapping = {}
+        self.tag_mapping = {}
         self.define_classes_mapping()
+        self.define_tags_mapping()
         self.output_meta = None
 
     def validate(self):
@@ -113,6 +116,9 @@ class Layer:
 
     def define_classes_mapping(self):
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
+
+    def define_tags_mapping(self):
+        self.tag_mapping[TagConstants.OTHER] = TagConstants.DEFAULT
 
     def get_added_tag_metas(self):
         return []
@@ -178,6 +184,7 @@ class Layer:
             res_meta = deepcopy(full_input_meta)
             in_class_titles = set((obj_class.name for obj_class in full_input_meta.obj_classes))
 
+            ### CLASSES
             # __other__ -> smth
             if ClassConstants.OTHER in self.cls_mapping:
                 other_classes = in_class_titles - set(self.cls_mapping.keys())
@@ -206,7 +213,10 @@ class Layer:
                         new_name = new_cls_dict["title"]
                         new_shape = new_cls_dict["shape"]
                         new_geometry_type = GET_GEOMETRY_FROM_STR(new_shape)
-                        inp_obj_class = ObjClass(new_name, new_geometry_type)
+                        new_color = new_cls_dict.get("color", None)
+                        if new_color is not None and new_color[0] == "#":
+                            new_color = hex2rgb(new_color)
+                        inp_obj_class = ObjClass(new_name, new_geometry_type, new_color)
                         if res_meta.obj_classes.has_key(new_name):
                             existing_obj_class = res_meta.obj_classes.get(new_name)
                             if existing_obj_class.geometry_type != new_geometry_type:
@@ -296,24 +306,184 @@ class Layer:
                     if new_color is not None and new_color[0] == "#":
                         new_color = hex2rgb(new_color)
                     obj_cls = res_meta.get_obj_class(src_class_title)
-                    obj_cls = obj_cls.clone(
-                        name=new_name, geometry_type=new_geometry_type, color=new_color
-                    )
+                    if obj_cls is None:
+                        obj_cls = ObjClass(new_name, new_geometry_type, new_color)
+                    else:
+                        obj_cls = obj_cls.clone(
+                            name=new_name, geometry_type=new_geometry_type, color=new_color
+                        )
                     res_meta = res_meta.delete_obj_class(src_class_title)
                     res_meta = res_meta.add_obj_class(obj_cls)
+            ### ------------------
 
-            rm_imtags = [TagMeta.from_json(tag) for tag in self.get_removed_tag_metas()]
-            res_meta = res_meta.clone(
-                tag_metas=[tm for tm in res_meta.tag_metas if tm not in rm_imtags]
-            )
-            new_imtags = [TagMeta.from_json(tag) for tag in self.get_added_tag_metas()]
-            new_imtags_exist = [
-                tm for tm in res_meta.tag_metas.intersection(TagMetaCollection(new_imtags))
-            ]
-            if len(new_imtags_exist) != 0:
-                exist_tag_names = [t.name for t in new_imtags_exist]
-                logger.warn("Tags {} already exist.".format(exist_tag_names))
-            res_meta.clone(tag_metas=new_imtags)
+            ### TAGS
+            in_tags_titles = set((tag_meta.name for tag_meta in full_input_meta.tag_metas))
+
+            if TagConstants.OTHER in self.tag_mapping:
+                other_tags = in_tags_titles - set(self.tag_mapping.keys())
+                for otag in other_tags:
+                    self.tag_mapping[otag] = self.tag_mapping[TagConstants.OTHER]
+                del self.tag_mapping[TagConstants.OTHER]
+
+            missing_tags = in_tags_titles - set(self.tag_mapping.keys())
+            if len(missing_tags) != 0:
+                raise CreateMetaError(
+                    "Some tags in input meta are missing in mapping",
+                    extra={
+                        "missing_tags": [
+                            res_meta.tag_metas.get(tag_meta_name) for tag_meta_name in missing_tags
+                        ]
+                    },
+                )
+
+            for src_tag_title, dst_tag in self.tag_mapping.items():
+                # __new__ -> [ list of tags ]
+                if src_tag_title == TagConstants.NEW:
+                    if type(dst_tag) is not list:
+                        raise RuntimeError("Internal tag meta mapping error in layer (NEW spec).")
+                    for new_tag_dict in dst_tag:
+                        new_name = new_tag_dict["title"]
+                        new_value_type = new_tag_dict["value_type"]
+                        new_color = new_tag_dict.get("color", None)
+                        if new_color is not None and new_color[0] == "#":
+                            new_color = hex2rgb(new_color)
+                        new_possible_values = new_tag_dict.get("possible_values", None)
+                        new_applicable_to = new_tag_dict.get("applicable_to", None)
+                        new_applicable_classes = new_tag_dict.get("applicable_classes", None)
+                        inp_tag_meta = TagMeta(
+                            name=new_name,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
+                        )
+                        if res_meta.tag_metas.has_key(new_name):
+                            existing_tag_meta = res_meta.tag_metas.get(new_name)
+                            if existing_tag_meta.value_type != new_value_type:
+                                raise CreateMetaError(
+                                    "Trying to add existing TagMeta with different value type",
+                                    extra={
+                                        "existing_tag_meta": existing_tag_meta.to_json(),
+                                        "new_tag_meta": inp_tag_meta.to_json(),
+                                    },
+                                )
+                        else:
+                            res_meta = res_meta.add_tag_meta(inp_tag_meta)
+
+                # __clone__ -> dict {parent_tag_name: child_tag_name}
+                elif src_tag_title == TagConstants.CLONE:
+                    if type(dst_tag) is not dict:
+                        raise RuntimeError("Internal tag mapping error in layer (CLONE spec).")
+
+                    for src_title, dst_title in dst_tag.items():
+                        if src_title == "__other__":
+                            continue
+                        real_src_tag = res_meta.tag_metas.get(src_title, None)
+                        if real_src_tag is None:
+                            raise CreateMetaError(
+                                "TagMeta not found in input meta",
+                                extra={
+                                    "tag_meta_name": src_title,
+                                    "existing_tag_metas": res_meta.tag_metas.to_json(),
+                                },
+                            )
+                        if real_src_tag.name == dst_title:
+                            continue
+                        real_dst_tag = real_src_tag.clone(name=dst_title)
+                        res_meta = res_meta.add_tag_meta(real_dst_tag)
+
+                # __update__ -> [ list of tags ]
+                elif src_tag_title == TagConstants.UPDATE:
+                    if type(dst_tag) is not list:
+                        raise RuntimeError("Internal tag mapping error in layer (NEW spec).")
+
+                    for tag_dct in dst_tag:
+                        title = tag_dct["title"]
+                        existing_tag = res_meta.tag_metas.get(title, None)
+                        if existing_tag is None:
+                            raise CreateMetaError(
+                                "TagMeta not found in input meta",
+                                extra={
+                                    "tag_meta_name": title,
+                                    "existing_tag_metas": res_meta.tag_metas.to_json(),
+                                },
+                            )
+                        new_value_type = tag_dct.get("value_type", None)
+                        new_color = tag_dct.get("color", None)
+                        if new_color is not None and new_color[0] == "#":
+                            new_color = hex2rgb(new_color)
+                        new_possible_values = new_tag_dict.get("possible_values", None)
+                        new_applicable_to = new_tag_dict.get("applicable_to", None)
+                        new_applicable_classes = new_tag_dict.get("applicable_classes", None)
+
+                        new_tag_meta = existing_tag.clone(
+                            name=title,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
+                        )
+                        res_meta = res_meta.delete_tag_meta(title)
+                        res_meta = res_meta.add_tag_meta(new_tag_meta)
+
+                # smth -> __default__
+                elif dst_tag == TagConstants.DEFAULT:
+                    pass
+
+                # smth -> __clone__
+                elif dst_tag == TagConstants.CLONE:
+                    pass
+
+                # smth -> __ignore__
+                elif dst_tag == TagConstants.IGNORE:
+                    res_meta = res_meta.delete_tag_meta(src_tag_title)
+
+                # smth -> new name
+                elif type(dst_tag) is str:
+                    tag_meta = res_meta.get_tag_meta(src_tag_title)
+                    tag_meta = tag_meta.clone(name=dst_tag)
+                    res_meta = res_meta.delete_tag_meta(src_tag_title)
+                    res_meta = res_meta.add_tag_meta(tag_meta)
+
+                # smth -> new tag description
+                elif type(dst_tag) is dict:
+                    new_name = dst_tag.get("title", None)
+                    new_value_type = dst_tag.get("value_type", None)
+                    new_color = dst_tag.get("color", None)
+                    if new_color is not None and new_color[0] == "#":
+                        new_color = hex2rgb(new_color)
+                    new_possible_values = dst_tag.get("possible_values", None)
+                    new_applicable_to = dst_tag.get("applicable_to", None)
+                    new_applicable_classes = dst_tag.get("applicable_classes", None)
+                    inp_tag_meta = TagMeta(
+                        name=new_name,
+                        value_type=new_value_type,
+                        possible_values=new_possible_values,
+                        color=new_color,
+                        applicable_to=new_applicable_to,
+                        applicable_classes=new_applicable_classes,
+                    )
+
+                    tag_meta = res_meta.get_tag_meta(src_tag_title)
+                    if tag_meta is None:
+                        tag_meta = TagMeta(
+                            name=new_name, value_type=new_value_type, color=new_color
+                        )
+                    else:
+                        tag_meta = tag_meta.clone(
+                            name=new_name,
+                            value_type=new_value_type,
+                            possible_values=new_possible_values,
+                            color=new_color,
+                            new_applicable_to=new_applicable_to,
+                            applicable_classes=new_applicable_classes,
+                        )
+                    res_meta = res_meta.delete_tag_meta(src_tag_title)
+                    res_meta = res_meta.add_tag_meta(tag_meta)
+            ### ------------------
+
             self.output_meta = res_meta
         except CustomException as e:
             e.extra["layer_config"] = self._config

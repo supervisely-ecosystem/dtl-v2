@@ -368,27 +368,29 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     is_starting_layer = True
     prev_img_desc = None
     prev_ann = None
-    for data_el, layer_indx in processing_generator:
-        if layer_indx in updated:
-            continue
-        layer = g.layers[all_layers_ids[layer_indx]]
-        layer: Layer
-        if len(data_el) == 1:
-            img_desc, ann = data_el[0]
-        elif len(data_el) == 3:
-            img_desc, ann, _ = data_el
-        else:
-            img_desc, ann = data_el
-        if not is_starting_layer:
-            layer.set_src_img_desc(prev_img_desc)
-            layer.set_src_ann(prev_ann)
-        prev_img_desc = img_desc
-        prev_ann = ann
-        layer.update_preview(img_desc, ann)
-        layer.set_preview_loading(False)
-        is_starting_layer = False
-        updated.add(layer_indx)
-
+    try:
+        for data_el, layer_indx in processing_generator:
+            if layer_indx in updated:
+                continue
+            layer = g.layers[all_layers_ids[layer_indx]]
+            layer: Layer
+            if len(data_el) == 1:
+                img_desc, ann = data_el[0]
+            elif len(data_el) == 3:
+                img_desc, ann, _ = data_el
+            else:
+                img_desc, ann = data_el
+            if not is_starting_layer:
+                layer.set_src_img_desc(prev_img_desc)
+                layer.set_src_ann(prev_ann)
+            prev_img_desc = img_desc
+            prev_ann = ann
+            layer.update_preview(img_desc, ann)
+            layer.set_preview_loading(False)
+            is_starting_layer = False
+            updated.add(layer_indx)
+    except Exception as e:
+        sly.logger.error(f"Error updating preview", exc_info=str(e))
     net.preview_mode = False
 
 

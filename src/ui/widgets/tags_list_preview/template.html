@@ -1,6 +1,11 @@
 <div
 	:style="{ flex: '1 1 auto', 'max-width': data.{{{widget.widget_id}}}.maxWidth }"
 >
+	{% if widget._empty_text %}
+	<span v-if="state.{{{widget.widget_id}}}.tags.length == 0">
+		{{{ widget._empty_text }}}
+	</span>
+	{% endif %}
 	<div v-for="tag in state.{{{widget.widget_id}}}.tags">
 		<div style="display: flex; gap: 10px">
 			<i class="zmdi zmdi-label" :style="{color: tag.color}"></i>

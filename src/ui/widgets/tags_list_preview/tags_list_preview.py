@@ -15,16 +15,17 @@ VALUE_TYPE_NAME = {
 }
 
 
-class TagMetasPreview(Widget):
+class TagsListPreview(Widget):
     def __init__(
         self,
         tag_metas: Union[List[TagMeta], TagMetaCollection] = [],
         max_width: int = 300,
+        empty_text: str = None,
         widget_id: int = None,
     ):
         self._tag_metas = tag_metas
         self._max_width = self._get_max_width(max_width)
-
+        self._empty_text = empty_text
         super().__init__(widget_id=widget_id, file_path=__file__)
 
     def _get_max_width(self, value):
