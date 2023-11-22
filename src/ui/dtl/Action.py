@@ -79,8 +79,7 @@ class OutputAction(Action):
 
 
 class FilterAndConditionAction(Action):
-    header_color = "#f7782f"
-    header_text_color = "#000000"
+    node_color = "#3fbfbf"
     icon = "zmdi zmdi-arrow-split"
 
 

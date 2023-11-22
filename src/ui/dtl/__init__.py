@@ -52,6 +52,9 @@ from .actions.save.save import SaveAction
 from .actions.save_masks.save_masks import SaveMasksAction
 from .actions.supervisely.supervisely import SuperviselyAction
 from .actions.apply_nn.apply_nn import ApplyNNAction
+from .actions.filter_images_without_objects.filter_images_without_objects import (
+    FilterImageWithoutObjects,
+)
 
 
 SOURCE_ACTIONS = "Input"
@@ -109,6 +112,7 @@ actions_list = {
     FILTERS_AND_CONDITIONS: [
         FilterImageByObject.name,
         FilterImageByTag.name,
+        FilterImageWithoutObjects.name,
         IfAction.name,
     ],
     NEURAL_NETWORKS: [ApplyNNAction.name],
@@ -165,6 +169,7 @@ actions_dict = {
     # Filters and conditions
     FilterImageByObject.name: FilterImageByObject,
     FilterImageByTag.name: FilterImageByTag,
+    FilterImageWithoutObjects.name: FilterImageWithoutObjects,
     IfAction.name: IfAction,
     # Neural Networks
     ApplyNNAction.name: ApplyNNAction,
