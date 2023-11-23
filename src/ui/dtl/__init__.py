@@ -56,6 +56,9 @@ from .actions.filter_images_without_objects.filter_images_without_objects import
     FilterImageWithoutObjects,
 )
 
+# Video
+from .actions.video_data.video_data import VideoDataAction
+
 
 SOURCE_ACTIONS = "Input"
 # TRANSFORMATION_ACTIONS = "Transformation actions"
@@ -69,7 +72,7 @@ NEURAL_NETWORKS = "Neural networks"
 
 
 actions_list = {
-    SOURCE_ACTIONS: [DataAction.name],
+    SOURCE_ACTIONS: [DataAction.name, VideoDataAction.name],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
         BlurAction.name,
@@ -130,6 +133,7 @@ actions_list = {
 actions_dict = {
     # Data layers
     DataAction.name: DataAction,
+    VideoDataAction.name: VideoDataAction,
     # Pixel-level transforms layers
     AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,

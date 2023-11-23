@@ -273,7 +273,14 @@ def load_preview_for_data_layer(layer: Layer):
         )
 
     try:
-        preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
+        if layer.id.startswith("data"):
+            preview_img_path, preview_ann_path = download_preview(
+                project_name, dataset_name, project_meta
+            )
+        elif layer.id.startswith("video_data"):
+            preview_img_path, preview_ann_path = download_preview(
+                project_name, dataset_name, project_meta, "videos"
+            )
     except Exception as e:
         raise CustomException(
             f"Error downloading image and annotation for preview",
@@ -421,7 +428,9 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             )
 
         try:
-            preview_img_path, preview_ann_path = download_preview(project_name, dataset_name)
+            preview_img_path, preview_ann_path = download_preview(
+                project_name, dataset_name, project_meta
+            )
         except Exception as e:
             raise CustomException(
                 f"Error downloading image and annotation for preview",
