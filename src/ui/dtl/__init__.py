@@ -103,7 +103,6 @@ actions_list = {
         MergeBitmapsAction.name,
         ObjectsFilterAction.name,
         PolygonToBitmapAction.name,
-        RandomColorsAction.name,
         RasterizeAction.name,
         RenameAction.name,
         SkeletonizeAction.name,
