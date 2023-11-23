@@ -30,9 +30,11 @@ Input:
 
 Pixel-level transformations:
 
+- [Anonymize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/anonymize/readme.md#anonymize)
 - [Blur](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/blur/README.md#blur)
 - [Contrast Brightness](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/contrast_brightness/README.md#contrast-and-brightness)
 - [Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/noise/README.md#noise)
+- [Random Color](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/random_color/README.md#random_color)
 
 Spatial-level transformations:
 
@@ -62,18 +64,27 @@ Annotation-level transformations:
 - [Merge Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/merge_bitmaps/README.md#merge-masks)
 - [ObjectsFilter](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/objects_filter/README.md#objects-filter)
 - [Polygon to Mask](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/poly2bitmap/README.md#polygon-to-mask)
-- [Random Colors](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/random_color/README.md#random_color)
 - [Rasterize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rasterize/README.md#rasterize)
 - [Rename](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rename/README.md#rename)
 - [Skeletonize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/skeletonize/README.md#skeletonize)
 - [Split Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/split_masks/README.md#split-masks)
 - [Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/tag/README.md#tag)
 
+Filter and conditions:
+
+- [Filter Image by Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_image_by_object/readme.md#filter-image-by-object-action)
+- [Filter Image by Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_image_by_tag/readme.md#filter-images-by-tag-action)
+- [Filter Image without Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_images_without_objects/README.md#filter-image-without-objects)
+- [If](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/if_action/README.md#if-action)
+
+Neural networks:
+
+- [Apply NN](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/apply_nn/README.md#apply-nn)
+
 Other:
 
 - [Dataset](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dataset/README.md#dataset)
 - [Dummy](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dummy/README.md#dummy)
-- [If](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/if_action/README.md#if-action)
 
 Output:
 
@@ -87,34 +98,53 @@ Output:
 
 - **Transform Data:** Apply a wide variety of data transformation operations to images within a project. These transformations include rotation, cropping, blurring, resizing, and many more.
 
-  ![transform-data](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/6b1fb925-1961-44cc-be6c-2777294f7f06)
+  ![transform-data](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/58d857fe-91af-413b-995b-20c674d72a9f)
+
+- **Use Neural Networks:** Apply deployed models on your data to perform object detection, instance segmentation, and other tasks. You can use any of the neural network models available in the Supervisely Ecosystem, or train your own custom models.
+  
+  ![apply-nn](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/9f715cf2-9106-47d0-bda3-500d2508f3b8)
 
 - **Enhance Data:** Improve the quality and usability of your image data by adjusting contrast, brightness, and noise levels.
 
 - **Object-Level Manipulation:** Perform operations on individual objects or instances within images, such as cropping, duplicating, or changing their color classes.
 
-  ![object-transforms](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/b16b6767-403b-49f4-be9e-6aa0dcbb0c2d)
+  ![object-transforms](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/34294f35-b720-4941-9e19-5fce70be9c33)
 
 - **Customize Workflows:** Create complex data transformation workflows by combining multiple transformation nodes to meet your specific requirements.
 
 - **Node Documentation:** Detailed documentation is available for each transformation node, explaining how to use it effectively. These guides provide step-by-step instructions and examples for each node, making it easy for users to understand and leverage the full power of the application.
 
-  ![node-docs](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/91c82b09-4ea4-444a-9819-f2dbf5d28f2b)
+  ![node-docs](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/6d5d1c8a-9a72-4827-9869-714b98b2e418)
 
 - **Save & Load Presets:** Save your customized transformation workflows as presets for future use. This feature allows you to store and reuse your preferred configurations quickly.
 
-  ![load-preset-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c3a262fb-41c8-4116-8efd-beaadcd8f62b)
+  ![load-preset](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/5cd9ebb7-0fd5-4901-a1d3-9ecee38b629f)
 
 - **Output Flexibility:** Choose from multiple export options to save your transformed data in a format that best suits your needs.
 
-  ![merge-projects](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/17fd2b98-66ed-496c-a2b5-f8a43b0d3910)
+  ![merge-projects](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/1baaedff-3d02-46bb-a307-d690036509d2)
 
 ## How To Run
 
-**Step 1:** Run the application from the ecosystem, project, dataset or preset file.
+You can run the application from the ecosystem, project or saved preset file.
 
-**Step 2:** Wait until the app is started and open the app.
+<details open>
+<summary><b>1. Run App from Ecosystem</b></summary>
 
-Once the app is started, new task appear in workspace tasks. Wait for the message `Application is started` and then press `Open App` button.
+![run-from-ecosystem-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/4dc28226-74d6-4603-a282-bdb94270d893)
 
-![run-app](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c3fee897-9aac-4f1b-be8b-893df3839202)
+</details>
+
+<details open>
+<summary><b>2. Run App from Project</b></summary>
+
+![run-from-project-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c92ecdc6-c038-4f86-880c-b974183dc6ab)
+
+</details>
+
+<details open>
+<summary><b>3. Run App from Team Files</b></summary>
+
+![run-from-teamfiles-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/ae996fcb-b9e0-4b1a-a514-bfab1097b40d)
+
+</details>
