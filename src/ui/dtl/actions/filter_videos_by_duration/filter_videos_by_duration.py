@@ -9,7 +9,6 @@ from src.ui.dtl.utils import (
     get_layer_docs,
     get_text_font_size,
 )
-import src.globals as g
 
 
 class FilterVideoByDuration(FilterAndConditionAction):
@@ -42,6 +41,10 @@ class FilterVideoByDuration(FilterAndConditionAction):
             widgets=[settings_edit_text, duration_unit_selector, duration_settings],
         )
         saved_settings = {}
+
+        @dur_thresh_input.value_changed
+        def dur_thresh_input_cb(value):
+            _save_settings
 
         def _save_settings():
             nonlocal saved_settings

@@ -62,7 +62,12 @@ from .actions.video_data.video_data import VideoDataAction
 from .actions.filter_videos_without_objects.filter_videos_without_objects import (
     FilterVideoWithoutObjects,
 )
+from .actions.filter_videos_without_annotation.filter_videos_without_annotation import (
+    FilterVideoWithoutAnnotation,
+)
 from .actions.filter_videos_by_duration.filter_videos_by_duration import FilterVideoByDuration
+
+# ---
 
 import src.globals as g
 
@@ -194,10 +199,13 @@ image_actions_dict = {
 
 video_actions_list = {
     SOURCE_ACTIONS: [VideoDataAction.name],
-    FILTERS_AND_CONDITIONS: [FilterVideoWithoutObjects.name, FilterVideoByDuration.name],
+    FILTERS_AND_CONDITIONS: [
+        FilterVideoWithoutObjects.name,
+        FilterVideoWithoutAnnotation.name,
+        FilterVideoByDuration.name,
+    ],
     SAVE_ACTIONS: [
         SaveAction.name,
-        SaveMasksAction.name,
         SuperviselyAction.name,
     ],
 }
@@ -207,10 +215,10 @@ video_actions_dict = {
     VideoDataAction.name: VideoDataAction,
     # Filter and condition layers
     FilterVideoWithoutObjects.name: FilterVideoWithoutObjects,
+    FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,
     # Save layers
     SaveAction.name: SaveAction,
-    SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,
 }
 

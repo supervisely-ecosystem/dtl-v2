@@ -45,8 +45,8 @@ class FilterVideobyDuration(Layer):
             # by frames
             if duration_unit == "frames":
                 if ann.frames_count <= duration_threshold:
-                    yield data_el + tuple([1])  # True
+                    yield data_el + tuple([0])  # True
                 else:
-                    yield data_el + tuple([0])  # False
+                    yield data_el + tuple([1])  # False
             else:
                 pass

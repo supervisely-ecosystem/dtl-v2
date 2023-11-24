@@ -40,6 +40,6 @@ class FilterVideoWithoutObjects(Layer):
                 break
 
         if satisfies_cond:
-            yield data_el + tuple([1])  # True
+            yield data_el + tuple([1])  # False
         else:
-            yield data_el + tuple([0])  # False
+            yield data_el + tuple([0])  # True
