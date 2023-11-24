@@ -56,9 +56,15 @@ from .actions.filter_images_without_objects.filter_images_without_objects import
     FilterImageWithoutObjects,
 )
 
+
 # Video
 from .actions.video_data.video_data import VideoDataAction
+from .actions.filter_videos_without_objects.filter_videos_without_objects import (
+    FilterVideoWithoutObjects,
+)
+from .actions.filter_videos_by_duration.filter_videos_by_duration import FilterVideoByDuration
 
+import src.globals as g
 
 SOURCE_ACTIONS = "Input"
 # TRANSFORMATION_ACTIONS = "Transformation actions"
@@ -71,8 +77,8 @@ FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
 
 
-actions_list = {
-    SOURCE_ACTIONS: [DataAction.name, VideoDataAction.name],
+image_actions_list = {
+    SOURCE_ACTIONS: [DataAction.name],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
         BlurAction.name,
@@ -130,10 +136,10 @@ actions_list = {
     ],
 }
 
-actions_dict = {
+# Image Actions
+image_actions_dict = {
     # Data layers
     DataAction.name: DataAction,
-    VideoDataAction.name: VideoDataAction,
     # Pixel-level transforms layers
     AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,
@@ -185,3 +191,31 @@ actions_dict = {
     SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,
 }
+
+video_actions_list = {
+    SOURCE_ACTIONS: [VideoDataAction.name],
+    FILTERS_AND_CONDITIONS: [FilterVideoWithoutObjects.name, FilterVideoByDuration.name],
+    SAVE_ACTIONS: [
+        SaveAction.name,
+        SaveMasksAction.name,
+        SuperviselyAction.name,
+    ],
+}
+
+video_actions_dict = {
+    # Data layers
+    VideoDataAction.name: VideoDataAction,
+    # Filter and condition layers
+    FilterVideoWithoutObjects.name: FilterVideoWithoutObjects,
+    FilterVideoByDuration.name: FilterVideoByDuration,
+    # Save layers
+    SaveAction.name: SaveAction,
+    SaveMasksAction.name: SaveMasksAction,
+    SuperviselyAction.name: SuperviselyAction,
+}
+
+modality_dict = {"images": image_actions_dict, "videos": video_actions_dict}
+modality_list = {"images": image_actions_list, "videos": video_actions_list}
+
+actions_dict = modality_dict[g.MODALITY_TYPE]
+actions_list = modality_list[g.MODALITY_TYPE]

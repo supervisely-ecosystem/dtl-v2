@@ -14,7 +14,7 @@ from src.utils import (
 )
 from src.compute.Net import Net
 from src.compute.Layer import Layer as NetLayer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.ui.dtl import actions_dict, actions_list
 from src.ui.dtl.Action import Action, SourceAction
 from src.ui.dtl.Layer import Layer
@@ -89,7 +89,7 @@ def init_layers(nodes_state: dict):
                 ANNOTATION_TRANSFORMS,
                 OTHER,
             )
-            for action in actions_list[group]
+            for action in actions_list.get(group, [])
         ]:
             transform_layers_ids.append(node_id)
         all_layers_ids.append(node_id)
@@ -273,11 +273,11 @@ def load_preview_for_data_layer(layer: Layer):
         )
 
     try:
-        if layer.id.startswith("data"):
+        if layer.id.startswith("data"):  # or g.MODALITY_TYPE == "images":
             preview_img_path, preview_ann_path = download_preview(
                 project_name, dataset_name, project_meta
             )
-        elif layer.id.startswith("video_data"):
+        elif layer.id.startswith("video_data"):  # or g.MODALITY_TYPE == "videos":
             preview_img_path, preview_ann_path = download_preview(
                 project_name, dataset_name, project_meta, "videos"
             )
@@ -295,14 +295,14 @@ def load_preview_for_data_layer(layer: Layer):
         LegacyProjectItem(
             project_name=project_name,
             ds_name=dataset_name,
-            image_name="preview_image",
-            ia_data={"image_ext": ".jpg"},
-            img_path=f"{preview_path}/preview_image.jpg",
+            item_name="preview_image",
+            ia_data={"item_ext": ".jpg"},
+            item_path=f"{preview_path}/preview_image.jpg",
             ann_path=f"{preview_path}/preview_ann.json",
         ),
         False,
     )
-    img_desc = img_desc.clone_with_img(preview_img)
+    img_desc = img_desc.clone_with_item(preview_img)
     img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
     layer.set_src_img_desc(img_desc)
     layer.set_src_ann(preview_ann)
@@ -326,7 +326,8 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     if children:
         for l_id in children:
             g.layers[l_id].clear_preview()
-    net.preview_mode = False
+
+    # net.preview_mode = False ??
 
     layers_id_chain = None  # parents chain
     if issubclass(layer.action, SourceAction):
@@ -445,9 +446,9 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             LegacyProjectItem(
                 project_name=project_name,
                 ds_name=dataset_name,
-                image_name="preview_image",
-                ia_data={"image_ext": ".jpg"},
-                img_path=f"{preview_path}/preview_image.jpg",
+                item_name="preview_image",
+                ia_data={"item_ext": ".jpg"},
+                item_path=f"{preview_path}/preview_image.jpg",
                 ann_path=f"{preview_path}/preview_ann.json",
             ),
             False,

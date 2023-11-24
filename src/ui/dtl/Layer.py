@@ -23,7 +23,7 @@ from src.ui.dtl.utils import (
     get_text_font_size,
 )
 import src.globals as g
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 
 class Layer:

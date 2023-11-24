@@ -8,7 +8,7 @@ from supervisely.aug.aug import instance_crop
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 
 class InstancesCropLayer(Layer):
@@ -91,7 +91,7 @@ class InstancesCropLayer(Layer):
 
         for idx, (new_img, new_ann) in enumerate(all_results):
             new_img_desc = img_desc.clone_with_img(new_img).clone_with_name(
-                img_desc.get_img_name() + "_crop_" + obj_class_name + str(idx)
+                img_desc.get_item_name() + "_crop_" + obj_class_name + str(idx)
             )
             new_img_desc = new_img_desc
             yield new_img_desc, new_ann

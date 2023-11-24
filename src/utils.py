@@ -17,9 +17,9 @@ LegacyProjectItem = namedtuple(
     [
         "project_name",
         "ds_name",
-        "image_name",
+        "item_name",
         "ia_data",
-        "img_path",
+        "item_path",
         "ann_path",
     ],
 )

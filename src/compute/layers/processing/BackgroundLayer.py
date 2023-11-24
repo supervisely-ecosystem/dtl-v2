@@ -5,7 +5,7 @@ from supervisely import Annotation, Label, Rectangle, ObjClass
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 
 class BackgroundLayer(Layer):

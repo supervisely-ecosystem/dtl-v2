@@ -5,7 +5,7 @@ import numpy as np
 from os.path import join
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from supervisely.nn.inference import Session
 from src.compute.classes_utils import ClassConstants
 from src.compute.tags_utils import TagConstants

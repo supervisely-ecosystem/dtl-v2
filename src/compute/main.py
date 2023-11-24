@@ -20,9 +20,9 @@ def make_legacy_project_item(project: sly.Project, dataset, item_name):
     return LegacyProjectItem(
         project_name=project.name,
         ds_name=dataset.name,
-        image_name=item_name_base,
-        ia_data={"image_ext": item_ext},
-        img_path=dataset.get_img_path(item_name),
+        item_name=item_name_base,
+        ia_data={"item_ext": item_ext},
+        item_path=dataset.get_img_path(item_name),
         ann_path=dataset.get_ann_path(item_name),
     )
 
@@ -37,7 +37,7 @@ def check_in_graph():
     is_archive = net.is_archive()
 
     need_download = net.may_require_images()
-    return {"download_images": need_download, "is_archive": is_archive}
+    return {"download_items": need_download, "is_archive": is_archive}
 
 
 def calculate_datasets_conflict_map(helper):
@@ -93,19 +93,19 @@ def main(progress: Progress):
                 export_output_generator = net.start(data_el)
                 for res_export in export_output_generator:
                     logger.trace(
-                        "image processed",
-                        extra={"img_name": res_export[0][0].get_img_name()},
+                        "item processed",
+                        extra={"item_name": res_export[0][0].get_item_name()},
                     )
                     results_counter += 1
             except Exception as e:
                 extra = {
                     "project_name": data_el[0].get_pr_name(),
                     "ds_name": data_el[0].get_ds_name(),
-                    "image_name": data_el[0].get_img_name(),
+                    "item_name": data_el[0].get_item_name(),
                     "exc_str": str(e),
                 }
                 logger.warn(
-                    "Image was skipped because some error occurred",
+                    "Item was skipped because some error occurred",
                     exc_info=True,
                     extra=extra,
                 )

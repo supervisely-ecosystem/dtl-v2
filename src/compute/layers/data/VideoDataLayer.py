@@ -1,11 +1,11 @@
 # coding: utf-8
-from typing import Tuple
+from typing import Tuple, Union
 
-from supervisely import Annotation, Label, ProjectMeta
+from supervisely import Annotation, Label, ProjectMeta, Frame, VideoFigure, VideoObject
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import VideoDescriptor
 from src.compute.dtl_utils import apply_to_labels
 from src.utils import get_project_by_name, get_project_meta
 from src.exceptions import BadSettingsError
@@ -80,30 +80,58 @@ class VideoDataLayer(Layer):
         else:
             Layer.define_classes_mapping(self)
 
-    def class_mapper(self, label: Label):
-        curr_class = label.obj_class.name
-
-        if curr_class in self.cls_mapping:
-            new_class = self.cls_mapping[curr_class]
+    def class_mapper(self, map_item: Union[Label, Frame]):
+        # for preview
+        if isinstance(map_item, Label):  # if self.net.preview_mode
+            # map_item = label
+            curr_class = map_item.obj_class.name
+            if curr_class in self.cls_mapping:
+                new_class = self.cls_mapping[curr_class]
+            else:
+                raise BadSettingsError(
+                    "Can not find mapping for class", extra={"class": curr_class}
+                )
+            if new_class == ClassConstants.IGNORE:
+                return []  # drop the figure
+            elif new_class != ClassConstants.DEFAULT:
+                obj_class = map_item.obj_class.clone(name=new_class)  # rename class
+                map_item = map_item.clone(obj_class=obj_class)
+            else:
+                pass  # don't change
+            return [map_item]
         else:
-            raise BadSettingsError("Can not find mapping for class", extra={"class": curr_class})
-
-        if new_class == ClassConstants.IGNORE:
-            return []  # drop the figure
-        elif new_class != ClassConstants.DEFAULT:
-            obj_class = label.obj_class.clone(name=new_class)  # rename class
-            label = label.clone(obj_class=obj_class)
-        else:
-            pass  # don't change
-        return [label]
+            # map_item = frame
+            curr_frame_figures = map_item.figures
+            figures = []
+            for figure in curr_frame_figures:
+                figure: VideoFigure
+                curr_class: VideoObject = figure.video_object
+                curr_class_name = curr_class._obj_class.name
+                if curr_class_name in self.cls_mapping:
+                    new_class = self.cls_mapping[curr_class_name]
+                else:
+                    raise BadSettingsError(
+                        "Can not find mapping for class", extra={"class": curr_class_name}
+                    )
+                if new_class == ClassConstants.IGNORE:
+                    return []  # drop the figure
+                elif new_class != ClassConstants.DEFAULT:
+                    obj_class = figure.video_object._obj_class.clone(name=new_class)  # rename class
+                    video_object = VideoObject(obj_class)
+                    figure = figure.clone(video_object=video_object)
+                    figures.append(figure)
+                else:
+                    pass  # don't change
+            if len(figures) > 0:
+                map_item = map_item.clone(figures=[figures])
+            return [map_item]
 
     def validate_source_connections(self):
         pass
 
-    def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
-        # vid_desc
-        img_desc, ann = data_el
+    def process(self, data_el: Tuple[VideoDescriptor, Annotation]):
+        vid_desc, ann = data_el
 
         ann = apply_to_labels(ann, self.class_mapper)
 
-        yield (img_desc, ann)
+        yield (vid_desc, ann)

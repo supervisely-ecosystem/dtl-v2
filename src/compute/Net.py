@@ -5,11 +5,11 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, rand_str, ProjectMeta
+from supervisely import Annotation, rand_str, ProjectMeta, VideoAnnotation, KeyIdMap
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.utils import (
     get_project_by_name,
     get_dataset_by_name,
@@ -27,6 +27,8 @@ from src.exceptions import (
     GraphError,
     CustomException,
 )
+
+from supervisely.io.fs import get_file_ext
 
 
 class Net:
@@ -114,7 +116,7 @@ class Net:
             layer.preprocess()
 
     def get_free_name(self, img_desc: ImageDescriptor, project_name: str):
-        name = img_desc.get_img_name()
+        name = img_desc.get_item_name()
         new_name = name
         full_ds_name = f"{project_name}/{img_desc.get_res_ds_name()}"
         names_in_ds = self.existing_names.get(full_ds_name, set())
@@ -382,28 +384,62 @@ class Net:
             project_info = get_project_by_id(project_id)
             for dataset_id in dataset_ids:
                 dataset_info = get_dataset_by_id(dataset_id)
-                for batch in g.api.image.get_list_generator(dataset_id=dataset_id, batch_size=50):
-                    for img_info in batch:
-                        img_data = np.zeros((img_info.height, img_info.width, 3), dtype=np.uint8)
-                        if require_images:
-                            img_data = g.api.image.download_np(img_info.id)
-                        img_desc = ImageDescriptor(
-                            LegacyProjectItem(
-                                project_name=project_info.name,
-                                ds_name=dataset_info.name,
-                                image_name=".".join(img_info.name.split(".")[:-1]),
-                                ia_data={"image_ext": "." + img_info.ext},
-                                img_path="",
-                                ann_path="",
-                            ),
-                            False,
-                        )
-                        img_desc.update_image(img_data)
-                        ann = Annotation.from_json(
-                            g.api.annotation.download(img_info.id).annotation, project_meta
-                        )
-                        data_el = (img_desc, ann)
-                        yield data_el
+                if g.MODALITY_TYPE == "images":
+                    for batch in g.api.image.get_list_generator(
+                        dataset_id=dataset_id, batch_size=50
+                    ):
+                        for img_info in batch:
+                            img_data = np.zeros(
+                                (img_info.height, img_info.width, 3), dtype=np.uint8
+                            )
+                            if require_images:
+                                img_data = g.api.image.download_np(img_info.id)
+                            img_desc = ImageDescriptor(
+                                LegacyProjectItem(
+                                    project_name=project_info.name,
+                                    ds_name=dataset_info.name,
+                                    item_name=".".join(img_info.name.split(".")[:-1]),
+                                    ia_data={"item_ext": "." + img_info.ext},
+                                    item_path="",
+                                    ann_path="",
+                                ),
+                                False,
+                            )
+                            img_desc.update_image(img_data)
+                            ann = Annotation.from_json(
+                                g.api.annotation.download(img_info.id).annotation, project_meta
+                            )
+                            data_el = (img_desc, ann)
+                            yield data_el
+                elif g.MODALITY_TYPE == "videos":
+                    for batch in g.api.video.get_list_generator(
+                        dataset_id=dataset_id, batch_size=50
+                    ):
+                        for vid_info in batch:
+                            vid_ext = get_file_ext(vid_info.name)
+                            vid_desc = VideoDescriptor(
+                                LegacyProjectItem(
+                                    project_name=project_info.name,
+                                    ds_name=dataset_info.name,
+                                    item_name=".".join(vid_info.name.split(".")[:-1]),
+                                    ia_data={"item_ext": vid_ext},
+                                    item_path="",
+                                    ann_path="",
+                                ),
+                                True,
+                            )
+
+                            video_path = os.path.join(g.DATA_DIR, vid_info.name)
+                            g.api.video.download_path(vid_info.id, video_path)
+                            vid_desc.update_video(video_path)
+                            ann_json = g.api.video.annotation.download(vid_info.id)
+                            ann = VideoAnnotation.from_json(
+                                ann_json,
+                                project_meta,
+                                KeyIdMap(),
+                            )
+                            data_el = (vid_desc, ann)
+                            yield data_el
 
     def get_save_layer_dest(self):
         return self.save_layer.dsts[0]

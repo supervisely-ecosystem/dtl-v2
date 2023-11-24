@@ -11,7 +11,7 @@ from supervisely.project.project import Dataset
 
 from src.compute.utils import imaging
 from src.compute.utils import os_utils
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 

@@ -9,7 +9,7 @@ from typing import Tuple
 import jsonschema
 
 from supervisely import ProjectMeta, TagMeta, ObjClass, TagMetaCollection, Annotation
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.utils import json_utils
 from src.compute.utils import os_utils
 from src.compute.utils.stat_timer import TinyTimer, global_timer

@@ -2,14 +2,14 @@
 
 from typing import Tuple
 
-from supervisely import Annotation
+from supervisely import VideoAnnotation, Frame, VideoObject, VideoFigure
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import VideoDescriptor
 
 
-class FilterImageWithoutObjectsLayer(Layer):
-    action = "filter_image_without_objects"
+class FilterVideoWithoutObjects(Layer):
+    action = "filter_video_without_objects"
 
     layer_settings = {
         "required": ["settings"],
@@ -27,13 +27,15 @@ class FilterImageWithoutObjectsLayer(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
-    def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
-        img_desc, ann = data_el
+    def process(self, data_el: Tuple[VideoDescriptor, VideoAnnotation]):
+        vid_desc, ann = data_el
+        ann: VideoAnnotation
 
         satisfies_cond = False
         exclude_classes = self.settings["exclude_classes"]
-        for label in ann.labels:
-            if label.obj_class.name in exclude_classes:
+        for object in ann.objects:
+            object: VideoObject
+            if object.obj_class.name in exclude_classes:
                 satisfies_cond = True
                 break
 

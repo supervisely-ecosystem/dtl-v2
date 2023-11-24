@@ -20,6 +20,7 @@ TEAM_FILES_PATH = "data-nodes"
 PROJECT_ID = sly.env.project_id(raise_not_found=False)
 DATASET_ID = sly.env.dataset_id(raise_not_found=False)
 FILE = sly.env.team_files_file(raise_not_found=False)
+MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
 
 api = sly.Api()
 

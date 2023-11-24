@@ -44,7 +44,10 @@ class BlurAction(PixelLevelAction):
             font_size=get_text_font_size(),
         )
 
+        # ???
         settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
+        # remove ^^^
+
         blur_type_text = Text("Blur type", status="text", font_size=get_text_font_size())
 
         blur_selector = Select(

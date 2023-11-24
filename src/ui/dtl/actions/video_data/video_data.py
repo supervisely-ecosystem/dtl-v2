@@ -36,7 +36,7 @@ from supervisely.app.widgets import (
 
 
 # VideosProject
-class VideoDataAction:
+class VideoDataAction(SourceAction):
     name = "video_data"
     title = "Videos Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
