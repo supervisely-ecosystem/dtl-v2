@@ -16,7 +16,7 @@ class FilterVideobyDuration(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["duration_unit", "min_duration", "max_duration"],
+                "required": ["duration_unit", "duration_threshold"],
                 "properties": {
                     "duration_unit": {
                         "type": "string",
@@ -25,7 +25,7 @@ class FilterVideobyDuration(Layer):
                             "seconds",
                         ],
                     },
-                    "filter_duration": {"type": "integer", "minimum": 0},
+                    "duration_threshold": {"type": "integer", "minimum": 0},
                 },
             }
         },
@@ -39,11 +39,14 @@ class FilterVideobyDuration(Layer):
         ann: VideoAnnotation
 
         duration_unit = self.settings["duration_unit"]
-        filter_duration = self.settings["filter_duration"]
+        duration_threshold = self.settings["duration_threshold"]
 
         if not self.net.preview_mode:
             # by frames
-            if ann.frames_count <= filter_duration:
-                yield data_el + tuple([1])  # True
+            if duration_unit == "frames":
+                if ann.frames_count <= duration_threshold:
+                    yield data_el + tuple([1])  # True
+                else:
+                    yield data_el + tuple([0])  # False
             else:
-                yield data_el + tuple([0])
+                pass

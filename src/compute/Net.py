@@ -413,7 +413,7 @@ class Net:
                             yield data_el
                 elif g.MODALITY_TYPE == "videos":
                     for batch in g.api.video.get_list_generator(
-                        dataset_id=dataset_id, batch_size=50
+                        dataset_id=dataset_id, batch_size=1
                     ):
                         for vid_info in batch:
                             vid_ext = get_file_ext(vid_info.name)
