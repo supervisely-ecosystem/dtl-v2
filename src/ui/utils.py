@@ -274,11 +274,11 @@ def load_preview_for_data_layer(layer: Layer):
 
     try:
         if layer.id.startswith("data"):  # or g.MODALITY_TYPE == "images":
-            preview_img_path, preview_ann_path = download_preview(
+            item_info, preview_img_path, preview_ann_path = download_preview(
                 project_name, dataset_name, project_meta
             )
         elif layer.id.startswith("video_data"):  # or g.MODALITY_TYPE == "videos":
-            preview_img_path, preview_ann_path = download_preview(
+            item_info, preview_img_path, preview_ann_path = download_preview(
                 project_name, dataset_name, project_meta, "videos"
             )
     except Exception as e:
@@ -296,6 +296,7 @@ def load_preview_for_data_layer(layer: Layer):
             project_name=project_name,
             ds_name=dataset_name,
             item_name="preview_image",
+            item_info=item_info,
             ia_data={"item_ext": ".jpg"},
             item_path=f"{preview_path}/preview_image.jpg",
             ann_path=f"{preview_path}/preview_ann.json",
@@ -429,9 +430,14 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             )
 
         try:
-            preview_img_path, preview_ann_path = download_preview(
-                project_name, dataset_name, project_meta
-            )
+            if g.MODALITY_TYPE == "images":
+                item_info, preview_img_path, preview_ann_path = download_preview(
+                    project_name, dataset_name, project_meta
+                )
+            else:
+                item_info, preview_img_path, preview_ann_path = download_preview(
+                    project_name, dataset_name, project_meta, "videos"
+                )
         except Exception as e:
             raise CustomException(
                 f"Error downloading image and annotation for preview",
@@ -447,6 +453,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
                 project_name=project_name,
                 ds_name=dataset_name,
                 item_name="preview_image",
+                item_info=item_info,
                 ia_data={"item_ext": ".jpg"},
                 item_path=f"{preview_path}/preview_image.jpg",
                 ann_path=f"{preview_path}/preview_ann.json",

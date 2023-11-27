@@ -44,9 +44,12 @@ class FilterVideobyDuration(Layer):
         if not self.net.preview_mode:
             # by frames
             if duration_unit == "frames":
-                if ann.frames_count <= duration_threshold:
+                if vid_desc.info.item_info.frames_count <= duration_threshold:
                     yield data_el + tuple([0])  # True
                 else:
                     yield data_el + tuple([1])  # False
             else:
-                pass
+                if vid_desc.info.item_info.duration <= duration_threshold:
+                    yield data_el + tuple([0])  # True
+                else:
+                    yield data_el + tuple([1])  # False

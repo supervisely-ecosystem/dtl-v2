@@ -44,7 +44,11 @@ class FilterVideoByDuration(FilterAndConditionAction):
 
         @dur_thresh_input.value_changed
         def dur_thresh_input_cb(value):
-            _save_settings
+            _save_settings()
+
+        @duration_unit_selector.value_changed
+        def duration_unit_selector_cb(value):
+            _save_settings()
 
         def _save_settings():
             nonlocal saved_settings
@@ -52,7 +56,6 @@ class FilterVideoByDuration(FilterAndConditionAction):
                 "duration_unit": duration_unit_selector.get_value(),
                 "duration_threshold": dur_thresh_input.get_value(),
             }
-
             saved_settings = settings
 
         def get_settings(options_json: dict) -> dict:

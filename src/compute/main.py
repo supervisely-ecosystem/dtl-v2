@@ -21,6 +21,7 @@ def make_legacy_project_item(project: sly.Project, dataset, item_name):
         project_name=project.name,
         ds_name=dataset.name,
         item_name=item_name_base,
+        item_info=None,
         ia_data={"item_ext": item_ext},
         item_path=dataset.get_img_path(item_name),
         ann_path=dataset.get_ann_path(item_name),

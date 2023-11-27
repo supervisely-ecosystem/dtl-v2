@@ -18,6 +18,7 @@ LegacyProjectItem = namedtuple(
         "project_name",
         "ds_name",
         "item_name",
+        "item_info",
         "ia_data",
         "item_path",
         "ann_path",
@@ -38,16 +39,16 @@ def get_random_video_frame(dataset_id: int):
     return video, frame_id
 
 
-def download_preview_image(dataset_id: int, preview_img_path: str) -> dict:
-    image_id = get_random_image(dataset_id).id
-    g.api.image.download(image_id, preview_img_path)
-    ann_json = g.api.annotation.download_json(image_id)
-    return ann_json
+def download_preview_image(dataset_id: int, preview_img_path: str) -> tuple:
+    image = get_random_image(dataset_id)
+    g.api.image.download(image.id, preview_img_path)
+    ann_json = g.api.annotation.download_json(image)
+    return image, ann_json
 
 
 def download_preview_video(
     dataset_id: int, preview_img_path: str, project_meta: ProjectMeta
-) -> dict:
+) -> tuple:
     video, frame_id = get_random_video_frame(dataset_id)
     g.api.video.frame.download_path(video.id, frame_id, preview_img_path)
     ann_json = g.api.video.annotation.download(video.id)
@@ -65,7 +66,7 @@ def download_preview_video(
     img_size = (video.frame_height, video.frame_width)
     ann = sly.Annotation(img_size, labels)
     ann_json = ann.to_json()
-    return ann_json
+    return video, ann_json
 
 
 def download_preview(
@@ -88,16 +89,18 @@ def download_preview(
     preview_img_path = f"{preview_dataset_path}/preview_image.jpg"
     preview_ann_path = f"{preview_dataset_path}/preview_ann.json"
     if modality_type == "images":
-        ann_json = download_preview_image(dataset_info.id, preview_img_path)
+        item_info, ann_json = download_preview_image(dataset_info.id, preview_img_path)
     elif modality_type == "videos":
-        ann_json = download_preview_video(dataset_info.id, preview_img_path, project_meta)
+        item_info, ann_json = download_preview_video(
+            dataset_info.id, preview_img_path, project_meta
+        )
     else:
         raise NotImplemented(f"Modality type {modality_type} is not supported")
 
     with open(preview_ann_path, "w") as f:
         json.dump(ann_json, f)
 
-    return preview_img_path, preview_ann_path
+    return item_info, preview_img_path, preview_ann_path
 
 
 def _get_project_by_name_or_id(name: str = None, id: int = None):
