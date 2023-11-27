@@ -203,6 +203,7 @@ image_actions_dict = {
 
 video_actions_list = {
     SOURCE_ACTIONS: [VideoDataAction.name],
+    ANNOTATION_TRANSFORMS: [BBoxAction.name],
     VIDEO_TRANSFORMS: [SplitVideoByDuration.name],
     FILTERS_AND_CONDITIONS: [
         FilterVideoWithoutObjects.name,
@@ -218,6 +219,8 @@ video_actions_list = {
 video_actions_dict = {
     # Data layers
     VideoDataAction.name: VideoDataAction,
+    # Annotation layers
+    BBoxAction.name: BBoxAction,
     # Video transofrms
     SplitVideoByDuration.name: SplitVideoByDuration,
     # Filter and condition layers

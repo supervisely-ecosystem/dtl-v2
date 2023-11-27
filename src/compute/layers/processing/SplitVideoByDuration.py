@@ -148,14 +148,14 @@ class SplitVideobyDuration(Layer):
         vid_desc, ann = data_el
         ann: VideoAnnotation
 
-        if len(ann.objects) > 0:
-            raise NotImplementedError("Splitting is not supported for labeled videos yet")
-
         duration_unit = self.settings["duration_unit"]
         duration_threshold = self.settings["duration_threshold"]
         video_info: VideoInfo = vid_desc.info.item_info
 
         if not self.net.preview_mode:
+            if len(ann.objects) > 0:
+                raise NotImplementedError("Splitting is not supported for labeled videos yet")
+
             video_shape = (video_info.frame_height, video_info.frame_width)
             video_frames_count = video_info.frames_count
 
