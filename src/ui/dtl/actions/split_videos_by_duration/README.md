@@ -1,6 +1,6 @@
-# Filter Video by Duration
+# Split Video by Duration
 
-`Filter Video by Duration` layer is used to filter videos by the duration.
+`Split Video by Duration` layer is used to split videos by the duration.
 
 # Settings
 
@@ -14,13 +14,13 @@
 
 ```json
 {
-	"action": "filter_video_by_duration",
+	"action": "split_video_by_duration",
 	"src": [
 		"$data_1"
 	],
 	"dst": [
-		"$filter_video_without_objects_2__true",
-		"$filter_video_without_objects_2__false"
+		"$split_video_without_objects_2__true",
+		"$split_video_without_objects_2__false"
 	],
 	"settings": {
 		"exclude_classes": [

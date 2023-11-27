@@ -131,7 +131,5 @@ class VideoDataLayer(Layer):
 
     def process(self, data_el: Tuple[VideoDescriptor, Annotation]):
         vid_desc, ann = data_el
-
         ann = apply_to_labels(ann, self.class_mapper)
-
         yield (vid_desc, ann)

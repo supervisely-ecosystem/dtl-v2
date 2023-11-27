@@ -2,8 +2,7 @@
 
 from typing import Tuple
 
-from supervisely import VideoAnnotation, Frame, VideoObject, VideoFigure
-
+from supervisely import VideoAnnotation
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import VideoDescriptor
 

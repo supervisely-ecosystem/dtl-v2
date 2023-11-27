@@ -66,6 +66,7 @@ from .actions.filter_videos_without_annotation.filter_videos_without_annotation 
     FilterVideoWithoutAnnotation,
 )
 from .actions.filter_videos_by_duration.filter_videos_by_duration import FilterVideoByDuration
+from .actions.split_videos_by_duration.split_videos_by_duration import SplitVideoByDuration
 
 # ---
 
@@ -81,6 +82,9 @@ SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
 
+# Video specific
+VIDEO_TRANSFORMS = "Video transforms"
+# ---
 
 image_actions_list = {
     SOURCE_ACTIONS: [DataAction.name],
@@ -199,6 +203,7 @@ image_actions_dict = {
 
 video_actions_list = {
     SOURCE_ACTIONS: [VideoDataAction.name],
+    VIDEO_TRANSFORMS: [SplitVideoByDuration.name],
     FILTERS_AND_CONDITIONS: [
         FilterVideoWithoutObjects.name,
         FilterVideoWithoutAnnotation.name,
@@ -213,6 +218,8 @@ video_actions_list = {
 video_actions_dict = {
     # Data layers
     VideoDataAction.name: VideoDataAction,
+    # Video transofrms
+    SplitVideoByDuration.name: SplitVideoByDuration,
     # Filter and condition layers
     FilterVideoWithoutObjects.name: FilterVideoWithoutObjects,
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,

@@ -428,7 +428,7 @@ class Net:
                                     item_path="",
                                     ann_path="",
                                 ),
-                                True,
+                                False,
                             )
 
                             video_path = os.path.join(g.DATA_DIR, vid_info.name)
