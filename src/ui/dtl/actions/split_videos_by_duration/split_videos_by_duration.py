@@ -27,13 +27,13 @@ class SplitVideoByDuration(VideoAction):
         ]
         duration_unit_selector = Select(measure_unit_selector_items, size="small")
 
-        dur_thresh_input = InputNumber(value=30, step=1, controls=True, size="small")
+        split_step_input = InputNumber(value=30, step=1, controls=True, size="small")
         duration_settings = Field(
-            title="Split duration threshold",
+            title="Split step size",
             description=(
-                "Videos will be splitted by the given duration. If given duration is more than video duration, video will remain unchanged."
+                "Videos will be splitted by the given step. If given step is more than video duration, video will remain unchanged."
             ),
-            content=dur_thresh_input,
+            content=split_step_input,
         )
 
         settings_container = Container(
@@ -41,8 +41,8 @@ class SplitVideoByDuration(VideoAction):
         )
         saved_settings = {}
 
-        @dur_thresh_input.value_changed
-        def dur_thresh_input_cb(value):
+        @split_step_input.value_changed
+        def split_step_input_cb(value):
             _save_settings()
 
         @duration_unit_selector.value_changed
@@ -53,7 +53,7 @@ class SplitVideoByDuration(VideoAction):
             nonlocal saved_settings
             settings = {
                 "duration_unit": duration_unit_selector.get_value(),
-                "duration_threshold": dur_thresh_input.get_value(),
+                "split_step": split_step_input.get_value(),
             }
             saved_settings = settings
 
@@ -64,8 +64,8 @@ class SplitVideoByDuration(VideoAction):
         def _set_settings_from_json(settings: dict):
             duration_unit = settings.get("duration_unit", "frames")
             duration_unit_selector.set_value(duration_unit)
-            dur_thresh = settings.get("duration_threshold", 30)
-            dur_thresh_input.value = dur_thresh
+            split_step = settings.get("split_step", 30)
+            split_step_input.value = split_step
             _save_settings()
 
         def create_options(src: list, dst: list, settings: dict) -> dict:

@@ -129,11 +129,20 @@ def process_annotations(
         range_tags = get_frame_range_tags(frame_range_tags, curr_frame_range)
 
         split_ann_tags.extend(range_tags)
-        split_ann = ann.clone(
-            frames_count=curr_frames_count,
-            frames=split_frames_coll,
-            tags=VideoTagCollection(split_ann_tags),
-        )
+
+        try:
+            split_ann = ann.clone(
+                frames_count=curr_frames_count,
+                frames=split_frames_coll,
+                tags=VideoTagCollection(split_ann_tags),
+            )
+        except:
+            split_ann = ann.clone(
+                frames_count=curr_frames_count - 1,
+                frames=split_frames_coll,
+                tags=VideoTagCollection(split_ann_tags),
+            )
+
         annotations.append(split_ann)
     return annotations
 
@@ -169,7 +178,7 @@ class SplitVideobyDuration(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["duration_unit", "duration_threshold"],
+                "required": ["duration_unit", "split_step"],
                 "properties": {
                     "duration_unit": {
                         "type": "string",
@@ -178,7 +187,7 @@ class SplitVideobyDuration(Layer):
                             "seconds",
                         ],
                     },
-                    "duration_threshold": {"type": "integer", "minimum": 0},
+                    "split_step": {"type": "integer", "minimum": 0},
                 },
             }
         },
@@ -192,25 +201,18 @@ class SplitVideobyDuration(Layer):
         ann: VideoAnnotation
 
         duration_unit = self.settings["duration_unit"]
-        duration_threshold = self.settings["duration_threshold"]
+        split_step = self.settings["split_step"]
         video_info: VideoInfo = vid_desc.info.item_info
 
         if not self.net.preview_mode:
-            # if len(ann.objects) > 0:
-            #     raise NotImplementedError("Splitting is not supported for labeled videos yet")
-
-            video_shape = (video_info.frame_height, video_info.frame_width)
             video_frames_count = video_info.frames_count
-
             video_length = video_info.frames_to_timecodes[-1]
             if duration_unit == "frames":
-                if duration_threshold >= video_frames_count:
+                if split_step >= video_frames_count:
                     # Frames count set for splitting, is more then video
                     yield (vid_desc, ann)
                 else:
-                    splitter = get_frames_splitter(
-                        duration_threshold, video_info.frames_to_timecodes
-                    )
+                    splitter = get_frames_splitter(split_step, video_info.frames_to_timecodes)
                     video_splits_paths, video_splits_names = write_videos(
                         vid_desc.item_data, splitter, g.RESULTS_DIR, video_info
                     )
@@ -223,16 +225,18 @@ class SplitVideobyDuration(Layer):
                         yield process_splits(vid_desc, video_path, video_name, ann)
 
             else:
-                pass
-                # if duration_threshold >= video_info.duration:
-                #     # Time set for splitting, is more then video
-                #     yield (vid_desc, ann)
-                # else:
-                #     video_splits_paths, video_splits_names, annotations = split_video(
-                #         vid_desc.item_data, ann, duration_threshold, False
-                #     )
+                if split_step >= video_info.duration:
+                    # Time set for splitting, is more then video
+                    yield (vid_desc, ann)
+                else:
+                    splitter = get_time_splitter(split_step, video_length)
+                    video_splits_paths, video_splits_names = write_videos(
+                        vid_desc.item_data, splitter, g.RESULTS_DIR, video_info
+                    )
 
-                #     for video_path, video_name, ann in zip(
-                #         video_splits_paths, video_splits_names, annotations
-                #     ):
-                #         yield process_splits(vid_desc, video_path, video_name, ann)
+                    annotations = process_annotations(video_splits_paths, ann)
+
+                    for video_path, video_name, ann in zip(
+                        video_splits_paths, video_splits_names, annotations
+                    ):
+                        yield process_splits(vid_desc, video_path, video_name, ann)
