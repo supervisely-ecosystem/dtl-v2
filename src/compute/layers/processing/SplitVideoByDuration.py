@@ -44,7 +44,7 @@ def get_frames_splitter(split_frames, fr_to_timecodes):
     splitter = []
     for start in range(0, len(fr_to_timecodes), split_frames):
         end = min(start + split_frames - 1, len(fr_to_timecodes) - 1)
-        splitter.append([fr_to_timecodes[start], fr_to_timecodes[end]])
+        splitter.append([fr_to_timecodes[start], fr_to_timecodes[end] + 0.001])
     return splitter
 
 
@@ -129,13 +129,6 @@ def process_annotations(
         range_tags = get_frame_range_tags(frame_range_tags, curr_frame_range)
 
         split_ann_tags.extend(range_tags)
-
-        # split_ann = ann.clone(
-        #     frames_count=curr_frames_count,
-        #     frames=split_frames_coll,
-        #     tags=VideoTagCollection(split_ann_tags),
-        # )
-
         split_ann = ann.clone(
             frames_count=len(split_frames_coll),
             frames=split_frames_coll,
