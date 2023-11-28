@@ -66,12 +66,12 @@ def split_video(
     total = ann.frames_count
 
     for _ in range(len(output_paths)):
-        frame_range = FrameCollection(frames[start:end])
+        frame_range = frames[start:end]
         ann = VideoAnnotation(
             img_size=(video.h, video.w),
-            frames_count=1,
+            frames_count=len(frame_range),
             objects=ann.objects,
-            frames=frame_range,
+            frames=FrameCollection(frame_range),
             tags=ann.tags,
         )
         annotations.append(ann)
