@@ -54,29 +54,50 @@ def split_video(
         end += segment_duration
         index += 1
 
+    annotations = split_annotation(
+        len(output_paths), ann, (video.h, video.w), segment_length, by_frames
+    )
+    return output_paths, output_filenames, annotations
+
+
+def split_annotation(
+    videos_n: int,
+    ann: VideoAnnotation,
+    video_shape: tuple,
+    segment_length: int,
+    by_frames: bool = True,
+):
     annotations = []
     frames = list([frame for frame in ann.frames])
     start = 0
     end = segment_length
     total = ann.frames_count
-
-    for _ in range(len(output_paths)):
+    for _ in range(videos_n):
         frame_range = frames[start:end]
-        ann = VideoAnnotation(
-            img_size=(video.h, video.w),
-            frames_count=len(frame_range),
+        new_frames = []
+        for idx, frame in enumerate(frame_range):
+            frame: Frame
+            new_figures = []
+            for fig in frame.figures:
+                fig: VideoFigure
+                new_fig = fig.clone()
+                new_figures.append(new_fig)
+            new_frame = frame.clone(idx, new_figures)
+            new_frames.append(new_frame)
+        new_ann = VideoAnnotation(
+            img_size=video_shape,
+            frames_count=len(new_frames),
             objects=ann.objects,
-            frames=FrameCollection(frame_range),
+            frames=FrameCollection(new_frames),
             tags=ann.tags,
         )
-        annotations.append(ann)
-
+        annotations.append(new_ann)
         start += segment_length
         end += segment_length
         if end > total:
             end = total
 
-    return output_paths, output_filenames, annotations
+    return annotations
 
 
 def process_splits(
