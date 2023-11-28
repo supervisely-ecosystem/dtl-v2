@@ -27,7 +27,7 @@ class SplitVideoByDuration(VideoAction):
         ]
         duration_unit_selector = Select(measure_unit_selector_items, size="small")
 
-        split_step_input = InputNumber(value=30, step=1, controls=True, size="small")
+        split_step_input = InputNumber(value=500, step=1, controls=True, size="small")
         duration_settings = Field(
             title="Split step size",
             description=(
@@ -64,7 +64,7 @@ class SplitVideoByDuration(VideoAction):
         def _set_settings_from_json(settings: dict):
             duration_unit = settings.get("duration_unit", "frames")
             duration_unit_selector.set_value(duration_unit)
-            split_step = settings.get("split_step", 30)
+            split_step = settings.get("split_step", 500)
             split_step_input.value = split_step
             _save_settings()
 
