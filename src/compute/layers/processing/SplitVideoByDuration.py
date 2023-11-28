@@ -130,18 +130,17 @@ def process_annotations(
 
         split_ann_tags.extend(range_tags)
 
-        try:
-            split_ann = ann.clone(
-                frames_count=curr_frames_count,
-                frames=split_frames_coll,
-                tags=VideoTagCollection(split_ann_tags),
-            )
-        except:
-            split_ann = ann.clone(
-                frames_count=curr_frames_count - 1,
-                frames=split_frames_coll,
-                tags=VideoTagCollection(split_ann_tags),
-            )
+        # split_ann = ann.clone(
+        #     frames_count=curr_frames_count,
+        #     frames=split_frames_coll,
+        #     tags=VideoTagCollection(split_ann_tags),
+        # )
+
+        split_ann = ann.clone(
+            frames_count=len(split_frames_coll),
+            frames=split_frames_coll,
+            tags=VideoTagCollection(split_ann_tags),
+        )
 
         annotations.append(split_ann)
     return annotations
