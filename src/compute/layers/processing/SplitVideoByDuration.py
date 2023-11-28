@@ -54,15 +54,10 @@ def split_video(
         end += segment_duration
         index += 1
 
-    ann_segments = []
-    for start in range(0, ann.frames_count, segment_length):
-        end = min(start + segment_length - 1, ann.frames_count - 1)
-        ann_segments.append([start, end])
-
     annotations = []
     frames = list([frame for frame in ann.frames])
     start = 0
-    end = segment_length - 1
+    end = segment_length
     total = ann.frames_count
 
     for _ in range(len(output_paths)):
