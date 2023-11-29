@@ -16,19 +16,14 @@
 {
 	"action": "filter_video_by_duration",
 	"src": [
-		"$data_1"
+		"$video_data_1"
 	],
-	"dst": [
-		"$filter_video_without_objects_2__true",
-		"$filter_video_without_objects_2__false"
-	],
+	"dst": "$filter_video_by_duration_2",
 	"settings": {
-		"exclude_classes": [
-			"car",
-			"pedestrian"
-		]
+		"duration_unit": "frames",
+		"duration_threshold": 500
 	}
-},
+}
 ```
 
 </details>

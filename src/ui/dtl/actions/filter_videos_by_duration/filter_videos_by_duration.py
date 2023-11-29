@@ -27,7 +27,7 @@ class FilterVideoByDuration(FilterAndConditionAction):
         ]
         duration_unit_selector = Select(measure_unit_selector_items, size="small")
 
-        dur_thresh_input = InputNumber(value=30, step=1, controls=True, size="small")
+        dur_thresh_input = InputNumber(value=500, step=1, controls=True, size="small")
         duration_settings = Field(
             title="Duration threshold",
             description=(
@@ -65,7 +65,7 @@ class FilterVideoByDuration(FilterAndConditionAction):
         def _set_settings_from_json(settings: dict):
             duration_unit = settings.get("duration_unit", "frames")
             duration_unit_selector.set_value(duration_unit)
-            dur_thresh = settings.get("duration_threshold", 30)
+            dur_thresh = settings.get("duration_threshold", 500)
             dur_thresh_input.value = dur_thresh
             _save_settings()
 

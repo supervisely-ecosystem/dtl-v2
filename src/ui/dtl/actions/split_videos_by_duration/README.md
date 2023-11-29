@@ -5,7 +5,7 @@
 # Settings
 
 - **Duration unit** - Set duration in frames or seconds of the video.
-- **Duration threshold** - Set duration threshold.
+- **Split step** - Set the step of the split. For example, if you set the step to 10 seconds, the video will be split every 10 seconds.
 
 ### JSON views
 
@@ -16,19 +16,14 @@
 {
 	"action": "split_video_by_duration",
 	"src": [
-		"$data_1"
+		"$video_data_1"
 	],
-	"dst": [
-		"$split_video_without_objects_2__true",
-		"$split_video_without_objects_2__false"
-	],
+	"dst": "$split_video_by_duration_2",
 	"settings": {
-		"exclude_classes": [
-			"car",
-			"pedestrian"
-		]
+		"duration_unit": "frames",
+		"split_step": 500
 	}
-},
+}
 ```
 
 </details>

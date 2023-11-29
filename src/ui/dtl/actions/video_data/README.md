@@ -24,11 +24,11 @@ The `Video Project` layer allows you to specify the project and datasets that wi
 
 ### Example
 
-1. Add `Videos Project` layer and select project `My project`. 
-2. Select some dataset from this project. For example, `animals` dataset.
-3. Select classes that will be used in the transformation process. For example, we will select `raccoon` class.
+1. Add `Videos Project` layer and select project `My project`.
+2. Select some dataset from this project. For example, `road` dataset.
+3. Select classes that will be used in the transformation process. For example, we will select `pedestrian` class.
 
-As a result, we will get all videos from the `animals` dataset and all objects with the `raccoon` class.
+As a result, we will get all videos from the `road` dataset and all objects with the `pedestrian` class.
 This data will be used in the next layers of the transformation process.
 
 ### JSON view
@@ -37,16 +37,13 @@ This data will be used in the next layers of the transformation process.
   <summary>Specific datasets and classes</summary>
 <pre>
 {
-  "action": "data",
-  "src": ["My project/animals"],
-  "dst": "$data_15",
+  "action": "video_data",
+  "src": ["My project/road"],
+  "dst": "$video_data_2",
   "settings": {
     "classes_mapping": {
-      "blueberries": "__ignore__",
-      "raccoon": "raccoon",
-      "dog": "__ignore__",
-      "plants": "__ignore__",
-      "tree": "__ignore__"
+      "car": "__ignore__",
+      "pedestrian": "pedestrian",
     }
   }
 }

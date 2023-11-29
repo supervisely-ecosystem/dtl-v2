@@ -15,7 +15,7 @@
 {
 	"action": "filter_video_without_objects",
 	"src": [
-		"$data_1"
+		"$video_data_1"
 	],
 	"dst": [
 		"$filter_video_without_objects_2__true",

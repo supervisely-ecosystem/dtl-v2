@@ -15,18 +15,13 @@ This layer doesn't have any settings.
 {
 	"action": "filter_video_without_annotation",
 	"src": [
-		"$data_1"
+		"$video_data_1"
 	],
 	"dst": [
 		"$filter_video_without_objects_2__true",
 		"$filter_video_without_objects_2__false"
 	],
-	"settings": {
-		"exclude_classes": [
-			"car",
-			"pedestrian"
-		]
-	}
+	"settings": {}
 },
 ```
 
