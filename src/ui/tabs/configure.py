@@ -140,9 +140,16 @@ left_sidebar_groups_widgets = {
     for group_name, group_actions in actions_list.items()
 }
 
+modality_type_text = Text(
+    f"The list of Data Nodes (operations) below is for <b>{g.MODALITY_TYPE}</b> modality."
+    "Run the app with different option to change the data type.",
+    status="text",
+    font_size=12,
+)
 
 left_sidebar_widgets = [
     Flexbox(widgets=[collapse_sidebar_btn, filter_actions_input]),
+    modality_type_text,
     *[left_sidebar_groups_widgets[group_name] for group_name in actions_list.keys()],
 ]
 sidebar = Sidebar(
