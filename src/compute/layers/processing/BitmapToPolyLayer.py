@@ -14,8 +14,8 @@ from src.exceptions import WrongGeometryError
 
 
 # FigureBitmap to FigurePolygon
-class FindContoursLayer(Layer):
-    action = "find_contours"
+class BitmapToPolyLayer(Layer):
+    action = "bitmap2poly"
 
     layer_settings = {
         "required": ["settings"],

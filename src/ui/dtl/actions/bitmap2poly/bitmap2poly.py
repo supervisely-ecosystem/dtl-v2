@@ -25,8 +25,8 @@ from src.ui.dtl.utils import (
 import src.globals as g
 
 
-class FindContoursAction(AnnotationAction):
-    name = "find_contours"
+class BitmapToPolyAction(AnnotationAction):
+    name = "bitmap2poly"
     title = "Mask to Polygon"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/find_contours"

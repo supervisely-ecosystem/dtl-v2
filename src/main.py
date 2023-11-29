@@ -1,11 +1,15 @@
 import threading
 import time
-from supervisely import Application
+from supervisely import Application, ProjectInfo, DatasetInfo
 
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_metas, update_nodes, nodes_flow
 from src.ui.tabs.presets import load_json
+
 from src.ui.dtl.actions.data.data import DataAction
+from src.ui.dtl.actions.video_data.video_data import VideoDataAction
+
+
 import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
@@ -59,10 +63,16 @@ update_loop.start()
 if g.PROJECT_ID:
     ds = "*"
     if g.DATASET_ID:
-        ds = g.api.dataset.get_info_by_id(g.DATASET_ID).name
-    pr = g.api.project.get_info_by_id(g.PROJECT_ID).name
+        ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+    pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID).name
     src = [f"{pr}/{ds}"]
-    layer = create_new_layer(DataAction.name)
+
+    if pr.type == "images":
+        layer = create_new_layer(DataAction.name)
+    elif pr.type == "videos":
+        layer = create_new_layer(VideoDataAction.name)
+    else:
+        raise NotImplementedError(f"Project type {pr.type} is not supported")
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)

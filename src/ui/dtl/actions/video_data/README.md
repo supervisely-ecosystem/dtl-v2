@@ -16,8 +16,8 @@ The `Video Project` layer allows you to specify the project and datasets that wi
 
 ### Settings:
 
-- **Select project** - select project that will be used in data transformation processes:
-    - `Project` - select project
+- **Select project** - select a project that will be used in data transformation processes:
+    - `Project` - select a project
     - `Select all datasets` - if this option is enabled, all datasets from the selected project will be used
     - `Dataset` - select one or more datasets from the selected project
 - **Classes** - select classes that will be used in data transformation processes.
@@ -28,10 +28,8 @@ The `Video Project` layer allows you to specify the project and datasets that wi
 2. Select some dataset from this project. For example, `animals` dataset.
 3. Select classes that will be used in the transformation process. For example, we will select `raccoon` class.
 
-As a result, we will get all images from the `animals` dataset and all objects with the `raccoon` class.
+As a result, we will get all videos from the `animals` dataset and all objects with the `raccoon` class.
 This data will be used in the next layers of the transformation process.
-
-![data-2](https://github.com/supervisely-ecosystem/ml-nodes/assets/79905215/4c6c66db-3197-4c76-add6-c1107cb0ecc5)
 
 ### JSON view
 

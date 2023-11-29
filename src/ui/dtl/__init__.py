@@ -29,7 +29,7 @@ from .actions.dummy.dummy import DummyAction
 from .actions.duplicate_objects.duplicate_objects import DuplicateObjectsAction
 from .actions.filter_image_by_object.filter_image_by_object import FilterImageByObject
 from .actions.filter_image_by_tag.filter_image_by_tag import FilterImageByTag
-from .actions.find_contours.find_contours import FindContoursAction
+from .actions.bitmap2poly.bitmap2poly import BitmapToPolyAction
 from .actions.flip.flip import FlipAction
 from .actions.if_action.if_action import IfAction
 from .actions.instances_crop.instances_crop import InstancesCropAction
@@ -116,7 +116,7 @@ image_actions_list = {
         DropLinesByLengthAction.name,
         DropNoiseAction.name,
         DuplicateObjectsAction.name,
-        FindContoursAction.name,
+        BitmapToPolyAction.name,
         LineToBitmapAction.name,
         MergeBitmapsAction.name,
         ObjectsFilterAction.name,
@@ -175,7 +175,7 @@ image_actions_dict = {
     DropLinesByLengthAction.name: DropLinesByLengthAction,
     DropNoiseAction.name: DropNoiseAction,
     DuplicateObjectsAction.name: DuplicateObjectsAction,
-    FindContoursAction.name: FindContoursAction,
+    BitmapToPolyAction.name: BitmapToPolyAction,
     LineToBitmapAction.name: LineToBitmapAction,
     MergeBitmapsAction.name: MergeBitmapsAction,
     ObjectsFilterAction.name: ObjectsFilterAction,
