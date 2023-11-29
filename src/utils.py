@@ -42,7 +42,7 @@ def get_random_video_frame(dataset_id: int):
 def download_preview_image(dataset_id: int, preview_img_path: str) -> tuple:
     image = get_random_image(dataset_id)
     g.api.image.download(image.id, preview_img_path)
-    ann_json = g.api.annotation.download_json(image)
+    ann_json = g.api.annotation.download_json(image.id)
     return image, ann_json
 
 

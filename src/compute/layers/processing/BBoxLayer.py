@@ -1,10 +1,12 @@
 # coding: utf-8
 
-from supervisely import Rectangle, Label, Annotation
+from typing import Tuple, Union
+from supervisely import Rectangle, Label, Annotation, VideoAnnotation
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils import apply_to_labels, convert_video_annotation
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 
 
 class BBoxLayer(Layer):
@@ -34,7 +36,10 @@ class BBoxLayer(Layer):
             self.cls_mapping[old_class] = {"title": new_class, "shape": Rectangle.geometry_name()}
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
-    def process(self, data_el):
+    def process(
+        self,
+        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
+    ):
         item_desc, ann = data_el
 
         def to_fig_rect(label: Label):

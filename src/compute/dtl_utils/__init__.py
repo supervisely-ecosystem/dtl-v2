@@ -29,6 +29,16 @@ def apply_to_labels(ann: Union[Annotation, VideoAnnotation], fn: Callable):
     return ann
 
 
+# tbd
+# def apply_to_figures(ann: VideoAnnotation, fn: Callable):
+# new_frames = []
+# for frame in ann.frames:
+#     new_frames.extend(fn(frame))
+# frames_col = FrameCollection(new_frames)
+# ann = ann.clone(frames=frames_col)
+#     return ann
+
+
 def convert_video_annotation(ann: VideoAnnotation, dst_meta: ProjectMeta):
     frames = []
     new_objects = {}

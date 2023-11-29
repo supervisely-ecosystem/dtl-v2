@@ -1,9 +1,10 @@
 # coding: utf-8
 
-from typing import Tuple
+from typing import Tuple, Union
 
-import supervisely as sly
-
+from supervisely import Annotation, VideoAnnotation, KeyIdMap
+import supervisely.io.fs as sly_fs
+import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
@@ -57,7 +58,6 @@ class SuperviselyLayer(Layer):
         self.sly_project_info = g.api.project.create(
             g.WORKSPACE_ID,
             self.out_project_name,
-            # type=sly.ProjectType.IMAGES,
             type=g.MODALITY_TYPE,
             change_name_if_conflict=True,
         )
@@ -76,7 +76,10 @@ class SuperviselyLayer(Layer):
         else:
             return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
 
-    def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
+    def process(
+        self,
+        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
+    ):
         item_desc, ann = data_el
 
         if not self.net.preview_mode:
@@ -95,11 +98,8 @@ class SuperviselyLayer(Layer):
                     video_info = g.api.video.upload_path(
                         dataset_info.id, out_item_name, item_desc.item_data
                     )
-                    import supervisely.io.json as sly_json
-                    import supervisely.io.fs as sly_fs
-
                     ann_path = f"{item_desc.item_data}.json"
-                    ann_json = ann.to_json(sly.KeyIdMap())
+                    ann_json = ann.to_json(KeyIdMap())
                     sly_json.dump_json_file(ann_json, ann_path)
                     g.api.video.annotation.upload_paths(
                         [video_info.id], [ann_path], self.output_meta
