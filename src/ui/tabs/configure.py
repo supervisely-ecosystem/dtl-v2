@@ -141,7 +141,7 @@ left_sidebar_groups_widgets = {
 }
 
 modality_type_text = Text(
-    f"The list of Data Nodes (operations) below is for <b>{g.MODALITY_TYPE}</b> modality."
+    f"The list of Data Nodes (operations) below is for <b>{g.MODALITY_TYPE}</b> modality. "
     "Run the app with different option to change the data type.",
     status="text",
     font_size=12,
