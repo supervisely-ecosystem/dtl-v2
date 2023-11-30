@@ -1,12 +1,20 @@
 # coding: utf-8
 from typing import Tuple, Union
 
-from supervisely import Annotation, Label, ProjectMeta, Frame, VideoFigure, VideoObject
+from supervisely import (
+    Annotation,
+    Label,
+    ProjectMeta,
+    Frame,
+    VideoFigure,
+    VideoObject,
+    VideoAnnotation,
+)
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils.item_descriptor import VideoDescriptor
-from src.compute.dtl_utils import apply_to_labels
+from src.compute.dtl_utils.item_descriptor import VideoDescriptor, ImageDescriptor
+from src.compute.dtl_utils import apply_to_labels, apply_to_frames
 from src.utils import get_project_by_name, get_project_meta
 from src.exceptions import BadSettingsError
 
@@ -129,7 +137,14 @@ class VideoDataLayer(Layer):
     def validate_source_connections(self):
         pass
 
-    def process(self, data_el: Tuple[VideoDescriptor, Annotation]):
-        vid_desc, ann = data_el
-        ann = apply_to_labels(ann, self.class_mapper)
-        yield (vid_desc, ann)
+    def process(
+        self,
+        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
+    ):
+        item_desc, ann = data_el
+
+        if self.net.preview_mode:
+            ann = apply_to_labels(ann, self.class_mapper)
+        else:
+            ann = apply_to_frames(ann, self.class_mapper)
+        yield (item_desc, ann)

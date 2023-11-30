@@ -1,11 +1,17 @@
 # coding: utf-8
 
 from typing import Tuple, Union
-from supervisely import Rectangle, Label, Annotation, VideoAnnotation
+from supervisely import (
+    Rectangle,
+    Label,
+    Annotation,
+    VideoAnnotation,
+    Frame,
+)
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils import apply_to_labels, convert_video_annotation
+from src.compute.dtl_utils import apply_to_labels, apply_to_frames
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 
 
@@ -55,8 +61,22 @@ class BBoxLayer(Layer):
             )  # keep description and binding key?
             return [label]  # iterable
 
+        def to_fig_rect_video(frame: Frame):
+            new_figures = []
+            for figure in frame.figures:
+                new_title = self.settings["classes_mapping"].get(figure.video_object.obj_class.name)
+                if new_title is None:
+                    return [frame]
+                new_obj_class = figure.video_object.obj_class.clone(
+                    name=new_title, geometry_type=Rectangle
+                )
+                new_video_object = figure.video_object.clone(obj_class=new_obj_class)
+                new_figure = figure.clone(new_video_object, figure.geometry.to_bbox())
+                new_figures.append(new_figure)
+            return [frame.clone(frame.index, new_figures)]
+
         if isinstance(ann, Annotation):
             ann = apply_to_labels(ann, to_fig_rect)
         else:
-            ann = convert_video_annotation(ann, self.output_meta)
+            ann = apply_to_frames(ann, to_fig_rect_video)
         yield item_desc, ann

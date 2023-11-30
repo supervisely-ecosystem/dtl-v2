@@ -81,7 +81,7 @@ class BackgroundLayer(Layer):
         bg_geometry = Rectangle(0, 0, h - 1, w - 1)
         bg_class = ObjClass(self.settings["class"], Rectangle)
 
-        if self.net.preview_mode or isinstance(ann, Annotation):
+        if isinstance(ann, Annotation):
             ann = add_bg_to_image(ann, bg_class, bg_geometry)
             yield item_desc, ann
         else:

@@ -3,13 +3,20 @@
 from copy import deepcopy
 from typing import Tuple, Union
 
-from supervisely import Annotation, Polygon, Rectangle, Label, VideoAnnotation
+from supervisely import (
+    Annotation,
+    Polygon,
+    Rectangle,
+    Label,
+    VideoAnnotation,
+    Frame,
+)
 from supervisely.geometry.helpers import geometry_to_polygon
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
-from src.compute.dtl_utils import apply_to_labels, convert_video_annotation
+from src.compute.dtl_utils import apply_to_labels, apply_to_frames
 from src.exceptions import WrongGeometryError
 
 
@@ -63,8 +70,33 @@ class BBoxToPolyLayer(Layer):
             result_label = label.clone(geometry=poly, obj_class=result_obj_class)
             return [result_label]  # iterable
 
+        def to_geom_rect_video(frame: Frame):
+            new_figures = []
+            for figure in frame.figures:
+                new_title = self.settings["classes_mapping"].get(figure.video_object.obj_class.name)
+                if new_title is None:
+                    return [frame]
+
+                if not isinstance(figure.geometry, Rectangle):
+                    raise WrongGeometryError(
+                        None,
+                        "Rectangle",
+                        figure.geometry.geometry_name(),
+                        extra={"layer": self.action},
+                    )
+
+                poly = geometry_to_polygon(figure.geometry)[0]
+
+                new_obj_class = figure.video_object.obj_class.clone(
+                    name=new_title, geometry_type=Polygon
+                )
+                new_video_object = figure.video_object.clone(obj_class=new_obj_class)
+                new_figure = figure.clone(new_video_object, poly)
+                new_figures.append(new_figure)
+            return [frame.clone(frame.index, new_figures)]
+
         if isinstance(ann, Annotation):
             ann = apply_to_labels(ann, to_geom_rect)
         else:
-            ann = convert_video_annotation(ann, self.output_meta)
+            ann = apply_to_frames(ann, to_geom_rect_video)
         yield item_desc, ann
