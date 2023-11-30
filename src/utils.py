@@ -72,6 +72,9 @@ def download_preview_video(
 def download_preview(
     project_name: str, dataset_name: str, project_meta: ProjectMeta, modality_type: str = "images"
 ) -> Tuple[str, str]:
+    if modality_type not in g.SUPPORTED_MODALITIES:
+        raise ValueError(f"Modality type {modality_type} is not supported")
+
     project_info = get_project_by_name(project_name)
     if project_info is None:
         raise RuntimeError(f"Project {project_name} not found")

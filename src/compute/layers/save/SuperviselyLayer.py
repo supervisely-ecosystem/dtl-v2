@@ -58,7 +58,7 @@ class SuperviselyLayer(Layer):
         self.sly_project_info = g.api.project.create(
             g.WORKSPACE_ID,
             self.out_project_name,
-            type=g.MODALITY_TYPE,
+            type=self.net.modality,
             change_name_if_conflict=True,
         )
         g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
@@ -89,12 +89,12 @@ class SuperviselyLayer(Layer):
             )
             if self.sly_project_info is not None:
                 dataset_info = self.get_or_create_dataset(dataset_name)
-                if g.MODALITY_TYPE == "images":
+                if self.net.modality == "images":
                     image_info = g.api.image.upload_np(
                         dataset_info.id, out_item_name, item_desc.read_image()
                     )
                     g.api.annotation.upload_ann(image_info.id, ann)
-                elif g.MODALITY_TYPE == "videos":
+                elif self.net.modality == "videos":
                     video_info = g.api.video.upload_path(
                         dataset_info.id, out_item_name, item_desc.item_data
                     )

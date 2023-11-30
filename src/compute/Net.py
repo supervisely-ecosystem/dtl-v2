@@ -32,9 +32,10 @@ from supervisely.io.fs import get_file_ext
 
 
 class Net:
-    def __init__(self, graph_desc, output_folder):
+    def __init__(self, graph_desc, output_folder, modality):
         self.layers = []
         self.preview_mode = False
+        self.modality = modality
 
         if type(graph_desc) is str:
             graph_path = graph_desc
@@ -384,7 +385,7 @@ class Net:
             project_info = get_project_by_id(project_id)
             for dataset_id in dataset_ids:
                 dataset_info = get_dataset_by_id(dataset_id)
-                if g.MODALITY_TYPE == "images":
+                if self.modality == "images":
                     for batch in g.api.image.get_list_generator(
                         dataset_id=dataset_id, batch_size=50
                     ):
@@ -406,13 +407,13 @@ class Net:
                                 ),
                                 False,
                             )
-                            img_desc.update_image(img_data)
+                            img_desc.update_item(img_data)
                             ann = Annotation.from_json(
                                 g.api.annotation.download(img_info.id).annotation, project_meta
                             )
                             data_el = (img_desc, ann)
                             yield data_el
-                elif g.MODALITY_TYPE == "videos":
+                elif self.modality == "videos":
                     for batch in g.api.video.get_list_generator(
                         dataset_id=dataset_id, batch_size=1
                     ):
@@ -433,7 +434,7 @@ class Net:
 
                             video_path = os.path.join(g.DATA_DIR, vid_info.name)
                             g.api.video.download_path(vid_info.id, video_path)
-                            vid_desc.update_video(video_path)
+                            vid_desc.update_item(video_path)
                             ann_json = g.api.video.annotation.download(vid_info.id)
                             ann = VideoAnnotation.from_json(
                                 ann_json,

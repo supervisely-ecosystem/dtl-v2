@@ -95,7 +95,7 @@ def run():
                 unit_scale=True,
                 total=get_file_size(tar_path),
             ) as pbar:
-                dst = f"/{g.TEAM_FILES_PATH}/archives/{Path(tar_path).name}"
+                dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{Path(tar_path).name}"
                 if g.api.file.exists(g.TEAM_ID, dst):
                     dst = g.api.file.get_free_name(g.TEAM_ID, dst)
                 file_info = g.api.file.upload(

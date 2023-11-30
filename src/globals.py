@@ -21,6 +21,10 @@ PROJECT_ID = sly.env.project_id(raise_not_found=False)
 DATASET_ID = sly.env.dataset_id(raise_not_found=False)
 FILE = sly.env.team_files_file(raise_not_found=False)
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
+SUPPORTED_MODALITIES = ["images", "videos"]
+
+
+PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
 api = sly.Api()
 

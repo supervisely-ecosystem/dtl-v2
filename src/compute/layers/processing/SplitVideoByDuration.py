@@ -155,7 +155,7 @@ def process_splits(
         ),
         False,
     )
-    vid_desc.update_video(video_path)
+    vid_desc.update_item(video_path)
     return vid_desc, ann
 
 
@@ -232,3 +232,5 @@ class SplitVideobyDuration(Layer):
                         video_splits_paths, video_splits_names, annotations
                     ):
                         yield process_splits(vid_desc, video_path, video_name, ann)
+        else:
+            yield vid_desc, ann

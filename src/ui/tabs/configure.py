@@ -293,7 +293,7 @@ def update_nodes(layer_id: str = None):
             utils.delete_results_dir()
             utils.create_results_dir()
             dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-            net = Net(dtl_json, g.RESULTS_DIR)
+            net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
             net.preview_mode = True
 
             # Load preview for data layers
@@ -322,7 +322,7 @@ def update_nodes(layer_id: str = None):
             utils.delete_results_dir()
             utils.create_results_dir()
             dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-            net = Net(dtl_json, g.RESULTS_DIR)
+            net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
             net.preview_mode = True
 
             ui_utils.update_preview(net, data_layers_ids, all_layers_ids, layer_id)
@@ -358,7 +358,7 @@ def update_metas():
         utils.delete_results_dir()
         utils.create_results_dir
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
-        net = Net(dtl_json, g.RESULTS_DIR)
+        net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
         net.preview_mode = True
         ui_utils.init_output_metas(net, data_layers_ids, all_layers_ids, nodes_state, edges)
 

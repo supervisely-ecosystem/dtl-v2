@@ -37,7 +37,7 @@ from supervisely.app.widgets import (
 
 # VideosProject
 class VideoDataAction(SourceAction):
-    name = "video_data"
+    name = "video_data"  # "data" ?
     title = "Videos Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
     description = "Use to specify project and its datasets that will participate in data transformation process."

@@ -30,7 +30,7 @@ def make_legacy_project_item(project: sly.Project, dataset, item_name):
 
 def check_in_graph():
     helper = DtlHelper()
-    net = Net(helper.graph, helper.in_project_metas, helper.paths.results_dir)
+    net = Net(helper.graph, helper.in_project_metas, helper.paths.results_dir, helper.modality)
     net.validate()
     net.calc_metas()
 
@@ -61,14 +61,14 @@ def calculate_datasets_conflict_map(helper):
     return datasets_conflict_map
 
 
-def main(progress: Progress):
+def main(progress: Progress, modality):
     task_helpers.task_verification(check_in_graph)
 
     logger.info("DTL started")
     helper = DtlHelper()
 
     try:
-        net = Net(helper.graph, helper.paths.results_dir)
+        net = Net(helper.graph, helper.paths.results_dir, modality)
         net.validate()
         net.calc_metas()
         net.preprocess()

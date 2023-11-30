@@ -273,14 +273,9 @@ def load_preview_for_data_layer(layer: Layer):
         )
 
     try:
-        if layer.id.startswith("data"):  # or g.MODALITY_TYPE == "images":
-            item_info, preview_img_path, preview_ann_path = download_preview(
-                project_name, dataset_name, project_meta
-            )
-        elif layer.id.startswith("video_data"):  # or g.MODALITY_TYPE == "videos":
-            item_info, preview_img_path, preview_ann_path = download_preview(
-                project_name, dataset_name, project_meta, "videos"
-            )
+        item_info, preview_img_path, preview_ann_path = download_preview(
+            project_name, dataset_name, project_meta, g.MODALITY_TYPE
+        )
     except Exception as e:
         raise CustomException(
             f"Error downloading image and annotation for preview",
@@ -327,8 +322,6 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     if children:
         for l_id in children:
             g.layers[l_id].clear_preview()
-
-    # net.preview_mode = False ??
 
     layers_id_chain = None  # parents chain
     if issubclass(layer.action, SourceAction):
@@ -402,6 +395,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     except Exception as e:
         sly.logger.error(f"Error updating preview", exc_info=str(e))
     net.preview_mode = False
+    # ^?remove?^
 
 
 def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
@@ -430,14 +424,16 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             )
 
         try:
-            if g.MODALITY_TYPE == "images":
+            if net.modality == "images":
                 item_info, preview_img_path, preview_ann_path = download_preview(
                     project_name, dataset_name, project_meta
                 )
-            else:
+            elif net.modality == "videos":
                 item_info, preview_img_path, preview_ann_path = download_preview(
                     project_name, dataset_name, project_meta, "videos"
                 )
+            else:
+                raise NotImplementedError(f"Modality {net.modality} is not supported yet")
         except Exception as e:
             raise CustomException(
                 f"Error downloading image and annotation for preview",
@@ -481,6 +477,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             layer.set_preview_loading(False)
             updated.add(layer_indx)
     net.preview_mode = False
+    # ^?remove?^
 
 
 def create_results_widget(file_infos, supervisely_layers):

@@ -90,9 +90,6 @@ class ImageDescriptor(ItemDescriptor):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         return img
 
-    def update_image(self, img) -> None:
-        self.item_data = img
-
     def write_image_local(self, img_path) -> None:
         if self.item_data is None:
             raise RuntimeError(
@@ -124,9 +121,6 @@ class VideoDescriptor(ItemDescriptor):
             raise RuntimeError("Video not found. {}".format(self.get_item_path()))
         self.item_data = video
         return video
-
-    def update_video(self, video) -> None:
-        self.item_data = video
 
     def write_video_local(self, video_path):
         if self.item_data is None:
