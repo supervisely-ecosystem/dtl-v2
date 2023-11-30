@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 from supervisely.project.project import Dataset, Project, OpenMode
-from supervisely import Annotation, VideoAnnotation, ProjectMeta
+from supervisely import Annotation, VideoAnnotation, ProjectMeta, Bitmap, Polygon, logger
 from src.compute.utils import imaging
 from src.compute.utils import os_utils
 from supervisely.imaging.color import random_rgb
@@ -46,7 +46,7 @@ class SaveLayer(Layer):
             color = color_mapping.get(label.obj_class.name)
             if color is None:
                 continue
-            if isinstance(label.geometry, sly.Bitmap) or isinstance(label.geometry, sly.Polygon):
+            if isinstance(label.geometry, Bitmap) or isinstance(label.geometry, Polygon):
                 label.geometry.draw(res_img, color)
             else:
                 label.geometry.draw_contour(res_img, color, line_w)
