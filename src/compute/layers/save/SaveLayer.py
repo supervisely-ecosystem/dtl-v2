@@ -36,7 +36,7 @@ class SaveLayer(Layer):
     }
 
     @classmethod
-    def draw_colored_mask(cls, ann: sly.Annotation, color_mapping):
+    def draw_colored_mask(cls, ann: Annotation, color_mapping):
         h, w = ann.img_size
         line_w = int((max(w, h) + 1) / 300)
         line_w = max(line_w, 1)
