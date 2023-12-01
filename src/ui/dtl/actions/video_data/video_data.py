@@ -470,4 +470,5 @@ class VideoDataAction(SourceAction):
             get_settings=get_settings,
             meta_changed_cb=meta_changed_cb,
             custom_update_btn=update_preview_btn,
+            need_preview=True if g.MODALITY_TYPE == "images" else False,
         )

@@ -1,14 +1,13 @@
 # coding: utf-8
 import json
 import os.path as osp
-import shutil
 from typing import Tuple, Union
 
 import cv2
 import numpy as np
 
 from supervisely.project.project import Dataset, Project, OpenMode
-from supervisely.project.video_project import VideoDataset, VideoProject, OpenMode
+from supervisely.project.video_project import VideoProject, OpenMode
 
 
 from supervisely import Annotation, VideoAnnotation, ProjectMeta, Bitmap, Polygon, logger, KeyIdMap

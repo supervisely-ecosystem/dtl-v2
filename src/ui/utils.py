@@ -306,6 +306,10 @@ def load_preview_for_data_layer(layer: Layer):
 
 
 def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_id: str):
+    # disable preview if "videos"
+    if net.modality == "videos":
+        return
+
     layer = g.layers[layer_id]
     layer.clear_preview()
 
@@ -399,6 +403,10 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
 
 
 def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
+    # disable preview if "videos"
+    if net.modality == "videos":
+        return
+
     for layer in g.layers.values():
         layer.clear_preview()
     updated = set()
