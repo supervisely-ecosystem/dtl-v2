@@ -56,6 +56,8 @@ class FilterImageByTagLayer(Layer):
             satisfies_cond = all(
                 not has_tag(ann.img_tags, f_tag) for f_tag in self.settings["tags"]
             )
+        else:
+            raise NotImplementedError()
 
         if satisfies_cond:
             yield data_el + tuple([0])  # branch 0
