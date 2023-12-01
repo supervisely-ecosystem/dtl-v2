@@ -1,19 +1,16 @@
 # coding: utf-8
 
-from os.path import join, splitext, basename
+from os.path import join, splitext
 from typing import Tuple, List
 from copy import deepcopy
 
 from supervisely import (
     VideoAnnotation,
     Frame,
-    VideoObject,
-    VideoFigure,
     FrameCollection,
     VideoTagCollection,
 )
 from supervisely.api.video.video_api import VideoInfo
-from supervisely import KeyIdMap
 from src.utils import LegacyProjectItem
 
 from src.compute.Layer import Layer
@@ -139,8 +136,55 @@ def process_annotations(
     return annotations
 
 
+# unsafe method
+def make_new_video_info(video_info: VideoInfo, video_name: str, video_path: str) -> VideoInfo:
+    video = get_video_info(video_path)
+    file_meta = video_info.file_meta
+    file_meta["duration"] = video["duration"]
+    file_meta["size"] = video["size"]
+    file_meta["streams"] = video["streams"]
+    for stream in video["streams"]:
+        codec_type = stream.get("codec_type", None)
+        if codec_type is None:
+            codec_type = stream.get("codecType", None)
+        if codec_type == "video":
+            file_meta["framesCount"] = stream["framesCount"]
+            file_meta["framesToTimecodes"] = stream["framesToTimecodes"]
+            file_meta["height"] = stream["height"]
+            file_meta["width"] = stream["width"]
+            break
+
+    new_video_info = VideoInfo(
+        id=None,
+        name=video_name,
+        hash=None,
+        link=None,
+        team_id=g.TEAM_ID,
+        workspace_id=g.WORKSPACE_ID,
+        project_id=None,
+        dataset_id=None,
+        path_original=None,
+        frames_to_timecodes=file_meta["framesToTimecodes"],
+        frames_count=file_meta["framesCount"],
+        frame_width=file_meta["width"],
+        frame_height=file_meta["height"],
+        created_at=None,
+        updated_at=None,
+        tags=video_info.tags,
+        file_meta=file_meta,
+        meta=None,
+        custom_data={},
+        processing_path=None,
+    )
+    return new_video_info
+
+
 def process_splits(
-    vid_desc: VideoDescriptor, video_path: str, video_name: str, ann: VideoAnnotation
+    vid_desc: VideoDescriptor,
+    video_path: str,
+    video_name: str,
+    ann: VideoAnnotation,
+    video_info: VideoInfo,
 ):
     video_name, item_ext = splitext(video_name)
     vid_desc = VideoDescriptor(
@@ -148,7 +192,7 @@ def process_splits(
             project_name=vid_desc.get_pr_name(),
             ds_name=vid_desc.get_ds_name(),
             item_name=video_name,
-            item_info=None,
+            item_info=video_info,
             ia_data={"item_ext": item_ext},
             item_path=video_path,
             ann_path="",
@@ -208,13 +252,12 @@ class SplitVideobyDuration(Layer):
                     video_splits_paths, video_splits_names = write_videos(
                         vid_desc.item_data, splitter, g.RESULTS_DIR, video_info
                     )
-
                     annotations = process_annotations(video_splits_paths, ann)
-
                     for video_path, video_name, ann in zip(
                         video_splits_paths, video_splits_names, annotations
                     ):
-                        yield process_splits(vid_desc, video_path, video_name, ann)
+                        new_video_info = make_new_video_info(video_info, video_name, video_path)
+                        yield process_splits(vid_desc, video_path, video_name, ann, new_video_info)
 
             else:
                 if split_step >= video_info.duration:
@@ -231,6 +274,7 @@ class SplitVideobyDuration(Layer):
                     for video_path, video_name, ann in zip(
                         video_splits_paths, video_splits_names, annotations
                     ):
-                        yield process_splits(vid_desc, video_path, video_name, ann)
+                        new_video_info = make_new_video_info(video_info, video_name, video_path)
+                        yield process_splits(vid_desc, video_path, video_name, ann, new_video_info)
         else:
             yield vid_desc, ann

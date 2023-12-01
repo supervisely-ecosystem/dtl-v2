@@ -99,12 +99,13 @@ class SuperviselyLayer(Layer):
                         dataset_info.id, out_item_name, item_desc.item_data
                     )
                     ann_path = f"{item_desc.item_data}.json"
-                    ann_json = ann.to_json(KeyIdMap())
-                    sly_json.dump_json_file(ann_json, ann_path)
+                    if not sly_fs.file_exists(ann_path):
+                        ann_json = ann.to_json(KeyIdMap())
+                        sly_json.dump_json_file(ann_json, ann_path)
                     g.api.video.annotation.upload_paths(
                         [video_info.id], [ann_path], self.output_meta
                     )
-                    sly_fs.silent_remove(item_desc.item_data)
-                    sly_fs.silent_remove(ann_path)
+                    # sly_fs.silent_remove(item_desc.item_data)
+                    # sly_fs.silent_remove(ann_path)
 
         yield ([item_desc, ann])

@@ -4,12 +4,6 @@ from typing import NamedTuple
 import cv2
 import numpy as np
 
-from supervisely.api.image_api import ImageInfo
-from supervisely.api.video.video_api import VideoInfo
-from supervisely.api.project_api import ProjectInfo
-from supervisely.api.dataset_api import DatasetInfo
-
-
 from src.compute.utils.os_utils import ensure_base_path
 
 
@@ -34,6 +28,9 @@ class ItemDescriptor:
 
     # def encode_item(self) -> None:
     #     raise NotImplementedError
+
+    def update_item_info(self, item_info: NamedTuple) -> None:
+        self.info.item_info = item_info
 
     def need_write(self) -> bool:
         if self.item_data is None:
@@ -77,7 +74,7 @@ class ItemDescriptor:
 
 
 class ImageDescriptor(ItemDescriptor):
-    def __init__(self, info: ImageInfo, modify_ds_name: bool = True) -> None:
+    def __init__(self, info: NamedTuple, modify_ds_name: bool = True) -> None:
         super().__init__(info, modify_ds_name)
 
     def read_image(self) -> np.ndarray:
@@ -110,7 +107,7 @@ class ImageDescriptor(ItemDescriptor):
 
 
 class VideoDescriptor(ItemDescriptor):
-    def __init__(self, info: VideoInfo, modify_ds_name: bool = True):
+    def __init__(self, info: NamedTuple, modify_ds_name: bool = True):
         super().__init__(info, modify_ds_name)
 
     def read_video(self) -> cv2.VideoCapture:
