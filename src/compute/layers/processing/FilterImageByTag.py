@@ -42,26 +42,20 @@ class FilterImageByTagLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 
-        satisfies_cond = False
         condition = self.settings["condition"]
 
-        def has_tags(img_tags: Union[List[Tag], TagCollection], filter_tags: List[dict]):
-            has_filters = [False for _ in filter_tags]
+        def has_tag(img_tags: Union[List[Tag], TagCollection], filter_tag: dict):
             for img_tag in img_tags:
-                for i, f_tag in enumerate(filter_tags):
-                    if img_tag.name == f_tag["name"] and img_tag.value == f_tag["value"]:
-                        has_filters[i] = True
-            return all(has_filters)
+                if img_tag.name == filter_tag["name"] and img_tag.value == filter_tag["value"]:
+                    return True
+            return False
 
         if condition == "with":
-            satisfies_cond = False
+            satisfies_cond = all(has_tag(ann.img_tags, f_tag) for f_tag in self.settings["tags"])
         elif condition == "without":
-            satisfies_cond = True
-        else:
-            raise NotImplementedError()
-
-        if has_tags(ann.img_tags, self.settings["tags"]):
-            satisfies_cond = not satisfies_cond
+            satisfies_cond = all(
+                not has_tag(ann.img_tags, f_tag) for f_tag in self.settings["tags"]
+            )
 
         if satisfies_cond:
             yield data_el + tuple([0])  # branch 0
