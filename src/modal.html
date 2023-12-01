@@ -1,5 +1,5 @@
 <sly-field
-	v-if="!context.slyProjectId || !context.slyDatasetId"
+	v-if="!context.slyProjectId && !context.slyDatasetId"
 	title="Data type (modality)"
 	description="There are nodes for different data types - images, videos, 3D point clouds and DICOM volumes"
 >
