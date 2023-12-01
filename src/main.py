@@ -61,11 +61,12 @@ update_loop = threading.Thread(
 update_loop.start()
 
 if g.PROJECT_ID:
-    ds = "*"
+    ds_name = "*"
     if g.DATASET_ID:
         ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
+        ds_name = ds.name
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
-    src = [f"{pr.name}/{ds.name}"]
+    src = [f"{pr.name}/{ds_name}"]
 
     if pr.type == "images":
         layer = create_new_layer(DataAction.name)
