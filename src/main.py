@@ -63,9 +63,9 @@ update_loop.start()
 if g.PROJECT_ID:
     ds = "*"
     if g.DATASET_ID:
-        ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID).name
-    pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID).name
-    src = [f"{pr}/{ds}"]
+        ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
+    pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
+    src = [f"{pr.name}/{ds.name}"]
 
     if pr.type == "images":
         layer = create_new_layer(DataAction.name)
