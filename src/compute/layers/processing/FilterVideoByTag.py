@@ -53,12 +53,7 @@ class FilterVideoByTagLayer(Layer):
             elif all(name not in video_tags for name in filter_tags) and condition == "without":
                 return True
 
-        video_tags = []
-        for object in ann.objects.items():
-            for tag in object.tags.items():
-                video_tags.append({"name": tag.name, "value": tag.value})
-        for tag in ann.tags.items():
-            video_tags.append({"name": tag.name, "value": tag.value})
+        video_tags = [{"name": tag.name, "value": tag.value} for tag in ann.tags.items()]
 
         satisfies_cond = set_condition(video_tags, self.settings["tags"], condition)
 
