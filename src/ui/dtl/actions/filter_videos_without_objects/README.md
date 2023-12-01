@@ -1,6 +1,6 @@
-# Filter Video without Objects
+# Filter Videos without Object Classes
 
-`Filter Video without Objects` layer is used to filter videos depending on not having any objects of the selected class on it.
+`Filter Videos without Object Classes` layer is used to filter videos depending on not having any objects of the selected class on it.
 
 # Settings
 

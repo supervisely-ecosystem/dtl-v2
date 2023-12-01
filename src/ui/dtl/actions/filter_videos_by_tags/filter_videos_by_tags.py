@@ -19,11 +19,11 @@ from src.ui.dtl.utils import (
 )
 
 
-class FilterImageByTag(FilterAndConditionAction):
-    name = "filter_image_by_tag"
-    title = "Filter Images by Tags"
+class FilterVideosByTag(FilterAndConditionAction):
+    name = "filter_videos_by_tag"
+    title = "Filter Videos by Tags"
     docs_url = ""
-    description = "Filter Images based on the presence of specified tags."
+    description = "Filter Videos based on the presence of specified tags."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -32,7 +32,7 @@ class FilterImageByTag(FilterAndConditionAction):
 
         condition_text = Text("Condition", status="text", font_size=get_text_font_size())
         condition_selector = Select(
-            [Select.Item("with", "With tag"), Select.Item("without", "Without tag")],
+            [Select.Item("with", "With tags"), Select.Item("without", "Without tags")],
             size="small",
         )
 

@@ -33,9 +33,9 @@ import src.globals as g
 
 class FilterVideoWithoutObjects(FilterAndConditionAction):
     name = "filter_video_without_objects"
-    title = "Filter Video without Objects"
+    title = "Filter Videos without Object Classes"
     docs_url = ""
-    description = "Filter Videos based on the presence of objects."
+    description = "Filter Videos based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod

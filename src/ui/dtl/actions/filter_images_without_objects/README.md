@@ -1,6 +1,6 @@
-# Filter Image without Objects
+# Filter Images without Object Classes
 
-`Filter Image without Objects` layer is used to filter images depending on not having any objects of the selected class on it.
+`Filter Images without Object Classes` layer is used to filter images depending on not having any objects of the selected class on it.
 
 # Settings
 

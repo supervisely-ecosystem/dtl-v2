@@ -13,7 +13,7 @@ from src.ui.dtl.utils import (
 
 class FilterVideoByDuration(FilterAndConditionAction):
     name = "filter_video_by_duration"
-    title = "Filter Video by Duration"
+    title = "Filter Videos by Duration"
     docs_url = ""
     description = "Filter Videos based on their duration."
     md_description = get_layer_docs(dirname(realpath(__file__)))

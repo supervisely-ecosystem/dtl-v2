@@ -11,7 +11,6 @@ from supervisely.app.widgets import (
     Text,
     Button,
     Switch,
-    Empty,
     NotificationBox,
 )
 
@@ -33,11 +32,11 @@ from src.ui.widgets import ClassesList, ClassesListPreview
 import src.globals as g
 
 
-class FilterImageByObject(FilterAndConditionAction):
-    name = "filter_images_by_object"
-    title = "Filter Images by Object Classes"
+class FilterVideosByObject(FilterAndConditionAction):
+    name = "filter_videos_by_object"
+    title = "Filter Videos by Object Classes"
     docs_url = None
-    description = "Filter Images based on the presence of objects of specified classes."
+    description = "Filter Videos based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -51,8 +50,8 @@ class FilterImageByObject(FilterAndConditionAction):
         include_classes_list_widget = ClassesList(multiple=True)
         include_switch = Switch(switched=True)
         include_classes_list_field = Field(
-            title="Image have objects of classes below",
-            description="Please, select classes that have to be presented on the image",
+            title="Video have objects of classes below",
+            description="Please, select classes that have to be presented on the video",
             content=include_switch,
         )
 
@@ -75,8 +74,8 @@ class FilterImageByObject(FilterAndConditionAction):
                 exclude_classes_list_widget.hide()
 
         exclude_classes_list_field = Field(
-            title="Image have no objects of classes below",
-            description="Please, select classes that should not be presented on the image",
+            title="Video have no objects of classes below",
+            description="Please, select classes that should not be presented on the video",
             content=exclude_switch,
         )
 
@@ -89,7 +88,7 @@ class FilterImageByObject(FilterAndConditionAction):
             include_classes_list_widget.deselect([cls.name for cls in selected])
 
         description = Container(
-            widgets=[Text("Image will be passed to the True branch if:")],
+            widgets=[Text("Video will be passed to the True branch if:")],
             style="margin-top: 25px;",
         )
         settings_save_btn = create_save_btn()
