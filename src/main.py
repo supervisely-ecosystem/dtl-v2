@@ -78,5 +78,5 @@ if g.PROJECT_ID:
     node = layer.create_node()
     nodes_flow.add_node(node)
 
-if g.FILE:
-    g.updater("load_json")
+# if g.FILE:
+#     g.updater("load_json")

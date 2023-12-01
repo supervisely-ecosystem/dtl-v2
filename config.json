@@ -15,12 +15,11 @@
 	"poster": "https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/73838fba-d57b-4405-9db5-80e3514f9983",
 	"context_menu": {
 		"target": [
+			"ecosystem",
 			"images_project",
 			"images_dataset",
 			"videos_project",
-			"videos_dataset",
-			"ecosystem",
-			"files_file"
+			"videos_dataset"
 		]
 	}
 }
