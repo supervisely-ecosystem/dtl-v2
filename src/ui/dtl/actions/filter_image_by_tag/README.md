@@ -1,10 +1,10 @@
-# Filter Images by Tag Action
+# Filter Images by Tags
 
-`Filter image by Tag Action` layer is used to route images down either the "True" or "False" branch, depending on specific tag inclusion and exclusion criteria. Users can define tag and filtering condition either "with tag" or "without tag". 
+`Filter Images by Tags` layer is used to route images down either the "True" or "False" branch, depending on specific tag inclusion and exclusion criteria. Users can define tag and filtering condition either "with tag" or "without tag". 
 
 # Settings
 
-- **Tag** - Represents the tag by which images whould be filtered
+- **Tag** - Represents the tag by which the images will be filtered
   - **Name** - Tag Meta Name
   - **Value** - Tag Value
 - **Condition** - Filtering condition: either with or without tag

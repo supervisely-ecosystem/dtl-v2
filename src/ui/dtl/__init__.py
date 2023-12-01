@@ -67,8 +67,8 @@ from .actions.filter_videos_without_annotation.filter_videos_without_annotation 
 )
 from .actions.filter_videos_by_duration.filter_videos_by_duration import FilterVideoByDuration
 from .actions.split_videos_by_duration.split_videos_by_duration import SplitVideoByDuration
-from .actions.filter_video_by_object.filter_video_by_object import FilterVideoByObject
-from .actions.filter_video_by_tag.filter_video_by_tag import FilterVideoByTag
+from .actions.filter_videos_by_objects.filter_videos_by_objects import FilterVideosByObject
+from .actions.filter_videos_by_tags.filter_videos_by_tags import FilterVideosByTag
 
 # ---
 
@@ -212,8 +212,8 @@ video_actions_list = {
     ],
     VIDEO_TRANSFORMS: [SplitVideoByDuration.name],
     FILTERS_AND_CONDITIONS: [
-        FilterVideoByObject.name,
-        FilterVideoByTag.name,
+        FilterVideosByObject.name,
+        FilterVideosByTag.name,
         FilterVideoWithoutObjects.name,
         FilterVideoWithoutAnnotation.name,
         FilterVideoByDuration.name,
@@ -234,8 +234,8 @@ video_actions_dict = {
     # Video transofrms
     SplitVideoByDuration.name: SplitVideoByDuration,
     # Filter and condition layers
-    FilterVideoByObject.name: FilterVideoByObject,
-    FilterVideoByTag.name: FilterVideoByTag,
+    FilterVideosByObject.name: FilterVideosByObject,
+    FilterVideosByTag.name: FilterVideosByTag,
     FilterVideoWithoutObjects.name: FilterVideoWithoutObjects,
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,

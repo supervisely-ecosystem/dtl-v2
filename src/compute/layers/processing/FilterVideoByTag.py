@@ -10,7 +10,7 @@ from supervisely import Tag, TagCollection
 
 
 class FilterVideoByTagLayer(Layer):
-    action = "filter_video_by_tag"
+    action = "filter_videos_by_tag"
 
     layer_settings = {
         "required": ["settings"],

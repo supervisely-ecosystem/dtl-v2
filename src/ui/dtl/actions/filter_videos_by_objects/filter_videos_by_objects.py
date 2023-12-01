@@ -32,9 +32,9 @@ from src.ui.widgets import ClassesList, ClassesListPreview
 import src.globals as g
 
 
-class FilterVideoByObject(FilterAndConditionAction):
-    name = "filter_video_by_object"
-    title = "Filter video by object"
+class FilterVideosByObject(FilterAndConditionAction):
+    name = "filter_videos_by_object"
+    title = "Filter Videos by Object Classes"
     docs_url = None
     description = "Filter Videos based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))

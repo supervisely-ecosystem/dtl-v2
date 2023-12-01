@@ -19,9 +19,9 @@ from src.ui.dtl.utils import (
 )
 
 
-class FilterVideoByTag(FilterAndConditionAction):
-    name = "filter_video_by_tag"
-    title = "Filter video by tag"
+class FilterVideosByTag(FilterAndConditionAction):
+    name = "filter_videos_by_tag"
+    title = "Filter Videos by Tags"
     docs_url = ""
     description = "Filter Videos based on the presence of specified tags."
     md_description = get_layer_docs(dirname(realpath(__file__)))

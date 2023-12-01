@@ -35,7 +35,7 @@ import src.globals as g
 
 class FilterImageByObject(FilterAndConditionAction):
     name = "filter_images_by_object"
-    title = "Filter image by object"
+    title = "Filter Images by Object Classes"
     docs_url = None
     description = "Filter Images based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))

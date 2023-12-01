@@ -9,7 +9,7 @@ from src.compute.dtl_utils.item_descriptor import VideoDescriptor
 
 
 class FilterVideoByObjectLayer(Layer):
-    action = "filter_video_by_object"
+    action = "filter_videos_by_object"
 
     layer_settings = {
         "required": ["settings"],

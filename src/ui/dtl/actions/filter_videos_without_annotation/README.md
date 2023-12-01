@@ -1,6 +1,6 @@
-# Filter Video without Annotation
+# Filter Videos without Annotations
 
-`Filter Video without Annotation` layer is used to filter videos without objects and tags.
+`Filter Videos without Annotations` layer is used to filter videos without objects and tags.
 
 # Settings
 
