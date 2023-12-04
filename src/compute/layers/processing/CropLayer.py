@@ -183,6 +183,6 @@ class CropLayer(Layer):
         new_img, ann = crop(
             img, ann, paddings["top"], paddings["left"], paddings["bottom"], paddings["right"]
         )
-        new_img_desc = img_desc.clone_with_img(new_img)
+        new_img_desc = img_desc.clone_with_item(new_img)
 
         yield new_img_desc, ann

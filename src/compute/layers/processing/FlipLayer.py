@@ -37,7 +37,7 @@ class FlipLayer(Layer):
         else:
             img = img[::-1, :, :]
 
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         new_labels = []
         for label in ann.labels:
             if self.horiz:

@@ -47,5 +47,5 @@ class RandomColorLayer(Layer):
         res_img = np.dot(res_img, rand).reshape(shape)
 
         img = np.clip(res_img, 0, 255).astype(np.uint8)
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann_orig

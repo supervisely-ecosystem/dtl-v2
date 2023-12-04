@@ -310,7 +310,7 @@ class ApplyNN(Layer):
             elif add_pred_ann_method == "replace":
                 ann = pred_ann
 
-            new_img_desc = img_desc.clone_with_img(img)
+            new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
     def validate(self):

@@ -21,7 +21,7 @@ class RandomColorsAction(PixelLevelAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         color_strength_text = Text("Strength", status="text", font_size=get_text_font_size())
         color_strength_slider = Slider(
-            value=0,
+            value=0.50,
             min=0,
             max=1,
             step=0.01,
@@ -37,7 +37,7 @@ class RandomColorsAction(PixelLevelAction):
             }
 
         def _set_settings_from_json(settings: dict):
-            strength = settings.get("strength", None)
+            strength = settings.get("strength", 0.50)
             if strength is not None:
                 color_strength_slider.set_value(strength)
 

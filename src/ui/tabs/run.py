@@ -104,6 +104,8 @@ def run():
                     dst=dst,
                     progress_cb=pbar,
                 )
+                # delete after upload?
+
             file_infos.append(file_info)
             if not sly.is_development():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)

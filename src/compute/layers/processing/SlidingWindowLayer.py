@@ -61,4 +61,4 @@ class SlidingWindowLayer(Layer):
             res_img = crop(img_orig, rect_to_crop)
             res_ann = ann.relative_crop(rect_to_crop)
 
-            yield img_desc.clone_with_img(res_img), res_ann
+            yield img_desc.clone_with_item(res_img), res_ann

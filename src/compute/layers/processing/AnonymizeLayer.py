@@ -60,5 +60,5 @@ class AnonymizeLayer(Layer):
                 if label.obj_class.name in self.settings["classes"]:
                     label.draw(img, color=label.obj_class.color)
 
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann

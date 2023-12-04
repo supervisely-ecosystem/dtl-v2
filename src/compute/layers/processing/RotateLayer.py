@@ -121,4 +121,4 @@ class RotateLayer(Layer):
         if new_img is None:
             return  # no yield
 
-        yield img_desc.clone_with_img(new_img), new_ann
+        yield img_desc.clone_with_item(new_img), new_ann

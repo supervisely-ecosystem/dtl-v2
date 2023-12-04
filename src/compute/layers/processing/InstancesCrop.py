@@ -90,7 +90,7 @@ class InstancesCropLayer(Layer):
             random.shuffle(all_results)
 
         for idx, (new_img, new_ann) in enumerate(all_results):
-            new_img_desc = img_desc.clone_with_img(new_img).clone_with_name(
+            new_img_desc = img_desc.clone_with_item(new_img).clone_with_name(
                 img_desc.get_item_name() + "_crop_" + obj_class_name + str(idx)
             )
             new_img_desc = new_img_desc

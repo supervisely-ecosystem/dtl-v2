@@ -72,5 +72,5 @@ class ContrastBrightnessLayer(Layer):
         img = (img - contrast_c) * float(contrast_value) + (brightness_value + contrast_c)
 
         img = np.clip(img, 0, 255).astype(np.uint8)
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann_orig
