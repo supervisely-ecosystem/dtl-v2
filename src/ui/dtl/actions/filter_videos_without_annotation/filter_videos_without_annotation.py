@@ -10,7 +10,7 @@ from src.ui.dtl.utils import get_layer_docs
 
 class FilterVideoWithoutAnnotation(FilterAndConditionAction):
     name = "filter_video_without_annotation"
-    title = "Filter Video without Annotation"
+    title = "Filter Videos without Annotations"
     docs_url = ""
     description = "Filter Videos without objects and tags."
     md_description = get_layer_docs(dirname(realpath(__file__)))

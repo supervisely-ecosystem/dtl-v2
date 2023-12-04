@@ -2,15 +2,15 @@
 
 from typing import List, Tuple, Union
 
-from supervisely import Annotation
+from supervisely import VideoAnnotation
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import VideoDescriptor
 from supervisely import Tag, TagCollection
 
 
-class FilterImageByTagLayer(Layer):
-    action = "filter_image_by_tag"
+class FilterVideoByTagLayer(Layer):
+    action = "filter_videos_by_tag"
 
     layer_settings = {
         "required": ["settings"],
@@ -39,23 +39,25 @@ class FilterImageByTagLayer(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
-    def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
-        img_desc, ann = data_el
+    def process(self, data_el: Tuple[VideoDescriptor, VideoAnnotation]):
+        _, ann = data_el
+
+        satisfies_cond = False
         condition = self.settings["condition"]
 
-        def has_tag(img_tags: Union[List[Tag], TagCollection], filter_tag: dict):
-            for img_tag in img_tags:
-                if img_tag.name == filter_tag["name"] and img_tag.value == filter_tag["value"]:
-                    return True
-            return False
+        def set_condition(
+            video_tags: Union[List[Tag], TagCollection], filter_tags: List[dict], condition: str
+        ):
+            if all(name in video_tags for name in filter_tags) and condition == "with":
+                return True
+            elif all(name not in video_tags for name in filter_tags) and condition == "without":
+                return True
 
-        if condition == "with":
-            satisfies_cond = all(has_tag(ann.img_tags, f_tag) for f_tag in self.settings["tags"])
-        elif condition == "without":
-            satisfies_cond = all(
-                not has_tag(ann.img_tags, f_tag) for f_tag in self.settings["tags"]
-            )
+        video_tags = [{"name": tag.name, "value": tag.value} for tag in ann.tags.items()]
+
+        satisfies_cond = set_condition(video_tags, self.settings["tags"], condition)
+
         if satisfies_cond:
-            yield data_el + tuple([0])  # branch 0
+            yield data_el + tuple([0])  # Output True
         else:
-            yield data_el + tuple([1])  # branch 1
+            yield data_el + tuple([1])  # Output False

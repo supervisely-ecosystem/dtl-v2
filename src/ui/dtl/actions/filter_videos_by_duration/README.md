@@ -1,6 +1,6 @@
-# Filter Video by Duration
+# Filter Videos by Duration
 
-`Filter Video by Duration` layer is used to filter videos by the duration.
+`Filter Videos by Duration` layer is used to filter videos by the duration.
 
 # Settings
 
