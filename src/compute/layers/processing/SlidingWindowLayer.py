@@ -7,7 +7,7 @@ from supervisely.geometry.sliding_windows import SlidingWindows
 from supervisely.imaging.image import crop
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 
 class SlidingWindowLayer(Layer):
@@ -61,4 +61,4 @@ class SlidingWindowLayer(Layer):
             res_img = crop(img_orig, rect_to_crop)
             res_ann = ann.relative_crop(rect_to_crop)
 
-            yield img_desc.clone_with_img(res_img), res_ann
+            yield img_desc.clone_with_item(res_img), res_ann

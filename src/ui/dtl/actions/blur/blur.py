@@ -44,9 +44,7 @@ class BlurAction(PixelLevelAction):
             font_size=get_text_font_size(),
         )
 
-        settings_edit_text = Text("Settings", status="text", font_size=get_text_font_size())
         blur_type_text = Text("Blur type", status="text", font_size=get_text_font_size())
-
         blur_selector = Select(
             items=[
                 Select.Item(
@@ -143,10 +141,6 @@ class BlurAction(PixelLevelAction):
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
             settings_options = [
-                NodesFlow.Node.Option(
-                    name="Settings",
-                    option_component=NodesFlow.WidgetOptionComponent(settings_edit_text),
-                ),
                 NodesFlow.Node.Option(
                     name="Settings",
                     option_component=NodesFlow.WidgetOptionComponent(settings_preview),

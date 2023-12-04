@@ -5,7 +5,7 @@ import numpy as np
 from os.path import join
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from supervisely.nn.inference import Session
 from src.compute.classes_utils import ClassConstants
 from src.compute.tags_utils import TagConstants
@@ -310,7 +310,7 @@ class ApplyNN(Layer):
             elif add_pred_ann_method == "replace":
                 ann = pred_ann
 
-            new_img_desc = img_desc.clone_with_img(img)
+            new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
     def validate(self):

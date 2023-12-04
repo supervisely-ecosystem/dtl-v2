@@ -1,10 +1,10 @@
-# Filter Images by Tag Action
+# Filter Videos by Tags
 
-`Filter image by Tag Action` layer is used to route images down either the "True" or "False" branch, depending on specific tag inclusion and exclusion criteria. Users can define tag and filtering condition either "with tag" or "without tag". 
+`Filter Videos by Tags` layer is used to route videos down either the "True" or "False" branch, depending on specific tag inclusion and exclusion criteria. Users can define tag and filtering condition either "with tag" or "without tag". 
 
 # Settings
 
-- **Tag** - Represents the tag by which images whould be filtered
+- **Tag** - Represents the tag by which the videos will be filtered
   - **Name** - Tag Meta Name
   - **Value** - Tag Value
 - **Condition** - Filtering condition: either with or without tag
@@ -16,13 +16,13 @@
 
 ```json
 {
-    "action": "filter_image_by_tag",
+    "action": "filter_videos_by_tag",
     "src": [
         "$data_1"
     ],
     "dst": [
-        "$filter_image_by_tag_2__true",
-        "$filter_image_by_tag_2__false"
+        "$filter_videos_by_tag_2__true",
+        "$filter_videos_by_tag_2__false"
     ],
     "settings": {
         "tag": {
@@ -41,13 +41,13 @@
 
 ```json
 {
-    "action": "filter_image_by_tag",
+    "action": "filter_videos_by_tag",
     "src": [
         "$data_1"
     ],
     "dst": [
-        "$filter_image_by_tag_2__true",
-        "$filter_image_by_tag_2__false"
+        "$filter_videos_by_tag_2__true",
+        "$filter_videos_by_tag_2__false"
     ],
     "settings": {
         "tag": {

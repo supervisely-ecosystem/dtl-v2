@@ -6,7 +6,7 @@ from supervisely import Annotation
 from supervisely.aug.aug import resize
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.exceptions import BadSettingsError
 
 
@@ -126,6 +126,6 @@ class ResizeLayer(Layer):
 
         img, ann = resize(img, ann, get_resize_hw(img_hw, set_size_hw, keep))
         img, ann = extend(img, ann, get_result_hw(ann.img_size, set_size_hw))
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
 
         yield new_img_desc, ann

@@ -33,5 +33,5 @@ class NoiseLayer(Layer):
         img += np.random.normal(self.settings["mean"], self.settings["std"], img.shape)
 
         img = np.clip(img, 0, 255).astype(np.uint8)
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann_orig

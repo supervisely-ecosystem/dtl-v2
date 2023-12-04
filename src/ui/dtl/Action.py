@@ -86,3 +86,12 @@ class FilterAndConditionAction(Action):
 class NeuralNetworkAction(Action):
     node_color = "#f7782f"
     icon = "zmdi zmdi-fire"
+
+
+# Video specific
+class VideoAction(Action):
+    node_color = "#bc805b"
+    icon = "zmdi zmdi-videocam"
+
+
+# ---

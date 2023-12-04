@@ -21,7 +21,7 @@ from src.ui.dtl.utils import (
 
 class FilterImageByTag(FilterAndConditionAction):
     name = "filter_image_by_tag"
-    title = "Filter Images by tag"
+    title = "Filter Images by Tags"
     docs_url = ""
     description = "Filter Images based on the presence of specified tags."
     md_description = get_layer_docs(dirname(realpath(__file__)))

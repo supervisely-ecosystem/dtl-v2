@@ -1,10 +1,11 @@
 # coding: utf-8
 
-from typing import Tuple
+from typing import Tuple, Union
 
-import supervisely as sly
-
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from supervisely import Annotation, VideoAnnotation, KeyIdMap
+import supervisely.io.fs as sly_fs
+import supervisely.io.json as sly_json
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
@@ -57,7 +58,7 @@ class SuperviselyLayer(Layer):
         self.sly_project_info = g.api.project.create(
             g.WORKSPACE_ID,
             self.out_project_name,
-            type=sly.ProjectType.IMAGES,
+            type=self.net.modality,
             change_name_if_conflict=True,
         )
         g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
@@ -75,20 +76,36 @@ class SuperviselyLayer(Layer):
         else:
             return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
 
-    def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
-        img_desc, ann = data_el
+    def process(
+        self,
+        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
+    ):
+        item_desc, ann = data_el
 
         if not self.net.preview_mode:
-            dataset_name = img_desc.get_res_ds_name()
+            dataset_name = item_desc.get_res_ds_name()
             out_item_name = (
-                self.net.get_free_name(img_desc, self.out_project_name) + img_desc.get_image_ext()
+                self.net.get_free_name(item_desc, self.out_project_name) + item_desc.get_item_ext()
             )
-
             if self.sly_project_info is not None:
                 dataset_info = self.get_or_create_dataset(dataset_name)
-                image_info = g.api.image.upload_np(
-                    dataset_info.id, out_item_name, img_desc.read_image()
-                )
-                g.api.annotation.upload_ann(image_info.id, ann)
+                if self.net.modality == "images":
+                    image_info = g.api.image.upload_np(
+                        dataset_info.id, out_item_name, item_desc.read_image()
+                    )
+                    g.api.annotation.upload_ann(image_info.id, ann)
+                elif self.net.modality == "videos":
+                    video_info = g.api.video.upload_path(
+                        dataset_info.id, out_item_name, item_desc.item_data
+                    )
+                    ann_path = f"{item_desc.item_data}.json"
+                    if not sly_fs.file_exists(ann_path):
+                        ann_json = ann.to_json(KeyIdMap())
+                        sly_json.dump_json_file(ann_json, ann_path)
+                    g.api.video.annotation.upload_paths(
+                        [video_info.id], [ann_path], self.output_meta
+                    )
+                    # sly_fs.silent_remove(item_desc.item_data)
+                    # sly_fs.silent_remove(ann_path)
 
-        yield ([img_desc, ann],)
+        yield ([item_desc, ann])

@@ -29,7 +29,7 @@ from .actions.dummy.dummy import DummyAction
 from .actions.duplicate_objects.duplicate_objects import DuplicateObjectsAction
 from .actions.filter_image_by_object.filter_image_by_object import FilterImageByObject
 from .actions.filter_image_by_tag.filter_image_by_tag import FilterImageByTag
-from .actions.find_contours.find_contours import FindContoursAction
+from .actions.bitmap2poly.bitmap2poly import BitmapToPolyAction
 from .actions.flip.flip import FlipAction
 from .actions.if_action.if_action import IfAction
 from .actions.instances_crop.instances_crop import InstancesCropAction
@@ -57,6 +57,23 @@ from .actions.filter_images_without_objects.filter_images_without_objects import
 )
 
 
+# Video
+from .actions.video_data.video_data import VideoDataAction
+from .actions.filter_videos_without_objects.filter_videos_without_objects import (
+    FilterVideoWithoutObjects,
+)
+from .actions.filter_videos_without_annotation.filter_videos_without_annotation import (
+    FilterVideoWithoutAnnotation,
+)
+from .actions.filter_videos_by_duration.filter_videos_by_duration import FilterVideoByDuration
+from .actions.split_videos_by_duration.split_videos_by_duration import SplitVideoByDuration
+from .actions.filter_videos_by_objects.filter_videos_by_objects import FilterVideosByObject
+from .actions.filter_videos_by_tags.filter_videos_by_tags import FilterVideosByTag
+
+# ---
+
+import src.globals as g
+
 SOURCE_ACTIONS = "Input"
 # TRANSFORMATION_ACTIONS = "Transformation actions"
 PIXEL_LEVEL_TRANSFORMS = "Pixel-level transforms"
@@ -67,8 +84,11 @@ SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
 
+# Video specific
+VIDEO_TRANSFORMS = "Video transforms"
+# ---
 
-actions_list = {
+image_actions_list = {
     SOURCE_ACTIONS: [DataAction.name],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
@@ -98,7 +118,7 @@ actions_list = {
         DropLinesByLengthAction.name,
         DropNoiseAction.name,
         DuplicateObjectsAction.name,
-        FindContoursAction.name,
+        BitmapToPolyAction.name,
         LineToBitmapAction.name,
         MergeBitmapsAction.name,
         ObjectsFilterAction.name,
@@ -127,7 +147,8 @@ actions_list = {
     ],
 }
 
-actions_dict = {
+# Image Actions
+image_actions_dict = {
     # Data layers
     DataAction.name: DataAction,
     # Pixel-level transforms layers
@@ -156,7 +177,7 @@ actions_dict = {
     DropLinesByLengthAction.name: DropLinesByLengthAction,
     DropNoiseAction.name: DropNoiseAction,
     DuplicateObjectsAction.name: DuplicateObjectsAction,
-    FindContoursAction.name: FindContoursAction,
+    BitmapToPolyAction.name: BitmapToPolyAction,
     LineToBitmapAction.name: LineToBitmapAction,
     MergeBitmapsAction.name: MergeBitmapsAction,
     ObjectsFilterAction.name: ObjectsFilterAction,
@@ -181,3 +202,50 @@ actions_dict = {
     SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,
 }
+
+video_actions_list = {
+    SOURCE_ACTIONS: [VideoDataAction.name],
+    ANNOTATION_TRANSFORMS: [
+        BackgroundAction.name,
+        BBoxAction.name,
+        BboxToPolyAction.name,
+    ],
+    VIDEO_TRANSFORMS: [SplitVideoByDuration.name],
+    FILTERS_AND_CONDITIONS: [
+        FilterVideosByObject.name,
+        FilterVideosByTag.name,
+        FilterVideoWithoutObjects.name,
+        FilterVideoWithoutAnnotation.name,
+        FilterVideoByDuration.name,
+    ],
+    SAVE_ACTIONS: [
+        SaveAction.name,
+        SuperviselyAction.name,
+    ],
+}
+
+video_actions_dict = {
+    # Data layers
+    VideoDataAction.name: VideoDataAction,
+    # Annotation layers
+    BackgroundAction.name: BackgroundAction,
+    BBoxAction.name: BBoxAction,
+    BboxToPolyAction.name: BboxToPolyAction,
+    # Video transofrms
+    SplitVideoByDuration.name: SplitVideoByDuration,
+    # Filter and condition layers
+    FilterVideosByObject.name: FilterVideosByObject,
+    FilterVideosByTag.name: FilterVideosByTag,
+    FilterVideoWithoutObjects.name: FilterVideoWithoutObjects,
+    FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
+    FilterVideoByDuration.name: FilterVideoByDuration,
+    # Save layers
+    SaveAction.name: SaveAction,
+    SuperviselyAction.name: SuperviselyAction,
+}
+
+modality_dict = {"images": image_actions_dict, "videos": video_actions_dict}
+modality_list = {"images": image_actions_list, "videos": video_actions_list}
+
+actions_dict = modality_dict[g.MODALITY_TYPE]
+actions_list = modality_list[g.MODALITY_TYPE]

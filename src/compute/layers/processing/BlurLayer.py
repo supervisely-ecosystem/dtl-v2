@@ -7,7 +7,7 @@ import numpy as np
 from supervisely import Annotation
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.exceptions import BadSettingsError
 
 
@@ -91,5 +91,5 @@ class BlurLayer(Layer):
             raise NotImplementedError()
 
         img = np.clip(res_img, 0, 255).astype(np.uint8)
-        new_img_desc = img_desc.clone_with_img(img)
+        new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann

@@ -33,7 +33,7 @@ import src.globals as g
 
 class FilterImageWithoutObjects(FilterAndConditionAction):
     name = "filter_image_without_objects"
-    title = "Filter Image without Objects"
+    title = "Filter Images without Object Classes"
     docs_url = ""
     description = "Filter Images based on the presence of objects."
     md_description = get_layer_docs(dirname(realpath(__file__)))

@@ -19,9 +19,24 @@ STATIC_DIR = "static"
 TEAM_FILES_PATH = "data-nodes"
 PROJECT_ID = sly.env.project_id(raise_not_found=False)
 DATASET_ID = sly.env.dataset_id(raise_not_found=False)
-FILE = sly.env.team_files_file(raise_not_found=False)
+# FILE = sly.env.team_files_file(raise_not_found=False)
+SUPPORTED_MODALITIES = ["images", "videos"]
+
 
 api = sly.Api()
+
+MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
+if PROJECT_ID is not None:
+    project_type = api.project.get_info_by_id(PROJECT_ID).type
+    if project_type not in SUPPORTED_MODALITIES:
+        raise ValueError(
+            f"Project type '{project_type}' is not supported. "
+            f"Supported modalities: {', '.join(SUPPORTED_MODALITIES)}"
+        )
+    MODALITY_TYPE = project_type
+
+PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
+
 
 cache = {
     "workspace_info": {},

@@ -6,7 +6,7 @@ from cv2 import connectedComponents
 from supervisely import Annotation, Bitmap, Label
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
 from src.exceptions import WrongGeometryError
 

@@ -1,6 +1,6 @@
 # Mask to Polygon
 
-`Mask to Polygon` layer extracts contours from masks (bitmaps) and stores results as polygons with the same class names.
+`Mask to Polygon` layer extracts contours from masks (bitmaps) and stores result as polygons with the same class names.
 
 ### Settings
 

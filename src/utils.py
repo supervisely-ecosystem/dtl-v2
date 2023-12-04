@@ -7,6 +7,7 @@ import shutil
 from tqdm import tqdm
 
 import supervisely as sly
+from supervisely import ProjectMeta, KeyIdMap
 
 import src.globals as g
 
@@ -16,9 +17,10 @@ LegacyProjectItem = namedtuple(
     [
         "project_name",
         "ds_name",
-        "image_name",
+        "item_name",
+        "item_info",
         "ia_data",
-        "img_path",
+        "item_path",
         "ann_path",
     ],
 )
@@ -29,7 +31,50 @@ def get_random_image(dataset_id: int):
     return random.choice(images)
 
 
-def download_preview(project_name, dataset_name) -> Tuple[str, str]:
+def get_random_video_frame(dataset_id: int):
+    videos = g.api.video.get_list(dataset_id)
+    video = random.choice(videos)
+    frames_list = list(range(video.frames_count))
+    frame_id = random.choice(frames_list)
+    return video, frame_id
+
+
+def download_preview_image(dataset_id: int, preview_img_path: str) -> tuple:
+    image = get_random_image(dataset_id)
+    g.api.image.download(image.id, preview_img_path)
+    ann_json = g.api.annotation.download_json(image.id)
+    return image, ann_json
+
+
+def download_preview_video(
+    dataset_id: int, preview_img_path: str, project_meta: ProjectMeta
+) -> tuple:
+    video, frame_id = get_random_video_frame(dataset_id)
+    g.api.video.frame.download_path(video.id, frame_id, preview_img_path)
+    ann_json = g.api.video.annotation.download(video.id)
+    ann = sly.VideoAnnotation.from_json(ann_json, project_meta, KeyIdMap())
+    labels = []
+    frame_annotation = ann.frames.get(frame_id)
+    if frame_annotation is not None:
+        for figure in frame_annotation.figures:
+            cur_label = sly.Label(
+                figure.geometry,
+                figure.parent_object.obj_class,
+            )
+            labels.append(cur_label)
+
+    img_size = (video.frame_height, video.frame_width)
+    ann = sly.Annotation(img_size, labels)
+    ann_json = ann.to_json()
+    return video, ann_json
+
+
+def download_preview(
+    project_name: str, dataset_name: str, project_meta: ProjectMeta, modality_type: str = "images"
+) -> Tuple[str, str]:
+    if modality_type not in g.SUPPORTED_MODALITIES:
+        raise ValueError(f"Modality type {modality_type} is not supported")
+
     project_info = get_project_by_name(project_name)
     if project_info is None:
         raise RuntimeError(f"Project {project_name} not found")
@@ -43,15 +88,22 @@ def download_preview(project_name, dataset_name) -> Tuple[str, str]:
     preview_project_path = f"{g.PREVIEW_DIR}/{project_name}"
     preview_dataset_path = f"{preview_project_path}/{dataset_name}"
     ensure_dir(preview_dataset_path)
-    image_id = get_random_image(dataset_info.id).id
+
     preview_img_path = f"{preview_dataset_path}/preview_image.jpg"
-    g.api.image.download(image_id, preview_img_path)
-    ann_json = g.api.annotation.download_json(image_id)
     preview_ann_path = f"{preview_dataset_path}/preview_ann.json"
+    if modality_type == "images":
+        item_info, ann_json = download_preview_image(dataset_info.id, preview_img_path)
+    elif modality_type == "videos":
+        item_info, ann_json = download_preview_video(
+            dataset_info.id, preview_img_path, project_meta
+        )
+    else:
+        raise NotImplemented(f"Modality type {modality_type} is not supported")
+
     with open(preview_ann_path, "w") as f:
         json.dump(ann_json, f)
 
-    return preview_img_path, preview_ann_path
+    return item_info, preview_img_path, preview_ann_path
 
 
 def _get_project_by_name_or_id(name: str = None, id: int = None):

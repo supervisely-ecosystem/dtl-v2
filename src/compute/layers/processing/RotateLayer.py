@@ -7,7 +7,7 @@ from supervisely import Annotation, Rectangle
 from supervisely import aug
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
 from src.exceptions import BadSettingsError
 
@@ -121,4 +121,4 @@ class RotateLayer(Layer):
         if new_img is None:
             return  # no yield
 
-        yield img_desc.clone_with_img(new_img), new_ann
+        yield img_desc.clone_with_item(new_img), new_ann

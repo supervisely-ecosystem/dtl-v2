@@ -5,7 +5,7 @@ from supervisely import Annotation, Label, ProjectMeta
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
 from src.utils import get_project_by_name, get_project_meta
 from src.exceptions import BadSettingsError
@@ -98,7 +98,5 @@ class DataLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
-
         ann = apply_to_labels(ann, self.class_mapper)
-
         yield (img_desc, ann)

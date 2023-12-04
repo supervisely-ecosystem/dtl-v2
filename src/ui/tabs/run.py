@@ -76,7 +76,7 @@ def run():
         dtl_json = [g.layers[node_id].to_json() for node_id in nodes_state]
         g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)
-        net = compute_dtls(progress)
+        net = compute_dtls(progress, g.MODALITY_TYPE)
 
         # Save results
         file_infos = []
@@ -95,7 +95,7 @@ def run():
                 unit_scale=True,
                 total=get_file_size(tar_path),
             ) as pbar:
-                dst = f"/{g.TEAM_FILES_PATH}/archives/{Path(tar_path).name}"
+                dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{Path(tar_path).name}"
                 if g.api.file.exists(g.TEAM_ID, dst):
                     dst = g.api.file.get_free_name(g.TEAM_ID, dst)
                 file_info = g.api.file.upload(
@@ -104,6 +104,8 @@ def run():
                     dst=dst,
                     progress_cb=pbar,
                 )
+                # delete after upload?
+
             file_infos.append(file_info)
             if not sly.is_development():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)

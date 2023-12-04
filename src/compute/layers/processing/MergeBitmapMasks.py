@@ -6,7 +6,7 @@ import numpy as np
 from supervisely import Bitmap, Annotation, Label
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.exceptions import WrongGeometryError
 
 

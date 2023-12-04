@@ -64,7 +64,7 @@ class BitwiseMasksLayer(Layer):
                 "layer_config": self.config,
                 "project_name": data_el[0].get_pr_name(),
                 "ds_name": data_el[0].get_ds_name(),
-                "image_name": data_el[0].get_img_name(),
+                "image_name": data_el[0].get_item_name(),
             }
             logger.warn(
                 "Image was skipped because mask labels not found",
@@ -95,7 +95,7 @@ class BitwiseMasksLayer(Layer):
                             "layer_config": self.config,
                             "project_name": data_el[0].get_pr_name(),
                             "ds_name": data_el[0].get_ds_name(),
-                            "image_name": data_el[0].get_img_name(),
+                            "image_name": data_el[0].get_item_name(),
                         },
                     )
                 else:

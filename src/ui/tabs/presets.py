@@ -45,7 +45,7 @@ save_container = Container(
     widgets=[
         Field(
             title="Preset name",
-            description=f'Preset will be saved to folder "{g.TEAM_FILES_PATH}/presets" in your Team files with .json extension',
+            description=f'Preset will be saved to folder "{g.PRESETS_PATH}" in your Team files with .json extension',
             content=preset_name_input,
         ),
         save_preset_btn,
@@ -77,7 +77,7 @@ load_container = Container(
     widgets=[
         Field(
             title="Select preset",
-            description=f'Presets are stored in folder "{g.TEAM_FILES_PATH}/presets" in your Team files',
+            description=f'Presets are stored in folder "{g.PRESETS_PATH}" in your Team files',
             content=load_file_selector,
         ),
         load_notification_no_presets,
@@ -110,7 +110,8 @@ def save_json_button_cb():
         save_notification_select.set_value("empty_name")
         return
 
-    dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
+    # dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
+    dst_path = f"{g.PRESETS_PATH}/{preset_name}.json"
     if g.api.file.exists(g.TEAM_ID, dst_path):
         dst_path = g.api.file.get_free_name(g.TEAM_ID, dst_path)
     src_path = g.DATA_DIR + "/preset.json"
@@ -139,14 +140,15 @@ def load_json():
     load_preset_btn.loading = True
     load_file_selector.disable()
     load_notification_select.set_value("empty")
-    if g.FILE is not None:
-        path = g.FILE
-    else:
-        filename = load_file_selector.get_value()
-        if filename is None:
-            load_notification_select.set_value("not selected")
-            return
-        path = f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
+    # if g.FILE is not None:
+    #     path = g.FILE
+    # else:
+    filename = load_file_selector.get_value()
+    if filename is None:
+        load_notification_select.set_value("not selected")
+        return
+    # path =f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
+    path = f"{g.PRESETS_PATH}/{filename}.json"
     nodes_flow.clear()
     try:
         utils.create_data_dir()
@@ -252,7 +254,7 @@ def apply_json(dtl_json):
         data_layer.update_project_meta(project_meta)
 
     # init metas for all layers
-    net = Net(dtl_json, g.RESULTS_DIR)
+    net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
     net.calc_metas()
     for layer_id, net_layer in zip(ids, net.layers):
         layer = g.layers[layer_id]
@@ -312,9 +314,7 @@ def load_json_button_cb():
 def update_load_dialog():
     load_notification_select.set_value("empty")
     load_file_selector.loading = True
-    presets_infos = g.api.file.list(
-        g.TEAM_ID, "/" + g.TEAM_FILES_PATH + "/presets", return_type="fileinfo"
-    )
+    presets_infos = g.api.file.list(g.TEAM_ID, g.PRESETS_PATH, return_type="fileinfo")
     load_file_selector.set(
         items=[Select.Item(".".join(info.name.split(".")[:-1])) for info in presets_infos]
     )

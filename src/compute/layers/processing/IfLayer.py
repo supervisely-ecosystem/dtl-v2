@@ -7,7 +7,7 @@ import re
 from supervisely import Annotation
 
 from src.compute.Layer import Layer
-from src.compute.dtl_utils.image_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.exceptions import BadSettingsError
 
 
@@ -172,7 +172,7 @@ class IfLayer(Layer):
         elif "regex_names" in condition:
             regex_names = condition["regex_names"]
             satisfies_cond = any(
-                re.search(regex_name, img_desc.get_img_name()) for regex_name in regex_names
+                re.search(regex_name, img_desc.get_item_name()) for regex_name in regex_names
             )
             # @TODO: is it safe?
 
@@ -217,7 +217,7 @@ class IfLayer(Layer):
         elif "name_in_range" in condition:
             range = condition["name_in_range"]
             frame_step = condition["frame_step"]
-            if self.is_image_name_in_range(img_desc.get_img_name(), range[0], range[1]):
+            if self.is_image_name_in_range(img_desc.get_item_name(), range[0], range[1]):
                 if self.frame_counter % frame_step == 0:
                     satisfies_cond = True
                 self.frame_counter += 1
