@@ -142,9 +142,9 @@ You can run the application from the ecosystem, project or saved preset file.
 
 </details>
 
-<details open>
+<!-- <details open>
 <summary><b>3. Run App from Team Files</b></summary>
 
 ![run-from-teamfiles-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/ae996fcb-b9e0-4b1a-a514-bfab1097b40d)
 
-</details>
+</details> -->
