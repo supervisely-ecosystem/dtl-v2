@@ -1,0 +1,92 @@
+import src.globals as g
+from src.ui.dtl.utils import (
+    create_save_btn,
+    get_set_settings_button_style,
+    get_set_settings_container,
+    get_text_font_size,
+)
+from supervisely.app.widgets import (
+    Button,
+    Container,
+    Text,
+    Select,
+    Field,
+)
+
+import src.globals as g
+
+
+def create_job_members_widgets():
+    # SIDEBAR SETTINGS
+    team_members = g.api.user.get_team_members(g.TEAM_ID)
+    lj_members_items = [Select.Item(value=member.id, label=member.login) for member in team_members]
+
+    lj_members_reviewer_selector = Select(items=lj_members_items, filterable=True, size="small")
+    lj_members_reviewer_field = Field(
+        title="Select Reviewer",
+        description="Select user that will be responsible for reviewing annotations",
+        content=lj_members_reviewer_selector,
+    )
+
+    lj_members_labelers_selector = Select(
+        items=lj_members_items, multiple=True, filterable=True, size="small"
+    )
+    lj_members_labelers_field = Field(
+        title="Select Annotators",
+        description="Select users that will be responsible for labeling",
+        content=lj_members_labelers_selector,
+    )
+
+    lj_members_save_btn = create_save_btn()
+    lj_members_sidebar_container = Container(
+        [
+            lj_members_reviewer_field,
+            lj_members_labelers_field,
+            lj_members_save_btn,
+        ]
+    )
+    # ----------------------------
+
+    # PREVIEW
+    lj_members_reviewer_preview = Text("Reviewer:", "text", font_size=get_text_font_size())
+
+    lj_members_labelers_preview = Text("Assign to:", "text", font_size=get_text_font_size())
+
+    lj_members_preview_container = Container(
+        [
+            lj_members_reviewer_preview,
+            lj_members_labelers_preview,
+        ]
+    )
+    # ----------------------------
+
+    # LAYOUT
+    lj_members_text = Text("Members", status="text", font_size=get_text_font_size())
+    lj_members_edit_btn = Button(
+        text="EDIT",
+        icon="zmdi zmdi-edit",
+        button_type="text",
+        button_size="small",
+        emit_on_click="openSidebar",
+        style=get_set_settings_button_style(),
+    )
+    lj_members_container = get_set_settings_container(lj_members_text, lj_members_edit_btn)
+    # ----------------------------
+    return (
+        # sidebar
+        lj_members_items,
+        lj_members_reviewer_field,
+        lj_members_reviewer_selector,
+        lj_members_labelers_field,
+        lj_members_labelers_selector,
+        lj_members_save_btn,
+        lj_members_sidebar_container,
+        # preview
+        lj_members_reviewer_preview,
+        lj_members_labelers_preview,
+        lj_members_preview_container,
+        # layout
+        lj_members_text,
+        lj_members_edit_btn,
+        lj_members_container,
+    )

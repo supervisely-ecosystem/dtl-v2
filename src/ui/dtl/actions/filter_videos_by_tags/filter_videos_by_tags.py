@@ -32,7 +32,10 @@ class FilterVideosByTag(FilterAndConditionAction):
 
         condition_text = Text("Condition", status="text", font_size=get_text_font_size())
         condition_selector = Select(
-            [Select.Item("with", "With tags"), Select.Item("without", "Without tags")],
+            [
+                Select.Item("with", "Video has tags"),
+                Select.Item("without", "Video doesn't have tags"),
+            ],
             size="small",
         )
 

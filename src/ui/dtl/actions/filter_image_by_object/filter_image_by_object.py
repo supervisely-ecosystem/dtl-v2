@@ -35,7 +35,7 @@ import src.globals as g
 
 class FilterImageByObject(FilterAndConditionAction):
     name = "filter_images_by_object"
-    title = "Filter Images by Object Classes"
+    title = "Filter Images by Objects"
     docs_url = None
     description = "Filter Images based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -126,13 +126,13 @@ class FilterImageByObject(FilterAndConditionAction):
         exclude_preview = ClassesListPreview()
         with_container = Container(
             widgets=[
-                Text("With classes:"),
+                Text("Images has objects:"),
                 include_preview,
             ]
         )
         without_container = Container(
             widgets=[
-                Text("Without classes:"),
+                Text("Image doesn't have objects:"),
                 exclude_preview,
             ]
         )

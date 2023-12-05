@@ -32,7 +32,10 @@ class FilterImageByTag(FilterAndConditionAction):
 
         condition_text = Text("Condition", status="text", font_size=get_text_font_size())
         condition_selector = Select(
-            [Select.Item("with", "With tag"), Select.Item("without", "Without tag")],
+            [
+                Select.Item("with", "Image has tag"),
+                Select.Item("without", "Image doesn't have tag"),
+            ],
             size="small",
         )
 

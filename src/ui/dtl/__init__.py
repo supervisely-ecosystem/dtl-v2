@@ -72,6 +72,9 @@ from .actions.filter_videos_by_tags.filter_videos_by_tags import FilterVideosByT
 
 # ---
 
+# Labeling job
+from .actions.labeling_job.labeling_job import LabelingJobAction
+
 import src.globals as g
 
 SOURCE_ACTIONS = "Input"
@@ -136,10 +139,7 @@ image_actions_list = {
         IfAction.name,
     ],
     NEURAL_NETWORKS: [ApplyNNAction.name],
-    OTHER: [
-        DatasetAction.name,
-        DummyAction.name,
-    ],
+    OTHER: [DatasetAction.name, DummyAction.name, LabelingJobAction.name],
     SAVE_ACTIONS: [
         SaveAction.name,
         SaveMasksAction.name,
@@ -197,6 +197,7 @@ image_actions_dict = {
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
+    LabelingJobAction.name: LabelingJobAction,
     # Save layers
     SaveAction.name: SaveAction,
     SaveMasksAction.name: SaveMasksAction,

@@ -68,7 +68,9 @@ class FilterVideoWithoutObjects(FilterAndConditionAction):
                 ),
             ]
         )
-        settings_edit_text = Text("Without classes", status="text", font_size=get_text_font_size())
+        settings_edit_text = Text(
+            "Video doesn't have objects:", status="text", font_size=get_text_font_size()
+        )
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",

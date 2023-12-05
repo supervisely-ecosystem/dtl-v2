@@ -33,7 +33,7 @@ import src.globals as g
 
 class FilterImageWithoutObjects(FilterAndConditionAction):
     name = "filter_image_without_objects"
-    title = "Filter Images without Object Classes"
+    title = "Filter Images without Objects"
     docs_url = ""
     description = "Filter Images based on the presence of objects."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -68,7 +68,9 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
                 ),
             ]
         )
-        settings_edit_text = Text("Without classes", status="text", font_size=get_text_font_size())
+        settings_edit_text = Text(
+            "Image doesn't have objects:", status="text", font_size=get_text_font_size()
+        )
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
