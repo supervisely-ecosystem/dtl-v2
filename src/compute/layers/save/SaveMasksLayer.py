@@ -110,6 +110,9 @@ class SaveMasksLayer(Layer):
                 "Some output target ({}) should be set to true.".format(", ".join(target_arr))
             )
 
+    def modifies_data(self):
+        return False
+
     def preprocess(self):
         if self.net.preview_mode:
             return

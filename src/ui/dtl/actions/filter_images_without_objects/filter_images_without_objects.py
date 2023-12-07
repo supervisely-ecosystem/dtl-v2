@@ -118,7 +118,10 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
                 "exclude_classes": exclude_classes,
             }
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_meta
             if project_meta == _current_meta:
                 return
@@ -199,7 +202,7 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             need_preview=False,
         )
 

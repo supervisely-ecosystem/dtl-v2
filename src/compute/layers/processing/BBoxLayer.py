@@ -42,6 +42,9 @@ class BBoxLayer(Layer):
             self.cls_mapping[old_class] = {"title": new_class, "shape": Rectangle.geometry_name()}
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
+    def modifies_data(self):
+        return True
+
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],

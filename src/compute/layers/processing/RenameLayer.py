@@ -50,6 +50,9 @@ class RenameLayer(Layer):
             label = label.clone(obj_class=label.obj_class.clone(name=new_class))
             return [label]
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann = data_el
         ann = apply_to_labels(ann, self.class_mapper)

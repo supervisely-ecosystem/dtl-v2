@@ -359,6 +359,13 @@ def update_metas():
         utils.create_results_dir
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
+        modifies_data = net.modifies_data()
+
+        for layer_id in all_layers_ids:
+            layer = g.layers[layer_id]
+            layer: Layer
+            layer.modifies_data(modifies_data)
+
         net.preview_mode = True
         ui_utils.init_output_metas(net, data_layers_ids, all_layers_ids, nodes_state, edges)
 

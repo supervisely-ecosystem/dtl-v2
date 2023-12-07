@@ -32,6 +32,9 @@ class DropNoiseFromBitmap(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         imsize_wh = ann.img_size[::-1]

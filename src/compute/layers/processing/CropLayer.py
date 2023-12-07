@@ -99,6 +99,9 @@ class CropLayer(Layer):
             check_min_max(random_part["height"], "height")
             check_min_max(random_part["width"], "width")
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann = data_el
         img_h, img_w = ann.img_size

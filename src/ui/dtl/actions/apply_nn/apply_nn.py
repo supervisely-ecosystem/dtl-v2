@@ -204,7 +204,10 @@ class ApplyNNAction(NeuralNetworkAction):
             nonlocal saved_tags_settings
             saved_tags_settings = copy.deepcopy(default_tags_settings)
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_meta, _model_meta
             if project_meta == _current_meta:
                 return
@@ -408,6 +411,6 @@ class ApplyNNAction(NeuralNetworkAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
         )

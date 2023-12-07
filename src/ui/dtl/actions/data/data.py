@@ -252,7 +252,10 @@ class DataAction(SourceAction):
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = copy.deepcopy(default_classes_mapping_settings)
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_info, _current_meta
 
             if _current_info is not None and len(project_meta.obj_classes) == 0:
@@ -359,7 +362,7 @@ class DataAction(SourceAction):
             # set src preview
             _set_src_preview()
             # update meta
-            meta_changed_cb(project_meta)
+            data_changed_cb(**{"project_meta": project_meta})
 
         def _set_settings_from_json(settings: dict):
             # if settings are empty, set default
@@ -468,6 +471,6 @@ class DataAction(SourceAction):
             create_options=create_options,
             get_src=get_src,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
         )

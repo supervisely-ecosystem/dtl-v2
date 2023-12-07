@@ -52,6 +52,9 @@ class ResizeLayer(Layer):
     def requires_image(self):
         return True
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img_hw = ann.img_size

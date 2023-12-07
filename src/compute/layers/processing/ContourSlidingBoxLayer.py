@@ -140,6 +140,9 @@ class ContourSlidingBoxLayer(Layer):
                 if value.isdigit():
                     return int(value)
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         imsize_wh = ann.img_size[::-1]

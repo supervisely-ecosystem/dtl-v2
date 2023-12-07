@@ -75,18 +75,18 @@ def create_settings_options(
             name="Job Tags Preview",
             option_component=NodesFlow.WidgetOptionComponent(lj_settings_tags_list_preview),
         ),
-        NodesFlow.Node.Option(
-            name="Job Filters",
-            option_component=NodesFlow.WidgetOptionComponent(
-                widget=lj_filters_edit_container,
-                sidebar_component=NodesFlow.WidgetOptionComponent(lj_filters_sidebar_container),
-                sidebar_width=380,
-            ),
-        ),
-        NodesFlow.Node.Option(
-            name="Job Filters Preview",
-            option_component=NodesFlow.WidgetOptionComponent(lj_filters_preview_container),
-        ),
+        # NodesFlow.Node.Option(
+        #     name="Job Filters",
+        #     option_component=NodesFlow.WidgetOptionComponent(
+        #         widget=lj_filters_edit_container,
+        #         sidebar_component=NodesFlow.WidgetOptionComponent(lj_filters_sidebar_container),
+        #         sidebar_width=380,
+        #     ),
+        # ),
+        # NodesFlow.Node.Option(
+        #     name="Job Filters Preview",
+        #     option_component=NodesFlow.WidgetOptionComponent(lj_filters_preview_container),
+        # ),
         NodesFlow.Node.Option(
             name="Job Output",
             option_component=NodesFlow.WidgetOptionComponent(

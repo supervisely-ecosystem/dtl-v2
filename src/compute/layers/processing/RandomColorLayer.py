@@ -32,6 +32,9 @@ class RandomColorLayer(Layer):
     def requires_image(self):
         return True
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann_orig = data_el
 

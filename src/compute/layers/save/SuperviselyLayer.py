@@ -41,6 +41,9 @@ class SuperviselyLayer(Layer):
             if len(dst) == 0:
                 raise ValueError("Destination name in '{}' layer is empty!".format(self.action))
 
+    def modifies_data(self):
+        return False
+
     def preprocess(self):
         if self.net.preview_mode:
             return

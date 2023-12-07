@@ -42,6 +42,9 @@ class BitmapToPolyLayer(Layer):
             self.cls_mapping[old_class] = {"title": new_class, "shape": Polygon.geometry_name()}
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         approx_epsilon = self.settings.get("approx_epsilon")

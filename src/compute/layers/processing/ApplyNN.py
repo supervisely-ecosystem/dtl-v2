@@ -212,6 +212,9 @@ class ApplyNN(Layer):
     def requires_image(self):
         return True
 
+    def modifies_data(self):
+        return True
+
     def define_classes_mapping(self):
         current_meta = ProjectMeta().from_json(self.settings["current_meta"])
         model_meta = ProjectMeta().from_json(self.settings["model_meta"])

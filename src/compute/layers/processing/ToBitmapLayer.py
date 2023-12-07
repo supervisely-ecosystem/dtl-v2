@@ -40,6 +40,9 @@ class LineToBitmapLayer(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
+    def modifies_data(self):
+        return True
+
     def define_classes_mapping(self):
         for old_class, new_class in self.settings["classes_mapping"].items():
             self.cls_mapping[old_class] = {"title": new_class, "shape": Bitmap.geometry_name()}

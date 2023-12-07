@@ -28,6 +28,9 @@ class FlipLayer(Layer):
     def requires_image(self):
         return True
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img = img_desc.read_image()

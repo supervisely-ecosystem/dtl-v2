@@ -132,6 +132,9 @@ class Layer:
     def requires_image(self):
         return False
 
+    def modifies_data(self):
+        return False
+
     def validate_source_connections(self):
         for src in self.srcs:
             if src == Layer.null:

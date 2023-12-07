@@ -109,6 +109,7 @@ def save_settings(
     lj_output_project_name_input: Input,
     lj_output_dataset_keep_checkbox: Checkbox,
     lj_output_dataset_name_input: Input,
+    modifies_data: bool,
 ) -> dict:
     # init vars
     disable_objects_limit_per_item = None
@@ -163,6 +164,7 @@ def save_settings(
         "include_items_with_tags": include_items_with_tags,
         "exclude_items_with_tags": exclude_items_with_tags,
         # output
+        "create_new_project": modifies_data,
         "project_name": project_name,
         "dataset_name": dataset_name,
         "keep_original_ds": keep_original_ds,

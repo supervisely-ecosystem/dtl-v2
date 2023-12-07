@@ -93,6 +93,9 @@ class DropLinesByLengthLayer(Layer):
                 '"min_length" should be less than "max_length" for "delete_lines_by_length" layer',
             )
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         imgsize_hw = ann.img_size

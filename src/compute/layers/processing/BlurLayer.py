@@ -76,6 +76,9 @@ class BlurLayer(Layer):
         if self.settings["name"] == "gaussian":
             check_min_max(self.settings["sigma"], "sigma")
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 

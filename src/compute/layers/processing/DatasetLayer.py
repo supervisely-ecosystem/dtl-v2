@@ -41,6 +41,9 @@ class DatasetLayer(Layer):
         if len(self.settings.get("name", "")) > 2048:
             raise RuntimeError("Dataset name is too long, huh?")
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann_orig = data_el
         new_img_desc = deepcopy(img_desc)

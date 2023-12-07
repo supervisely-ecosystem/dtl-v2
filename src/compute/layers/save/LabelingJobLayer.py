@@ -45,6 +45,7 @@ class LabelingJobLayer(Layer):
                     "tags_limit_per_item",
                     "include_items_with_tags",
                     "exclude_items_with_tags",
+                    "create_new_project",
                     "project_name",
                     "dataset_name",
                     "keep_original_ds",
@@ -83,6 +84,7 @@ class LabelingJobLayer(Layer):
                         "oneOf": [{"type": "null"}, {"type": "array", "items": {"type": "string"}}]
                     },
                     # output
+                    "create_new_project": {"type": "boolean"},
                     "project_name": {"type": "string"},
                     "dataset_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "keep_original_ds": {"type": "boolean"},
@@ -95,6 +97,7 @@ class LabelingJobLayer(Layer):
         Layer.__init__(self, config, net=net)
         self.output_folder = output_folder
         self.sly_project_info = None
+        # self._labeling_job_map = {"dataset_id": ["images_ids"]}
 
     def is_archive(self):
         return False
@@ -108,6 +111,9 @@ class LabelingJobLayer(Layer):
         for dst in self.dsts:
             if len(dst) == 0:
                 raise ValueError("Destination name in '{}' layer is empty!".format(self.action))
+
+    def modifies_data(self):
+        return False
 
     def preprocess(self):
         if self.net.preview_mode:
@@ -123,6 +129,7 @@ class LabelingJobLayer(Layer):
         dst = self.dsts[0]
         self.out_project_name = dst
 
+        # if self.settings["create_new_project"]:
         self.sly_project_info = g.api.project.create(
             g.WORKSPACE_ID,
             self.settings["project_name"],

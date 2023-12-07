@@ -137,6 +137,9 @@ class VideoDataLayer(Layer):
     def validate_source_connections(self):
         pass
 
+    def modifies_data(self):
+        return False
+
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],

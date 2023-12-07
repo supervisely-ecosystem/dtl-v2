@@ -99,6 +99,12 @@ class Net:
             raise GraphError("Less than two layers")
         self.check_connections()
 
+    def modifies_data(self):
+        for layer in self.layers:
+            if layer.modifies_data():
+                return True
+        return False
+
     def get_input_project_metas(self):
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         input_project_metas = {}

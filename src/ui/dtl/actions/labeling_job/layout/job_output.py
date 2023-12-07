@@ -78,5 +78,6 @@ def create_job_output_widgets():
         lj_output_dataset_name_preview,
         lj_output_container_preview,
         # layout
+        lj_output_edit_btn,
         lj_output_edit_container,
     )

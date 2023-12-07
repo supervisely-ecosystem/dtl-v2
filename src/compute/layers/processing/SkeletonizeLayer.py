@@ -46,6 +46,9 @@ class SkeletonizeLayer(Layer):
     def define_classes_mapping(self):
         super().define_classes_mapping()  # don't change
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         method = self.method_mapping.get(self.settings["method"], None)

@@ -151,6 +151,9 @@ class IfLayer(Layer):
     def is_image_name_in_range(cls, img_name, min_name, max_name):
         return img_name >= min_name and img_name <= max_name
 
+    def modifies_data(self):
+        return True
+
     def preprocess(self):
         condition = list(self.settings["condition"].keys())[0]
         if condition == "project_datasets":
