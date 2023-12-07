@@ -65,7 +65,7 @@ class SuperviselyLayer(Layer):
 
         custom_data = {
             "source_projects": _get_source_projects_ids_from_dtl(),
-            "ml-nodes": g.current_dtl_json,
+            "data-nodes": g.current_dtl_json,
         }
         g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
         self.net_change_images = self.net.may_require_images()

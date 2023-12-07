@@ -60,77 +60,102 @@ def create_job_filters_widgets() -> tuple:
     # ----------------------------
 
     # ITEMS RANGE
-    lj_filters_items_range_checkbox = Checkbox("Select all items", checked=True)
+    # lj_filters_items_range_checkbox = Checkbox("Select all items", checked=True)
 
-    lj_filters_items_range_start = InputNumber(
-        value=1, step=1, min=1, max=1, size="small", controls=True  # max len(items_ids)
-    )
-    lj_filters_items_range_separator = Text(" _ ", status="text", font_size=16)
-    lj_filters_items_range_end = InputNumber(
-        value=0, step=1, min=1, max=1, size="small", controls=True  # value/max len(items_ids)
-    )
-    lj_filters_items_range_container = Flexbox(
-        [
-            lj_filters_items_range_start,
-            lj_filters_items_range_separator,
-            lj_filters_items_range_end,
-        ],
-        gap=3,
-        center_content=False,
-    )
-    lj_filters_items_range_container.hide()
+    # lj_filters_items_range_start = InputNumber(
+    #     value=1, step=1, min=1, max=1, size="small", controls=True  # max len(items_ids)
+    # )
+    # lj_filters_items_range_separator = Text(" _ ", status="text", font_size=16)
+    # lj_filters_items_range_end = InputNumber(
+    #     value=0, step=1, min=1, max=1, size="small", controls=True  # value/max len(items_ids)
+    # )
+    # lj_filters_items_range_container = Flexbox(
+    #     [
+    #         lj_filters_items_range_start,
+    #         lj_filters_items_range_separator,
+    #         lj_filters_items_range_end,
+    #     ],
+    #     gap=3,
+    #     center_content=False,
+    # )
+    # lj_filters_items_range_container.hide()
 
-    lj_filters_items_range_field = Field(
-        title="Items Range",
-        description="Select items range that will be available to annotators",
-        content=Container([lj_filters_items_range_checkbox, lj_filters_items_range_container]),
-    )
+    # lj_filters_items_range_field = Field(
+    #     title="Items Range",
+    #     description="Select items range that will be available to annotators",
+    #     content=Container([lj_filters_items_range_checkbox, lj_filters_items_range_container]),
+    # )
     # ----------------------------
 
     # ITEMS IDS
-    lj_filters_items_ids_selector_items = []
-    lj_filters_items_ids_selector = Select(
-        items=lj_filters_items_ids_selector_items,
-        placeholder="Select items",
-        filterable=True,
-        multiple=True,
-        size="small",
-    )
-    lj_filters_items_ids_selector_field = Field(
-        title="Select Items",
-        description="Select items that will be available to annotators",
-        content=lj_filters_items_ids_selector,
-    )
+    # lj_filters_items_ids_selector_items = []
+    # lj_filters_items_ids_selector = Select(
+    #     items=lj_filters_items_ids_selector_items,
+    #     placeholder="Select items",
+    #     filterable=True,
+    #     multiple=True,
+    #     size="small",
+    # )
+    # lj_filters_items_ids_selector_field = Field(
+    #     title="Select Items",
+    #     description="Select items that will be available to annotators",
+    #     content=lj_filters_items_ids_selector,
+    # )
     # ----------------------------
 
     # CONDITION SELECTOR
     lj_filters_save_btn = create_save_btn()
 
-    lj_filters_condition_container = Container(
-        [lj_filters_objects_limit_field, lj_filters_tags_limit_field, lj_filters_items_range_field]
-    )
-    lj_filters_items_container = Container([lj_filters_items_ids_selector_field])
+    # lj_filters_condition_container = Container(
+    #     [lj_filters_objects_limit_field, lj_filters_tags_limit_field, lj_filters_items_range_field]
+    # )
+    # lj_filters_items_container = Container([lj_filters_items_ids_selector_field])
 
-    lj_filters_condition_selector_items = [
-        Select.Item(value="condition", label="Condition", content=lj_filters_condition_container),
-        Select.Item(value="items", label="Items", content=lj_filters_items_container),
-    ]
-    lj_filters_condition_selector = Select(lj_filters_condition_selector_items, size="small")
-    lj_filters_condition_oneof = OneOf(lj_filters_condition_selector)
+    # lj_filters_condition_selector_items = [
+    #     Select.Item(value="condition", label="Condition", content=lj_filters_condition_container),
+    #     Select.Item(value="items", label="Items", content=lj_filters_items_container),
+    # ]
+    # lj_filters_condition_selector = Select(
+    #     lj_filters_condition_selector_items, placeholder="Select filter", size="small"
+    # )
 
-    lj_filters_condition_selector_field = Field(
-        title="Select by",
-        description="Select by condition",
-        content=Container(
-            [lj_filters_condition_selector, lj_filters_condition_oneof, lj_filters_save_btn]
-        ),
-    )
+    # lj_filters_condition_oneof = OneOf(lj_filters_condition_selector)
+    # lj_filters_condition_selector_field = Field(
+    #     title="Filter by",
+    #     description="Select filter condition for the labeling job",
+    #     content=Container(
+    #         [lj_filters_condition_selector, lj_filters_condition_oneof, lj_filters_save_btn]
+    #     ),
+    # )
     # ----------------------------
+    lj_filters_sidebar_container = Container(
+        [lj_filters_objects_limit_field, lj_filters_tags_limit_field, lj_filters_save_btn]
+    )
     # ----------------------------
 
     # PREVIEW
     # TODO: add preview
-    lj_filters_preview_text = Text("Select by:", "text", font_size=get_text_font_size())
+    # lj_filters_condition_preview_text = Text(
+    #     "Filter by: Condition", "text", font_size=get_text_font_size()
+    # )
+    lj_filters_objects_limit_preview_text = Text(
+        "Objects limit per item: unlimited", "text", font_size=get_text_font_size()
+    )
+    lj_filters_tags_limit_preview_text = Text(
+        "Tags limit per item: unlimited", "text", font_size=get_text_font_size()
+    )
+    # lj_filters_items_range_preview_text = Text(
+    #     "Items range: all items", "text", font_size=get_text_font_size()
+    # )
+
+    lj_filters_preview_container = Container(
+        [
+            # lj_filters_condition_preview_text,
+            lj_filters_objects_limit_preview_text,
+            lj_filters_tags_limit_preview_text,
+            # lj_filters_items_range_preview_text,
+        ]
+    )
     # ----------------------------
 
     # LAYOUT
@@ -158,24 +183,29 @@ def create_job_filters_widgets() -> tuple:
         lj_filters_tags_limit_checkbox,
         lj_filters_tags_limit_container,
         lj_filters_tags_limit_field,
-        lj_filters_items_range_checkbox,
-        lj_filters_items_range_start,
-        lj_filters_items_range_separator,
-        lj_filters_items_range_end,
-        lj_filters_items_range_container,
-        lj_filters_items_range_field,
-        lj_filters_items_ids_selector_items,
-        lj_filters_items_ids_selector,
-        lj_filters_items_ids_selector_field,
+        lj_filters_sidebar_container,
+        # lj_filters_items_range_checkbox,
+        # lj_filters_items_range_start,
+        # lj_filters_items_range_separator,
+        # lj_filters_items_range_end,
+        # lj_filters_items_range_container,
+        # lj_filters_items_range_field,
+        # lj_filters_items_ids_selector_items,
+        # lj_filters_items_ids_selector,
+        # lj_filters_items_ids_selector_field,
         lj_filters_save_btn,
-        lj_filters_condition_container,
-        lj_filters_items_container,
-        lj_filters_condition_selector_items,
-        lj_filters_condition_selector,
-        lj_filters_condition_oneof,
-        lj_filters_condition_selector_field,
+        # lj_filters_condition_container,
+        # lj_filters_items_container,
+        # lj_filters_condition_selector_items,
+        # lj_filters_condition_selector,
+        # lj_filters_condition_oneof,
+        # lj_filters_condition_selector_field,
         # preview
-        lj_filters_preview_text,
+        # lj_filters_condition_preview_text,
+        lj_filters_objects_limit_preview_text,
+        lj_filters_tags_limit_preview_text,
+        # lj_filters_items_range_preview_text,
+        lj_filters_preview_container,
         # layout
         lj_filters_edit_text,
         lj_filters_edit_btn,

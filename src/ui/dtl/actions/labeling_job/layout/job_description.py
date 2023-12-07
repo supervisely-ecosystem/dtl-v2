@@ -9,24 +9,26 @@ from supervisely.app.widgets import Button, Container, Text, Input, TextArea, Fi
 
 def create_job_description_widgets():
     # SIDEBAR SETTINGS
-    lj_description_title_input = Input(placeholder="Annotation Job")
+    lj_description_title_input = Input(value="Annotation Job", placeholder="Annotation Job")
     lj_description_title_field = Field(
         title="Title",
-        description="Enter name of your labeling job",
+        description="Name of the labeling job",
         content=lj_description_title_input,
     )
 
-    lj_description_description_editor = TextArea(rows=5)
+    lj_description_description_editor = TextArea(placeholder="Enter short description", rows=5)
     lj_description_description_field = Field(
         title="Short Description",
-        description="Enter description of your labeling job",
+        description="Short description of the labeling job",
         content=lj_description_description_editor,
     )
 
-    lj_description_readme_editor = TextArea(rows=10)
+    lj_description_readme_editor = TextArea(
+        placeholder="Add detailed description for labeling job", rows=10
+    )
     lj_description_readme_field = Field(
         title="Readme",
-        description="Detailed description of your labeling job. It will be displayed to annotators when they start labeling.",
+        description="Detailed description of the labeling job. It will be displayed to annotators when they start labeling.",
         content=lj_description_readme_editor,
     )
 

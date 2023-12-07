@@ -1,25 +1,5 @@
 from supervisely.app.widgets import NodesFlow
 
-# lj_description_container
-# lj_description_sidebar_container
-# lj_description_title_preview
-
-# lj_team_container
-# lj_team_sidebar_container
-# lj_team_preview_container
-
-# lj_settings_classes_list_edit_container
-# lj_settings_classes_list_widgets_container
-# lj_settings_classes_list_preview
-
-# lj_settings_tags_list_edit_container
-# lj_settings_tags_list_widgets_container
-# lj_settings_tags_list_preview
-
-# lj_filters_edit_container
-# lj_filters_condition_selector_field
-# -
-
 
 def create_settings_options(
     lj_description_container,
@@ -35,8 +15,8 @@ def create_settings_options(
     lj_settings_tags_list_widgets_container,
     lj_settings_tags_list_preview,
     lj_filters_edit_container,
-    lj_filters_condition_selector_field,
-    lj_filters_preview_text,
+    lj_filters_sidebar_container,
+    lj_filters_preview_container,
 ):
     settings_options = [
         NodesFlow.Node.Option(
@@ -95,15 +75,13 @@ def create_settings_options(
             name="Job Filters",
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=lj_filters_edit_container,
-                sidebar_component=NodesFlow.WidgetOptionComponent(
-                    lj_filters_condition_selector_field
-                ),
+                sidebar_component=NodesFlow.WidgetOptionComponent(lj_filters_sidebar_container),
                 sidebar_width=380,
             ),
         ),
         NodesFlow.Node.Option(
             name="Job Filters Preview",
-            option_component=NodesFlow.WidgetOptionComponent(lj_filters_preview_text),
+            option_component=NodesFlow.WidgetOptionComponent(lj_filters_preview_container),
         ),
     ]
 

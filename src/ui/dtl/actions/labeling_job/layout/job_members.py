@@ -33,7 +33,10 @@ def create_job_members_widgets():
     )
     lj_members_labelers_field = Field(
         title="Select Annotators",
-        description="Select users that will be responsible for labeling",
+        description=(
+            "Selected user will see new labeling job in status 'Pending'. "
+            "You can select multiple users — in this case dataset will be splitted equally."
+        ),
         content=lj_members_labelers_selector,
     )
 
@@ -48,9 +51,13 @@ def create_job_members_widgets():
     # ----------------------------
 
     # PREVIEW
-    lj_members_reviewer_preview = Text("Reviewer:", "text", font_size=get_text_font_size())
+    lj_members_reviewer_preview = Text(
+        "Reviewer: select reviewer in settings", "text", font_size=get_text_font_size()
+    )
 
-    lj_members_labelers_preview = Text("Assign to:", "text", font_size=get_text_font_size())
+    lj_members_labelers_preview = Text(
+        "Assign to: select annotators in settings", "text", font_size=get_text_font_size()
+    )
 
     lj_members_preview_container = Container(
         [
