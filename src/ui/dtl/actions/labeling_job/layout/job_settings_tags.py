@@ -62,16 +62,12 @@ def create_job_settings_tags_widgets() -> tuple:
     # lj_settings_tags_list_edit_container.hide()
     return (
         # sidebar
-        lj_settings_tags_list_widget_notification,
         lj_settings_tags_list_widget,
         lj_settings_tags_list_save_btn,
         lj_settings_tags_list_set_default_btn,
-        lj_settings_tags_list_widget_field,
         lj_settings_tags_list_widgets_container,
         # preview
         lj_settings_tags_list_preview,
         # layout
-        lj_settings_tags_list_edit_text,
-        lj_settings_tags_list_edit_btn,
         lj_settings_tags_list_edit_container,
     )

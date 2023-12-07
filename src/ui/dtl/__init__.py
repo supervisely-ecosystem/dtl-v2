@@ -139,8 +139,9 @@ image_actions_list = {
         IfAction.name,
     ],
     NEURAL_NETWORKS: [ApplyNNAction.name],
-    OTHER: [DatasetAction.name, DummyAction.name, LabelingJobAction.name],
+    OTHER: [DatasetAction.name, DummyAction.name],
     SAVE_ACTIONS: [
+        LabelingJobAction.name,
         SaveAction.name,
         SaveMasksAction.name,
         SuperviselyAction.name,
@@ -197,8 +198,8 @@ image_actions_dict = {
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
-    LabelingJobAction.name: LabelingJobAction,
     # Save layers
+    LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
     SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,

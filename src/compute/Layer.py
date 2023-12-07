@@ -545,6 +545,9 @@ class Layer:
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         raise NotImplementedError()
 
+    def postprocess(self):
+        pass
+
     def process_timed(self, data_el: Tuple[ImageDescriptor, Annotation]):
         tm = TinyTimer()
         for layer_output in self.process(data_el):

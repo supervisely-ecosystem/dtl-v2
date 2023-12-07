@@ -81,10 +81,7 @@ def create_job_members_widgets():
     # ----------------------------
     return (
         # sidebar
-        lj_members_items,
-        lj_members_reviewer_field,
         lj_members_reviewer_selector,
-        lj_members_labelers_field,
         lj_members_labelers_selector,
         lj_members_save_btn,
         lj_members_sidebar_container,
@@ -93,7 +90,5 @@ def create_job_members_widgets():
         lj_members_labelers_preview,
         lj_members_preview_container,
         # layout
-        lj_members_text,
-        lj_members_edit_btn,
         lj_members_container,
     )

@@ -116,6 +116,10 @@ class Net:
         for layer in self.layers:
             layer.preprocess()
 
+    def postprocess(self):
+        for layer in self.layers:
+            layer.postprocess()
+
     def get_free_name(self, img_desc: ImageDescriptor, project_name: str):
         name = img_desc.get_item_name()
         new_name = name

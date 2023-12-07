@@ -3,13 +3,11 @@ from typing import Optional
 from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
-from supervisely.app.widgets import NodesFlow, Text, Input, Checkbox
 
-from src.ui.dtl import OtherAction
+from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_layer_docs,
-    get_text_font_size,
     classes_list_settings_changed_meta,
     set_classes_list_settings_from_json,
     set_classes_list_preview,
@@ -33,27 +31,11 @@ from src.ui.dtl.actions.labeling_job.layout.job_settings_tags import (
 )
 from src.ui.dtl.actions.labeling_job.layout.job_filters import create_job_filters_widgets
 from src.ui.dtl.actions.labeling_job.layout.node_layout import create_settings_options
+from src.ui.dtl.actions.labeling_job.layout.job_output import create_job_output_widgets
 import src.ui.dtl.actions.labeling_job.layout.utils as lj_utils
 
-# g.api.labeling_job.create(
-#     name
-#     dataset_id
-#     user_ids
-#     readme
-#     description
-#     classes_to_label
-#     objects_limit_per_image
-#     tags_to_label
-#     tags_limit_per_image
-#     include_images_with_tags
-#     exclude_images_with_tags
-#     images_range
-#     reviewer_id
-#     images_ids
-# )
 
-
-class LabelingJobAction(OtherAction):
+class LabelingJobAction(OutputAction):
     name = "labeling_job"
     title = "Create Labeling Job"
     docs_url = ""
@@ -71,46 +53,17 @@ class LabelingJobAction(OtherAction):
         saved_tags_settings = "default"
         default_tags_settings = "default"
 
-        # # DATA
-        # (  # sidebar
-        #     lj_dataset_selector,
-        #     lj_dataset_selector_field,
-        #     lj_dataset_save_btn,
-        #     lj_dataset_sidebar_container,
-        #     # preview
-        #     lj_dataset_name_preview,
-        #     # layout
-        #     lj_dataset_text,
-        #     lj_dataset_edit_btn,
-        #     lj_dataset_container,
-        # ) = create_job_data_widgets()
-
-        # DATA CBs
-        # @lj_dataset_save_btn.click
-        # def dataset_save_btn_cb():
-        #     # lj_utils.set_lj_dataset_preview(lj_dataset_selector, lj_dataset_name_preview)
-        #     # _save_settings()
-        #     return
-
-        # ----------------------------
-
         # DESCRIPTION
         (
             # sidebar
-            lj_description_title_field,
             lj_description_title_input,
-            lj_description_description_field,
             lj_description_description_editor,
-            lj_description_readme_field,
             lj_description_readme_editor,
-            lj_description_markdown_support_text,
             lj_description_save_btn,
             lj_description_sidebar_container,
             # preview
             lj_description_title_preview,
             # layout
-            lj_description_text,
-            lj_description_edit_btn,
             lj_description_container,
         ) = create_job_description_widgets()
 
@@ -125,10 +78,7 @@ class LabelingJobAction(OtherAction):
         # MEMBERS
         (
             # sidebar
-            lj_members_items,
-            lj_members_reviewer_field,
             lj_members_reviewer_selector,
-            lj_members_labelers_field,
             lj_members_labelers_selector,
             lj_members_save_btn,
             lj_members_sidebar_container,
@@ -137,8 +87,6 @@ class LabelingJobAction(OtherAction):
             lj_members_labelers_preview,
             lj_members_preview_container,
             # layout
-            lj_members_text,
-            lj_members_edit_btn,
             lj_members_container,
         ) = create_job_members_widgets()
 
@@ -159,17 +107,13 @@ class LabelingJobAction(OtherAction):
         # CLASSES
         (
             # sidebar
-            lj_settings_classes_list_widget_notification,
             lj_settings_classes_list_widget,
             lj_settings_classes_list_save_btn,
             lj_settings_classes_list_set_default_btn,
-            lj_settings_classes_list_widget_field,
             lj_settings_classes_list_widgets_container,
             # preview
             lj_settings_classes_list_preview,
             # layout
-            lj_settings_classes_list_edit_text,
-            lj_settings_classes_list_edit_btn,
             lj_settings_classes_list_edit_container,
         ) = create_job_settings_classes_widgets()
 
@@ -204,17 +148,13 @@ class LabelingJobAction(OtherAction):
         # TAGS
         (
             # sidebar
-            lj_settings_tags_list_widget_notification,
             lj_settings_tags_list_widget,
             lj_settings_tags_list_save_btn,
             lj_settings_tags_list_set_default_btn,
-            lj_settings_tags_list_widget_field,
             lj_settings_tags_list_widgets_container,
             # preview
             lj_settings_tags_list_preview,
             # layout
-            lj_settings_tags_list_edit_text,
-            lj_settings_tags_list_edit_btn,
             lj_settings_tags_list_edit_container,
         ) = create_job_settings_tags_widgets()
 
@@ -245,38 +185,15 @@ class LabelingJobAction(OtherAction):
             # sidebar
             lj_filters_objects_limit_per_item_widget,
             lj_filters_objects_limit_checkbox,
-            lj_filters_objects_limit_container,
-            lj_filters_objects_limit_field,
             lj_filters_tags_limit_per_item_widget,
             lj_filters_tags_limit_checkbox,
-            lj_filters_tags_limit_container,
-            lj_filters_tags_limit_field,
             lj_filters_sidebar_container,
-            # lj_filters_items_range_checkbox,
-            # lj_filters_items_range_start,
-            # lj_filters_items_range_separator,
-            # lj_filters_items_range_end,
-            # lj_filters_items_range_container,
-            # lj_filters_items_range_field,
-            # lj_filters_items_ids_selector_items,
-            # lj_filters_items_ids_selector,
-            # lj_filters_items_ids_selector_field,
             lj_filters_save_btn,
-            # lj_filters_condition_container,
-            # lj_filters_items_container,
-            # lj_filters_condition_selector_items,
-            # lj_filters_condition_selector,
-            # lj_filters_condition_oneof,
-            # lj_filters_condition_selector_field,
             # preview
-            # lj_filters_condition_preview_text,
             lj_filters_objects_limit_preview_text,
             lj_filters_tags_limit_preview_text,
-            # lj_filters_items_range_preview_text,
             lj_filters_preview_container,
             # layout
-            lj_filters_edit_text,
-            lj_filters_edit_btn,
             lj_filters_edit_container,
         ) = create_job_filters_widgets()
 
@@ -295,30 +212,56 @@ class LabelingJobAction(OtherAction):
             else:
                 lj_filters_tags_limit_per_item_widget.show()
 
-        # @lj_filters_items_range_checkbox.value_changed
-        # def items_range_checkbox_cb(is_checked):
-        #     if is_checked:
-        #         lj_filters_items_range_container.hide()
-        #     else:
-        #         lj_filters_items_range_container.show()
-
         @lj_filters_save_btn.click
         def filters_save_btn_cb():
             lj_utils.set_lj_filter_preview(
-                # lj_filters_condition_selector,
-                # lj_filters_condition_preview_text,
                 lj_filters_objects_limit_checkbox,
                 lj_filters_objects_limit_per_item_widget,
                 lj_filters_objects_limit_preview_text,
                 lj_filters_tags_limit_checkbox,
                 lj_filters_tags_limit_per_item_widget,
                 lj_filters_tags_limit_preview_text,
-                # lj_filters_items_range_checkbox,
-                # lj_filters_items_range_start,
-                # lj_filters_items_range_end,
-                # lj_filters_items_range_preview_text,
             )
             _save_settings()
+
+        # ----------------------------
+
+        # OUTPUT
+        (
+            # sidebar
+            lj_output_project_name_input,
+            lj_output_dataset_keep_checkbox,
+            lj_output_dataset_name_input,
+            lj_output_save_btn,
+            lj_output_sidebar_container,
+            # preview
+            lj_output_project_name_preview,
+            lj_output_dataset_name_preview,
+            lj_output_container_preview,
+            # layout
+            lj_output_edit_container,
+        ) = create_job_output_widgets()
+
+        # OUTPUT CBs
+        @lj_output_save_btn.click
+        def dataset_save_btn_cb():
+            lj_utils.set_lj_output_project_name_preview(
+                lj_output_project_name_input, lj_output_project_name_preview
+            )
+            lj_utils.set_lj_output_dataset_name_preview(
+                lj_output_dataset_name_input,
+                lj_output_dataset_keep_checkbox,
+                lj_output_dataset_name_preview,
+            )
+            _save_settings()
+            return
+
+        @lj_output_dataset_keep_checkbox.value_changed
+        def dataset_keep_checkbox_cb(is_checked):
+            if is_checked:
+                lj_output_dataset_name_input.hide()
+            else:
+                lj_output_dataset_name_input.show()
 
         # ----------------------------
 
@@ -408,19 +351,17 @@ class LabelingJobAction(OtherAction):
                 lj_description_title_input,
                 lj_description_readme_editor,
                 lj_description_description_editor,
-                lj_members_labelers_selector,
                 lj_members_reviewer_selector,
-                lj_settings_classes_list_widget,
-                lj_settings_tags_list_widget,
-                lj_filters_condition_selector,
-                lj_filters_items_ids_selector,
+                lj_members_labelers_selector,
+                saved_classes_settings,
+                saved_tags_settings,
                 lj_filters_objects_limit_checkbox,
                 lj_filters_objects_limit_per_item_widget,
                 lj_filters_tags_limit_checkbox,
                 lj_filters_tags_limit_per_item_widget,
-                lj_filters_items_range_checkbox,
-                lj_filters_items_range_start,
-                lj_filters_items_range_end,
+                lj_output_project_name_input,
+                lj_output_dataset_keep_checkbox,
+                lj_output_dataset_name_input,
             )
             saved_settings = settings
 
@@ -443,19 +384,17 @@ class LabelingJobAction(OtherAction):
                 lj_settings_classes_list_preview,
                 lj_settings_tags_list_widget,
                 lj_settings_tags_list_preview,
-                # lj_filters_condition_selector,
-                # lj_filters_condition_preview_text,
-                # lj_filters_items_ids_selector,
                 lj_filters_objects_limit_checkbox,
                 lj_filters_objects_limit_per_item_widget,
-                # lj_filters_items_range_preview_text,
                 lj_filters_tags_limit_checkbox,
                 lj_filters_tags_limit_per_item_widget,
                 lj_filters_tags_limit_preview_text,
-                # lj_filters_items_range_checkbox,
-                # lj_filters_items_range_start,
-                # lj_filters_items_range_end,
                 lj_filters_objects_limit_preview_text,
+                lj_output_project_name_input,
+                lj_output_dataset_keep_checkbox,
+                lj_output_dataset_name_input,
+                lj_output_project_name_preview,
+                lj_output_dataset_name_preview,
             )
             return
 
@@ -477,6 +416,9 @@ class LabelingJobAction(OtherAction):
                 lj_filters_edit_container,
                 lj_filters_sidebar_container,
                 lj_filters_preview_container,
+                lj_output_edit_container,
+                lj_output_sidebar_container,
+                lj_output_container_preview,
             )
             return {
                 "src": [],
@@ -492,3 +434,7 @@ class LabelingJobAction(OtherAction):
             meta_changed_cb=meta_changed_cb,
             need_preview=False,
         )
+
+    @classmethod
+    def create_outputs(cls):
+        return []

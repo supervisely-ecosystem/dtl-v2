@@ -75,19 +75,13 @@ def create_job_description_widgets():
 
     return (
         # sidebar
-        lj_description_title_field,
         lj_description_title_input,
-        lj_description_description_field,
         lj_description_description_editor,
-        lj_description_readme_field,
         lj_description_readme_editor,
-        lj_description_markdown_support_text,
         lj_description_save_btn,
         lj_description_sidebar_container,
         # preview
         lj_description_title_preview,
         # layout
-        lj_description_text,
-        lj_description_edit_btn,
         lj_description_container,
     )
