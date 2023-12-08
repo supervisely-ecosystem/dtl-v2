@@ -1,12 +1,13 @@
 from typing import List
 from supervisely.app.widgets import (
+    Button,
     Input,
     Text,
     Checkbox,
     Select,
     TextArea,
     InputNumber,
-    SelectDataset,
+    NotificationBox,
 )
 from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagsListPreview
 from src.ui.dtl.utils import (
@@ -89,6 +90,27 @@ def set_lj_output_dataset_name_preview(
         lj_output_dataset_name_preview.set(f"Dataset name: {dataset_name}", "text")
 
 
+def set_output_preview(
+    modifies_data: bool,
+    lj_output_edit_btn: Button,
+    lj_output_modifies_data_preview: NotificationBox,
+    lj_output_project_name_preview: Text,
+    lj_output_dataset_name_preview: Text,
+):
+    if modifies_data:
+        # show output options
+        lj_output_modifies_data_preview.hide()
+        lj_output_edit_btn.enable()
+        lj_output_project_name_preview.show()
+        lj_output_dataset_name_preview.show()
+    else:
+        # hide output options, show notification
+        lj_output_edit_btn.disable()
+        lj_output_project_name_preview.hide()
+        lj_output_dataset_name_preview.hide()
+        lj_output_modifies_data_preview.show()
+
+
 # ----------------------------
 
 
@@ -138,11 +160,16 @@ def save_settings(
         tags_limit_per_item = lj_filters_tags_limit_per_item_widget.value
 
     project_name = lj_output_project_name_input.get_value()
-    keep_original_ds = lj_output_dataset_keep_checkbox.is_checked()
-    if keep_original_ds:
+
+    if not modifies_data:
         dataset_name = None
+        keep_original_ds = True
     else:
-        dataset_name = lj_output_dataset_name_input.get_value()
+        keep_original_ds = lj_output_dataset_keep_checkbox.is_checked()
+        if keep_original_ds:
+            dataset_name = None
+        else:
+            dataset_name = lj_output_dataset_name_input.get_value()
 
     return {
         # description

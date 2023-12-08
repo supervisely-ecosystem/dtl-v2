@@ -40,7 +40,7 @@ class FilterImageByTagLayer(Layer):
         Layer.__init__(self, config, net=net)
 
     def modifies_data(self):
-        return True
+        return False
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el

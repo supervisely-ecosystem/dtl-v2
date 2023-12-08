@@ -4,14 +4,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
-from supervisely.app.widgets import (
-    Button,
-    Container,
-    Text,
-    Input,
-    Field,
-    Checkbox,
-)
+from supervisely.app.widgets import Button, Container, Text, Input, Field, Checkbox, NotificationBox
 
 
 def create_job_output_widgets():
@@ -32,8 +25,9 @@ def create_job_output_widgets():
         title="Dataset Name",
         description=(
             "Dataset with given name will be created in the project. "
-            "If you want to use dataset name from input project check the "
-            "'Keep original datasets structure' checkbox above"
+            "If you want to use dataset name from input project or "
+            "dataset from 'Dataset' layer "
+            "check the 'Keep original datasets structure' checkbox above"
         ),
         content=lj_output_dataset_container,
     )
@@ -47,8 +41,24 @@ def create_job_output_widgets():
     # PREVIEW
     lj_output_project_name_preview = Text("Project name:", "text", font_size=get_text_font_size())
     lj_output_dataset_name_preview = Text("Dataset name:", "text", font_size=get_text_font_size())
+    lj_output_modifies_data_preview = NotificationBox(
+        title="Labeling job will be created for input project",
+        description="Layers that modify data not found, labeling job will be created for input project",
+        box_type="info",
+    )
+    lj_output_modifies_data_preview.hide()
+
+    # lj_output_modifies_data_preview = Text(
+    #     "Layers that modify data not found, labeling job will be created for input project.",
+    #     "text",
+    #     font_size=get_text_font_size(),
+    # )
     lj_output_container_preview = Container(
-        [lj_output_project_name_preview, lj_output_dataset_name_preview]
+        [
+            lj_output_project_name_preview,
+            lj_output_dataset_name_preview,
+            lj_output_modifies_data_preview,
+        ]
     )
     # ----------------------------
 
@@ -77,6 +87,7 @@ def create_job_output_widgets():
         lj_output_project_name_preview,
         lj_output_dataset_name_preview,
         lj_output_container_preview,
+        lj_output_modifies_data_preview,
         # layout
         lj_output_edit_btn,
         lj_output_edit_container,

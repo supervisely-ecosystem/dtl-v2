@@ -41,6 +41,7 @@ class LabelingJobAction(OutputAction):
     docs_url = ""
     description = "Creates Labeling Job with given parameters."
     md_description = get_layer_docs(dirname(realpath(__file__)))
+    width = 360
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -128,7 +129,7 @@ class LabelingJobAction(OutputAction):
                 saved_classes_settings,
             )
             _save_settings()
-            g.updater("metas")
+            # g.updater("metas")
 
         @lj_settings_classes_list_set_default_btn.click
         def classes_set_default_btn_cb():
@@ -142,7 +143,7 @@ class LabelingJobAction(OutputAction):
                 saved_classes_settings,
             )
             _save_settings()
-            g.updater("metas")
+            # g.updater("metas")
 
         # ----------------------------
 
@@ -167,7 +168,7 @@ class LabelingJobAction(OutputAction):
                 lj_settings_tags_list_widget, lj_settings_tags_list_preview, saved_tags_settings
             )
             _save_settings()
-            g.updater("metas")
+            # g.updater("metas")
 
         @lj_settings_tags_list_set_default_btn.click
         def tags_set_default_btn_cb():
@@ -177,7 +178,7 @@ class LabelingJobAction(OutputAction):
                 lj_settings_tags_list_widget, lj_settings_tags_list_preview, saved_tags_settings
             )
             _save_settings()
-            g.updater("metas")
+            # g.updater("metas")
 
         # ----------------------------
 
@@ -239,6 +240,7 @@ class LabelingJobAction(OutputAction):
             lj_output_project_name_preview,
             lj_output_dataset_name_preview,
             lj_output_container_preview,
+            lj_output_modifies_data_preview,
             # layout
             lj_output_edit_btn,
             lj_output_edit_container,
@@ -248,16 +250,14 @@ class LabelingJobAction(OutputAction):
         @lj_output_edit_btn.click
         def output_edit_btn_cb():
             nonlocal modifies_data
-            if modifies_data:
-                # show output options
-                lj_output_edit_btn.enable()
-                lj_output_project_name_preview.show()
-                lj_output_dataset_name_preview.show()
-            else:
-                # hide output options, show notification
-                lj_output_edit_btn.disable()
-                lj_output_project_name_preview.hide()
-                lj_output_dataset_name_preview.hide()
+            lj_utils.set_output_preview(
+                modifies_data,
+                lj_output_edit_btn,
+                lj_output_modifies_data_preview,
+                lj_output_project_name_preview,
+                lj_output_dataset_name_preview,
+            )
+            # hide whole container? lj_output_edit_container.hide()
 
         @lj_output_save_btn.click
         def dataset_save_btn_cb():
@@ -358,30 +358,26 @@ class LabelingJobAction(OutputAction):
 
             lj_settings_classes_list_widget.loading = False
             lj_settings_tags_list_widget.loading = False
-            _save_settings()
 
         def data_changed_cb(**kwargs):
             if "modifies_data" in kwargs:
                 nonlocal modifies_data
                 modifies_data = kwargs.get("modifies_data", False)
-                if modifies_data:
-                    # show output options
-                    lj_output_edit_btn.enable()
-                    lj_output_project_name_preview.show()
-                    lj_output_dataset_name_preview.show()
-
-                else:
-                    # hide output options, show notification
-                    lj_output_edit_btn.disable()
-                    lj_output_project_name_preview.hide()
-                    lj_output_dataset_name_preview.hide()
+                lj_utils.set_output_preview(
+                    modifies_data,
+                    lj_output_edit_btn,
+                    lj_output_modifies_data_preview,
+                    lj_output_project_name_preview,
+                    lj_output_dataset_name_preview,
+                )
 
             if "project_meta" in kwargs:
                 project_meta = kwargs.get("project_meta", ProjectMeta())
                 meta_change_cb(project_meta)
+            _save_settings()
 
         def _save_settings():
-            nonlocal saved_settings
+            nonlocal saved_settings, saved_classes_settings, saved_tags_settings
             settings = lj_utils.save_settings(
                 lj_description_title_input,
                 lj_description_readme_editor,
@@ -400,6 +396,18 @@ class LabelingJobAction(OutputAction):
                 modifies_data,
             )
             saved_settings = settings
+
+        def get_dst(options_json: dict) -> dict:
+            dst = lj_output_project_name_input.get_value()
+            if dst is None or dst == "":
+                return []
+            # if dst[0] == "[":
+            #     dst = json.loads(dst)
+            # else:
+            #     dst = [dst.strip("'\"")]
+            else:
+                dst = [dst]
+            return dst
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -432,6 +440,9 @@ class LabelingJobAction(OutputAction):
                 lj_output_project_name_preview,
                 lj_output_dataset_name_preview,
             )
+            _save_classes_list_settings()
+            _save_tags_list_settings()
+            _save_settings()
             return
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
@@ -467,6 +478,7 @@ class LabelingJobAction(OutputAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
+            get_dst=get_dst,
             data_changed_cb=data_changed_cb,
             need_preview=False,
         )

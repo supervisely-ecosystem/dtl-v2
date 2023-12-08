@@ -152,7 +152,7 @@ class IfLayer(Layer):
         return img_name >= min_name and img_name <= max_name
 
     def modifies_data(self):
-        return True
+        return False
 
     def preprocess(self):
         condition = list(self.settings["condition"].keys())[0]

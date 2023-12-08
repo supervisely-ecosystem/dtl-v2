@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from typing import Tuple, Union
-
+from collections import defaultdict
 from supervisely import Annotation, VideoAnnotation, KeyIdMap
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
@@ -97,15 +97,43 @@ class LabelingJobLayer(Layer):
         Layer.__init__(self, config, net=net)
         self.output_folder = output_folder
         self.sly_project_info = None
-        # self._labeling_job_map = {"dataset_id": ["images_ids"]}
+        self._labeling_job_map = defaultdict(list)  # {"dataset_id": ["images_ids"]}
 
     def is_archive(self):
         return False
 
     def validate(self):
-        super().validate()
-        if len(self.settings.get("name", "")) > 2048:
+        settings = self.settings
+        if len(settings.get("job_name", "")) > 256:
             raise RuntimeError("Labeling Job name is too long")
+
+        if settings["reviewer_id"] is None:
+            raise RuntimeError("Reviewer is not set")
+
+        if settings["user_ids"] is None or len(settings["user_ids"]) == 0:
+            raise RuntimeError("Labelers are not set")
+
+        if (settings["classes_to_label"] is None or len(settings["classes_to_label"]) == 0) and (
+            settings["tags_to_label"] is None or len(settings["tags_to_label"]) == 0
+        ):
+            raise RuntimeError("Set at least one class or tag to label")
+
+        if settings["create_new_project"]:
+            if settings["project_name"] is None or settings["project_name"] == "":
+                raise RuntimeError("Project name is not set")
+
+            if len(settings["project_name"]) > 256:
+                raise RuntimeError("Project name is too long")
+
+            if not settings["keep_original_ds"]:
+                if settings["dataset_name"] is None or settings["dataset_name"] == "":
+                    raise RuntimeError(
+                        "Dataset name is not set. Enter dataset name or check 'Keep original datasets structure' checkbox"
+                    )
+
+                if len(settings["dataset_name"]) > 256:
+                    raise RuntimeError("Dataset name is too long")
+        super().validate()
 
     def validate_dest_connections(self):
         for dst in self.dsts:
@@ -122,28 +150,36 @@ class LabelingJobLayer(Layer):
             raise GraphError(
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
-        if len(self.dsts) == 0:
+        if len(self.dsts) == 0 and self.settings["create_new_project"]:
             raise GraphError(
                 "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
             )
-        dst = self.dsts[0]
-        self.out_project_name = dst
 
-        # if self.settings["create_new_project"]:
-        self.sly_project_info = g.api.project.create(
-            g.WORKSPACE_ID,
-            self.settings["project_name"],
-            type=self.net.modality,
-            change_name_if_conflict=True,
-        )
-        g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
+        if self.settings["create_new_project"]:
+            dst = self.dsts[0]
+            self.out_project_name = dst
 
-        custom_data = {
-            "source_projects": _get_source_projects_ids_from_dtl(),
-            "data-nodes": g.current_dtl_json,
-        }
-        g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
-        self.net_change_images = self.net.may_require_images()
+            self.sly_project_info = g.api.project.create(
+                g.WORKSPACE_ID,
+                self.settings["project_name"],
+                type=self.net.modality,
+                change_name_if_conflict=True,
+            )
+            g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
+
+            custom_data = {
+                "source_projects": _get_source_projects_ids_from_dtl(),
+                "data-nodes": g.current_dtl_json,
+            }
+            g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
+            self.net_change_images = self.net.may_require_images()
+        else:  # use input project
+            project_id = _get_source_projects_ids_from_dtl()[0]
+            src_project_info = g.api.project.get_info_by_id(project_id)
+            dst = src_project_info.name
+            self.out_project_name = dst
+            self.sly_project_info = g.api.project.get_info_by_id(project_id, self.net.modality)
+            # need custom data update?
 
     def get_or_create_dataset(self, dataset_name):
         if not g.api.dataset.exists(self.sly_project_info.id, dataset_name):
@@ -166,25 +202,31 @@ class LabelingJobLayer(Layer):
                 self.net.get_free_name(item_desc, self.out_project_name) + item_desc.get_item_ext()
             )
             if self.sly_project_info is not None:
-                dataset_info = self.get_or_create_dataset(dataset_name)
-                if self.net.modality == "images":
-                    image_info = g.api.image.upload_np(
-                        dataset_info.id, out_item_name, item_desc.read_image()
+                if self.settings["create_new_project"]:
+                    dataset_info = self.get_or_create_dataset(dataset_name)
+                    if self.net.modality == "images":
+                        item_info = g.api.image.upload_np(
+                            dataset_info.id, out_item_name, item_desc.read_image()
+                        )
+                        g.api.annotation.upload_ann(item_info.id, ann)
+                    elif self.net.modality == "videos":
+                        item_info = g.api.video.upload_path(
+                            dataset_info.id, out_item_name, item_desc.item_data
+                        )
+                        ann_path = f"{item_desc.item_data}.json"
+                        if not sly_fs.file_exists(ann_path):
+                            ann_json = ann.to_json(KeyIdMap())
+                            sly_json.dump_json_file(ann_json, ann_path)
+                        g.api.video.annotation.upload_paths(
+                            [item_info.id], [ann_path], self.output_meta
+                        )
+                        # sly_fs.silent_remove(item_desc.item_data)
+                        # sly_fs.silent_remove(ann_path)
+                    self._labeling_job_map[dataset_info.id].append(item_info.id)
+                else:
+                    self._labeling_job_map[item_desc.info.item_info.dataset_id].append(
+                        item_desc.info.item_info.id
                     )
-                    g.api.annotation.upload_ann(image_info.id, ann)
-                elif self.net.modality == "videos":
-                    video_info = g.api.video.upload_path(
-                        dataset_info.id, out_item_name, item_desc.item_data
-                    )
-                    ann_path = f"{item_desc.item_data}.json"
-                    if not sly_fs.file_exists(ann_path):
-                        ann_json = ann.to_json(KeyIdMap())
-                        sly_json.dump_json_file(ann_json, ann_path)
-                    g.api.video.annotation.upload_paths(
-                        [video_info.id], [ann_path], self.output_meta
-                    )
-                    # sly_fs.silent_remove(item_desc.item_data)
-                    # sly_fs.silent_remove(ann_path)
 
         yield ([item_desc, ann])
 
@@ -192,9 +234,6 @@ class LabelingJobLayer(Layer):
         name = self.settings.get("job_name", None)
         description = self.settings.get("description", None)
         readme = self.settings.get("readme", None)
-
-        # dataset_ids = [80371]  # self.settings.get("dataset_id", None)
-        dataset_ids = [ds.id for ds in g.api.dataset.get_list(self.sly_project_info.id)]
 
         user_ids = self.settings.get("user_ids", None)
         reviewer_id = self.settings.get("reviewer_id", None)
@@ -221,7 +260,9 @@ class LabelingJobLayer(Layer):
         items_range = self.settings.get("items_range", None)
         items_ids = self.settings.get("items_ids", [])
 
+        dataset_ids = self._labeling_job_map.keys()
         for dataset_id in dataset_ids:
+            items_ids = self._labeling_job_map[dataset_id]
             g.api.labeling_job.create(
                 name=name,
                 dataset_id=dataset_id,
