@@ -14,7 +14,7 @@ import src.globals as g
 def _get_source_projects_ids_from_dtl():
     source_projects_ids = []
     for action in g.current_dtl_json:
-        if action["action"] == "data":
+        if action["action"] == "data" or action["action"] == "video_data":
             if len(action["src"]) == 0:
                 continue
             project_name = action["src"][0].split("/")[0]

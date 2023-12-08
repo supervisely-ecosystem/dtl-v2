@@ -1,8 +1,8 @@
 # coding: utf-8
 
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from collections import defaultdict
-from supervisely import Annotation, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, VideoAnnotation, KeyIdMap, ProjectMeta
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -14,13 +14,31 @@ import src.globals as g
 def _get_source_projects_ids_from_dtl():
     source_projects_ids = []
     for action in g.current_dtl_json:
-        if action["action"] == "data":
+        if action["action"] == "data" or action["action"] == "video_data":
             if len(action["src"]) == 0:
                 continue
             project_name = action["src"][0].split("/")[0]
             project_id = g.api.project.get_info_by_name(g.WORKSPACE_ID, project_name).id
             source_projects_ids.append(project_id)
     return source_projects_ids
+
+
+def _filter_meta(dataset_id: int, classes_to_label: List[str], tags_to_label: List[str]):
+    dataset_info = g.api.dataset.get_info_by_id(dataset_id)
+    project_id = dataset_info.project_id
+    project_meta_json = g.api.project.get_meta(project_id)
+    project_meta = ProjectMeta.from_json(project_meta_json)
+    obj_classes_names = [obj_class.name for obj_class in project_meta.obj_classes]
+    filtered_classes_to_label = []
+    for obj_class_name in classes_to_label:
+        if obj_class_name in obj_classes_names:
+            filtered_classes_to_label.append(obj_class_name)
+    tag_metas_names = [tag_meta.name for tag_meta in project_meta.tag_metas]
+    filtered_tags_to_label = []
+    for tag_meta_name in tags_to_label:
+        if tag_meta_name in tag_metas_names:
+            filtered_tags_to_label.append(tag_meta_name)
+    return filtered_classes_to_label, filtered_tags_to_label
 
 
 class LabelingJobLayer(Layer):
@@ -98,6 +116,7 @@ class LabelingJobLayer(Layer):
         self.output_folder = output_folder
         self.sly_project_info = None
         self._labeling_job_map = defaultdict(list)  # {"dataset_id": ["images_ids"]}
+        self.created_labeling_jobs = []
 
     def is_archive(self):
         return False
@@ -220,8 +239,6 @@ class LabelingJobLayer(Layer):
                         g.api.video.annotation.upload_paths(
                             [item_info.id], [ann_path], self.output_meta
                         )
-                        # sly_fs.silent_remove(item_desc.item_data)
-                        # sly_fs.silent_remove(ann_path)
                     self._labeling_job_map[dataset_info.id].append(item_info.id)
                 else:
                     self._labeling_job_map[item_desc.info.item_info.dataset_id].append(
@@ -248,11 +265,10 @@ class LabelingJobLayer(Layer):
         objects_limit_per_item = self.settings.get("objects_limit_per_item", None)
         tags_limit_per_item = self.settings.get("tags_limit_per_item", None)
 
+        # won't use here
         project_name = self.settings.get("project_name", None)
         dataset_name = self.settings.get("dataset_name", None)
         keep_original_ds = self.settings.get("keep_original_ds", False)
-
-        # won't use
         disable_objects_limit_per_item = self.settings.get("disable_objects_limit_per_item", None)
         disable_tags_limit_per_item = self.settings.get("disable_tags_limit_per_item", None)
         include_items_with_tags = self.settings.get("include_items_with_tags", None)
@@ -261,17 +277,21 @@ class LabelingJobLayer(Layer):
         items_ids = self.settings.get("items_ids", [])
 
         dataset_ids = self._labeling_job_map.keys()
+
         for dataset_id in dataset_ids:
+            filtered_classes_to_label, filtered_tags_to_label = _filter_meta(
+                dataset_id, classes_to_label, tags_to_label
+            )
             items_ids = self._labeling_job_map[dataset_id]
-            g.api.labeling_job.create(
+            created_lj_infos = g.api.labeling_job.create(
                 name=name,
                 dataset_id=dataset_id,
                 user_ids=user_ids,
                 readme=readme,
                 description=description,
-                classes_to_label=classes_to_label,
+                classes_to_label=filtered_classes_to_label,
                 objects_limit_per_image=objects_limit_per_item,
-                tags_to_label=tags_to_label,
+                tags_to_label=filtered_tags_to_label,
                 tags_limit_per_image=tags_limit_per_item,
                 include_images_with_tags=include_items_with_tags,
                 exclude_images_with_tags=exclude_items_with_tags,
@@ -279,3 +299,4 @@ class LabelingJobLayer(Layer):
                 reviewer_id=reviewer_id,
                 images_ids=items_ids,
             )
+            self.created_labeling_jobs.extend(created_lj_infos)

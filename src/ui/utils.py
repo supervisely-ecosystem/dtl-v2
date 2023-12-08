@@ -3,6 +3,8 @@ import json
 from supervisely.app.widgets import Container, Flexbox, FileThumbnail, ProjectThumbnail, Text
 from supervisely import ProjectMeta
 from supervisely.app.content import StateJson, DataJson
+from supervisely.api.labeling_job_api import LabelingJobInfo
+
 import supervisely as sly
 
 from src.utils import (
@@ -488,7 +490,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
     # ^?remove?^
 
 
-def create_results_widget(file_infos, supervisely_layers):
+def create_results_widget(file_infos, supervisely_layers, labeling_job_layers):
     widgets = []
     if len(file_infos) > 0:
         widgets.append(
@@ -508,6 +510,24 @@ def create_results_widget(file_infos, supervisely_layers):
                         ProjectThumbnail(update_project_info(l.sly_project_info))
                         for l in supervisely_layers
                     ],
+                ]
+            )
+        )
+    if len(labeling_job_layers) > 0:
+        labeling_job_text_widgets = []
+        for l in labeling_job_layers:
+            for lj_info in l.created_labeling_jobs:
+                lj_info: LabelingJobInfo
+                w = Text(
+                    f"<a href='{g.api.server_address}/labeling/jobs/{lj_info.id}/stats'>{lj_info.name}</a>"
+                )
+                labeling_job_text_widgets.append(w)
+
+        widgets.append(
+            Container(
+                widgets=[
+                    Text("Labeling jobs: "),
+                    *labeling_job_text_widgets,
                 ]
             )
         )

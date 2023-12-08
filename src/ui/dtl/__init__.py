@@ -221,6 +221,7 @@ video_actions_list = {
         FilterVideoByDuration.name,
     ],
     SAVE_ACTIONS: [
+        LabelingJobAction.name,
         SaveAction.name,
         SuperviselyAction.name,
     ],
@@ -242,6 +243,7 @@ video_actions_dict = {
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,
     # Save layers
+    LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
     SuperviselyAction.name: SuperviselyAction,
 }

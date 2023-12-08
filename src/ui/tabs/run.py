@@ -111,12 +111,11 @@ def run():
             if not sly.is_development():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)
 
-        supervisely_layers = [
-            l
-            for l in net.layers
-            if isinstance(l, SuperviselyLayer) or isinstance(l, LabelingJobLayer)
-        ]
-        results.set_content(ui_utils.create_results_widget(file_infos, supervisely_layers))
+        supervisely_layers = [l for l in net.layers if isinstance(l, SuperviselyLayer)]
+        labeling_job_layers = [l for l in net.layers if isinstance(l, LabelingJobLayer)]
+        results.set_content(
+            ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
+        )
         results.reload()
         results.show()
         circle_progress.set_status("success")
