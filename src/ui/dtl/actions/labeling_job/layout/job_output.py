@@ -27,7 +27,7 @@ def create_job_output_widgets():
             "Dataset with given name will be created in the project. "
             "If you want to use dataset name from input project or "
             "dataset from 'Dataset' layer "
-            "check the 'Keep original datasets structure' checkbox above"
+            "check the 'Keep original datasets structure' checkbox below"
         ),
         content=lj_output_dataset_container,
     )
