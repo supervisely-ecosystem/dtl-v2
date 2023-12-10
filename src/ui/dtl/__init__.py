@@ -51,6 +51,7 @@ from .actions.tag.tag import TagAction
 from .actions.save.save import SaveAction
 from .actions.save_masks.save_masks import SaveMasksAction
 from .actions.supervisely.supervisely import SuperviselyAction
+from .actions.existing_project.existing_project import ExistingProjectAction
 from .actions.apply_nn.apply_nn import ApplyNNAction
 from .actions.filter_images_without_objects.filter_images_without_objects import (
     FilterImageWithoutObjects,
@@ -144,6 +145,7 @@ image_actions_list = {
         LabelingJobAction.name,
         SaveAction.name,
         SaveMasksAction.name,
+        ExistingProjectAction.name,
         SuperviselyAction.name,
     ],
 }
@@ -202,6 +204,7 @@ image_actions_dict = {
     LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
     SaveMasksAction.name: SaveMasksAction,
+    ExistingProjectAction.name: ExistingProjectAction,
     SuperviselyAction.name: SuperviselyAction,
 }
 
@@ -223,6 +226,7 @@ video_actions_list = {
     SAVE_ACTIONS: [
         LabelingJobAction.name,
         SaveAction.name,
+        ExistingProjectAction.name,
         SuperviselyAction.name,
     ],
 }
@@ -245,6 +249,7 @@ video_actions_dict = {
     # Save layers
     LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
+    ExistingProjectAction.name: ExistingProjectAction,
     SuperviselyAction.name: SuperviselyAction,
 }
 
