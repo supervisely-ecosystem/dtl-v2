@@ -113,6 +113,7 @@ def main(progress: Progress, modality):
             finally:
                 pbar.update()
 
+    net.postprocess()
     logger.info(
         "DTL finished",
         extra={"event_type": EventType.DTL_APPLIED, "new_proj_size": results_counter},

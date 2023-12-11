@@ -34,7 +34,7 @@ class Layer:
         get_src: Optional[callable] = None,
         get_settings: Optional[callable] = None,
         get_dst: Optional[callable] = None,
-        meta_changed_cb: Optional[callable] = None,
+        data_changed_cb: Optional[callable] = None,
         need_preview: bool = True,
         id: Optional[str] = None,
         custom_update_btn: Button = None,
@@ -48,7 +48,7 @@ class Layer:
         self._get_settings = get_settings
         self._get_src = get_src
         self._get_dst = get_dst
-        self._meta_changed_cb = meta_changed_cb
+        self._data_changed_cb = data_changed_cb
         self._need_preview = need_preview
 
         self._src = []
@@ -286,9 +286,13 @@ class Layer:
     def get_ann(self):
         return self._res_ann
 
-    def update_project_meta(self, project_meta):
-        if self._meta_changed_cb is not None:
-            self._meta_changed_cb(project_meta)
+    def update_project_meta(self, project_meta: ProjectMeta):
+        if self._data_changed_cb is not None:
+            self._data_changed_cb(**{"project_meta": project_meta})
+
+    def modifies_data(self, modifies_data: bool):
+        if self._data_changed_cb is not None:
+            self._data_changed_cb(**{"modifies_data": modifies_data})
 
     # Utils
     def get_destination_name(self, dst_index: int):

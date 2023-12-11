@@ -33,6 +33,9 @@ class FilterVideobyDuration(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
+    def modifies_data(self):
+        return False
+
     def process(self, data_el: Tuple[VideoDescriptor, VideoAnnotation]):
         vid_desc, ann = data_el
         ann: VideoAnnotation

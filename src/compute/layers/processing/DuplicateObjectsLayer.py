@@ -57,6 +57,9 @@ class DuplicateObjectsLayer(Layer):
             duplicate = label.clone(obj_class=new_obj_class)
             return [label, duplicate]
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         ann = apply_to_labels(ann, self.class_mapper)

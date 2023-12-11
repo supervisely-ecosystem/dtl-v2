@@ -298,6 +298,9 @@ class FindCracknetsLayer(Layer):
         ]
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         imsize_wh = ann.img_size[::-1]

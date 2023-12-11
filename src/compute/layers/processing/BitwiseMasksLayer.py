@@ -51,6 +51,9 @@ class BitwiseMasksLayer(Layer):
             )
         return ops[type]
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann = data_el
         imsize = ann.img_size

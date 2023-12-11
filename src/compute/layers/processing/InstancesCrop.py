@@ -70,6 +70,9 @@ class InstancesCropLayer(Layer):
             self.cls_mapping[cls] = ClassConstants.DEFAULT
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.IGNORE
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         padding_dct = self.settings["pad"]["sides"]

@@ -35,7 +35,7 @@ import src.globals as g
 
 class FilterImageByObject(FilterAndConditionAction):
     name = "filter_images_by_object"
-    title = "Filter Images by Object Classes"
+    title = "Filter Images by Objects"
     docs_url = None
     description = "Filter Images based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -126,13 +126,13 @@ class FilterImageByObject(FilterAndConditionAction):
         exclude_preview = ClassesListPreview()
         with_container = Container(
             widgets=[
-                Text("With classes:"),
+                Text("Images has objects:"),
                 include_preview,
             ]
         )
         without_container = Container(
             widgets=[
-                Text("Without classes:"),
+                Text("Image doesn't have objects:"),
                 exclude_preview,
             ]
         )
@@ -214,7 +214,10 @@ class FilterImageByObject(FilterAndConditionAction):
                 "exclude": exclude,
             }
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_meta
             if project_meta == _current_meta:
                 return
@@ -322,7 +325,7 @@ class FilterImageByObject(FilterAndConditionAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             need_preview=False,
         )
 

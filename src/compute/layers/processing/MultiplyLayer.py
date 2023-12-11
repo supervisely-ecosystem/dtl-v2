@@ -20,6 +20,9 @@ class MultiplyLayer(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         for _ in range(self.settings["multiply"]):
             yield data_el

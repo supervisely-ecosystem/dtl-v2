@@ -14,6 +14,7 @@ import supervisely as sly
 
 from src.compute.main import main as compute_dtls
 from src.compute.layers.save.SuperviselyLayer import SuperviselyLayer
+from src.compute.layers.save.LabelingJobLayer import LabelingJobLayer
 from src.ui.tabs.configure import nodes_flow
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -111,7 +112,10 @@ def run():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)
 
         supervisely_layers = [l for l in net.layers if isinstance(l, SuperviselyLayer)]
-        results.set_content(ui_utils.create_results_widget(file_infos, supervisely_layers))
+        labeling_job_layers = [l for l in net.layers if isinstance(l, LabelingJobLayer)]
+        results.set_content(
+            ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
+        )
         results.reload()
         results.show()
         circle_progress.set_status("success")

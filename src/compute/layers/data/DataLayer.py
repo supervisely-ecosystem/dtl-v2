@@ -96,6 +96,9 @@ class DataLayer(Layer):
     def validate_source_connections(self):
         pass
 
+    def modifies_data(self):
+        return False
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         ann = apply_to_labels(ann, self.class_mapper)

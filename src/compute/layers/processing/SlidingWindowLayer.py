@@ -47,6 +47,9 @@ class SlidingWindowLayer(Layer):
     def requires_image(self):
         return True
 
+    def modifies_data(self):
+        return True
+
     def preprocess(self):
         window_wh = (self.settings["window"]["width"], self.settings["window"]["height"])
         min_overlap_xy = (self.settings["min_overlap"]["x"], self.settings["min_overlap"]["y"])

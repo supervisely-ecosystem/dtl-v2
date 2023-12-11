@@ -350,6 +350,11 @@ def update_metas():
         layers_ids = ui_utils.init_layers(nodes_state)
         all_layers_ids = layers_ids["all_layers_ids"]
         data_layers_ids = layers_ids["data_layers_ids"]
+        labeling_jobs_layers_ids = [
+            layer_id
+            for layer_id in all_layers_ids
+            if g.layers[layer_id].action.name.startswith("labeling_job")
+        ]
 
         # Init sources
         ui_utils.init_src(edges)
@@ -359,6 +364,16 @@ def update_metas():
         utils.create_results_dir
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
+
+        for layer_id in labeling_jobs_layers_ids:
+            modifies_data = False
+            parents = ui_utils.get_layer_parents_chain(layer_id)
+            for parent in parents:
+                net_layer = net.layers[all_layers_ids.index(parent)]
+                modifies_data = modifies_data or net_layer.modifies_data()
+            layer = g.layers[layer_id]
+            layer.modifies_data(modifies_data)
+
         net.preview_mode = True
         ui_utils.init_output_metas(net, data_layers_ids, all_layers_ids, nodes_state, edges)
 

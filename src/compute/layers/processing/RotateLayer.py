@@ -75,6 +75,9 @@ class RotateLayer(Layer):
 
         return exp_img, (delta_x, delta_y)
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 

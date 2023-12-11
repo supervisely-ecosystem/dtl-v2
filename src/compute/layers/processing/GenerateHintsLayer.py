@@ -64,6 +64,9 @@ class GenerateHintsLayer(Layer):
             negative_points = points[np.random.choice(points.shape[0], n_neg, replace=False), :]
         return positive_points, negative_points
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         shape_hw = ann.img_size

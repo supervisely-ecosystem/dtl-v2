@@ -1,7 +1,7 @@
 from typing import List, Literal, Union
 from os.path import join, exists
 
-from supervisely import ObjClass, ObjClassCollection
+from supervisely import ObjClass, ObjClassCollection, TagMeta, TagMetaCollection
 from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty, ClassesTable
 
 from src.ui.widgets import (
@@ -379,6 +379,18 @@ def set_classes_list_settings_from_json(
 
 
 # tags
+
+
+def tags_list_settings_changed_meta(
+    settings: Union[list, str],
+    new_tag_metas: Union[List[TagMeta], TagMetaCollection],
+):
+    names = {tag_meta.name for tag_meta in new_tag_metas}
+    if isinstance(settings, str):
+        if settings == "default":
+            return "default"
+        return settings if settings in names else ""
+    return [tag_name for tag_name in settings if tag_name in names]
 
 
 def set_tags_list_settings_from_json(tags_list_widget: TagsList, settings: Union[list, str]):

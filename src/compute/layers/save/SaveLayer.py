@@ -71,6 +71,9 @@ class SaveLayer(Layer):
     def validate_dest_connections(self):
         pass
 
+    def modifies_data(self):
+        return False
+
     def preprocess(self):
         if self.net.preview_mode:
             return

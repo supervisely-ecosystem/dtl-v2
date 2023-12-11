@@ -85,6 +85,9 @@ class TagLayer(Layer):
         return []
         # return [self.tag_json] if self.is_action_delete else []
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 

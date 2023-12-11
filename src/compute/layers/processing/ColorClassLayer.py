@@ -55,6 +55,9 @@ class ColorClassLayer(Layer):
 
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         ann = Annotation.from_json(ann.to_json(), self.output_meta)

@@ -132,6 +132,9 @@ class Layer:
     def requires_image(self):
         return False
 
+    def modifies_data(self):
+        return False
+
     def validate_source_connections(self):
         for src in self.srcs:
             if src == Layer.null:
@@ -544,6 +547,9 @@ class Layer:
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         raise NotImplementedError()
+
+    def postprocess(self):
+        pass
 
     def process_timed(self, data_el: Tuple[ImageDescriptor, Annotation]):
         tm = TinyTimer()

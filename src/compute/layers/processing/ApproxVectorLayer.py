@@ -35,6 +35,9 @@ class ApproxVectorLayer(Layer):
     def define_classes_mapping(self):
         super().define_classes_mapping()  # don't change
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el):
         img_desc, ann = data_el
         epsilon = self.settings["epsilon"]

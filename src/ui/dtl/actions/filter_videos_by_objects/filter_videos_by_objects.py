@@ -34,7 +34,7 @@ import src.globals as g
 
 class FilterVideosByObject(FilterAndConditionAction):
     name = "filter_videos_by_object"
-    title = "Filter Videos by Object Classes"
+    title = "Filter Videos by Objects"
     docs_url = None
     description = "Filter Videos based on the presence of objects of specified classes."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -125,13 +125,13 @@ class FilterVideosByObject(FilterAndConditionAction):
         exclude_preview = ClassesListPreview()
         with_container = Container(
             widgets=[
-                Text("With classes:"),
+                Text("Video has objects:"),
                 include_preview,
             ]
         )
         without_container = Container(
             widgets=[
-                Text("Without classes:"),
+                Text("Video doesn't have objects:"),
                 exclude_preview,
             ]
         )
@@ -213,7 +213,10 @@ class FilterVideosByObject(FilterAndConditionAction):
                 "exclude": exclude,
             }
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_meta
             if project_meta == _current_meta:
                 return
@@ -321,7 +324,7 @@ class FilterVideosByObject(FilterAndConditionAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             need_preview=False,
         )
 

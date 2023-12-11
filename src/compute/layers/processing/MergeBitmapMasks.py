@@ -34,6 +34,9 @@ class MergeMasksLayer(Layer):
 
         return Bitmap(base_mask)
 
+    def modifies_data(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img_size = ann.img_size

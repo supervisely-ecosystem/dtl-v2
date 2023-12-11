@@ -33,7 +33,7 @@ import src.globals as g
 
 class FilterImageWithoutObjects(FilterAndConditionAction):
     name = "filter_image_without_objects"
-    title = "Filter Images without Object Classes"
+    title = "Filter Images without Objects"
     docs_url = ""
     description = "Filter Images based on the presence of objects."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -68,7 +68,9 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
                 ),
             ]
         )
-        settings_edit_text = Text("Without classes", status="text", font_size=get_text_font_size())
+        settings_edit_text = Text(
+            "Image doesn't have objects:", status="text", font_size=get_text_font_size()
+        )
         settings_edit_btn = Button(
             text="EDIT",
             icon="zmdi zmdi-edit",
@@ -116,7 +118,10 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
                 "exclude_classes": exclude_classes,
             }
 
-        def meta_changed_cb(project_meta: ProjectMeta):
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
             nonlocal _current_meta
             if project_meta == _current_meta:
                 return
@@ -197,7 +202,7 @@ class FilterImageWithoutObjects(FilterAndConditionAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            meta_changed_cb=meta_changed_cb,
+            data_changed_cb=data_changed_cb,
             need_preview=False,
         )
 
