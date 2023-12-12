@@ -2,7 +2,7 @@
 
 from typing import Tuple, Union
 
-from supervisely import Annotation, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, VideoAnnotation, KeyIdMap, ProjectMeta
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -49,6 +49,7 @@ class ExistingProjectLayer(Layer):
                     },
                     "dataset_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "dataset_id": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
+                    "merge_meta": {"type": "boolean"},
                 },
             },
         },
@@ -58,6 +59,8 @@ class ExistingProjectLayer(Layer):
         Layer.__init__(self, config, net=net)
         self.output_folder = output_folder
         self.sly_project_info = None
+        self.ds_map = {}
+        self.dst_meta = None
 
     def is_archive(self):
         return False
@@ -75,6 +78,9 @@ class ExistingProjectLayer(Layer):
         if settings["dataset_option"] == "existing":
             if settings["dataset_id"] is None:
                 raise ValueError("Dataset is not selected")
+
+        if not settings["merge_meta"]:
+            raise ValueError("The meta update has not been confirmed")
 
         super().validate()
 
@@ -98,6 +104,11 @@ class ExistingProjectLayer(Layer):
         self.out_project_name = dst
 
         self.sly_project_info = g.api.project.get_info_by_id(self.settings["project_id"])
+        self.dst_meta = ProjectMeta.from_json(g.api.project.get_meta(self.sly_project_info.id))
+
+        if self.settings["merge_meta"]:
+            self.output_meta = ProjectMeta.merge(self.dst_meta, self.output_meta)
+
         g.api.project.update_meta(self.sly_project_info.id, self.output_meta)
 
         # custom_data = {
@@ -108,17 +119,20 @@ class ExistingProjectLayer(Layer):
         self.net_change_images = self.net.may_require_images()
 
     def get_or_create_dataset(self, dataset_name):
-        if not g.api.dataset.exists(self.sly_project_info.id, dataset_name):
-            return g.api.dataset.create(self.sly_project_info.id, dataset_name)
+        if dataset_name not in self.ds_map:
+            dataset_info = g.api.dataset.create(
+                self.sly_project_info.id, dataset_name, change_name_if_conflict=True
+            )
+            self.ds_map[dataset_name] = dataset_info
+            return dataset_info
         else:
-            return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
+            return self.ds_map[dataset_name]
 
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
     ):
         item_desc, ann = data_el
-
         dataset_option = self.settings["dataset_option"]
         if not self.net.preview_mode:
             dataset_name = item_desc.get_res_ds_name()
@@ -134,7 +148,6 @@ class ExistingProjectLayer(Layer):
                 else:
                     dataset_name = item_desc.get_ds_name()
                     dataset_info = self.get_or_create_dataset(dataset_name)
-
                 if self.net.modality == "images":
                     image_info = g.api.image.upload_np(
                         dataset_info.id, out_item_name, item_desc.read_image()

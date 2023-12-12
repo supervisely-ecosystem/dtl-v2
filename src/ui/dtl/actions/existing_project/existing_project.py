@@ -16,10 +16,12 @@ from supervisely.app.widgets import (
     Field,
     OneOf,
     Empty,
+    Checkbox,
+    NotificationBox,
 )
 
 from supervisely.app.content import StateJson
-
+from supervisely.project.project_meta import ProjectMeta
 from src.ui.dtl.utils import (
     get_layer_docs,
     get_set_settings_button_style,
@@ -78,23 +80,60 @@ class ExistingProjectAction(OutputAction):
             Select.Item(
                 "existing", "Existing Dataset", dst_dataset_options_existing_dataset_selector
             ),
-            Select.Item("keep", "Keep original dataset from input project", Empty()),
+            Select.Item("keep", "Keep source structure", Empty()),
         ]
         dst_dataset_options_selector = Select(dst_dataset_options_selector_items, size="small")
         dst_dataset_options_selector_oneof = OneOf(dst_dataset_options_selector)
+        dst_dataset_options_selector_text_1 = Text(
+            text=(" - Existing Dataset: select dataset from existing project to save results to."),
+            color="#7f858e",
+            font_size=13,
+        )
+        dst_dataset_options_selector_text_2 = Text(
+            text=(
+                " - New Dataset: enter name of new dataset to create in selected existing project."
+            ),
+            color="#7f858e",
+            font_size=13,
+        )
+        dst_dataset_options_selector_text_3 = Text(
+            text=(
+                " - Keep source structure: save the results in datasets that repeats the structure of the input project."
+            ),
+            color="#7f858e",
+            font_size=13,
+        )
         dst_dataset_options_selector_field = Field(
             title="Select Dataset Options",
-            description=(
-                "Existing Dataset: Select dataset from existing project to save results to. "
-                "New Dataset: Enter name of new dataset to create in selected existing project. "
-                "Keep original dataset from input project: Keep original dataset from input project."
+            content=Container(
+                [
+                    dst_dataset_options_selector_text_1,
+                    dst_dataset_options_selector_text_2,
+                    dst_dataset_options_selector_text_3,
+                    dst_dataset_options_selector,
+                    dst_dataset_options_selector_oneof,
+                ]
             ),
-            content=Container([dst_dataset_options_selector, dst_dataset_options_selector_oneof]),
         )
 
         sidebar_save_button = create_save_btn()
+
+        select_project_warning_notification_box = NotificationBox(
+            box_type="warning",
+            description="The ProjectMeta of the source project does not match the ProjectMeta of the destination project. By ticking this checkbox, you confirm that you understand and approve the update of the destination project's ProjectMeta.",
+        )
+        select_project_warning_checkbox = Checkbox("Confirm")
+        select_project_warning_container = Container(
+            [select_project_warning_notification_box, select_project_warning_checkbox]
+        )
+        select_project_warning_container.hide()
+
         sidebar_container = Container(
-            [dst_project_selector_field, dst_dataset_options_selector_field, sidebar_save_button]
+            [
+                dst_project_selector_field,
+                dst_dataset_options_selector_field,
+                sidebar_save_button,
+            ]
         )
 
         # SIDEBAR CBs
@@ -109,6 +148,14 @@ class ExistingProjectAction(OutputAction):
         @sidebar_save_button.click
         def on_save_btn_click():
             _save_settings()
+
+        @select_project_warning_checkbox.value_changed
+        def on_project_warning_checkbox_change(checked):
+            nonlocal saved_settings
+            if checked:
+                saved_settings["merge_meta"] = True
+            else:
+                saved_settings["merge_meta"] = False
 
         # -----------------------------
 
@@ -135,22 +182,26 @@ class ExistingProjectAction(OutputAction):
         # -----------------------------
 
         def _update_preview():
-            project_info = g.api.project.get_info_by_id(dst_project_selector.get_selected_id())
-            dst_project_preview.set(project_info)
+            selected_project_id = dst_project_selector.get_selected_id()
+            if selected_project_id is not None:
+                project_info = g.api.project.get_info_by_id(selected_project_id)
+                dst_project_preview.set(project_info)
 
-            dataset_option = dst_dataset_options_selector.get_value()
-            if dataset_option == "new":
-                dst_dataset_preview.set(
-                    f"Dataset: {dst_dataset_options_new_dataset_input.get_value()}", "text"
-                )
-            elif dataset_option == "existing":
-                dataset_name = g.api.dataset.get_info_by_id(
-                    dst_dataset_options_existing_dataset_selector.get_selected_id()
-                ).name
-                dst_dataset_preview.set(f"Dataset: {dataset_name}", "text")
-            else:
-                dst_dataset_preview.set("Dataset: Keep original dataset from input project", "text")
-            dst_preview_container.show()
+                dataset_option = dst_dataset_options_selector.get_value()
+                if dataset_option == "new":
+                    dst_dataset_preview.set(
+                        f"Dataset: {dst_dataset_options_new_dataset_input.get_value()}", "text"
+                    )
+                elif dataset_option == "existing":
+                    dataset_name = g.api.dataset.get_info_by_id(
+                        dst_dataset_options_existing_dataset_selector.get_selected_id()
+                    ).name
+                    dst_dataset_preview.set(f"Dataset: {dataset_name}", "text")
+                else:
+                    dst_dataset_preview.set(
+                        "Dataset(s) will keep structure from input project", "text"
+                    )
+                dst_preview_container.show()
 
         def get_settings(options_json: dict):
             nonlocal saved_settings
@@ -171,8 +222,26 @@ class ExistingProjectAction(OutputAction):
                 pass
             _save_settings()
 
+        def project_selected_cb(**kwargs):
+            global _saved_meta
+            nonlocal saved_settings
+
+            if "_saved_meta" not in globals():
+                _saved_meta = None
+
+            project_meta = kwargs.get("project_meta", None)
+
+            if _saved_meta is None or project_meta == _saved_meta:
+                select_project_warning_container.hide()
+                saved_settings["merge_meta"] = True
+            else:
+                saved_settings["merge_meta"] = False
+                select_project_warning_container.show()
+
         def _save_settings():
             nonlocal saved_settings
+            global _saved_meta
+
             settings = {
                 "project_id": dst_project_selector.get_selected_id(),
                 "dataset_name": None,
@@ -189,6 +258,18 @@ class ExistingProjectAction(OutputAction):
                 ] = dst_dataset_options_existing_dataset_selector.get_selected_id()
             else:
                 settings["dataset_option"] = "keep"
+
+            if settings["project_id"]:
+                _saved_meta = g.api.project.get_meta(settings["project_id"])
+                _saved_meta = ProjectMeta.from_json(_saved_meta)
+                g.updater("metas")
+            else:
+                _saved_meta = None
+
+            if saved_settings.get("merge_meta", None) is None:
+                settings["merge_meta"] = True
+            else:
+                settings["merge_meta"] = saved_settings["merge_meta"]
 
             saved_settings = settings
             _update_preview()
@@ -224,16 +305,25 @@ class ExistingProjectAction(OutputAction):
                     option_component=NodesFlow.WidgetOptionComponent(dst_preview_container),
                 ),
             ]
+            settings_options = [
+                NodesFlow.Node.Option(
+                    name="Approve Checkbox",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        select_project_warning_container
+                    ),
+                ),
+            ]
             return {
                 "src": [],
                 "dst": dst_options,
-                "settings": [],
+                "settings": settings_options,
             }
 
         return Layer(
             action=cls,
             id=layer_id,
             create_options=create_options,
+            data_changed_cb=project_selected_cb,
             get_settings=get_settings,
             get_dst=get_dst,
             need_preview=False,
