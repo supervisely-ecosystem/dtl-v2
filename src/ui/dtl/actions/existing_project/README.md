@@ -62,13 +62,13 @@ All files will be saved in the selected project in the same structure, with the 
     {
         "action": "existing_project",
         "src": ["$data_1 "],
-        " dst ": "dst_project_name",
-        " settings ": {
-            " project_id ": 30496,
-            " dataset_name ": null,
-            " dataset_id ": 79016,
-            " dataset_option ": " existing ",
-            " merge_meta ": true
+        "dst": "dst_project_name",
+        "settings": {
+            "project_id": 30496,
+            "dataset_name": null,
+            "dataset_id": 79016,
+            "dataset_option": "existing",
+            "merge_meta": true
         }
     }
   </pre>
@@ -76,20 +76,20 @@ All files will be saved in the selected project in the same structure, with the 
 
 <details>
   <summary>New dataset</summary>
-    <pre>
-      {
-          "action": "existing_project",
-          "src": ["$data_1"],
-          "dst": "dst_project_name",
-          "settings": {
-              "project_id": 30496,
-              "dataset_name": "new_dataset",
-              "dataset_id": null,
-              "dataset_option": "new",
-              "merge_meta": true
-          }
-      }
-    </pre>
+  <pre>
+    {
+        "action": "existing_project",
+        "src": ["$data_1"],
+        "dst": "dst_project_name",
+        "settings": {
+            "project_id": 30496,
+            "dataset_name": "new_dataset",
+            "dataset_id": null,
+            "dataset_option": "new",
+            "merge_meta": true
+        }
+    }
+  </pre>
 </details>
 
 <details>
