@@ -132,8 +132,8 @@ class Net:
         full_ds_name = f"{project_name}/{img_desc.get_res_ds_name()}"
         names_in_ds = self.existing_names.get(full_ds_name, set())
 
-        if name in names_in_ds:
-            new_name = name + "_" + rand_str(10)
+        if name in names_in_ds or name in self.save_layer.dst_ds_entity_names:
+            new_name = name + "_" + project_name
 
         names_in_ds.add(new_name)
         self.existing_names[full_ds_name] = names_in_ds

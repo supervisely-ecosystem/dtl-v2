@@ -44,6 +44,7 @@ class ExistingProjectAction(OutputAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         saved_settings = {}
+        _saved_meta = None
 
         # SIDEBAR
         dst_project_selector = SelectProject(
@@ -141,21 +142,9 @@ class ExistingProjectAction(OutputAction):
         def on_dst_project_selector_change(project_id):
             dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
 
-        @dst_dataset_options_existing_dataset_selector.value_changed
-        def on_dst_dataset_options_existing_dataset_selector_change(dataset_id):
-            return
-
         @sidebar_save_button.click
         def on_save_btn_click():
             _save_settings()
-
-        @select_project_warning_checkbox.value_changed
-        def on_project_warning_checkbox_change(checked):
-            nonlocal saved_settings
-            if checked:
-                saved_settings["merge_meta"] = True
-            else:
-                saved_settings["merge_meta"] = False
 
         # -----------------------------
 
@@ -205,11 +194,12 @@ class ExistingProjectAction(OutputAction):
 
         def get_settings(options_json: dict):
             nonlocal saved_settings
-            return saved_settings
+            return {
+                **saved_settings,
+                "merge_different_meta": select_project_warning_checkbox.is_checked(),
+            }
 
         def _set_settings_from_json(settings: dict):
-            project_id = settings.get("project_id", None)
-            dst_project_selector.set_project_id(project_id)
             dataset_option = settings.get("dataset_option", "new")
             dst_dataset_options_selector.set_value(dataset_option)
             if dataset_option == "new":
@@ -223,30 +213,23 @@ class ExistingProjectAction(OutputAction):
             _save_settings()
 
         def project_selected_cb(**kwargs):
-            global _saved_meta
+            nonlocal _saved_meta
             nonlocal saved_settings
-
-            if "_saved_meta" not in globals():
-                _saved_meta = None
 
             project_meta = kwargs.get("project_meta", None)
 
             if _saved_meta is None or project_meta == _saved_meta:
                 select_project_warning_container.hide()
-                saved_settings["merge_meta"] = True
             else:
-                saved_settings["merge_meta"] = False
                 select_project_warning_container.show()
 
         def _save_settings():
             nonlocal saved_settings
-            global _saved_meta
+            nonlocal _saved_meta
 
-            settings = {
-                "project_id": dst_project_selector.get_selected_id(),
-                "dataset_name": None,
-                "dataset_id": None,
-            }
+            project_id = dst_project_selector.get_selected_id()
+
+            settings = {}
             dataset_options = dst_dataset_options_selector.get_value()
             if dataset_options == "new":
                 settings["dataset_option"] = "new"
@@ -259,38 +242,39 @@ class ExistingProjectAction(OutputAction):
             else:
                 settings["dataset_option"] = "keep"
 
-            if settings["project_id"]:
-                _saved_meta = g.api.project.get_meta(settings["project_id"])
+            if project_id:
+                _saved_meta = g.api.project.get_meta(project_id)
                 _saved_meta = ProjectMeta.from_json(_saved_meta)
                 g.updater("metas")
             else:
                 _saved_meta = None
-
-            if saved_settings.get("merge_meta", None) is None:
-                settings["merge_meta"] = True
-            else:
-                settings["merge_meta"] = saved_settings["merge_meta"]
 
             saved_settings = settings
             _update_preview()
 
         def get_dst(options_json: dict) -> dict:
             project_id = dst_project_selector.get_selected_id()
-            if project_id is not None:
-                project_name = g.api.project.get_info_by_id(project_id).name
-            else:
-                project_name = None
-            dst = project_name
-            if dst is None or dst == "":
+            if project_id is None:
                 return []
-            if dst[0] == "[":
-                dst = json.loads(dst)
-            else:
-                dst = [dst.strip("'\"")]
+            dst = [str(project_id)]
             return dst
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
+
+            if isinstance(dst, list):
+                if len(dst) != 0:
+                    project_id = int(dst[0])
+                else:
+                    project_id = None
+            else:
+                project_id = int(dst)
+
+            dst_project_selector.set_project_id(project_id)
+            dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
+
+            _update_preview()
+
             dst_options = [
                 NodesFlow.Node.Option(
                     name="Select Project",

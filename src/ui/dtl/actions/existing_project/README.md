@@ -11,7 +11,7 @@
 
 ### Example 1. Existing dataset
 
-The results are saved to the selected dataset of an existing project.
+The results are saved to the selected dataset of an existing project. If a file already exists in the existing dataset with the same name as the file we want to save to it, the file to be saved will be automatically renamed - the name of the source project will be added as a suffix to its name.
 
 <table>
 <tr>
@@ -62,13 +62,11 @@ All files will be saved in the selected project in the same structure, with the 
     {
         "action": "existing_project",
         "src": ["$data_1 "],
-        "dst": "dst_project_name",
-        "settings": {
-            "project_id": 30496,
-            "dataset_name": null,
-            "dataset_id": 79016,
+        "dst": "32786",
+        "settings": {            
             "dataset_option": "existing",
-            "merge_meta": true
+            "dataset_id": 79016,
+            "merge_different_meta": true
         }
     }
   </pre>
@@ -81,12 +79,10 @@ All files will be saved in the selected project in the same structure, with the 
         "action": "existing_project",
         "src": ["$data_1"],
         "dst": "dst_project_name",
-        "settings": {
-            "project_id": 30496,
-            "dataset_name": "new_dataset",
-            "dataset_id": null,
+        "settings": {            
             "dataset_option": "new",
-            "merge_meta": true
+            "dataset_name": "new_dataset",
+            "merge_different_meta": true
         }
     }
   </pre>
@@ -98,13 +94,10 @@ All files will be saved in the selected project in the same structure, with the 
     {
         "action": "existing_project",
         "src": ["$data_1"],
-        "dst": "dst_project_name",
+        "dst": "32787",
         "settings": {
-            "project_id": 30496,
-            "dataset_name": null,
-            "dataset_id": null,
             "dataset_option": "keep",
-            "merge_meta": true
+            "merge_different_meta": true
         }
     }
   </pre>
