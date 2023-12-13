@@ -1,4 +1,4 @@
-# git+https://github.com/supervisely/supervisely.git@some-test-branch
+git+https://github.com/supervisely/supervisely.git@widgets-select-project-dataset-update
 
 jsonschema
 networkx
