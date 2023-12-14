@@ -77,7 +77,7 @@ class SaveMasksLayer(Layer):
     def is_archive(self):
         return True
 
-    def requires_image(self):
+    def requires_item(self):
         # res = self.settings['masks_human'] is True  # don't use img otherwise
         return True
 

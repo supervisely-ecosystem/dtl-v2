@@ -71,7 +71,6 @@ class SuperviselyLayer(Layer):
             "data-nodes": g.current_dtl_json,
         }
         g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
-        self.net_change_images = self.net.may_require_images()
 
     def get_or_create_dataset(self, dataset_name):
         if not g.api.dataset.exists(self.sly_project_info.id, dataset_name):
@@ -94,9 +93,14 @@ class SuperviselyLayer(Layer):
             if self.sly_project_info is not None:
                 dataset_info = self.get_or_create_dataset(dataset_name)
                 if self.net.modality == "images":
-                    image_info = g.api.image.upload_np(
-                        dataset_info.id, out_item_name, item_desc.read_image()
-                    )
+                    if self.net.may_require_items():
+                        image_info = g.api.image.upload_np(
+                            dataset_info.id, out_item_name, item_desc.read_image()
+                        )
+                    else:
+                        image_info = g.api.image.upload_id(
+                            dataset_info.id, out_item_name, item_desc.info.item_info.id
+                        )
                     g.api.annotation.upload_ann(image_info.id, ann)
                 elif self.net.modality == "videos":
                     video_info = g.api.video.upload_path(

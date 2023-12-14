@@ -126,10 +126,11 @@ class Net:
         for layer in self.layers:
             layer.postprocess()
 
-    def may_require_images(self):
-        # req_layers = [layer for layer in self.layers if layer.requires_image()]
-        # return len(req_layers) > 0
-        return True
+    def may_require_items(self):
+        for l in self.layers:
+            if l.requires_item():
+                return True
+        return False
 
     def check_connections(self, indx=-1):
         if indx == -1:
@@ -356,7 +357,7 @@ class Net:
         return total
 
     def get_elements_generator(self):
-        require_images = self.may_require_images()
+        require_items = self.may_require_items()
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         project_datasets = {}
         added = set()
@@ -389,7 +390,7 @@ class Net:
                             img_data = np.zeros(
                                 (img_info.height, img_info.width, 3), dtype=np.uint8
                             )
-                            if require_images:
+                            if require_items:
                                 img_data = g.api.image.download_np(img_info.id)
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(

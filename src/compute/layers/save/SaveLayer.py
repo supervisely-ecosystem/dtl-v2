@@ -65,7 +65,7 @@ class SaveLayer(Layer):
     def is_archive(self):
         return True
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def validate_dest_connections(self):

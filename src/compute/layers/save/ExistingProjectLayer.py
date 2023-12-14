@@ -142,9 +142,14 @@ class ExistingProjectLayer(Layer):
                 + item_desc.get_item_ext()
             )
             if self.net.modality == "images":
-                image_info = g.api.image.upload_np(
-                    dataset_info.id, out_item_name, item_desc.read_image()
-                )
+                if self.net.may_require_items():
+                    image_info = g.api.image.upload_np(
+                        dataset_info.id, out_item_name, item_desc.read_image()
+                    )
+                else:
+                    image_info = g.api.image.upload_id(
+                        dataset_info.id, out_item_name, item_desc.info.item_info.id
+                    )
                 g.api.annotation.upload_ann(image_info.id, ann)
             elif self.net.modality == "videos":
                 video_info = g.api.video.upload_path(

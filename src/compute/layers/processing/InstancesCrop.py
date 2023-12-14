@@ -61,7 +61,7 @@ class InstancesCropLayer(Layer):
     def _get_cls_lists(self):
         return self.settings["classes"], self.settings.get("save_classes", [])
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def define_classes_mapping(self):

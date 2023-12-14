@@ -132,7 +132,7 @@ class Layer:
     def is_archive(self):
         raise NotImplementedError()
 
-    def requires_image(self):
+    def requires_item(self):
         return False
 
     def modifies_data(self):
