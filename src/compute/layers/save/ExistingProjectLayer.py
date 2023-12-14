@@ -3,7 +3,15 @@
 from typing import Tuple, Union
 
 from supervisely.io.fs import get_file_name
-from supervisely import Annotation, VideoAnnotation, KeyIdMap, ProjectMeta, DatasetInfo
+from supervisely import (
+    Annotation,
+    VideoAnnotation,
+    KeyIdMap,
+    ProjectMeta,
+    DatasetInfo,
+    TagValueType,
+    TagMetaCollection,
+)
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -86,6 +94,24 @@ class ExistingProjectLayer(Layer):
 
         if self.output_meta != dst_meta:
             if self.settings["merge_different_meta"]:
+                updated_tag_metas = []
+                for tm in self.output_meta.tag_metas:
+                    if tm.value_type == TagValueType.ONEOF_STRING:
+                        dst_tm = dst_meta.get_tag_meta(tm.name)
+                        if dst_tm is not None:
+                            if dst_tm.value_type != TagValueType.ONEOF_STRING:
+                                raise GraphError(
+                                    f"Tag '{tm.name}' has different value type in destination project"
+                                )
+                            tm = tm.clone(
+                                possible_values=list(
+                                    set(tm.possible_values) + set(dst_tm.possible_values)
+                                )
+                            )
+                    updated_tag_metas.append(tm)
+                self.output_meta = self.output_meta.clone(
+                    tag_metas=TagMetaCollection(updated_tag_metas)
+                )
                 self.output_meta = ProjectMeta.merge(dst_meta, self.output_meta)
                 g.api.project.update_meta(self.out_project_id, self.output_meta)
             else:
