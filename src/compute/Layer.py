@@ -8,7 +8,7 @@ from typing import Tuple
 
 import jsonschema
 
-from supervisely import ProjectMeta, TagMeta, ObjClass, TagMetaCollection, Annotation
+from supervisely import ProjectMeta, TagMeta, ObjClass, TagMetaCollection, Annotation, rand_str
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.utils import json_utils
 from src.compute.utils import os_utils
@@ -93,6 +93,9 @@ class Layer:
         self.define_tags_mapping()
         self.output_meta = None
 
+        # for save layers
+        self.existing_names = {}
+
     def validate(self):
         try:
             jsonschema.validate(self._config, self.params)
@@ -126,10 +129,7 @@ class Layer:
     def get_removed_tag_metas(self):
         return []
 
-    def is_archive(self):
-        raise NotImplementedError()
-
-    def requires_image(self):
+    def requires_item(self):
         return False
 
     def modifies_data(self):
@@ -623,6 +623,19 @@ class Layer:
     #         raise RuntimeError('No mapping for tag "%s" for %s.' % (ann.tags[-1], img_info))
     #     folder = tag2folder[ann.tags[-1]]
     #     return folder
+
+    def get_free_name(self, name: str, dataset_name: str, project_name: str):
+        new_name = name
+        full_ds_name = f"{project_name}/{dataset_name}"
+        names_in_ds = self.existing_names.get(full_ds_name, set())
+
+        while new_name in names_in_ds:
+            new_name = name + "_" + rand_str(10)
+
+        names_in_ds.add(new_name)
+        self.existing_names[full_ds_name] = names_in_ds
+
+        return new_name
 
 
 def add_false_additional_properties(params):

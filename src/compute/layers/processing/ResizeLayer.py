@@ -49,7 +49,7 @@ class ResizeLayer(Layer):
                     'when "width" or "height" is -1',
                 )
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def modifies_data(self):

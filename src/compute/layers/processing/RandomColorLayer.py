@@ -29,7 +29,7 @@ class RandomColorLayer(Layer):
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def modifies_data(self):

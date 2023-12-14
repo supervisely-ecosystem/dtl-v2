@@ -91,6 +91,7 @@ Output:
 - [Export Archive](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save/README.md#export-archive)
 - [Export Archive with Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save_masks/README.md#export-archive-with-masks)
 - [New Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/supervisely/README.md#new-project)
+- [Existing Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/existing_project/README.md#existing-project)
 
 </details>
 

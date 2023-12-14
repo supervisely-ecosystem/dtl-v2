@@ -53,7 +53,7 @@ class RotateLayer(Layer):
         ):
             raise BadSettingsError('"min_degrees" should be <= "max_degrees"')
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     @staticmethod

@@ -76,7 +76,7 @@ class CropLayer(Layer):
 
         # @TODO: check 'sides' params for percents... or not
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def validate(self):

@@ -34,11 +34,8 @@ def check_in_graph():
     net.validate()
     net.calc_metas()
 
-    # to ensure validation
-    is_archive = net.is_archive()
-
-    need_download = net.may_require_images()
-    return {"download_items": need_download, "is_archive": is_archive}
+    need_download = net.may_require_items()
+    return {"download_items": need_download}
 
 
 def calculate_datasets_conflict_map(helper):

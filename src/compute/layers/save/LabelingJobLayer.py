@@ -118,9 +118,6 @@ class LabelingJobLayer(Layer):
         self._labeling_job_map = defaultdict(list)  # {"dataset_id": ["images_ids"]}
         self.created_labeling_jobs = []
 
-    def is_archive(self):
-        return False
-
     def validate(self):
         settings = self.settings
         if len(settings.get("job_name", "")) > 256:
@@ -191,7 +188,6 @@ class LabelingJobLayer(Layer):
                 "data-nodes": g.current_dtl_json,
             }
             g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
-            self.net_change_images = self.net.may_require_images()
         else:  # use input project
             project_id = _get_source_projects_ids_from_dtl()[0]
             src_project_info = g.api.project.get_info_by_id(project_id)
@@ -218,15 +214,21 @@ class LabelingJobLayer(Layer):
             else:
                 dataset_name = item_desc.get_res_ds_name()
             out_item_name = (
-                self.net.get_free_name(item_desc, self.out_project_name) + item_desc.get_item_ext()
+                self.get_free_name(item_desc.get_item_name(), dataset_name, self.out_project_name)
+                + item_desc.get_item_ext()
             )
             if self.sly_project_info is not None:
                 if self.settings["create_new_project"]:
                     dataset_info = self.get_or_create_dataset(dataset_name)
                     if self.net.modality == "images":
-                        item_info = g.api.image.upload_np(
-                            dataset_info.id, out_item_name, item_desc.read_image()
-                        )
+                        if self.net.may_require_items():
+                            item_info = g.api.image.upload_np(
+                                dataset_info.id, out_item_name, item_desc.read_image()
+                            )
+                        else:
+                            item_info = g.api.image.upload_id(
+                                dataset_info.id, out_item_name, item_desc.info.item_info.id
+                            )
                         g.api.annotation.upload_ann(item_info.id, ann)
                     elif self.net.modality == "videos":
                         item_info = g.api.video.upload_path(

@@ -51,7 +51,7 @@ class ContrastBrightnessLayer(Layer):
         check_min_max(self.settings["contrast"], "contrast")
         check_min_max(self.settings["brightness"], "brightness")
 
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def modifies_data(self):

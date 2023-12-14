@@ -62,10 +62,7 @@ class SaveLayer(Layer):
         Layer.__init__(self, config, net=net)
         self.output_folder = output_folder
 
-    def is_archive(self):
-        return True
-
-    def requires_image(self):
+    def requires_item(self):
         return True
 
     def validate_dest_connections(self):
@@ -117,7 +114,9 @@ class SaveLayer(Layer):
 
         if isinstance(ann, Annotation):
             if not self.net.preview_mode:
-                free_name = self.net.get_free_name(item_desc, self.out_project.name)
+                free_name = self.get_free_name(
+                    item_desc.get_item_name(), item_desc.get_ds_name(), self.out_project.name
+                )
                 new_dataset_name = item_desc.get_res_ds_name()
 
                 if self.settings.get("visualize"):
@@ -167,7 +166,9 @@ class SaveLayer(Layer):
                 else:
                     out_dataset.add_item_file(out_item_name, item_desc.get_item_path(), ann=ann)
         else:
-            free_name = self.net.get_free_name(item_desc, self.out_project.name)
+            free_name = self.get_free_name(
+                item_desc.get_item_name(), item_desc.get_ds_name(), self.out_project.name
+            )
             new_dataset_name = item_desc.get_res_ds_name()
 
             dataset_name = item_desc.get_res_ds_name()

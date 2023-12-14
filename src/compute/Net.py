@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, rand_str, ProjectMeta, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -126,24 +126,11 @@ class Net:
         for layer in self.layers:
             layer.postprocess()
 
-    def get_free_name(self, img_desc: ImageDescriptor, project_name: str):
-        name = img_desc.get_item_name()
-        new_name = name
-        full_ds_name = f"{project_name}/{img_desc.get_res_ds_name()}"
-        names_in_ds = self.existing_names.get(full_ds_name, set())
-
-        if name in names_in_ds:
-            new_name = name + "_" + rand_str(10)
-
-        names_in_ds.add(new_name)
-        self.existing_names[full_ds_name] = names_in_ds
-
-        return new_name
-
-    def may_require_images(self):
-        # req_layers = [layer for layer in self.layers if layer.requires_image()]
-        # return len(req_layers) > 0
-        return True
+    def may_require_items(self):
+        for l in self.layers:
+            if l.requires_item():
+                return True
+        return False
 
     def check_connections(self, indx=-1):
         if indx == -1:
@@ -204,11 +191,6 @@ class Net:
                     if layers_idx_whitelist is None or i in layers_idx_whitelist:
                         result.append(i)
         return result
-
-    # will construct 'export' archive
-    def is_archive(self):
-        res = self.save_layer.is_archive()
-        return res
 
     def reset_existing_names(self):
         self.existing_names = {}
@@ -370,7 +352,7 @@ class Net:
         return total
 
     def get_elements_generator(self):
-        require_images = self.may_require_images()
+        require_items = self.may_require_items()
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         project_datasets = {}
         added = set()
@@ -403,7 +385,7 @@ class Net:
                             img_data = np.zeros(
                                 (img_info.height, img_info.width, 3), dtype=np.uint8
                             )
-                            if require_images:
+                            if require_items:
                                 img_data = g.api.image.download_np(img_info.id)
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(
@@ -453,12 +435,6 @@ class Net:
                             )
                             data_el = (vid_desc, ann)
                             yield data_el
-
-    def get_save_layer_dest(self):
-        return self.save_layer.dsts[0]
-
-    def get_final_project_name(self):
-        return self.get_save_layer_dest()
 
     def get_result_project_meta(self):
         return self._output_meta

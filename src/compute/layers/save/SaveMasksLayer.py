@@ -74,10 +74,7 @@ class SaveMasksLayer(Layer):
 
         self.output_folder = output_folder
 
-    def is_archive(self):
-        return True
-
-    def requires_image(self):
+    def requires_item(self):
         # res = self.settings['masks_human'] is True  # don't use img otherwise
         return True
 
@@ -141,7 +138,9 @@ class SaveMasksLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
         img_desc, ann = data_el
         if not self.net.preview_mode:
-            free_name = self.net.get_free_name(img_desc, self.out_project.name)
+            free_name = self.get_free_name(
+                img_desc.get_item_name(), img_desc.get_ds_name(), self.out_project.name
+            )
             new_dataset_name = img_desc.get_res_ds_name()
 
             for out_dir, flag_name, mapping_name in self.odir_flag_mapping:
