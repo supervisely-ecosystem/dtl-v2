@@ -3,7 +3,7 @@
 from typing import Tuple, Union
 
 from supervisely.io.fs import get_file_name
-from supervisely import Annotation, VideoAnnotation, KeyIdMap, ProjectMeta
+from supervisely import Annotation, VideoAnnotation, KeyIdMap, ProjectMeta, DatasetInfo
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -36,8 +36,8 @@ class ExistingProjectLayer(Layer):
 
     def __init__(self, config, output_folder, net):
         Layer.__init__(self, config, net=net)
+        self.sly_project_info = None
         self.ds_map = {}
-        self.dst_ds_entity_names = []
 
     def is_archive(self):
         return False
@@ -99,7 +99,11 @@ class ExistingProjectLayer(Layer):
                 entities_info_list = g.api.image.get_list(self.settings["dataset_id"])
             elif self.net.modality == "videos":
                 entities_info_list = g.api.video.get_list(self.settings["dataset_id"])
-            self.dst_ds_entity_names = [get_file_name(info.name) for info in entities_info_list]
+            dataset_info = self.get_dataset_by_id(self.settings["dataset_id"])
+            existing_names = set(get_file_name(info.name) for info in entities_info_list)
+            self.existing_names[f"{self.sly_project_info.name}/{dataset_info.name}"].update(
+                existing_names
+            )
 
     def get_or_create_dataset(self, dataset_name):
         if dataset_name not in self.ds_map:
@@ -111,6 +115,9 @@ class ExistingProjectLayer(Layer):
         else:
             return self.ds_map[dataset_name]
 
+    def get_dataset_by_id(self, dataset_id) -> DatasetInfo:
+        return self.ds_map.setdefault(dataset_id, g.api.dataset.get_info_by_id(dataset_id))
+
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
@@ -118,19 +125,22 @@ class ExistingProjectLayer(Layer):
         item_desc, ann = data_el
         dataset_option = self.settings["dataset_option"]
         if not self.net.preview_mode:
-            dataset_name = item_desc.get_res_ds_name()
-            out_item_name = (
-                self.net.get_free_name(item_desc, item_desc.get_pr_name())
-                + item_desc.get_item_ext()
-            )
             if dataset_option == "new":
                 dataset_name = self.settings["dataset_name"]
                 dataset_info = self.get_or_create_dataset(dataset_name)
             elif dataset_option == "existing":
-                dataset_info = g.api.dataset.get_info_by_id(self.settings["dataset_id"])
+                dataset_info = self.get_dataset_by_id(self.settings["dataset_id"])
             else:
                 dataset_name = item_desc.get_ds_name()
                 dataset_info = self.get_or_create_dataset(dataset_name)
+            out_item_name = (
+                self.get_free_name(
+                    item_desc.get_item_name(),
+                    dataset_info.name,
+                    self.sly_project_info.name,
+                )
+                + item_desc.get_item_ext()
+            )
             if self.net.modality == "images":
                 image_info = g.api.image.upload_np(
                     dataset_info.id, out_item_name, item_desc.read_image()

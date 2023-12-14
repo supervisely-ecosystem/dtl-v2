@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, rand_str, ProjectMeta, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -125,20 +125,6 @@ class Net:
     def postprocess(self):
         for layer in self.layers:
             layer.postprocess()
-
-    def get_free_name(self, img_desc: ImageDescriptor, project_name: str):
-        name = img_desc.get_item_name()
-        new_name = name
-        full_ds_name = f"{project_name}/{img_desc.get_res_ds_name()}"
-        names_in_ds = self.existing_names.get(full_ds_name, set())
-
-        if name in names_in_ds or name in self.save_layer.dst_ds_entity_names:
-            new_name = name + "_" + project_name
-
-        names_in_ds.add(new_name)
-        self.existing_names[full_ds_name] = names_in_ds
-
-        return new_name
 
     def may_require_images(self):
         # req_layers = [layer for layer in self.layers if layer.requires_image()]
@@ -453,12 +439,6 @@ class Net:
                             )
                             data_el = (vid_desc, ann)
                             yield data_el
-
-    def get_save_layer_dest(self):
-        return self.save_layer.dsts[0]
-
-    def get_final_project_name(self):
-        return self.get_save_layer_dest()
 
     def get_result_project_meta(self):
         return self._output_meta

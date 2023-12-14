@@ -88,7 +88,8 @@ class SuperviselyLayer(Layer):
         if not self.net.preview_mode:
             dataset_name = item_desc.get_res_ds_name()
             out_item_name = (
-                self.net.get_free_name(item_desc, self.out_project_name) + item_desc.get_item_ext()
+                self.get_free_name(item_desc.get_item_name(), dataset_name, self.out_project_name)
+                + item_desc.get_item_ext()
             )
             if self.sly_project_info is not None:
                 dataset_info = self.get_or_create_dataset(dataset_name)
