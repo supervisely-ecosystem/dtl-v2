@@ -23,7 +23,9 @@ def set_lj_name_preview(lj_description_title_input: Input, lj_description_title_
     name = lj_description_title_input.get_value()
     if name is None:
         name = ""
-    lj_description_title_preview.set(f"Title: {name}", "text")
+    lj_description_title_preview.set(
+        f"<span style='padding-left: 14px'>Title: {name}</span>", "text"
+    )
 
 
 def set_lj_reviewer_preview(
@@ -31,8 +33,12 @@ def set_lj_reviewer_preview(
 ):
     reviewer_login = lj_members_reviewer_selector.get_label()
     if reviewer_login is None:
-        reviewer_login = "select reviewer in settings"
-    lj_members_reviewer_preview.set(f"Reviewer: {reviewer_login}", "text")
+        formatted_login = "select reviewer in settings"
+    else:
+        formatted_login = f'<i class="zmdi zmdi-account"></i>&nbsp;{reviewer_login}'
+    lj_members_reviewer_preview.set(
+        f"<span style='padding-left: 14px'>Reviewer: {formatted_login}</span>", "text"
+    )
 
 
 def set_lj_labelers_preview(
@@ -40,8 +46,17 @@ def set_lj_labelers_preview(
 ):
     user_logins = lj_members_labelers_selector.get_labels()
     if len(user_logins) == 0:
-        user_logins = ["select annotators in settings"]
-    lj_members_labelers_preview.set(f"Assigned to: {', '.join(user_logins)}", "text")
+        formatted_logins = "select annotators in settings"
+    elif len(user_logins) > 1:
+        formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}' + " ".join(
+            f'<div style="padding-left: 89px;"><i class="zmdi zmdi-account"></i>&nbsp;{login}</div>'
+            for login in user_logins[1:]
+        )
+    else:
+        formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}'
+    lj_members_labelers_preview.set(
+        f"<span style='padding-left: 14px'>Assigned to: {formatted_logins}</span>", "text"
+    )
 
 
 def set_lj_filter_preview(
@@ -74,7 +89,9 @@ def set_lj_output_project_name_preview(
     lj_output_project_name_input: Input, lj_output_project_name_preview: Text
 ):
     project_name = lj_output_project_name_input.get_value()
-    lj_output_project_name_preview.set(f"Project name: {project_name}", "text")
+    lj_output_project_name_preview.set(
+        f"<span style='padding-left: 14px'>Project name: {project_name}</span>", "text"
+    )
 
 
 def set_lj_output_dataset_name_preview(
@@ -84,10 +101,15 @@ def set_lj_output_dataset_name_preview(
 ):
     keep_dataset = lj_output_dataset_keep_checkbox.is_checked()
     if keep_dataset:
-        lj_output_dataset_name_preview.set("Dataset name: Keep original datasets structure", "text")
+        lj_output_dataset_name_preview.set(
+            "<span style='padding-left: 14px'>Keep source datasets structure</span>",
+            "text",
+        )
     else:
         dataset_name = lj_output_dataset_name_input.get_value()
-        lj_output_dataset_name_preview.set(f"Dataset name: {dataset_name}", "text")
+        lj_output_dataset_name_preview.set(
+            f"<span style='padding-left: 14px'>Dataset name: {dataset_name}</span>", "text"
+        )
 
 
 def set_output_preview(

@@ -1,6 +1,6 @@
-# New Project
+# Create New Project
 
-`New Project` layer stores results of data transformations to a new project in your workspace. Remember that you should specify a name to your output project.
+`Create New Project` layer stores results of data transformations to a new project in your workspace. Remember that you should specify a name to your output project.
 
 ### Settings
 

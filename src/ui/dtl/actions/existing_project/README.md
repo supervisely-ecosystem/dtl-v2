@@ -1,6 +1,6 @@
-# Existing Project
+# Add to Existing Project
 
-`Existing Project` stores results of data transformations to existing project in your workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence.
+`Add to Existing Project` stores results of data transformations to existing project in your workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence.
 
 ### Settings
 
