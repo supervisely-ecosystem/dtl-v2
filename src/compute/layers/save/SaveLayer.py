@@ -62,9 +62,6 @@ class SaveLayer(Layer):
         Layer.__init__(self, config, net=net)
         self.output_folder = output_folder
 
-    def is_archive(self):
-        return True
-
     def requires_item(self):
         return True
 

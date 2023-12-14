@@ -129,9 +129,6 @@ class Layer:
     def get_removed_tag_metas(self):
         return []
 
-    def is_archive(self):
-        raise NotImplementedError()
-
     def requires_item(self):
         return False
 

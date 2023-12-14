@@ -39,9 +39,6 @@ class ExistingProjectLayer(Layer):
         self.sly_project_info = None
         self.ds_map = {}
 
-    def is_archive(self):
-        return False
-
     def validate(self):
         settings = self.settings
 

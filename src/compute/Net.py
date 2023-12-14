@@ -192,11 +192,6 @@ class Net:
                         result.append(i)
         return result
 
-    # will construct 'export' archive
-    def is_archive(self):
-        res = self.save_layer.is_archive()
-        return res
-
     def reset_existing_names(self):
         self.existing_names = {}
 

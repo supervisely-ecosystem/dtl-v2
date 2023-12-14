@@ -33,9 +33,6 @@ class SuperviselyLayer(Layer):
         self.output_folder = output_folder
         self.sly_project_info = None
 
-    def is_archive(self):
-        return False
-
     def validate_dest_connections(self):
         for dst in self.dsts:
             if len(dst) == 0:

@@ -118,9 +118,6 @@ class LabelingJobLayer(Layer):
         self._labeling_job_map = defaultdict(list)  # {"dataset_id": ["images_ids"]}
         self.created_labeling_jobs = []
 
-    def is_archive(self):
-        return False
-
     def validate(self):
         settings = self.settings
         if len(settings.get("job_name", "")) > 256:
