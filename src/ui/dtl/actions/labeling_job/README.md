@@ -44,7 +44,7 @@ There are layers that alter source data or annotations between the source data l
 ### JSON views
 
 <details>
-  <summary>Source project</summary>
+  <summary>Assign to source project</summary>
   <pre>
 	  {
 	  	"action": "labeling_job",
