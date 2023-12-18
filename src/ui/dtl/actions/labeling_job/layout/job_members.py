@@ -50,25 +50,10 @@ def create_job_members_widgets():
     )
     # ----------------------------
 
-    # PREVIEW
-    lj_members_reviewer_preview = Text(
-        "Reviewer: select reviewer in settings", "text", font_size=get_text_font_size()
-    )
-
-    lj_members_labelers_preview = Text(
-        "Assign to: select annotators in settings", "text", font_size=get_text_font_size()
-    )
-
-    lj_members_preview_container = Container(
-        [
-            lj_members_reviewer_preview,
-            lj_members_labelers_preview,
-        ]
-    )
-    # ----------------------------
-
     # LAYOUT
-    lj_members_text = Text("Members", status="text", font_size=get_text_font_size())
+    lj_members_text = Text(
+        "Reviewer: select reviewer in settings", status="text", font_size=get_text_font_size()
+    )
     lj_members_edit_btn = Button(
         text="EDIT",
         icon="zmdi zmdi-edit",
@@ -79,6 +64,24 @@ def create_job_members_widgets():
     )
     lj_members_container = get_set_settings_container(lj_members_text, lj_members_edit_btn)
     # ----------------------------
+
+    # PREVIEW
+    # lj_members_reviewer_preview = Text(
+    #     "Reviewer: select reviewer in settings", status="text", font_size=get_text_font_size()
+    # )
+
+    lj_members_labelers_preview = Text(
+        "Assign to: select annotators in settings", "text", font_size=get_text_font_size()
+    )
+
+    lj_members_preview_container = Container(
+        [
+            # lj_members_reviewer_preview,
+            lj_members_labelers_preview,
+        ]
+    )
+    # ----------------------------
+
     return (
         # sidebar
         lj_members_reviewer_selector,
@@ -86,7 +89,7 @@ def create_job_members_widgets():
         lj_members_save_btn,
         lj_members_sidebar_container,
         # preview
-        lj_members_reviewer_preview,
+        lj_members_text,
         lj_members_labelers_preview,
         lj_members_preview_container,
         # layout

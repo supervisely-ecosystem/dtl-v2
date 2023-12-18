@@ -36,7 +36,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 class ExistingProjectAction(OutputAction):
     name = "existing_project"
-    title = "Existing Project"
+    title = "Add to Existing Project"
     docs_url = ""
     description = "Save results of data transformations to existing project in current workspace."
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -62,7 +62,7 @@ class ExistingProjectAction(OutputAction):
         StateJson().send_changes()
 
         dst_project_selector_field = Field(
-            title="Select Project",
+            title="Select Destination Project",
             description="Results will be saved to selected project.",
             content=dst_project_selector,
         )

@@ -103,7 +103,11 @@ class LabelingJobLayer(Layer):
 
     def validate(self):
         settings = self.settings
-        if len(settings.get("job_name", "")) > 256:
+
+        job_name = settings.get("job_name", "")
+        if job_name == "" or job_name is None:
+            raise RuntimeError("Labeling Job name is not set")
+        elif len(job_name) > 256:
             raise RuntimeError("Labeling Job name is too long")
 
         if settings["reviewer_id"] is None:
