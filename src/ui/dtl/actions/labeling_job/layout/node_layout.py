@@ -31,10 +31,10 @@ def create_settings_options(
                 sidebar_width=380,
             ),
         ),
-        NodesFlow.Node.Option(
-            name="Job Description Preview",
-            option_component=NodesFlow.WidgetOptionComponent(lj_description_title_preview),
-        ),
+        # NodesFlow.Node.Option(
+        #     name="Job Description Preview",
+        #     option_component=NodesFlow.WidgetOptionComponent(lj_description_title_preview),
+        # ),
         NodesFlow.Node.Option(
             name="Job Team",
             option_component=NodesFlow.WidgetOptionComponent(

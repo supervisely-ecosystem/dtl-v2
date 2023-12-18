@@ -21,11 +21,10 @@ from src.ui.dtl.utils import (
 # SET PREVIEWS
 def set_lj_name_preview(lj_description_title_input: Input, lj_description_title_preview: Text):
     name = lj_description_title_input.get_value()
-    if name is None:
-        name = ""
-    lj_description_title_preview.set(
-        f"<span style='padding-left: 14px'>Title: {name}</span>", "text"
-    )
+    if name is None or name == "":
+        lj_description_title_preview.set("Set description", "text")
+    else:
+        lj_description_title_preview.set(f"Title: {name}", "text")
 
 
 def set_lj_reviewer_preview(
@@ -35,10 +34,8 @@ def set_lj_reviewer_preview(
     if reviewer_login is None:
         formatted_login = "select reviewer in settings"
     else:
-        formatted_login = f'<i class="zmdi zmdi-account"></i>&nbsp;{reviewer_login}'
-    lj_members_reviewer_preview.set(
-        f"<span style='padding-left: 14px'>Reviewer: {formatted_login}</span>", "text"
-    )
+        formatted_login = f'<div style="padding-left: 58px;"><i class="zmdi zmdi-account"></i>&nbsp;{reviewer_login}</div>'
+    lj_members_reviewer_preview.set(f"Reviewer: {formatted_login}", "text")
 
 
 def set_lj_labelers_preview(
@@ -49,14 +46,12 @@ def set_lj_labelers_preview(
         formatted_logins = "select annotators in settings"
     elif len(user_logins) > 1:
         formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}' + " ".join(
-            f'<div style="padding-left: 89px;"><i class="zmdi zmdi-account"></i>&nbsp;{login}</div>'
+            f'<div style="padding-left: 75px;"><i class="zmdi zmdi-account"></i>&nbsp;{login}</div>'
             for login in user_logins[1:]
         )
     else:
         formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}'
-    lj_members_labelers_preview.set(
-        f"<span style='padding-left: 14px'>Assigned to: {formatted_logins}</span>", "text"
-    )
+    lj_members_labelers_preview.set(f"Assigned to: {formatted_logins}", "text")
 
 
 def set_lj_filter_preview(
@@ -225,7 +220,7 @@ def save_settings(
 
 # SET SETTINGS FROM JSON
 def set_lj_name_from_json(settings: dict, lj_description_title_input: Input):
-    name = settings.get("job_name", "Annotation Job")
+    name = settings.get("job_name")
     lj_description_title_input.set_value(name)
 
 
