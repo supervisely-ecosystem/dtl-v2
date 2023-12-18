@@ -54,7 +54,7 @@ def create_job_description_widgets():
     # ----------------------------
 
     # LAYOUT
-    lj_description_text = Text("Set description", status="text", font_size=get_text_font_size())
+    lj_description_edit_text = Text("Description", status="text", font_size=get_text_font_size())
     lj_description_edit_btn = Button(
         text="EDIT",
         icon="zmdi zmdi-edit",
@@ -65,12 +65,12 @@ def create_job_description_widgets():
     )
 
     lj_description_container = get_set_settings_container(
-        lj_description_text, lj_description_edit_btn
+        lj_description_edit_text, lj_description_edit_btn
     )
     # ----------------------------
 
     # PREVIEW
-    lj_description_title_preview = lj_description_text
+    lj_description_title_preview = Text("Title:", "text", font_size=get_text_font_size())
     # ----------------------------
 
     return (

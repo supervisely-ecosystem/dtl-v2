@@ -6,15 +6,23 @@ from supervisely.app.widgets import (
     Checkbox,
     Select,
     TextArea,
-    InputNumber,
     NotificationBox,
 )
-from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagsListPreview
+from src.ui.widgets import (
+    ClassesList,
+    ClassesListPreview,
+    TagsList,
+    TagsListPreview,
+    MembersList,
+    MembersListPreview,
+)
 from src.ui.dtl.utils import (
     set_classes_list_settings_from_json,
     set_classes_list_preview,
     set_tags_list_settings_from_json,
     set_tags_list_preview,
+    set_members_list_settings_from_json,
+    set_members_list_preview,
 )
 
 
@@ -22,7 +30,7 @@ from src.ui.dtl.utils import (
 def set_lj_name_preview(lj_description_title_input: Input, lj_description_title_preview: Text):
     name = lj_description_title_input.get_value()
     if name is None or name == "":
-        lj_description_title_preview.set("Set description", "text")
+        lj_description_title_preview.set("Set description in settings", "text")
     else:
         lj_description_title_preview.set(f"Title: {name}", "text")
 
@@ -34,24 +42,9 @@ def set_lj_reviewer_preview(
     if reviewer_login is None:
         formatted_login = "select reviewer in settings"
     else:
-        formatted_login = f'<div style="padding-left: 58px;"><i class="zmdi zmdi-account"></i>&nbsp;{reviewer_login}</div>'
+        # formatted_login = f"<b>{reviewer_login}</b>"
+        formatted_login = f'<i class="zmdi zmdi-account"></i><span style="padding-left: 5px"><b>{reviewer_login}</b></span>'
     lj_members_reviewer_preview.set(f"Reviewer: {formatted_login}", "text")
-
-
-def set_lj_labelers_preview(
-    lj_members_labelers_selector: Select, lj_members_labelers_preview: Text
-):
-    user_logins = lj_members_labelers_selector.get_labels()
-    if len(user_logins) == 0:
-        formatted_logins = "select annotators in settings"
-    elif len(user_logins) > 1:
-        formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}' + " ".join(
-            f'<div style="padding-left: 75px;"><i class="zmdi zmdi-account"></i>&nbsp;{login}</div>'
-            for login in user_logins[1:]
-        )
-    else:
-        formatted_logins = f'<i class="zmdi zmdi-account"></i>&nbsp;{user_logins[0]}'
-    lj_members_labelers_preview.set(f"Assigned to: {formatted_logins}", "text")
 
 
 def set_lj_output_project_name_preview(
@@ -112,7 +105,7 @@ def save_settings(
     lj_description_readme_editor: TextArea,
     lj_description_description_editor: TextArea,
     lj_members_reviewer_selector: Select,
-    lj_members_labelers_selector: Select,
+    lj_members_labelers_selector: MembersList,
     saved_classes_settings: List[str],
     saved_tags_settings: List[str],
     lj_output_project_name_input: Input,
@@ -124,7 +117,7 @@ def save_settings(
     description = lj_description_description_editor.get_value()
     readme = lj_description_readme_editor.get_value()
 
-    user_ids = lj_members_labelers_selector.get_value()
+    user_ids = [user.id for user in lj_members_labelers_selector.get_selected_members()]
     if not isinstance(user_ids, list):
         user_ids = [user_ids]
 
@@ -185,11 +178,6 @@ def set_lj_reviewer_from_json(settings: dict, lj_members_reviewer_selector: Sele
     lj_members_reviewer_selector.set_value(reviewer_id)
 
 
-def set_lj_labelers_from_json(settings: dict, lj_members_labelers_selector: Select):
-    user_ids = settings.get("user_ids", [])
-    lj_members_labelers_selector.set_value(user_ids)
-
-
 def set_output_project_name_from_json(settings: dict, lj_output_project_name_input: Input):
     project_name = settings.get("project_name", "")
     lj_output_project_name_input.set_value(project_name)
@@ -219,8 +207,8 @@ def set_settings_from_json(
     lj_description_description_editor: TextArea,
     lj_members_reviewer_selector: Select,
     lj_members_reviewer_preview: Text,
-    lj_members_labelers_selector: Select,
-    lj_members_labelers_preview: Text,
+    lj_members_labelers_selector: MembersList,
+    lj_members_labelers_preview: MembersListPreview,
     lj_settings_classes_list_widget: ClassesList,
     lj_settings_classes_list_preview: ClassesListPreview,
     lj_settings_tags_list_widget: TagsList,
@@ -231,9 +219,6 @@ def set_settings_from_json(
     lj_output_project_name_preview: Text,
     lj_output_dataset_name_preview: Text,
 ) -> dict:
-    # SET DATA
-    # set_lj_dataset_id_from_json(settings)
-
     # SET DESCRIPTION
     set_lj_name_from_json(settings, lj_description_title_input)
     set_lj_readme_from_json(settings, lj_description_readme_editor)
@@ -243,11 +228,16 @@ def set_settings_from_json(
     # ----------------------------
 
     # SET MEMBERS
+    ## reviewer
     set_lj_reviewer_from_json(settings, lj_members_reviewer_selector)
-    set_lj_labelers_from_json(settings, lj_members_labelers_selector)
-
     set_lj_reviewer_preview(lj_members_reviewer_selector, lj_members_reviewer_preview)
-    set_lj_labelers_preview(lj_members_labelers_selector, lj_members_labelers_preview)
+
+    ## labelers
+    members_settings = settings.get("user_ids", [])
+    set_members_list_settings_from_json(lj_members_labelers_selector, members_settings)
+    set_members_list_preview(
+        lj_members_labelers_selector, lj_members_labelers_preview, members_settings
+    )
     # ----------------------------
 
     # SET CLASSES
@@ -278,6 +268,7 @@ def set_settings_from_json(
         lj_output_dataset_keep_checkbox,
         lj_output_dataset_name_preview,
     )
+    # ----------------------------
 
 
 # ----------------------------

@@ -105,15 +105,19 @@ class ExistingProjectLayer(Layer):
                                 )
                             tm = tm.clone(
                                 possible_values=list(
-                                    set(tm.possible_values) + set(dst_tm.possible_values)
+                                    set(tm.possible_values).union(set(dst_tm.possible_values))
                                 )
                             )
                     updated_tag_metas.append(tm)
                 self.output_meta = self.output_meta.clone(
                     tag_metas=TagMetaCollection(updated_tag_metas)
                 )
-                self.output_meta = ProjectMeta.merge(dst_meta, self.output_meta)
-                g.api.project.update_meta(self.out_project_id, self.output_meta)
+
+                try:
+                    self.output_meta = ProjectMeta.merge(dst_meta, self.output_meta)
+                    g.api.project.update_meta(self.out_project_id, self.output_meta)
+                except Exception as e:
+                    raise GraphError(f"Failed to merge meta: {e}")
             else:
                 raise GraphError("The meta update has not been confirmed")
 
