@@ -1,13 +1,13 @@
 # Existing Project
 
-`Existing Project` stores results of data transformations to existing project in your workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence.
+`Existing Project` stores results of data transformations to the existing project in your workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence.
 
 ### Settings
 
-- **Select Dataset Options** 
-    - **Existing Dataset** - select dataset from existing project to save results to
-    - **New Dataset** - enter name of new dataset to create in selected project
-    - **Keep source structure** - save the results in datasets that repeats datasets structure of the input project
+- **Select Dataset Options**
+  - **Existing Dataset** - select the dataset from the existing project to save results to
+  - **New Dataset** - enter the name of a new dataset to create in the selected project
+  - **Keep source structure** - save the results in datasets that repeat the dataset structure of the input project
 
 ### Example 1. Existing dataset
 

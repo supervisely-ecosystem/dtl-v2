@@ -44,32 +44,6 @@ def set_lj_labelers_preview(
     lj_members_labelers_preview.set(f"Assigned to: {', '.join(user_logins)}", "text")
 
 
-def set_lj_filter_preview(
-    lj_filters_objects_limit_checkbox: Checkbox,
-    lj_filters_objects_limit_per_item_widget: InputNumber,
-    lj_filters_objects_limit_preview_text: Text,
-    lj_filters_tags_limit_checkbox: Checkbox,
-    lj_filters_tags_limit_per_item_widget: InputNumber,
-    lj_filters_tags_limit_preview_text: Text,
-):
-    if lj_filters_objects_limit_checkbox.is_checked():
-        lj_filters_objects_limit_preview_text.set("Objects limit per item: unlimited", "text")
-    else:
-        lj_filters_objects_limit_preview_text.set(
-            f"Objects limit per item: {lj_filters_objects_limit_per_item_widget.value}", "text"
-        )
-
-    if lj_filters_tags_limit_checkbox.is_checked():
-        lj_filters_tags_limit_preview_text.set("Tags limit per item: unlimited", "text")
-    else:
-        lj_filters_tags_limit_preview_text.set(
-            f"Tags limit per item: {lj_filters_tags_limit_per_item_widget.value}", "text"
-        )
-
-    lj_filters_objects_limit_preview_text.show()
-    lj_filters_tags_limit_preview_text.show()
-
-
 def set_lj_output_project_name_preview(
     lj_output_project_name_input: Input, lj_output_project_name_preview: Text
 ):
@@ -124,23 +98,11 @@ def save_settings(
     lj_members_labelers_selector: Select,
     saved_classes_settings: List[str],
     saved_tags_settings: List[str],
-    lj_filters_objects_limit_checkbox: Checkbox,
-    lj_filters_objects_limit_per_item_widget: InputNumber,
-    lj_filters_tags_limit_checkbox: Checkbox,
-    lj_filters_tags_limit_per_item_widget: InputNumber,
     lj_output_project_name_input: Input,
     lj_output_dataset_keep_checkbox: Checkbox,
     lj_output_dataset_name_input: Input,
     modifies_data: bool,
 ) -> dict:
-    # init vars
-    disable_objects_limit_per_item = None
-    disable_tags_limit_per_item = None
-    objects_limit_per_item = None
-    tags_limit_per_item = None
-    include_items_with_tags = None
-    exclude_items_with_tags = None
-
     name = lj_description_title_input.get_value()
     description = lj_description_description_editor.get_value()
     readme = lj_description_readme_editor.get_value()
@@ -150,15 +112,6 @@ def save_settings(
         user_ids = [user_ids]
 
     reviewer_id = lj_members_reviewer_selector.get_value()
-
-    disable_objects_limit_per_item = lj_filters_objects_limit_checkbox.is_checked()
-    if not disable_objects_limit_per_item:
-        objects_limit_per_item = lj_filters_objects_limit_per_item_widget.value
-
-    disable_tags_limit_per_item = lj_filters_tags_limit_checkbox.is_checked()
-    if not disable_tags_limit_per_item:
-        tags_limit_per_item = lj_filters_tags_limit_per_item_widget.value
-
     project_name = lj_output_project_name_input.get_value()
 
     if not modifies_data:
@@ -183,13 +136,6 @@ def save_settings(
         "classes_to_label": saved_classes_settings,
         # tags
         "tags_to_label": saved_tags_settings,
-        # filters
-        "disable_objects_limit_per_item": disable_objects_limit_per_item,
-        "objects_limit_per_item": objects_limit_per_item,
-        "disable_tags_limit_per_item": disable_tags_limit_per_item,
-        "tags_limit_per_item": tags_limit_per_item,
-        "include_items_with_tags": include_items_with_tags,
-        "exclude_items_with_tags": exclude_items_with_tags,
         # output
         "create_new_project": modifies_data,
         "project_name": project_name,
@@ -227,34 +173,6 @@ def set_lj_labelers_from_json(settings: dict, lj_members_labelers_selector: Sele
     lj_members_labelers_selector.set_value(user_ids)
 
 
-def set_lj_objects_limit_per_item_from_json(
-    settings: dict,
-    lj_filters_objects_limit_checkbox: Checkbox,
-    lj_filters_objects_limit_per_item_widget: InputNumber,
-):
-    disable_objects_limit_per_item = settings.get("disable_objects_limit_per_item", True)
-    if disable_objects_limit_per_item:
-        lj_filters_objects_limit_checkbox.check()
-    else:
-        lj_filters_objects_limit_checkbox.uncheck()
-        objects_limit_per_item = settings.get("objects_limit_per_item", None)
-        lj_filters_objects_limit_per_item_widget.value = objects_limit_per_item
-
-
-def set_lj_tags_limit_per_item_from_json(
-    settings: dict,
-    lj_filters_tags_limit_checkbox: Checkbox,
-    lj_filters_tags_limit_per_item_widget: InputNumber,
-):
-    disable_tags_limit_per_item = settings.get("disable_tags_limit_per_item", True)
-    if disable_tags_limit_per_item:
-        disable_tags_limit_per_item = lj_filters_tags_limit_checkbox.check()
-    else:
-        lj_filters_tags_limit_checkbox.uncheck()
-        tags_limit_per_item = settings.get("tags_limit_per_item", None)
-        lj_filters_tags_limit_per_item_widget.value = tags_limit_per_item
-
-
 def set_output_project_name_from_json(settings: dict, lj_output_project_name_input: Input):
     project_name = settings.get("project_name", "")
     lj_output_project_name_input.set_value(project_name)
@@ -290,12 +208,6 @@ def set_settings_from_json(
     lj_settings_classes_list_preview: ClassesListPreview,
     lj_settings_tags_list_widget: TagsList,
     lj_settings_tags_list_preview: TagsListPreview,
-    lj_filters_objects_limit_checkbox: Checkbox,
-    lj_filters_objects_limit_per_item_widget: InputNumber,
-    lj_filters_tags_limit_checkbox: Checkbox,
-    lj_filters_tags_limit_per_item_widget: InputNumber,
-    lj_filters_tags_limit_preview_text: Text,
-    lj_filters_objects_limit_preview_text: Text,
     lj_output_project_name_input: Input,
     lj_output_dataset_keep_checkbox: Checkbox,
     lj_output_dataset_name_input: Input,
@@ -305,7 +217,7 @@ def set_settings_from_json(
     # SET DATA
     # set_lj_dataset_id_from_json(settings)
 
-    # SET DESCRPTION
+    # SET DESCRIPTION
     set_lj_name_from_json(settings, lj_description_title_input)
     set_lj_readme_from_json(settings, lj_description_readme_editor)
     set_lj_description_from_json(settings, lj_description_description_editor)
@@ -337,24 +249,6 @@ def set_settings_from_json(
     )
     # ----------------------------
 
-    # SET FILTERS
-    set_lj_filter_preview(
-        lj_filters_objects_limit_checkbox,
-        lj_filters_objects_limit_per_item_widget,
-        lj_filters_objects_limit_preview_text,
-        lj_filters_tags_limit_checkbox,
-        lj_filters_tags_limit_per_item_widget,
-        lj_filters_tags_limit_preview_text,
-    )
-
-    set_lj_objects_limit_per_item_from_json(
-        settings, lj_filters_objects_limit_checkbox, lj_filters_objects_limit_per_item_widget
-    )
-    set_lj_tags_limit_per_item_from_json(
-        settings, lj_filters_tags_limit_checkbox, lj_filters_tags_limit_per_item_widget
-    )
-    # ----------------------------
-
     # SET OUTPUT
     set_output_project_name_from_json(settings, lj_output_project_name_input)
     set_output_dataset_name_from_json(
@@ -367,11 +261,6 @@ def set_settings_from_json(
         lj_output_dataset_keep_checkbox,
         lj_output_dataset_name_preview,
     )
-    # ----------------------------
-
-    # TODO: add include/exclude items with tags
-    # include_items_with_tags = None
-    # exclude_items_with_tags = None
 
 
 # ----------------------------

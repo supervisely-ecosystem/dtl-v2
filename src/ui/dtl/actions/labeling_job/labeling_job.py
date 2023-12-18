@@ -20,7 +20,6 @@ from src.ui.dtl.utils import (
 
 import src.globals as g
 
-# from src.ui.dtl.actions.labeling_job.layout.job_data import create_job_data_widgets
 from src.ui.dtl.actions.labeling_job.layout.job_description import create_job_description_widgets
 from src.ui.dtl.actions.labeling_job.layout.job_members import create_job_members_widgets
 from src.ui.dtl.actions.labeling_job.layout.job_settings_classes import (
@@ -29,7 +28,6 @@ from src.ui.dtl.actions.labeling_job.layout.job_settings_classes import (
 from src.ui.dtl.actions.labeling_job.layout.job_settings_tags import (
     create_job_settings_tags_widgets,
 )
-from src.ui.dtl.actions.labeling_job.layout.job_filters import create_job_filters_widgets
 from src.ui.dtl.actions.labeling_job.layout.node_layout import create_settings_options
 from src.ui.dtl.actions.labeling_job.layout.job_output import create_job_output_widgets
 import src.ui.dtl.actions.labeling_job.layout.utils as lj_utils
@@ -179,52 +177,6 @@ class LabelingJobAction(OutputAction):
             )
             _save_settings()
             # g.updater("metas")
-
-        # ----------------------------
-
-        # FILTERS
-        (
-            # sidebar
-            lj_filters_objects_limit_per_item_widget,
-            lj_filters_objects_limit_checkbox,
-            lj_filters_tags_limit_per_item_widget,
-            lj_filters_tags_limit_checkbox,
-            lj_filters_sidebar_container,
-            lj_filters_save_btn,
-            # preview
-            lj_filters_objects_limit_preview_text,
-            lj_filters_tags_limit_preview_text,
-            lj_filters_preview_container,
-            # layout
-            lj_filters_edit_container,
-        ) = create_job_filters_widgets()
-
-        # FILTERS CBs
-        @lj_filters_objects_limit_checkbox.value_changed
-        def objects_limit_checkbox_cb(is_checked):
-            if is_checked:
-                lj_filters_objects_limit_per_item_widget.hide()
-            else:
-                lj_filters_objects_limit_per_item_widget.show()
-
-        @lj_filters_tags_limit_checkbox.value_changed
-        def tags_limit_checkbox_cb(is_checked):
-            if is_checked:
-                lj_filters_tags_limit_per_item_widget.hide()
-            else:
-                lj_filters_tags_limit_per_item_widget.show()
-
-        @lj_filters_save_btn.click
-        def filters_save_btn_cb():
-            lj_utils.set_lj_filter_preview(
-                lj_filters_objects_limit_checkbox,
-                lj_filters_objects_limit_per_item_widget,
-                lj_filters_objects_limit_preview_text,
-                lj_filters_tags_limit_checkbox,
-                lj_filters_tags_limit_per_item_widget,
-                lj_filters_tags_limit_preview_text,
-            )
-            _save_settings()
 
         # ----------------------------
 
@@ -386,10 +338,6 @@ class LabelingJobAction(OutputAction):
                 lj_members_labelers_selector,
                 saved_classes_settings,
                 saved_tags_settings,
-                lj_filters_objects_limit_checkbox,
-                lj_filters_objects_limit_per_item_widget,
-                lj_filters_tags_limit_checkbox,
-                lj_filters_tags_limit_per_item_widget,
                 lj_output_project_name_input,
                 lj_output_dataset_keep_checkbox,
                 lj_output_dataset_name_input,
@@ -428,12 +376,6 @@ class LabelingJobAction(OutputAction):
                 lj_settings_classes_list_preview,
                 lj_settings_tags_list_widget,
                 lj_settings_tags_list_preview,
-                lj_filters_objects_limit_checkbox,
-                lj_filters_objects_limit_per_item_widget,
-                lj_filters_tags_limit_checkbox,
-                lj_filters_tags_limit_per_item_widget,
-                lj_filters_tags_limit_preview_text,
-                lj_filters_objects_limit_preview_text,
                 lj_output_project_name_input,
                 lj_output_dataset_keep_checkbox,
                 lj_output_dataset_name_input,
@@ -460,9 +402,6 @@ class LabelingJobAction(OutputAction):
                 lj_settings_tags_list_edit_container,
                 lj_settings_tags_list_widgets_container,
                 lj_settings_tags_list_preview,
-                lj_filters_edit_container,
-                lj_filters_sidebar_container,
-                lj_filters_preview_container,
                 lj_output_edit_container,
                 lj_output_sidebar_container,
                 lj_output_container_preview,

@@ -523,6 +523,9 @@ def create_results_widget(file_infos, supervisely_layers, labeling_job_layers):
                 )
                 labeling_job_text_widgets.append(w)
 
+        if len(labeling_job_text_widgets) == 0:
+            labeling_job_text_widgets.append(Text("No labeling jobs created. Check settings."))
+
         widgets.append(
             Container(
                 widgets=[
