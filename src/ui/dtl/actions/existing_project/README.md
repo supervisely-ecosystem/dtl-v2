@@ -4,10 +4,10 @@
 
 ### Settings
 
-- **Select Dataset Options** 
-    - **Existing Dataset** - select dataset from existing project to save results to
-    - **New Dataset** - enter name of new dataset to create in selected project
-    - **Keep source structure** - save the results in datasets that repeats datasets structure of the input project
+- **Select Dataset Options**
+  - **Existing Dataset** - select the dataset from the existing project to save results to
+  - **New Dataset** - enter the name of a new dataset to create in the selected project
+  - **Keep source structure** - save the results in datasets that repeat the dataset structure of the input project
 
 ### Example 1. Existing dataset
 

@@ -57,12 +57,6 @@ class LabelingJobLayer(Layer):
                     "reviewer_id",
                     "classes_to_label",
                     "tags_to_label",
-                    "disable_objects_limit_per_item",
-                    "objects_limit_per_item",
-                    "disable_tags_limit_per_item",
-                    "tags_limit_per_item",
-                    "include_items_with_tags",
-                    "exclude_items_with_tags",
                     "create_new_project",
                     "project_name",
                     "dataset_name",
@@ -89,17 +83,6 @@ class LabelingJobLayer(Layer):
                             {"type": "string"},
                             {"type": "array", "items": {"type": "string"}},
                         ]
-                    },
-                    # filters
-                    "disable_objects_limit_per_item": {"type": "boolean"},
-                    "objects_limit_per_item": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
-                    "disable_tags_limit_per_item": {"type": "boolean"},
-                    "tags_limit_per_item": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
-                    "include_items_with_tags": {
-                        "oneOf": [{"type": "null"}, {"type": "array", "items": {"type": "string"}}]
-                    },
-                    "exclude_items_with_tags": {
-                        "oneOf": [{"type": "null"}, {"type": "array", "items": {"type": "string"}}]
                     },
                     # output
                     "create_new_project": {"type": "boolean"},
@@ -268,22 +251,7 @@ class LabelingJobLayer(Layer):
         if tags_to_label == "default":
             tags_to_label = [tag_meta.name for tag_meta in self.output_meta.tag_metas]
 
-        objects_limit_per_item = self.settings.get("objects_limit_per_item", None)
-        tags_limit_per_item = self.settings.get("tags_limit_per_item", None)
-
-        # won't use here
-        project_name = self.settings.get("project_name", None)
-        dataset_name = self.settings.get("dataset_name", None)
-        keep_original_ds = self.settings.get("keep_original_ds", False)
-        disable_objects_limit_per_item = self.settings.get("disable_objects_limit_per_item", None)
-        disable_tags_limit_per_item = self.settings.get("disable_tags_limit_per_item", None)
-        include_items_with_tags = self.settings.get("include_items_with_tags", None)
-        exclude_items_with_tags = self.settings.get("exclude_items_with_tags", None)
-        items_range = self.settings.get("items_range", None)
-        items_ids = self.settings.get("items_ids", [])
-
         dataset_ids = self._labeling_job_map.keys()
-
         for dataset_id in dataset_ids:
             filtered_classes_to_label, filtered_tags_to_label = _filter_meta(
                 dataset_id, classes_to_label, tags_to_label
@@ -296,12 +264,12 @@ class LabelingJobLayer(Layer):
                 readme=readme,
                 description=description,
                 classes_to_label=filtered_classes_to_label,
-                objects_limit_per_image=objects_limit_per_item,
+                objects_limit_per_image=None,
                 tags_to_label=filtered_tags_to_label,
-                tags_limit_per_image=tags_limit_per_item,
-                include_images_with_tags=include_items_with_tags,
-                exclude_images_with_tags=exclude_items_with_tags,
-                images_range=items_range,
+                tags_limit_per_image=None,
+                include_images_with_tags=None,
+                exclude_images_with_tags=None,
+                images_range=None,
                 reviewer_id=reviewer_id,
                 images_ids=items_ids,
             )
