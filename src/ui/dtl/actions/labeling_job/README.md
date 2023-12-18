@@ -37,8 +37,9 @@ There are no layers that alter source data or annotations between the source dat
 
 There are layers that alter source data or annotations between the source data layer and the `Labeling Job` layer, so a new project will be created.
 
-![new-project](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/74518c1c-ce04-4570-9df2-8030209719f6)
-
+<div align="center" markdown>
+<img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/74518c1c-ce04-4570-9df2-8030209719f6" width="35%"></img>
+</div>
 
 ### JSON views
 
