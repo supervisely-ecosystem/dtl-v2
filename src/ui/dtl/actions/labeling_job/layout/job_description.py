@@ -9,7 +9,7 @@ from supervisely.app.widgets import Button, Container, Text, Input, TextArea, Fi
 
 def create_job_description_widgets():
     # SIDEBAR SETTINGS
-    lj_description_title_input = Input(placeholder="Annotation Job")
+    lj_description_title_input = Input(value="Labeling Job", placeholder="Labeling Job")
     lj_description_title_field = Field(
         title="Title",
         description="Name of the labeling job",
@@ -54,7 +54,7 @@ def create_job_description_widgets():
     # ----------------------------
 
     # LAYOUT
-    lj_description_edit_text = Text("Description", status="text", font_size=get_text_font_size())
+    lj_description_edit_text = Text("Job Info", status="text", font_size=get_text_font_size())
     lj_description_edit_btn = Button(
         text="EDIT",
         icon="zmdi zmdi-edit",

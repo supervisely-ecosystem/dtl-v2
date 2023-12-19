@@ -33,6 +33,10 @@ def create_settings_options(
             option_component=NodesFlow.WidgetOptionComponent(lj_description_title_preview),
         ),
         NodesFlow.Node.Option(
+            name=f"separator info",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        ),
+        NodesFlow.Node.Option(
             name="Job Team",
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=lj_team_container,
@@ -43,6 +47,10 @@ def create_settings_options(
         NodesFlow.Node.Option(
             name="Job Team Preview",
             option_component=NodesFlow.WidgetOptionComponent(lj_team_preview_container),
+        ),
+        NodesFlow.Node.Option(
+            name=f"separator members",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
         ),
         NodesFlow.Node.Option(
             name="Job Classes",
@@ -59,6 +67,10 @@ def create_settings_options(
             option_component=NodesFlow.WidgetOptionComponent(lj_settings_classes_list_preview),
         ),
         NodesFlow.Node.Option(
+            name=f"separator classes",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        ),
+        NodesFlow.Node.Option(
             name="Job Tags",
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=lj_settings_tags_list_edit_container,
@@ -71,6 +83,10 @@ def create_settings_options(
         NodesFlow.Node.Option(
             name="Job Tags Preview",
             option_component=NodesFlow.WidgetOptionComponent(lj_settings_tags_list_preview),
+        ),
+        NodesFlow.Node.Option(
+            name=f"separator tags",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
         ),
         NodesFlow.Node.Option(
             name="Job Output",

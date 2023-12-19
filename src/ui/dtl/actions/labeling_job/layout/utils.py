@@ -43,7 +43,7 @@ def set_lj_reviewer_preview(
         formatted_login = "select reviewer in settings"
     else:
         # formatted_login = f"<b>{reviewer_login}</b>"
-        formatted_login = f'<i class="zmdi zmdi-account"></i><span style="padding-left: 5px"><b>{reviewer_login}</b></span>'
+        formatted_login = f'<i class="zmdi zmdi-account" style="color: rgb(132, 146, 166)"></i><span style="padding-left: 5px"><b>{reviewer_login}</b></span>'
     lj_members_reviewer_preview.set(f"Reviewer: {formatted_login}", "text")
 
 
@@ -159,7 +159,7 @@ def save_settings(
 
 # SET SETTINGS FROM JSON
 def set_lj_name_from_json(settings: dict, lj_description_title_input: Input):
-    name = settings.get("job_name")
+    name = settings.get("job_name", "Labeling Job")
     lj_description_title_input.set_value(name)
 
 
