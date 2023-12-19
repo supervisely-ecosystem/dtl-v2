@@ -11,6 +11,8 @@ from src.ui.widgets import (
     ClassesListPreview,
     TagsList,
     TagsListPreview,
+    MembersList,
+    MembersListPreview,
 )
 from src.exceptions import BadSettingsError
 
@@ -438,6 +440,79 @@ def get_tags_list_value(tags_list_widget: TagsList, multiple: bool = True):
         elif isinstance(tags_list_widget, TagsList):
             return selected[0].name
         return selected[0].name
+
+
+# members
+def set_members_list_settings_from_json(
+    members_list_widget: MembersList, settings: Union[list, str]
+):
+    if isinstance(settings, str):
+        if settings == "default":
+            members_list_widget.select_all()
+            return
+        settings = [settings]
+
+    if isinstance(settings, list):
+        if len(settings) == 0:
+            members_list_widget.deselect_all()
+            return
+        else:
+            if isinstance(settings[0], int):
+                settings = [
+                    user.login
+                    for user in members_list_widget.get_all_members()
+                    if user.id in settings
+                ]
+
+    if isinstance(members_list_widget, MembersList):
+        members_list_widget.select(settings)
+        return
+
+
+def set_members_list_preview(
+    members_list_widget: MembersList,
+    members_list_preview_widget: MembersListPreview,
+    members_list_settings: Union[list, str],
+):
+    if isinstance(members_list_settings, str):
+        if members_list_settings == "default":
+            if isinstance(members_list_widget, TagsList):
+                members_list_preview_widget.set(members_list_widget.get_all_tags())
+            # TO BE ADDED WHEN MembersMapping IS READY
+            # elif isinstance(tags_list_widget, TagsMapping):
+            #   tags_list_preview_widget.set(tags_list_widget.get_tags())
+            return
+        names = [members_list_settings]
+    else:
+        if len(members_list_settings) == 0:
+            names = []
+        else:
+            if isinstance(members_list_settings[0], int):
+                names = [
+                    user.login
+                    for user in members_list_widget.get_all_members()
+                    if user.id in members_list_settings
+                ]
+            else:
+                names = members_list_settings
+
+    users = members_list_widget.get_all_members()
+    members_list_preview_widget.set([user for user in users if user.login in names])
+
+
+def get_members_list_value(members_list_widget: MembersList, multiple: bool = True):
+    selected = members_list_widget.get_selected_members()
+    if multiple:
+        if isinstance(members_list_widget, MembersList):
+            return [user.login for user in selected]
+        else:
+            return [user for user in selected]
+    else:
+        if len(selected) == 0:
+            return ""
+        elif isinstance(members_list_widget, MembersList):
+            return selected[0].login
+        return selected[0].login
 
 
 # Options utils

@@ -519,9 +519,12 @@ def create_results_widget(file_infos, supervisely_layers, labeling_job_layers):
             for lj_info in l.created_labeling_jobs:
                 lj_info: LabelingJobInfo
                 w = Text(
-                    f"<a href='{g.api.server_address}/labeling/jobs/{lj_info.id}/stats'>{lj_info.name}</a>"
+                    f'<a href="{g.api.server_address}/labeling/jobs/{lj_info.id}/stats" target="_blank">{lj_info.name}</a>'
                 )
                 labeling_job_text_widgets.append(w)
+
+        if len(labeling_job_text_widgets) == 0:
+            labeling_job_text_widgets.append(Text("No labeling jobs created. Check settings."))
 
         widgets.append(
             Container(
