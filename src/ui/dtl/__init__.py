@@ -142,11 +142,11 @@ image_actions_list = {
     NEURAL_NETWORKS: [ApplyNNAction.name],
     OTHER: [DatasetAction.name, DummyAction.name],
     SAVE_ACTIONS: [
-        LabelingJobAction.name,
         SaveAction.name,
         SaveMasksAction.name,
-        ExistingProjectAction.name,
         SuperviselyAction.name,
+        ExistingProjectAction.name,
+        LabelingJobAction.name,
     ],
 }
 
@@ -201,11 +201,11 @@ image_actions_dict = {
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
     # Save layers
-    LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
     SaveMasksAction.name: SaveMasksAction,
-    ExistingProjectAction.name: ExistingProjectAction,
     SuperviselyAction.name: SuperviselyAction,
+    ExistingProjectAction.name: ExistingProjectAction,
+    LabelingJobAction.name: LabelingJobAction,
 }
 
 video_actions_list = {
@@ -224,10 +224,10 @@ video_actions_list = {
         FilterVideoByDuration.name,
     ],
     SAVE_ACTIONS: [
-        LabelingJobAction.name,
         SaveAction.name,
         ExistingProjectAction.name,
         SuperviselyAction.name,
+        LabelingJobAction.name,
     ],
 }
 
@@ -247,10 +247,10 @@ video_actions_dict = {
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,
     # Save layers
-    LabelingJobAction.name: LabelingJobAction,
     SaveAction.name: SaveAction,
-    ExistingProjectAction.name: ExistingProjectAction,
     SuperviselyAction.name: SuperviselyAction,
+    ExistingProjectAction.name: ExistingProjectAction,
+    LabelingJobAction.name: LabelingJobAction,
 }
 
 modality_dict = {"images": image_actions_dict, "videos": video_actions_dict}
