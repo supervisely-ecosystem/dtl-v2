@@ -282,7 +282,7 @@ class ApplyNN(Layer):
         else:
             img_path = join(
                 f"{g.PREVIEW_DIR}",
-                f"{img_desc.info.image_name}{img_desc.info.ia_data['image_ext']}",
+                f"{img_desc.info.item_name}{img_desc.info.ia_data['item_ext']}",
             )
 
             model_meta = ProjectMeta().from_json(self.settings["model_meta"])
