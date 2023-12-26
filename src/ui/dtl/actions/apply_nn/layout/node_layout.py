@@ -61,6 +61,10 @@ def create_layout(
             option_component=NodesFlow.WidgetOptionComponent(connect_notification),
         ),
         NodesFlow.Node.Option(
+            name=f"Connect Model Separator",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        ),
+        NodesFlow.Node.Option(
             name="Select Classes",
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=classes_list_edit_container,
@@ -73,6 +77,10 @@ def create_layout(
             option_component=NodesFlow.WidgetOptionComponent(classes_list_preview),
         ),
         NodesFlow.Node.Option(
+            name=f"Classes Separator",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
+        ),
+        NodesFlow.Node.Option(
             name="Select Tags",
             option_component=NodesFlow.WidgetOptionComponent(
                 widget=tags_list_edit_container,
@@ -83,6 +91,10 @@ def create_layout(
         NodesFlow.Node.Option(
             "tags_preview",
             option_component=NodesFlow.WidgetOptionComponent(tags_list_preview),
+        ),
+        NodesFlow.Node.Option(
+            name=f"Tags Separator",
+            option_component=NodesFlow.HtmlOptionComponent("<hr>"),
         ),
         NodesFlow.Node.Option(
             name="Inference Settings",
