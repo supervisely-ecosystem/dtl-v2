@@ -1,16 +1,20 @@
 import os
-from typing import Optional, List, NamedTuple
+from typing import Optional, List, NamedTuple, Literal
 from os.path import realpath, dirname
 from supervisely.app.widgets import (
     NodesFlow,
     Input,
     Text,
     Select,
+    RadioGroup,
     RadioTable,
     Button,
     Container,
     Field,
     RadioTabs,
+    TrainedModelsSelector,
+    OneOf,
+    Checkbox,
 )
 import pandas as pd
 from supervisely.io.json import load_json_file
@@ -28,17 +32,18 @@ from src.ui.dtl.utils import (
 )
 
 
-COL_ID = "id".upper()
-COL_NAME = "name".upper()
+COL_ID = "task id".upper()
+COL_PROJECT = "training data project".upper()
+COL_ARTIFACTS = "artifacts".upper()
+COL_PREVIEW = "preview".upper()
 
 columns = [
     COL_ID,
-    COL_NAME,
+    COL_PROJECT,
+    COL_ARTIFACTS,
+    COL_PREVIEW,
 ]
 
-AGENT_STATUS_RUNNING_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(19, 206, 102);'></i>"
-AGENT_STATUS_WAITING_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(225, 75, 15);'></i> "
-AGENT_STATUS_OTHER_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(225, 75, 15);'></i> "
 
 models_dir = os.path.join("src", "ui", "dtl", "actions", "deploy_yolov8", "models")
 det_models_data_path = os.path.join(models_dir, "det_models_data.json")
@@ -48,37 +53,22 @@ det_models_data = load_json_file(det_models_data_path)
 seg_models_data = load_json_file(seg_models_data_path)
 pose_models_data = load_json_file(pose_models_data_path)
 
-
-def get_agent_table_rows(agents_list: List[NamedTuple]):
-    lines = []
-    for agent in agents_list:
-        agent_id = agent.id
-        agent_name = agent.name
-
-        agent_status = agent.status
-        if agent_status == "running":
-            agent_status_icon = AGENT_STATUS_RUNNING_ICON
-        elif agent_status == "waiting":
-            agent_status_icon = AGENT_STATUS_WAITING_ICON
-        else:
-            agent_status_icon = AGENT_STATUS_OTHER_ICON
-
-        # agent_name_with_status = f"<div>{agent_status_icon} {agent_name}</div>"
-
-        lines.append(
-            [
-                agent_id,
-                agent_name,
-            ]
-        )
-    return lines
+TASK_TYPES_MODELS_INFO_MAP = {
+    "object detection": det_models_data,
+    "instance segmentation": seg_models_data,
+    "pose estimation": pose_models_data,
+}
 
 
-def get_pretrained_model_table_rows(table: RadioTable):
-    models_table_columns = [key for key in det_models_data[0].keys()]
+def get_pretrained_model_table_rows(
+    table: RadioTable,
+    task_type: Literal["object detection", "instance segmentation", "pose estimation"],
+):
+    models_data = TASK_TYPES_MODELS_INFO_MAP[task_type]
+    models_table_columns = [key for key in models_data[0].keys()]
     models_table_subtitles = [None] * len(models_table_columns)
     models_table_rows = []
-    for element in det_models_data:
+    for element in models_data:
         models_table_rows.append(list(element.values()))
     table.set_data(
         columns=models_table_columns,
@@ -90,39 +80,167 @@ def get_pretrained_model_table_rows(table: RadioTable):
 def create_model_selector_widgets():
     # SIDEBAR
 
+    # CUSTOM MODEL OPTION SUPERVISELY
+    remote_path_to_custom_models = "/yolov8_train/"
+
+    model_selector_sidebar_custom_model_table_detection = TrainedModelsSelector(
+        team_id=g.TEAM_ID,
+        remote_path_to_models=remote_path_to_custom_models,
+        task_type="object detection",
+    )
+    model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
+        team_id=g.TEAM_ID,
+        remote_path_to_models=remote_path_to_custom_models,
+        task_type="instance segmentation",
+    )
+    model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
+        team_id=g.TEAM_ID,
+        remote_path_to_models=remote_path_to_custom_models,
+        task_type="pose estimation",
+    )
+    # ------------------------------
+
+    # CUSTOM MODEL OPTION INPUT
+    model_selector_sidebar_custom_model_input = Input(placeholder="Enter path to model checkpoint")
+    model_selector_sidebar_custom_model_input_field = Field(
+        title="Path to checkpoint",
+        description="Enter path to model checkpoint from Team Files",
+        content=model_selector_sidebar_custom_model_input,
+    )
+
+    # PUBLIC MODEL OPTIONS
+    model_selector_sidebar_public_model_table_detection = RadioTable(columns=[], rows=[])
+    get_pretrained_model_table_rows(
+        model_selector_sidebar_public_model_table_detection, task_type="object detection"
+    )
+
+    model_selector_sidebar_public_model_table_segmentation = RadioTable(columns=[], rows=[])
+    get_pretrained_model_table_rows(
+        model_selector_sidebar_public_model_table_segmentation, task_type="instance segmentation"
+    )
+
+    model_selector_sidebar_public_model_table_pose_estimation = RadioTable(columns=[], rows=[])
+    get_pretrained_model_table_rows(
+        model_selector_sidebar_public_model_table_pose_estimation, task_type="pose estimation"
+    )
+    # ------------------------------
+
+    # TASK TYPE SELECTOR CUSTOM
+    model_selector_sidebar_task_type_selector_items_custom = [
+        RadioGroup.Item(
+            value="object detection",
+            label="Object Detection",
+            content=model_selector_sidebar_custom_model_table_detection,
+        ),
+        RadioGroup.Item(
+            value="instance segmentation",
+            label="Instance Segmentation",
+            content=model_selector_sidebar_custom_model_table_segmentation,
+        ),
+        RadioGroup.Item(
+            value="pose estimation",
+            label="Pose Estimation",
+            content=model_selector_sidebar_custom_model_table_pose_estimation,
+        ),
+    ]
+
+    model_selector_sidebar_task_type_selector_custom = RadioGroup(
+        items=model_selector_sidebar_task_type_selector_items_custom, direction="vertical"
+    )
+
+    model_selector_sidebar_task_type_selector_oneof_custom = OneOf(
+        model_selector_sidebar_task_type_selector_custom
+    )
+
+    model_selector_sidebar_custom_task_type_selector_container = Container(
+        [
+            model_selector_sidebar_task_type_selector_custom,
+            model_selector_sidebar_task_type_selector_oneof_custom,
+        ]
+    )
+    # ------------------------------
+
+    # TASK TYPE SELECTOR PUBLIC
+    model_selector_sidebar_task_type_selector_items_public = [
+        RadioGroup.Item(
+            value="object detection",
+            label="Object Detection",
+            content=model_selector_sidebar_public_model_table_detection,
+        ),
+        RadioGroup.Item(
+            value="instance segmentation",
+            label="Instance Segmentation",
+            content=model_selector_sidebar_public_model_table_segmentation,
+        ),
+        RadioGroup.Item(
+            value="pose estimation",
+            label="Pose Estimation",
+            content=model_selector_sidebar_public_model_table_pose_estimation,
+        ),
+    ]
+
+    model_selector_sidebar_task_type_selector_public = RadioGroup(
+        items=model_selector_sidebar_task_type_selector_items_public, direction="vertical"
+    )
+
+    model_selector_sidebar_task_type_selector_oneof_public = OneOf(
+        model_selector_sidebar_task_type_selector_public
+    )
+
+    model_selector_sidebar_public_task_type_selector_container = Container(
+        [
+            model_selector_sidebar_task_type_selector_public,
+            model_selector_sidebar_task_type_selector_oneof_public,
+        ]
+    )
+
     # CUSTOM MODEL OPTION
-    model_selector_sidebar_custom_model_table = RadioTable(columns=[], rows=[])
-    model_selector_sidebar_custom_model_table_field = Field(
-        title="Select custom model",
-        description="",
-        content=model_selector_sidebar_custom_model_table,
+    model_selector_sidebar_custom_model_option_items = [
+        Select.Item(
+            value="table",
+            label="Select trained model (that you trained in Supervisely)",
+            content=model_selector_sidebar_custom_task_type_selector_container,
+        ),
+        Select.Item(
+            value="checkpoint",
+            label="Custom checkpoint directory",
+            content=model_selector_sidebar_custom_model_input_field,
+        ),
+    ]
+    model_selector_sidebar_custom_model_option_selector = Select(
+        model_selector_sidebar_custom_model_option_items
     )
-    # ------------------------------
-
-    # PRETRAINED MODEL OPTION
-    model_selector_sidebar_public_model_table = RadioTable(columns=[], rows=[])
-    get_pretrained_model_table_rows(model_selector_sidebar_public_model_table)
-    model_selector_sidebar_public_model_table_field = Field(
-        title="Select public model",
-        description="",
-        content=model_selector_sidebar_public_model_table,
+    model_selector_sidebar_custom_model_option_oneof = OneOf(
+        model_selector_sidebar_custom_model_option_selector
+    )
+    model_selector_sidebar_custom_model_option_container = Container(
+        [
+            model_selector_sidebar_custom_model_option_selector,
+            model_selector_sidebar_custom_model_option_oneof,
+        ]
     )
 
-    # ------------------------------
+    model_selector_sidebar_custom_model_option_field = Field(
+        title="Custom model",
+        description="Select whether you want to use a model trained in Supervisely or a custom checkpoint directory",
+        content=model_selector_sidebar_custom_model_option_container,
+    )
 
-    model_selector_sidebar_model_type = RadioTabs(
-        titles=["Custom models", "Pretrained public  models"],
+    # CUSTOM /PUBLIC TABS
+    model_selector_sidebar_model_type_tabs = RadioTabs(
+        titles=["Custom models", "Pretrained public models"],
         descriptions=["Models trained by you", "Models trained by YOLOV8 team"],
         contents=[
-            model_selector_sidebar_custom_model_table_field,
-            model_selector_sidebar_public_model_table_field,
+            model_selector_sidebar_custom_model_option_field,
+            model_selector_sidebar_public_task_type_selector_container,
         ],
     )
 
+    # SIDEBAR CONTAINER
     model_selector_sidebar_save_btn = create_save_btn()
     model_selector_sidebar_container = Container(
         [
-            model_selector_sidebar_model_type,
+            model_selector_sidebar_model_type_tabs,
             model_selector_sidebar_save_btn,
         ]
     )
@@ -134,6 +252,11 @@ def create_model_selector_widgets():
     # ------------------------------
 
     # LAYOUT
+    # STOP MODEL AFTER INFERENCE
+    model_selector_stop_model_after_inference_checkbox = Checkbox(
+        Text("Stop model after successful inference", "text", font_size=13), True
+    )
+
     model_selector_layout_edit_text = Text(
         "Select serving app", status="text", font_size=get_text_font_size()
     )
@@ -153,13 +276,25 @@ def create_model_selector_widgets():
 
     return (
         # sidebar
-        model_selector_sidebar_custom_model_table,
-        model_selector_sidebar_public_model_table,
-        model_selector_sidebar_model_type,
+        # custom options
+        model_selector_sidebar_custom_model_table_detection,
+        model_selector_sidebar_custom_model_table_segmentation,
+        model_selector_sidebar_custom_model_table_pose_estimation,
+        model_selector_sidebar_custom_model_input,
+        model_selector_sidebar_custom_model_option_selector,
+        model_selector_sidebar_task_type_selector_custom,
+        # public options
+        model_selector_sidebar_public_model_table_detection,
+        model_selector_sidebar_public_model_table_segmentation,
+        model_selector_sidebar_public_model_table_pose_estimation,
+        model_selector_sidebar_task_type_selector_public,
+        # sidebar
+        model_selector_sidebar_model_type_tabs,
         model_selector_sidebar_save_btn,
         model_selector_sidebar_container,
         # preview
         model_selector_preview,
         # layout
         model_selector_layout_container,
+        model_selector_stop_model_after_inference_checkbox,
     )

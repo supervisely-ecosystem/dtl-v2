@@ -12,6 +12,7 @@ load_dotenv(os.path.expanduser("~/supervisely.env"))
 
 TEAM_ID = sly.env.team_id()
 WORKSPACE_ID = sly.env.workspace_id()
+USER_ID = sly.env.user_id()
 DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
