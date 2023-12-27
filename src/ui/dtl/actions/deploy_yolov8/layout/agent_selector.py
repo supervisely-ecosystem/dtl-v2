@@ -5,7 +5,6 @@ from supervisely.app.widgets import (
     Container,
     Field,
 )
-import pandas as pd
 import src.globals as g
 
 # from supervisely.api.agent_api import AgentInfo
