@@ -11,28 +11,37 @@ from supervisely.app.widgets import (
     Checkbox,
 )
 
+from supervisely.api.app_api import SessionInfo
 from supervisely.io.fs import get_file_name_with_ext
+
+
+def set_agent_selector_preview(
+    agent_selector_sidebar_selector: Select,
+    agent_selector_sidebar_device_selector: Select,
+    agent_selector_preview: Text,
+):
+    icon = "<i class='zmdi zmdi-memory'></i>"
+    device = agent_selector_sidebar_device_selector.get_label()
+    agent_name = agent_selector_sidebar_selector.get_label()
+    # agent_selector_preview.set(f"<span>{icon} {agent_name} ({device})</span>", "text")
+    agent_selector_preview.set(f"{icon} {agent_name} ({device})", "text")
+    agent_selector_preview.show()
 
 
 def set_model_selector_preview(
     settings: dict,
     model_selector_preview: Text,
+    model_selector_preview_type: Text,
 ):
-    model_selector_preview.set(f"Selected model: {settings['model_name']}", "text")
+    if settings["model_type"] == "Pretrained models":
+        model_type = "Pretrained"
+    elif settings["model_type"] == "Custom models":
+        model_type = "Custom"
 
-
-def set_agent_selector_preview(
-    agent_selector_sidebar_selector: Select, agent_selector_preview: Text
-):
-    agent_name = agent_selector_sidebar_selector.get_label()
-    agent_selector_preview.set(f"Selected agent: {agent_name}", "text")
-
-
-def set_agent_selector_device_preview(
-    agent_selector_sidebar_device_selector: Select, agent_selector_device_preview: Text
-):
-    device = agent_selector_sidebar_device_selector.get_label()
-    agent_selector_device_preview.set(f"Device: {device}", "text")
+    model_selector_preview.set(f"Checkpoint: {settings['model_name']}", "text")
+    model_selector_preview_type.set(f"Type: {model_type}", "text")
+    model_selector_preview.show()
+    model_selector_preview_type.show()
 
 
 def set_model_serve_preview(message: str, model_serve_preview: Text, status="text"):
@@ -62,7 +71,7 @@ def save_model_settings(
     model_selector_sidebar_custom_model_table_detection: TrainedModelsSelector,
     model_selector_sidebar_custom_model_table_segmentation: TrainedModelsSelector,
     model_selector_sidebar_custom_model_table_pose_estimation: TrainedModelsSelector,
-    model_selector_stop_model_after_inference_checkbox: Checkbox,
+    model_selector_stop_model_after_pipeline_checkbox: Checkbox,
 ):
     # init default
     model_type = None
@@ -114,7 +123,7 @@ def save_model_settings(
                 model_path = selected_row.artifacts_selector.get_value()
                 model_name = selected_row.artifacts_selector.get_label()
 
-    stop_model_session = model_selector_stop_model_after_inference_checkbox.is_checked()
+    stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
     settings["model_type"] = model_type
     settings["model_name"] = model_name
@@ -144,7 +153,7 @@ def save_settings(
     model_selector_sidebar_custom_model_table_detection: TrainedModelsSelector,
     model_selector_sidebar_custom_model_table_segmentation: TrainedModelsSelector,
     model_selector_sidebar_custom_model_table_pose_estimation: TrainedModelsSelector,
-    model_selector_stop_model_after_inference_checkbox: Checkbox,
+    model_selector_stop_model_after_pipeline_checkbox: Checkbox,
 ):
     settings = save_agent_settings(
         settings, agent_selector_sidebar_selector, agent_selector_sidebar_device_selector
@@ -162,9 +171,35 @@ def save_settings(
         model_selector_sidebar_custom_model_table_detection,
         model_selector_sidebar_custom_model_table_segmentation,
         model_selector_sidebar_custom_model_table_pose_estimation,
-        model_selector_stop_model_after_inference_checkbox,
+        model_selector_stop_model_after_pipeline_checkbox,
     )
     return settings
+
+
+def validate_settings(
+    settings: dict,
+    model_serve_preview: Text,
+    model_selector_sidebar_custom_model_option_selector: Select,
+) -> bool:
+    if settings.get("agent_id", None) is None:
+        set_model_serve_preview("Please select agent", model_serve_preview, "warning")
+        return False
+    if settings.get("device", None) is None:
+        set_model_serve_preview("Please select device", model_serve_preview, "warning")
+        return False
+    if (
+        settings.get("model_type", None) is None
+        or settings.get("model_name", None) is None
+        or settings.get("task_type", None) is None
+    ):
+        set_model_serve_preview("Please select model", model_serve_preview, "warning")
+        return False
+
+    if model_selector_sidebar_custom_model_option_selector.get_value() == "checkpoint":
+        if settings.get("model_path", None) is None or settings.get("model_path", None) == "":
+            set_model_serve_preview("Please enter model path", model_serve_preview, "warning")
+            return False
+    return True
 
 
 # OTHER
@@ -179,8 +214,8 @@ def get_agent_devices(agent_info: NamedTuple) -> List[Select.Item]:
     return agent_selector_sidebar_device_selector_items
 
 
-def start_app(api: Api, workspace_id: int, saved_settings: dict):
-    session = api.app.start(
+def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
+    session_info = api.app.start(
         agent_id=saved_settings["agent_id"],
         module_id=500,
         workspace_id=workspace_id,
@@ -190,7 +225,7 @@ def start_app(api: Api, workspace_id: int, saved_settings: dict):
         app_version="data-nodes-deploy-yolov8",
         is_branch=True,
     )
-    return session
+    return session_info
 
 
 def deploy_model(api: Api, session_id: int, saved_settings: dict):

@@ -10,11 +10,12 @@ from supervisely.app.widgets import (
 def create_node_layout(
     agent_selector_layout_container: Container,
     agent_selector_sidebar_container: Container,
-    agent_selector_preview_container: Container,
+    agent_selector_preview: Text,
     model_selector_layout_container: Container,
     model_selector_sidebar_container: Container,
     model_selector_preview: Text,
-    model_selector_stop_model_after_inference_checkbox: Checkbox,
+    model_selector_preview_type: Text,
+    model_selector_stop_model_after_pipeline_checkbox: Checkbox,
     model_serve_layout_container: Container,
 ) -> List[NodesFlow.Node.Option]:
     settings_options = [
@@ -28,7 +29,7 @@ def create_node_layout(
         ),
         NodesFlow.Node.Option(
             name="Agent Selector Preview",
-            option_component=NodesFlow.WidgetOptionComponent(agent_selector_preview_container),
+            option_component=NodesFlow.WidgetOptionComponent(agent_selector_preview),
         ),
         NodesFlow.Node.Option(
             name=f"Agent Selector Separator",
@@ -43,13 +44,17 @@ def create_node_layout(
             ),
         ),
         NodesFlow.Node.Option(
+            name="Model Selector Type Preview",
+            option_component=NodesFlow.WidgetOptionComponent(model_selector_preview_type),
+        ),
+        NodesFlow.Node.Option(
             name="Model Selector Preview",
             option_component=NodesFlow.WidgetOptionComponent(model_selector_preview),
         ),
         NodesFlow.Node.Option(
             name="Stop Model Checkbox",
             option_component=NodesFlow.WidgetOptionComponent(
-                model_selector_stop_model_after_inference_checkbox
+                model_selector_stop_model_after_pipeline_checkbox
             ),
         ),
         NodesFlow.Node.Option(

@@ -1,7 +1,7 @@
 from typing import Optional
-from time import sleep
 from os.path import realpath, dirname
 
+from supervisely.nn.inference.session import Session
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
@@ -26,7 +26,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         saved_settings = {}
-        session = None
+        session: Session = None
 
         # AGENT SELECTOR
         (  # sidebar
@@ -40,9 +40,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             agent_selector_sidebar_container,
             # preview
             agent_selector_preview,
-            agent_selector_device_preview,
-            agent_selector_preview_container,
             # layout
+            agent_selector_layout_edit_text,
+            agent_selector_layout_edit_btn,
             agent_selector_layout_container,
         ) = create_agent_selector_widgets()
 
@@ -64,10 +64,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 agent_selector_sidebar_device_selector,
             )
             utils.set_agent_selector_preview(
-                agent_selector_sidebar_selector, agent_selector_preview
-            )
-            utils.set_agent_selector_device_preview(
-                agent_selector_sidebar_device_selector, agent_selector_device_preview
+                agent_selector_sidebar_selector,
+                agent_selector_sidebar_device_selector,
+                agent_selector_preview,
             )
 
         # -----------------------------
@@ -93,9 +92,12 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             model_selector_sidebar_container,
             # preview
             model_selector_preview,
+            model_selector_preview_type,
             # layout
+            model_selector_layout_edit_text,
+            model_selector_layout_edit_btn,
             model_selector_layout_container,
-            model_selector_stop_model_after_inference_checkbox,
+            model_selector_stop_model_after_pipeline_checkbox,
         ) = create_model_selector_widgets()
 
         # MODEL SELECTOR CBs
@@ -115,11 +117,10 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_selector_sidebar_custom_model_table_detection,
                 model_selector_sidebar_custom_model_table_segmentation,
                 model_selector_sidebar_custom_model_table_pose_estimation,
-                model_selector_stop_model_after_inference_checkbox,
+                model_selector_stop_model_after_pipeline_checkbox,
             )
             utils.set_model_selector_preview(
-                saved_settings,
-                model_selector_preview,
+                saved_settings, model_selector_preview, model_selector_preview_type
             )
 
         # -----------------------------
@@ -135,49 +136,67 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         @model_serve_btn.click
         def model_serve_btn_cb():
             nonlocal saved_settings, session
+            model_serve_btn.disable()
+            agent_selector_layout_edit_btn.disable()
+            model_selector_layout_edit_btn.disable()
 
-            # if model_serve_btn.text == "STOP":
-            #     g.api.app.stop(session.task_id)
-            #     model_serve_btn.text = "RUN"
-            #     model_serve_btn.style = "primary"
-            #     return
+            if model_serve_btn.text == "STOP":
+                utils.set_model_serve_preview("Stopping...", model_serve_preview)
+                g.api.app.stop(session.task_id)
+                model_serve_btn.text = "SERVE"
+                model_serve_btn.icon = "zmdi zmdi-play"
+                model_serve_btn.enable()
+                agent_selector_layout_edit_btn.enable()
+                model_selector_layout_edit_btn.enable()
+                utils.set_model_serve_preview(
+                    "<span style='color: rgb(90, 103, 114);'>Model stopped<br>Reselect model checkpoint</span>",
+                    model_serve_preview,
+                )
+                saved_settings["session_id"] = None
+                return
 
             utils.set_model_serve_preview("", model_serve_preview)
-
             # add validation
-            agent_id = saved_settings["agent_id"]
-            device = saved_settings["device"]
-            model_type = saved_settings["model_type"]
-            model_path = saved_settings["model_path"]
-            model_name = saved_settings["model_name"]
-            task_type = saved_settings["task_type"]
+            success = utils.validate_settings(
+                saved_settings,
+                model_serve_preview,
+                model_selector_sidebar_custom_model_option_selector,
+            )
+            if not success:
+                agent_selector_layout_edit_btn.enable()
+                model_selector_layout_edit_btn.enable()
+                model_serve_btn.enable()
+                return
 
-            if session is None:
-                session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
-
-            # wait for task to start not working
-            task_started = g.api.task.get_status(session.task_id)
-            while not task_started is g.api.task.Status.STARTED:
-                sleep(5)
-                utils.set_model_serve_preview("Starting...", model_serve_preview)
-                task_started = g.api.task.get_status(session.task_id)
+            session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
 
             try:
-                task_started = g.api.task.get_status(session.task_id)
+                utils.set_model_serve_preview("Starting...", model_serve_preview)
                 utils.deploy_model(g.api, session.task_id, saved_settings)
+
                 app_link_message = (
                     f"Model deployed "
                     f"- <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+                    f"<br>Press STOP to change model"
                 )
                 utils.set_model_serve_preview(app_link_message, model_serve_preview, "success")
                 saved_settings = utils.save_model_serve_settings(saved_settings, session.task_id)
                 _save_settings()
+                model_serve_btn.text = "STOP"
+                model_serve_btn.icon = "zmdi zmdi-pause"
+                agent_selector_layout_edit_btn.disable()
             except:
                 utils.set_model_serve_preview(
-                    "An error occured while starting the app", model_serve_preview, "warning"
+                    "An error occured while deploying the model", model_serve_preview, "warning"
                 )
+                agent_selector_layout_edit_btn.enable()
+                model_selector_layout_edit_btn.enable()
+            finally:
+                model_serve_btn.enable()
 
         # -----------------------------
+        def data_changed_cb(**kwargs):
+            pass
 
         def _save_settings() -> dict:
             nonlocal saved_settings
@@ -196,7 +215,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_selector_sidebar_custom_model_table_detection,
                 model_selector_sidebar_custom_model_table_segmentation,
                 model_selector_sidebar_custom_model_table_pose_estimation,
-                model_selector_stop_model_after_inference_checkbox,
+                model_selector_stop_model_after_pipeline_checkbox,
             )
 
         def get_settings(options_json: dict) -> dict:
@@ -211,11 +230,12 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             settings_options = create_node_layout(
                 agent_selector_layout_container,
                 agent_selector_sidebar_container,
-                agent_selector_preview_container,
+                agent_selector_preview,
                 model_selector_layout_container,
                 model_selector_sidebar_container,
                 model_selector_preview,
-                model_selector_stop_model_after_inference_checkbox,
+                model_selector_preview_type,
+                model_selector_stop_model_after_pipeline_checkbox,
                 model_serve_layout_container,
             )
             return {

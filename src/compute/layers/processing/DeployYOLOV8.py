@@ -17,6 +17,7 @@ from supervisely import (
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
+import src.globals as g
 
 
 class DeployYOLOV8(Layer):
@@ -53,6 +54,24 @@ class DeployYOLOV8(Layer):
 
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
+
+    def validate(self):
+        settings = self.settings
+
+        if settings.get("agent_id", None) is None:
+            raise ValueError("Select agent")
+        if settings.get("device", None) is None:
+            raise ValueError("Select device")
+        if settings.get("model_type", None) is None:
+            raise ValueError("Select model")
+        if settings.get("session_id", None) is None:
+            raise ValueError("Deploy model")
+
+        return super().validate()
+
+    def postprocess(self):
+        if self.settings["stop_model_session"]:
+            g.api.app.stop(self.settings["session_id"])
 
     def modifies_data(self):
         return False

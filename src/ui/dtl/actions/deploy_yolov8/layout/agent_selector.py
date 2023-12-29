@@ -7,7 +7,6 @@ from supervisely.app.widgets import (
 )
 import src.globals as g
 
-# from supervisely.api.agent_api import AgentInfo
 from src.ui.dtl.utils import get_text_font_size
 import src.ui.dtl.actions.deploy_yolov8.layout.utils as utils
 from src.ui.dtl.utils import (
@@ -25,7 +24,7 @@ AGENT_STATUS_OTHER_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(225, 75
 def create_agent_selector_widgets():
     # SIDEBAR
     # AGENT SELECTOR
-    available_agents = g.api.agent.get_list(g.TEAM_ID)  # -> NamedTuple (AgentInfo)
+    available_agents = g.api.agent.get_list(g.TEAM_ID)  # -> AgentInfo
     agent_selector_sidebar_selector_items = [
         Select.Item(value=agent.id, label=agent.name) for agent in available_agents
     ]
@@ -79,12 +78,8 @@ def create_agent_selector_widgets():
     # ------------------------------
 
     # PREVIEW
-    # TODO: App thumbnail widget
-    agent_selector_preview = Text("Selected agent:", status="text", font_size=get_text_font_size())
-    agent_selector_device_preview = Text("Device:", status="text", font_size=get_text_font_size())
-    agent_selector_preview_container = Container(
-        [agent_selector_preview, agent_selector_device_preview]
-    )
+    agent_selector_preview = Text("", "text", font_size=get_text_font_size())
+    agent_selector_preview.hide()
     # ------------------------------
 
     # LAYOUT
@@ -117,8 +112,8 @@ def create_agent_selector_widgets():
         agent_selector_sidebar_container,
         # preview
         agent_selector_preview,
-        agent_selector_device_preview,
-        agent_selector_preview_container,
         # layout
+        agent_selector_layout_edit_text,
+        agent_selector_layout_edit_btn,
         agent_selector_layout_container,
     )

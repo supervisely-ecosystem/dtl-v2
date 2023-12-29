@@ -1,8 +1,6 @@
 import os
-from typing import Optional, List, NamedTuple, Literal
-from os.path import realpath, dirname
+from typing import Literal
 from supervisely.app.widgets import (
-    NodesFlow,
     Input,
     Text,
     Select,
@@ -16,15 +14,12 @@ from supervisely.app.widgets import (
     OneOf,
     Checkbox,
 )
-import pandas as pd
 from supervisely.io.json import load_json_file
 
 # from supervisely.api.agent_api import AgentInfo
-from src.ui.dtl import NeuralNetworkAction
-from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 import src.globals as g
 from src.ui.dtl.utils import (
+    get_text_font_size,
     create_save_btn,
     get_set_settings_button_style,
     get_set_settings_container,
@@ -85,17 +80,17 @@ def create_model_selector_widgets():
 
     model_selector_sidebar_custom_model_table_detection = TrainedModelsSelector(
         team_id=g.TEAM_ID,
-        remote_path_to_models=remote_path_to_custom_models,
+        training_app_directory=remote_path_to_custom_models,
         task_type="object detection",
     )
     model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
         team_id=g.TEAM_ID,
-        remote_path_to_models=remote_path_to_custom_models,
+        training_app_directory=remote_path_to_custom_models,
         task_type="instance segmentation",
     )
     model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
         team_id=g.TEAM_ID,
-        remote_path_to_models=remote_path_to_custom_models,
+        training_app_directory=remote_path_to_custom_models,
         task_type="pose estimation",
     )
     # ------------------------------
@@ -248,17 +243,20 @@ def create_model_selector_widgets():
 
     # PREVIEW
     # TODO: App thumbnail widget
-    model_selector_preview = Text("Selected model:", status="text", font_size=get_text_font_size())
+    model_selector_preview = Text("Checkpoint:", status="text", font_size=get_text_font_size())
+    model_selector_preview.hide()
+    model_selector_preview_type = Text("Type:", status="text", font_size=get_text_font_size())
+    model_selector_preview_type.hide()
     # ------------------------------
 
     # LAYOUT
     # STOP MODEL AFTER INFERENCE
-    model_selector_stop_model_after_inference_checkbox = Checkbox(
-        Text("Stop model after successful inference", "text", font_size=13), True
+    model_selector_stop_model_after_pipeline_checkbox = Checkbox(
+        Text("Auto stop model on pipeline finish", "text", font_size=13), True
     )
 
     model_selector_layout_edit_text = Text(
-        "Select serving app", status="text", font_size=get_text_font_size()
+        "Select model", status="text", font_size=get_text_font_size()
     )
     model_selector_layout_edit_btn = Button(
         text="EDIT",
@@ -294,7 +292,10 @@ def create_model_selector_widgets():
         model_selector_sidebar_container,
         # preview
         model_selector_preview,
+        model_selector_preview_type,
         # layout
+        model_selector_layout_edit_text,
+        model_selector_layout_edit_btn,
         model_selector_layout_container,
-        model_selector_stop_model_after_inference_checkbox,
+        model_selector_stop_model_after_pipeline_checkbox,
     )
