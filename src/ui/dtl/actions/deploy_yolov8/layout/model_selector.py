@@ -252,7 +252,7 @@ def create_model_selector_widgets():
     # LAYOUT
     # STOP MODEL AFTER INFERENCE
     model_selector_stop_model_after_pipeline_checkbox = Checkbox(
-        Text("Auto stop model on pipeline finish", "text", font_size=13), True
+        Text("Auto stop model on pipeline finish", "text", font_size=13), False
     )
 
     model_selector_layout_edit_text = Text(

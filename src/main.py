@@ -80,3 +80,5 @@ if g.PROJECT_ID:
 
 # if g.FILE:
 #     g.updater("load_json")
+
+app.call_before_shutdown(u.on_app_shutdown)

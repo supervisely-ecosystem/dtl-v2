@@ -1,10 +1,4 @@
-from supervisely.app.widgets import (
-    Text,
-    Select,
-    Button,
-    Container,
-    Field,
-)
+from supervisely.app.widgets import Text, Select, Button, Container, Field, AgentSelector
 import src.globals as g
 
 from src.ui.dtl.utils import get_text_font_size
@@ -25,10 +19,7 @@ def create_agent_selector_widgets():
     # SIDEBAR
     # AGENT SELECTOR
     available_agents = g.api.agent.get_list(g.TEAM_ID)  # -> AgentInfo
-    agent_selector_sidebar_selector_items = [
-        Select.Item(value=agent.id, label=agent.name) for agent in available_agents
-    ]
-    agent_selector_sidebar_selector = Select(agent_selector_sidebar_selector_items)
+    agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID)
     agent_selector_sidebar_selector_empty_message = Text(
         (
             "No agents available. Follow this "

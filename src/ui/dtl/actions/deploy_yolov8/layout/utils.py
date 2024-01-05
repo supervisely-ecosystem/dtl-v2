@@ -13,6 +13,7 @@ from supervisely.app.widgets import (
 
 from supervisely.api.app_api import SessionInfo
 from supervisely.io.fs import get_file_name_with_ext
+import src.globals as g
 
 
 def set_agent_selector_preview(
@@ -21,9 +22,9 @@ def set_agent_selector_preview(
     agent_selector_preview: Text,
 ):
     icon = "<i class='zmdi zmdi-memory'></i>"
+    agent_id = agent_selector_sidebar_selector.get_value()
+    agent_name = g.api.agent.get_info_by_id(agent_id).name
     device = agent_selector_sidebar_device_selector.get_label()
-    agent_name = agent_selector_sidebar_selector.get_label()
-    # agent_selector_preview.set(f"<span>{icon} {agent_name} ({device})</span>", "text")
     agent_selector_preview.set(f"{icon} {agent_name} ({device})", "text")
     agent_selector_preview.show()
 

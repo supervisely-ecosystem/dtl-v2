@@ -48,9 +48,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
 
         # AGENT SELECTOR CBs
         @agent_selector_sidebar_selector.value_changed
-        def agent_selector_sidebar_selector_cb(value):
+        def agent_selector_sidebar_selector_cb(agent_id):
             agent_selector_sidebar_device_selector.loading = True
-            agent_info = g.api.agent.get_info_by_id(value)
+            agent_info = g.api.agent.get_info_by_id(agent_id)
             devices = utils.get_agent_devices(agent_info)
             agent_selector_sidebar_device_selector.set(devices)
             agent_selector_sidebar_device_selector.loading = False
@@ -143,6 +143,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             if model_serve_btn.text == "STOP":
                 utils.set_model_serve_preview("Stopping...", model_serve_preview)
                 g.api.app.stop(session.task_id)
+                g.running_sessions_ids.remove(session.task_id)
                 model_serve_btn.text = "SERVE"
                 model_serve_btn.icon = "zmdi zmdi-play"
                 model_serve_btn.enable()
@@ -153,6 +154,8 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                     model_serve_preview,
                 )
                 saved_settings["session_id"] = None
+                session = None
+                g.updater("metas")
                 return
 
             utils.set_model_serve_preview("", model_serve_preview)
@@ -185,6 +188,8 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_serve_btn.text = "STOP"
                 model_serve_btn.icon = "zmdi zmdi-pause"
                 agent_selector_layout_edit_btn.disable()
+                g.running_sessions_ids.append(session.task_id)
+                g.updater("metas")
             except:
                 utils.set_model_serve_preview(
                     "An error occured while deploying the model", model_serve_preview, "warning"
@@ -195,6 +200,13 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_serve_btn.enable()
 
         # -----------------------------
+        def get_data() -> dict:
+            nonlocal session
+            if session is not None:
+                return {"session_id": session.task_id}
+            else:
+                return {}
+
         def data_changed_cb(**kwargs):
             pass
 
@@ -249,5 +261,6 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
+            get_data=get_data,
             need_preview=False,
         )

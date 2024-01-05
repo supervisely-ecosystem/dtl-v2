@@ -292,3 +292,12 @@ def clean_static_dir(static_dir):
                 shutil.rmtree(item_path)
         else:
             os.remove(item_path)
+
+
+def kill_serving_app():
+    for task_id in g.running_sessions_ids:
+        g.api.task.stop(task_id)
+
+
+def on_app_shutdown():
+    kill_serving_app()

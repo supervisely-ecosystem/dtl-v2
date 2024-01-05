@@ -113,3 +113,6 @@ error_dialog = Dialog(
 @error_close_btn.click
 def on_error_close():
     error_dialog.hide()
+
+
+running_sessions_ids = []

@@ -71,11 +71,11 @@ def main(progress: Progress, modality):
         net.preprocess()
         datasets_conflict_map = calculate_datasets_conflict_map(helper)
     except CustomException as e:
-        logger.error("Error occurred on DTL-graph initialization step!")
-        e.log()
+        # logger.error("Error occurred on DTL-graph initialization step!")
+        # e.log()
         raise e
     except Exception as e:
-        logger.error("Error occurred on DTL-graph initialization step!", exc_info=str(e))
+        # logger.error("Error occurred on DTL-graph initialization step!", exc_info=str(e))
         raise e
 
     total = net.get_total_elements()

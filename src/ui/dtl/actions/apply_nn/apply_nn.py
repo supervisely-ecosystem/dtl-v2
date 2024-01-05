@@ -70,6 +70,7 @@ class ApplyNNAction(NeuralNetworkAction):
             use_suffix_preview,
             conflict_method_preview,
             apply_method_preview,
+            inf_settings_edit_text,
             inf_settings_edit_container,
             inf_settings_widgets_container,
             inf_settings_preview_container,
@@ -130,7 +131,9 @@ class ApplyNNAction(NeuralNetworkAction):
             _model_meta, _model_info, _model_settings = get_model_settings(_session_id)
             set_model_preview(_model_info, connect_nn_model_preview)
             set_model_settings(_model_settings, inf_settings_editor)
+            connect_nn_model_preview.show()
 
+            classes_list_edit_text.show()
             saved_classes_settings = set_model_classes(
                 classes_list_widget, [obj_class for obj_class in _model_meta.obj_classes]
             )
@@ -142,6 +145,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 "Model Classes",
             )
 
+            tags_list_edit_text.show()
             saved_tags_settings = set_model_tags(
                 tags_list_widget, [tag_meta for tag_meta in _model_meta.tag_metas]
             )
@@ -150,6 +154,7 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_notification.hide()
             connect_notification.loading = False
 
+            inf_settings_edit_text.show()
             set_model_settings_preview(
                 model_suffix_input,
                 always_add_suffix_checkbox,
@@ -205,10 +210,47 @@ class ApplyNNAction(NeuralNetworkAction):
             saved_tags_settings = copy.deepcopy(default_tags_settings)
 
         def data_changed_cb(**kwargs):
+            nonlocal _session_id
+            nonlocal _current_meta, _model_meta
+
+            session_id = kwargs.get("session_id", None)
+            if session_id is not None:
+                if session_id == _session_id:
+                    pass
+                else:
+                    _session_id = session_id
+                    connect_nn_model_selector.set_session_id(_session_id)
+                    update_model_info_preview(
+                        _session_id, connect_nn_model_info_empty_text, connect_nn_model_info
+                    )
+                    confirm_model()
+            elif session_id is None:
+                _session_id = None
+                reset_model(
+                    connect_nn_model_selector,
+                    connect_nn_model_info,
+                    connect_nn_model_info_empty_text,
+                    connect_nn_model_preview,
+                    classes_list_widget,
+                    classes_list_preview,
+                    classes_list_edit_container,
+                    tags_list_widget,
+                    tags_list_preview,
+                    tags_list_edit_container,
+                    inf_settings_edit_container,
+                    suffix_preview,
+                    use_suffix_preview,
+                    conflict_method_preview,
+                    apply_method_preview,
+                    connect_notification,
+                    update_preview_btn,
+                )
+            elif _session_id is not None:
+                pass
+
             project_meta = kwargs.get("project_meta", None)
             if project_meta is None:
                 return
-            nonlocal _current_meta, _model_meta
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
