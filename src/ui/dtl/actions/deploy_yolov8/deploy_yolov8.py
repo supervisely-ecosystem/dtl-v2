@@ -1,6 +1,6 @@
 from typing import Optional
 from os.path import realpath, dirname
-
+from supervisely import logger
 from supervisely.nn.inference.session import Session
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
@@ -153,6 +153,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                     "<span style='color: rgb(90, 103, 114);'>Model stopped<br>Reselect model checkpoint</span>",
                     model_serve_preview,
                 )
+                logger.info(f"Session ID: {session.task_id} has been stopped")
                 saved_settings["session_id"] = None
                 session = None
                 g.updater("metas")
@@ -176,10 +177,11 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             try:
                 utils.set_model_serve_preview("Starting...", model_serve_preview)
                 utils.deploy_model(g.api, session.task_id, saved_settings)
+                logger.info(f"Session ID: {session.task_id} has been deployed")
 
                 app_link_message = (
-                    f"Model deployed "
-                    f"- <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+                    f"Model deployed - ID {session.task_id}"
+                    # f"- <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
                     f"<br>Press STOP to change model"
                 )
                 utils.set_model_serve_preview(app_link_message, model_serve_preview, "success")

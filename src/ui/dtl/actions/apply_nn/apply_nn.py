@@ -38,6 +38,7 @@ class ApplyNNAction(NeuralNetworkAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _session_id = None
+        _model_from_deploy_node = False
         _current_meta = ProjectMeta()
         _model_meta = ProjectMeta()
         _model_info = {}
@@ -210,13 +211,37 @@ class ApplyNNAction(NeuralNetworkAction):
             saved_tags_settings = copy.deepcopy(default_tags_settings)
 
         def data_changed_cb(**kwargs):
-            nonlocal _session_id
+            nonlocal _session_id, _model_from_deploy_node
             nonlocal _current_meta, _model_meta
 
             session_id = kwargs.get("session_id", None)
-            if session_id is not None:
+            if session_id is None:
+                if _model_from_deploy_node:
+                    _session_id = None
+                    reset_model(
+                        connect_nn_model_selector,
+                        connect_nn_model_info,
+                        connect_nn_model_info_empty_text,
+                        connect_nn_model_preview,
+                        classes_list_widget,
+                        classes_list_preview,
+                        classes_list_edit_container,
+                        tags_list_widget,
+                        tags_list_preview,
+                        tags_list_edit_container,
+                        inf_settings_edit_container,
+                        suffix_preview,
+                        use_suffix_preview,
+                        conflict_method_preview,
+                        apply_method_preview,
+                        connect_notification,
+                        update_preview_btn,
+                    )
+                    _model_from_deploy_node = False
+            else:
+                _model_from_deploy_node = True
                 if session_id == _session_id:
-                    pass
+                    return
                 else:
                     _session_id = session_id
                     connect_nn_model_selector.set_session_id(_session_id)
@@ -224,29 +249,6 @@ class ApplyNNAction(NeuralNetworkAction):
                         _session_id, connect_nn_model_info_empty_text, connect_nn_model_info
                     )
                     confirm_model()
-            elif session_id is None:
-                _session_id = None
-                reset_model(
-                    connect_nn_model_selector,
-                    connect_nn_model_info,
-                    connect_nn_model_info_empty_text,
-                    connect_nn_model_preview,
-                    classes_list_widget,
-                    classes_list_preview,
-                    classes_list_edit_container,
-                    tags_list_widget,
-                    tags_list_preview,
-                    tags_list_edit_container,
-                    inf_settings_edit_container,
-                    suffix_preview,
-                    use_suffix_preview,
-                    conflict_method_preview,
-                    apply_method_preview,
-                    connect_notification,
-                    update_preview_btn,
-                )
-            elif _session_id is not None:
-                pass
 
             project_meta = kwargs.get("project_meta", None)
             if project_meta is None:
