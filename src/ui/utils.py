@@ -163,6 +163,7 @@ def init_nodes_state(
             the_layer = net.layers[the_layer_idx]
             return all((x in metas_dict for x in the_layer.srcs))
 
+        datas_dict = {}
         processed_layers = set()
         while len(cur_level_layers_idxs) != 0:
             next_level_layers_idxs = set()
@@ -179,11 +180,13 @@ def init_nodes_state(
                 ui_layer = g.layers[ui_layer_id]
                 ui_layer: Layer
                 merged_data = {}
-                if not issubclass(ui_layer.action, SourceAction):
-                    for src in ui_layer.get_src():
-                        merged_data.update(g.layers[find_layer_id_by_dst(src)].get_data())
+                # gather data from all sources
+                for src in ui_layer.get_src():
+                    merged_data.update(datas_dict.get(find_layer_id_by_dst(src), {}))
+                # update data in node
                 ui_layer.update_data({**merged_data, "project_meta": merged_meta})
-                # ui_layer.update_project_meta(merged_meta)
+                # get update data to use in next nodes
+                datas_dict[ui_layer_id] = merged_data.update(ui_layer.get_data())
 
                 # update settings according to new meta
                 node_options = nodes_state.get(ui_layer_id, {})
