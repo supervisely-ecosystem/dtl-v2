@@ -52,6 +52,7 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_nn_save_btn,
             connect_nn_model_selector,
             connect_nn_model_field,
+            connect_nn_model_selector_disabled_text,
             connect_nn_model_info,
             connect_nn_model_info_empty_text,
             connect_nn_model_info_container,
@@ -238,8 +239,13 @@ class ApplyNNAction(NeuralNetworkAction):
                         update_preview_btn,
                     )
                     _model_from_deploy_node = False
+                    connect_nn_model_selector_disabled_text.hide()
+                    connect_nn_model_selector.enable()
+
             else:
                 _model_from_deploy_node = True
+                connect_nn_model_selector.disable()
+                connect_nn_model_selector_disabled_text.show()
                 if session_id == _session_id:
                     return
                 else:
