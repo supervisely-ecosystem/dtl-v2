@@ -186,7 +186,8 @@ def init_nodes_state(
                 # update data in node
                 ui_layer.update_data({**merged_data, "project_meta": merged_meta})
                 # get update data to use in next nodes
-                datas_dict[ui_layer_id] = merged_data.update(ui_layer.get_data())
+                merged_data.update(ui_layer.get_data())
+                datas_dict[ui_layer_id] = merged_data
 
                 # update settings according to new meta
                 node_options = nodes_state.get(ui_layer_id, {})
