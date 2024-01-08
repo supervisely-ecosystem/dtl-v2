@@ -2,6 +2,7 @@ from typing import List, NamedTuple
 from supervisely.api.api import Api
 from supervisely.app.widgets import (
     Input,
+    Button,
     Text,
     Select,
     RadioTable,
@@ -109,20 +110,23 @@ def save_model_settings(
                 selected_row: TrainedModelsSelector.ModelRow = (
                     model_selector_sidebar_custom_model_table_detection.get_selected_row()
                 )
-                model_path = selected_row.artifacts_selector.get_value()
-                model_name = selected_row.artifacts_selector.get_label()
+                if selected_row is not None:
+                    model_path = selected_row.artifacts_selector.get_value()
+                    model_name = selected_row.artifacts_selector.get_label()
             elif task_type == "instance segmentation":
                 selected_row: TrainedModelsSelector.ModelRow = (
                     model_selector_sidebar_custom_model_table_segmentation.get_selected_row()
                 )
-                model_path = selected_row.artifacts_selector.get_value()
-                model_name = selected_row.artifacts_selector.get_label()
+                if selected_row is not None:
+                    model_path = selected_row.artifacts_selector.get_value()
+                    model_name = selected_row.artifacts_selector.get_label()
             elif task_type == "pose estimation":
                 selected_row: TrainedModelsSelector.ModelRow = (
                     model_selector_sidebar_custom_model_table_pose_estimation.get_selected_row()
                 )
-                model_path = selected_row.artifacts_selector.get_value()
-                model_name = selected_row.artifacts_selector.get_label()
+                if selected_row is not None:
+                    model_path = selected_row.artifacts_selector.get_value()
+                    model_name = selected_row.artifacts_selector.get_label()
 
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
@@ -252,3 +256,87 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
             },
         },
     )
+
+
+# Check model
+
+
+def check_model_avaliability_by_task_type(
+    task_type: str,
+    model_selector_sidebar_custom_model_table_segmentation: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_detection: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_pose_estimation: TrainedModelsSelector,
+    model_selector_sidebar_save_btn: Button,
+):
+    if task_type == "object detection":
+        if len(model_selector_sidebar_custom_model_table_segmentation.rows) == 0:
+            model_selector_sidebar_save_btn.disable()
+        else:
+            model_selector_sidebar_save_btn.enable()
+    if task_type == "instance segmentation":
+        if len(model_selector_sidebar_custom_model_table_detection.rows) == 0:
+            model_selector_sidebar_save_btn.disable()
+        else:
+            model_selector_sidebar_save_btn.enable()
+    if task_type == "pose estimation":
+        if len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0:
+            model_selector_sidebar_save_btn.disable()
+        else:
+            model_selector_sidebar_save_btn.enable()
+
+
+def check_model_avaliability_by_model_type(
+    model_type: str,
+    model_selector_sidebar_custom_model_option_selector: Select,
+    model_selector_sidebar_custom_model_table_segmentation: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_detection: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_pose_estimation: TrainedModelsSelector,
+    model_selector_sidebar_save_btn: Button,
+):
+    if model_type == "Custom models":
+        if model_selector_sidebar_custom_model_option_selector.get_value() == "table":
+            if (
+                len(model_selector_sidebar_custom_model_table_detection.rows) == 0
+                and len(model_selector_sidebar_custom_model_table_segmentation.rows) == 0
+                and len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0
+            ):
+                model_selector_sidebar_save_btn.disable()
+            else:  # if at least one table is not empty
+                model_selector_sidebar_save_btn.enable()
+        else:
+            model_selector_sidebar_save_btn.enable()
+    else:
+        model_selector_sidebar_save_btn.enable()
+
+
+def set_default_model(
+    model_selector_sidebar_custom_model_table_detection: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_segmentation: TrainedModelsSelector,
+    model_selector_sidebar_custom_model_table_pose_estimation: TrainedModelsSelector,
+    model_selector_sidebar_model_type_tabs: RadioTabs,
+    model_selector_sidebar_task_type_selector_custom: RadioGroup,
+):
+    if (
+        len(model_selector_sidebar_custom_model_table_detection.rows) == 0
+        and len(model_selector_sidebar_custom_model_table_segmentation.rows) == 0
+        and len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0
+    ):
+        model_selector_sidebar_model_type_tabs.set_active_tab("Pretrained public models")
+    elif (
+        len(model_selector_sidebar_custom_model_table_detection.rows) > 0
+        and len(model_selector_sidebar_custom_model_table_segmentation.rows) == 0
+        and len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0
+    ):
+        model_selector_sidebar_task_type_selector_custom.set_value("object detection")
+    elif (
+        len(model_selector_sidebar_custom_model_table_detection.rows) == 0
+        and len(model_selector_sidebar_custom_model_table_segmentation.rows) > 0
+        and len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0
+    ):
+        model_selector_sidebar_task_type_selector_custom.set_value("instance segmentation")
+    elif (
+        len(model_selector_sidebar_custom_model_table_detection.rows) == 0
+        and len(model_selector_sidebar_custom_model_table_segmentation.rows) > 0
+        and len(model_selector_sidebar_custom_model_table_pose_estimation.rows) == 0
+    ):
+        model_selector_sidebar_task_type_selector_custom.set_value("pose estimation")

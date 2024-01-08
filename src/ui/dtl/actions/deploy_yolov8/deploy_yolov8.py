@@ -101,6 +101,41 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         ) = create_model_selector_widgets()
 
         # MODEL SELECTOR CBs
+        @model_selector_sidebar_custom_model_option_selector.value_changed
+        def model_selector_sidebar_custom_model_option_selector_cb(model_option):
+            if model_option == "table":
+                task_type = model_selector_sidebar_task_type_selector_custom.get_value()
+                utils.check_model_avaliability_by_task_type(
+                    task_type,
+                    model_selector_sidebar_custom_model_table_segmentation,
+                    model_selector_sidebar_custom_model_table_detection,
+                    model_selector_sidebar_custom_model_table_pose_estimation,
+                    model_selector_sidebar_save_btn,
+                )
+            else:
+                model_selector_sidebar_save_btn.enable()
+
+        @model_selector_sidebar_model_type_tabs.value_changed
+        def model_selector_sidebar_model_type_tabs_cb(model_type):
+            utils.check_model_avaliability_by_model_type(
+                model_type,
+                model_selector_sidebar_custom_model_option_selector,
+                model_selector_sidebar_custom_model_table_segmentation,
+                model_selector_sidebar_custom_model_table_detection,
+                model_selector_sidebar_custom_model_table_pose_estimation,
+                model_selector_sidebar_save_btn,
+            )
+
+        @model_selector_sidebar_task_type_selector_custom.value_changed
+        def model_selector_sidebar_task_type_selector_custom_cb(task_type):
+            utils.check_model_avaliability_by_task_type(
+                task_type,
+                model_selector_sidebar_custom_model_table_segmentation,
+                model_selector_sidebar_custom_model_table_detection,
+                model_selector_sidebar_custom_model_table_pose_estimation,
+                model_selector_sidebar_save_btn,
+            )
+
         @model_selector_sidebar_save_btn.click
         def model_selector_sidebar_save_btn_cb():
             nonlocal saved_settings
@@ -196,6 +231,11 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 utils.set_model_serve_preview(
                     "An error occured while deploying the model", model_serve_preview, "warning"
                 )
+                try:
+                    g.api.app.stop(session.task_id)
+                    g.running_sessions_ids.remove(session.task_id)
+                except:
+                    pass
                 agent_selector_layout_edit_btn.enable()
                 model_selector_layout_edit_btn.enable()
             finally:

@@ -25,6 +25,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
+import src.ui.dtl.actions.deploy_yolov8.layout.utils as utils
 
 
 COL_ID = "task id".upper()
@@ -83,11 +84,13 @@ def create_model_selector_widgets():
         training_app_directory=remote_path_to_custom_models,
         task_type="object detection",
     )
+
     model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
         team_id=g.TEAM_ID,
         training_app_directory=remote_path_to_custom_models,
         task_type="instance segmentation",
     )
+
     model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
         team_id=g.TEAM_ID,
         training_app_directory=remote_path_to_custom_models,
@@ -271,6 +274,14 @@ def create_model_selector_widgets():
         model_selector_layout_edit_text, model_selector_layout_edit_btn
     )
     # ------------------------------
+
+    utils.set_default_model(
+        model_selector_sidebar_custom_model_table_detection,
+        model_selector_sidebar_custom_model_table_segmentation,
+        model_selector_sidebar_custom_model_table_pose_estimation,
+        model_selector_sidebar_model_type_tabs,
+        model_selector_sidebar_task_type_selector_custom,
+    )
 
     return (
         # sidebar
