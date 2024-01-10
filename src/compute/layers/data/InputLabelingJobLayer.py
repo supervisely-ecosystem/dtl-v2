@@ -23,91 +23,6 @@ from src.exceptions import BadSettingsError
 import src.globals as g
 
 
-def get_geometry(type: str, data: dict):
-    if type == "bitmap":
-        mask = Bitmap.base64_2_data(data["bitmap"]["data"])
-        origin = data["bitmap"]["origin"]
-        origin = PointLocation(origin[1], origin[0])
-        geometry = Bitmap(mask, origin)
-
-    elif type == "point":  # points
-        row, col = data["points"]["exterior"][0][1], data["points"]["exterior"][0][0]
-        geometry = Point(row, col)
-
-    elif type == "rectangle":  # points
-        top, left, bottom, right = (
-            data["points"]["exterior"][0][1],
-            data["points"]["exterior"][0][0],
-            data["points"]["exterior"][1][1],
-            data["points"]["exterior"][1][0],
-        )
-        geometry = Rectangle(top, left, bottom, right)
-
-    elif type == "polygon":  # points
-        exterior = [PointLocation(coord[1], coord[0]) for coord in data["points"]["exterior"]]
-        interior = [PointLocation(coord[1], coord[0]) for coord in data["points"]["interior"]]
-        geometry = Polygon(exterior, interior)
-
-    elif type == "line":  # points
-        exterior = [PointLocation(coord[1], coord[0]) for coord in data["points"]["exterior"]]
-        geometry = Polyline(exterior)
-
-    else:
-        geometry = None
-
-    return geometry
-
-
-def create_tags_from_labeling_job(job_tags_map: List[dict], project_meta: ProjectMeta) -> List[Tag]:
-    tags = []
-    for tag in job_tags_map:
-        tag_meta = project_meta.get_tag_meta_by_id(tag["tagId"])
-        if tag_meta is None:
-            continue
-        tag_value = tag.get("value", None)
-        tag = Tag(tag_meta, value=tag_value)
-        tags.append(tag)
-    return tags
-
-
-def create_labels_from_labeling_job(
-    figures_map: List[dict], project_meta: ProjectMeta
-) -> List[Label]:
-    labels = []
-    for figure in figures_map:
-        obj_class = project_meta.get_obj_class_by_id(figure["classId"])
-        if obj_class is None:
-            continue
-        geometry = get_geometry(figure["geometryType"], figure["geometry"])
-        if geometry is None:
-            continue
-        tags = create_tags_from_labeling_job(figure["tags"], project_meta)
-
-        label = Label(obj_class=obj_class, geometry=geometry, tags=tags)
-        labels.append(label)
-    return labels
-
-
-def create_ann_from_labeling_job(
-    settings: dict,
-    image_id: Tuple[int, int],
-    project_meta: ProjectMeta,
-) -> Annotation:
-    g.api.add_header("x-job-id", str(settings["job_id"]))
-    figures = [
-        figure
-        for figure in g.api.figure.get_list(settings["job_dataset_id"])["entities"]
-        if image_id == figure["entityId"]
-    ]
-    image = g.api.image.get_info_by_id(image_id)
-    g.api.pop_header("x-job-id")
-
-    img_tags = create_tags_from_labeling_job(image.tags, project_meta)
-    labels = create_labels_from_labeling_job(figures, project_meta)
-    ann = Annotation(img_size=(image.height, image.width), labels=labels, img_tags=img_tags)
-    return ann
-
-
 class InputLabelingJobLayer(Layer):
     action = "input_labeling_job"
 
@@ -216,9 +131,8 @@ class InputLabelingJobLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         if img_desc.info.item_info.id in self.settings["entities_ids"]:
-            # take ann from lj
-            ann = create_ann_from_labeling_job(
-                self.settings, img_desc.info.item_info.id, self.in_project_meta
+            ann = g.api.labeling_job.get_annotation_by_image_id(
+                self.settings["job_id"], img_desc.info.item_info.id
             )
             ann = apply_to_labels(ann, self.class_mapper)
             yield (img_desc, ann)

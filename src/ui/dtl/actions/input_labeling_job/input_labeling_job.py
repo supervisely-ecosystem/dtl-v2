@@ -93,7 +93,7 @@ class InputLabelingJobAction(SourceAction):
                 update_preview_btn.disable()
                 return
 
-            job_meta = utils.get_job_meta(job_info)
+            job_meta = g.api.labeling_job.get_project_meta(job_id)  # utils.get_job_meta(job_info)
 
             _current_meta = job_meta
             _current_info = job_info
@@ -108,11 +108,7 @@ class InputLabelingJobAction(SourceAction):
             utils.set_job_tags_preview(job_meta.tag_metas, lj_selector_preview_tags)
             utils.set_job_name_preview(job_info.name, lj_selector_preview_lj_text)
             utils.set_job_status_preview(job_info.status, lj_selector_preview_lj_status)
-            utils.set_job_progress_preview(
-                job_info.accepted_images_count,
-                job_info.images_count,
-                lj_selector_preview_lj_progress,
-            )
+            utils.set_job_progress_preview(job_info, lj_selector_preview_lj_progress)
 
             _save_settings()
             g.updater("metas")

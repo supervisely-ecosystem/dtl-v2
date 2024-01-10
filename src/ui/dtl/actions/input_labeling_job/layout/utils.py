@@ -51,10 +51,16 @@ def set_job_status_preview(job_status: str, lj_selector_preview_lj_status: Text)
     lj_selector_preview_lj_status.show()
 
 
-def set_job_progress_preview(
-    accepted_images: int, total_images: int, lj_selector_preview_lj_progress: Text
-):
-    lj_selector_preview_lj_progress.set(f"Job progress: {accepted_images} / {total_images}", "text")
+def set_job_progress_preview(job_info: LabelingJobInfo, lj_selector_preview_lj_progress: Text):
+    job_status = job_info.status
+    if job_status == "in_progress":
+        lj_selector_preview_lj_progress.set(
+            f"Job progress: {job_info.finished_images_count} / {job_info.images_count}", "text"
+        )
+    else:  # job_status == "on_review" or job_status == "completed" or job_status == "stopped":
+        lj_selector_preview_lj_progress.set(
+            f"Job progress: {job_info.accepted_images_count} / {job_info.images_count}", "text"
+        )
     lj_selector_preview_lj_progress.show()
 
 
