@@ -298,6 +298,15 @@ def kill_serving_app():
     for task_id in g.running_sessions_ids:
         g.api.task.stop(task_id)
         logger.info(f"Session ID: {task_id} has been stopped")
+        
+def kill_deployed_app_by_layer_id(id:str):
+    layer = g.layers[id]
+    settings = layer._settings
+    session_id = settings.get("session_id", None)
+    if session_id is not None:
+        g.api.app.stop(session_id)
+    else:
+        return
 
 
 def on_app_shutdown():

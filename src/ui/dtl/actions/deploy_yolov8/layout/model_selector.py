@@ -15,8 +15,8 @@ from supervisely.app.widgets import (
     Checkbox,
 )
 from supervisely.io.json import load_json_file
+from supervisely.nn.inference.checkpoints import yolov8
 
-# from supervisely.api.agent_api import AgentInfo
 import src.globals as g
 from src.ui.dtl.utils import (
     get_text_font_size,
@@ -78,23 +78,29 @@ def create_model_selector_widgets():
 
     # CUSTOM MODEL OPTION SUPERVISELY
     remote_path_to_custom_models = "/yolov8_train/"
+    available_models = yolov8.list_checkpoints(g.api, g.TEAM_ID)
+    det_models = [
+        checkpoint for checkpoint in available_models if checkpoint.task_type == "object detection"
+    ]
+    seg_models = [
+        checkpoint
+        for checkpoint in available_models
+        if checkpoint.task_type == "instance segmentation"
+    ]
+    pose_models = [
+        checkpoint for checkpoint in available_models if checkpoint.task_type == "pose estimation"
+    ]
 
     model_selector_sidebar_custom_model_table_detection = TrainedModelsSelector(
-        team_id=g.TEAM_ID,
-        training_app_directory=remote_path_to_custom_models,
-        task_type="object detection",
+        team_id=g.TEAM_ID, checkpoint_infos=det_models
     )
 
     model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
-        team_id=g.TEAM_ID,
-        training_app_directory=remote_path_to_custom_models,
-        task_type="instance segmentation",
+        team_id=g.TEAM_ID, checkpoint_infos=seg_models
     )
 
     model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
-        team_id=g.TEAM_ID,
-        training_app_directory=remote_path_to_custom_models,
-        task_type="pose estimation",
+        team_id=g.TEAM_ID, checkpoint_infos=pose_models
     )
     # ------------------------------
 

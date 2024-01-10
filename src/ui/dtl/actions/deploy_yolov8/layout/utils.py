@@ -208,13 +208,15 @@ def validate_settings(
 
 
 # OTHER
-def get_agent_devices(agent_info: NamedTuple) -> List[Select.Item]:
+def get_agent_devices(agent_info: dict) -> List[Select.Item]:
     agent_selector_sidebar_device_selector_items = []
-    has_gpu = agent_info.capabilities["types"]["app_gpu"]["enabled"]
+    has_gpu = agent_info["gpuInfo"]["is_available"]
     if has_gpu:
-        agent_selector_sidebar_device_selector_items.append(
-            Select.Item(value="cuda:0", label="GPU")
-        )
+        
+        for idx, device_name in enumerate(agent_info["gpuInfo"]["device_names"]):
+            agent_selector_sidebar_device_selector_items.append(
+                Select.Item(value=f"cuda:{idx}", label=device_name)
+            )
     agent_selector_sidebar_device_selector_items.append(Select.Item(value="cpu", label="CPU"))
     return agent_selector_sidebar_device_selector_items
 
@@ -239,20 +241,20 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
         "deploy_nn_serving",
         data={
             "device": saved_settings[
-                "device"
-            ],  # "cpu" / "cuda" / "cuda:0" / "cuda:1" / "cuda:2" / "cuda:3"
+                "device"  # "cpu" / "cuda" / "cuda:0" / "cuda:1" / "cuda:2" / "cuda:3"
+            ],
             "model_dir": "data-nodes/models",  # downloaded models save path
             "deploy_params": {
                 "model_source": saved_settings[
-                    "model_type"
-                ],  # "Pretrained models" / "Custom models"
+                    "model_type"  # "Pretrained models" / "Custom models"
+                ],
                 "weights_name": saved_settings["model_name"],
                 "custom_weights_path": saved_settings[
-                    "model_path"
-                ],  # "path_to_file_in_team_files", # None,
+                    "model_path"  # "path_to_file_in_team_files", # None,
+                ],
                 "task_type": saved_settings[
-                    "task_type"
-                ],  # "object detection" / "instance segmentation" / "pose estimation"
+                    "task_type"  # "object detection" / "instance segmentation" / "pose estimation"
+                ],
             },
         },
     )

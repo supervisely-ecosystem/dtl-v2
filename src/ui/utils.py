@@ -137,7 +137,7 @@ def init_nodes_state(
             layer.update_project_meta(layer_input_meta)
 
         cur_level_layers_idxs = {
-            idx for idx, layer in enumerate(net.layers) if layer.type == "data"
+            idx for idx, layer in enumerate(net.layers) if layer.type == "data" or not layer.srcs
         }
         metas_dict = {}
         for data_layer_idx in cur_level_layers_idxs:
@@ -603,3 +603,4 @@ def show_error(message: str, error: CustomException):
     g.error_description.text = description
     g.error_extra.set_text(extra_text)
     g.error_dialog.show()
+

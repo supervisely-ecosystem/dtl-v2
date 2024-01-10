@@ -18,11 +18,9 @@ AGENT_STATUS_OTHER_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(225, 75
 def create_agent_selector_widgets():
     # SIDEBAR
     # AGENT SELECTOR
-    # available_agents = g.api.agent.get_list(g.TEAM_ID)  # -> AgentInfo
-    available_agents = [
-        agent for agent in g.api.agent.get_list(g.TEAM_ID) if agent.user_id == g.USER_ID
-    ]  # -> AgentInfo
-    agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID)
+    available_agents = g.api.agent.get_list_available(g.TEAM_ID)
+    agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID, show_only_running=True) 
+    
     agent_selector_sidebar_selector_empty_message = Text(
         (
             "No agents available. Follow this "
@@ -32,7 +30,6 @@ def create_agent_selector_widgets():
         status="text",
     )
 
-    # if current_agent is not None:
     if len(available_agents) > 0:
         agent_selector_sidebar_selector_empty_message.hide()
     else:
@@ -47,7 +44,6 @@ def create_agent_selector_widgets():
     # DEVICE SELECTOR
     agent_selector_sidebar_device_selector_empty_message = Text("Select agent first", status="text")
 
-    # if current_agent is not None and len(available_agents) > 0:
     if len(available_agents) > 0:
         agent_selector_sidebar_device_selector_items = utils.get_agent_devices(available_agents[0])
         agent_selector_sidebar_device_selector_empty_message.hide()

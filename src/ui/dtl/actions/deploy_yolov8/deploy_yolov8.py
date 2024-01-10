@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Optional
 from os.path import realpath, dirname
 from supervisely import logger
@@ -50,7 +51,12 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         @agent_selector_sidebar_selector.value_changed
         def agent_selector_sidebar_selector_cb(agent_id):
             agent_selector_sidebar_device_selector.loading = True
-            agent_info = g.api.agent.get_info_by_id(agent_id)
+            agents_infos = g.api.agent.get_list_available(g.TEAM_ID)
+            for agent in agents_infos:
+                if agent["id"] == agent_id:
+                    agent_info = agent
+                    break
+            
             devices = utils.get_agent_devices(agent_info)
             agent_selector_sidebar_device_selector.set(devices)
             agent_selector_sidebar_device_selector.loading = False
@@ -208,7 +214,8 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 return
 
             session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
-
+            utils.set_model_serve_preview("Waiting for app to start...", model_serve_preview)
+            sleep(20)
             try:
                 utils.set_model_serve_preview("Starting...", model_serve_preview)
                 utils.deploy_model(g.api, session.task_id, saved_settings)

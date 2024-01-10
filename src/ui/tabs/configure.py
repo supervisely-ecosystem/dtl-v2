@@ -230,6 +230,12 @@ def item_dropped_cb(item):
     action_name = item["item"]["key"]
     add_layer(action_name, position)
     g.context_menu_position = None
+    
+@nodes_flow.node_removed
+def node_removed(layer_id):
+    if layer_id.startswith("deploy"):
+        utils.kill_deployed_app_by_layer_id(layer_id)
+
 
 
 @add_layer_from_dialog_btn.click
