@@ -15,7 +15,7 @@ from supervisely.app.widgets import (
     Checkbox,
 )
 from supervisely.io.json import load_json_file
-from supervisely.nn.inference.checkpoints import yolov8
+from supervisely.nn.checkpoints import yolov8
 
 import src.globals as g
 from src.ui.dtl.utils import (
@@ -30,13 +30,13 @@ import src.ui.dtl.actions.deploy_yolov8.layout.utils as utils
 
 COL_ID = "task id".upper()
 COL_PROJECT = "training data project".upper()
-COL_ARTIFACTS = "artifacts".upper()
+COL_CHECKPOINTS = "checkpoints".upper()
 COL_PREVIEW = "preview".upper()
 
 columns = [
     COL_ID,
     COL_PROJECT,
-    COL_ARTIFACTS,
+    COL_CHECKPOINTS,
     COL_PREVIEW,
 ]
 
@@ -78,7 +78,7 @@ def create_model_selector_widgets():
 
     # CUSTOM MODEL OPTION SUPERVISELY
     remote_path_to_custom_models = "/yolov8_train/"
-    available_models = yolov8.list_checkpoints(g.api, g.TEAM_ID)
+    available_models = yolov8.get_list(g.api, g.TEAM_ID)
     det_models = [
         checkpoint for checkpoint in available_models if checkpoint.task_type == "object detection"
     ]
@@ -92,15 +92,15 @@ def create_model_selector_widgets():
     ]
 
     model_selector_sidebar_custom_model_table_detection = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoint_infos=det_models
+        team_id=g.TEAM_ID, checkpoints=det_models
     )
 
     model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoint_infos=seg_models
+        team_id=g.TEAM_ID, checkpoints=seg_models
     )
 
     model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoint_infos=pose_models
+        team_id=g.TEAM_ID, checkpoints=pose_models
     )
     # ------------------------------
 

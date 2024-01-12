@@ -39,6 +39,9 @@ SUPPORTED_MODALITIES_MAP = {
 
 api = sly.Api()
 
+
+ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
+
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
 if PROJECT_ID is not None:
     project_type = api.project.get_info_by_id(PROJECT_ID).type

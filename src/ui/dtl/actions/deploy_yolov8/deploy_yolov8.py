@@ -53,10 +53,10 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             agent_selector_sidebar_device_selector.loading = True
             agents_infos = g.api.agent.get_list_available(g.TEAM_ID)
             for agent in agents_infos:
-                if agent["id"] == agent_id:
+                if agent.id == agent_id:
                     agent_info = agent
                     break
-            
+
             devices = utils.get_agent_devices(agent_info)
             agent_selector_sidebar_device_selector.set(devices)
             agent_selector_sidebar_device_selector.loading = False

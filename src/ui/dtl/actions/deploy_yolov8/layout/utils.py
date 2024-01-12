@@ -1,4 +1,4 @@
-from typing import List, NamedTuple
+from typing import List
 from supervisely.api.api import Api
 from supervisely.app.widgets import (
     Input,
@@ -12,6 +12,7 @@ from supervisely.app.widgets import (
     Checkbox,
 )
 
+from supervisely.api.agent_api import AgentInfo
 from supervisely.api.app_api import SessionInfo
 from supervisely.io.fs import get_file_name_with_ext
 import src.globals as g
@@ -111,22 +112,22 @@ def save_model_settings(
                     model_selector_sidebar_custom_model_table_detection.get_selected_row()
                 )
                 if selected_row is not None:
-                    model_path = selected_row.artifacts_selector.get_value()
-                    model_name = selected_row.artifacts_selector.get_label()
+                    model_path = selected_row.checkpoints_selector.get_value()
+                    model_name = selected_row.checkpoints_selector.get_label()
             elif task_type == "instance segmentation":
                 selected_row: TrainedModelsSelector.ModelRow = (
                     model_selector_sidebar_custom_model_table_segmentation.get_selected_row()
                 )
                 if selected_row is not None:
-                    model_path = selected_row.artifacts_selector.get_value()
-                    model_name = selected_row.artifacts_selector.get_label()
+                    model_path = selected_row.checkpoints_selector.get_value()
+                    model_name = selected_row.checkpoints_selector.get_label()
             elif task_type == "pose estimation":
                 selected_row: TrainedModelsSelector.ModelRow = (
                     model_selector_sidebar_custom_model_table_pose_estimation.get_selected_row()
                 )
                 if selected_row is not None:
-                    model_path = selected_row.artifacts_selector.get_value()
-                    model_name = selected_row.artifacts_selector.get_label()
+                    model_path = selected_row.checkpoints_selector.get_value()
+                    model_name = selected_row.checkpoints_selector.get_label()
 
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
@@ -208,12 +209,11 @@ def validate_settings(
 
 
 # OTHER
-def get_agent_devices(agent_info: dict) -> List[Select.Item]:
+def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
     agent_selector_sidebar_device_selector_items = []
-    has_gpu = agent_info["gpuInfo"]["is_available"]
+    has_gpu = agent_info.gpu_info["is_available"]
     if has_gpu:
-        
-        for idx, device_name in enumerate(agent_info["gpuInfo"]["device_names"]):
+        for idx, device_name in enumerate(agent_info.gpu_info["device_names"]):
             agent_selector_sidebar_device_selector_items.append(
                 Select.Item(value=f"cuda:{idx}", label=device_name)
             )
