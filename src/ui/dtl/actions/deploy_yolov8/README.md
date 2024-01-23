@@ -1,12 +1,12 @@
-# Deploy YoloV8
+# Deploy YOLOv8
 
-`Deploy YoloV8` layer can be used to deploy custom and pretrained YoloV8 models that you can use with `Apply NN` layer. Custom models will appear in the custom section of the table only if you have any trained `YoloV8` models in your Team Files. You can train your own model using `Train YoloV8` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
+`Deploy YOLOv8` layer can be used to deploy custom and pretrained YOLOv8 models that you can use with `Apply NN` layer. Custom models will appear in the custom section of the table only if you have any trained `YOLOv8` models in your Team Files. You can train your own model using `Train YOLOv8` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
 ### Settings:
 
 ### How to use:
 
-1. Add `Deploy YoloV8` layer
+1. Add `Deploy YOLOv8` layer
 2. Open agent settings and select agent and device
 3. Open models selector and select one of the available models
 4. Press `SERVE`

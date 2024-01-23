@@ -228,7 +228,7 @@ def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
         workspace_id=workspace_id,
         description=f"AutoServe session for Serve YOLOv8",
         task_name="AutoServe/serve",
-        params=saved_settings,
+        params={"autostart": False, **saved_settings},
         app_version="data-nodes-deploy-yolov8",
         is_branch=True,
     )

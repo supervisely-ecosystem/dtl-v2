@@ -59,13 +59,15 @@ class DeployYOLOV8(Layer):
         settings = self.settings
 
         if settings.get("agent_id", None) is None:
-            raise ValueError("Select agent")
+            raise ValueError("Select agent in 'Deploy YOLOv8' node'")
         if settings.get("device", None) is None:
-            raise ValueError("Select device")
+            raise ValueError("Select device in 'Deploy YOLOv8' node")
         if settings.get("model_type", None) is None:
-            raise ValueError("Select model")
+            raise ValueError("Select model in 'Deploy YOLOv8' node")
         if settings.get("session_id", None) is None:
-            raise ValueError("Deploy model")
+            raise ValueError(
+                "Selected model is not served in 'Deploy YOLOv8' node. Press'SERVE' button to deploy model or close 'Deploy YOLOv8' node to proceed"
+            )
 
         return super().validate()
 

@@ -251,10 +251,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         # -----------------------------
         def get_data() -> dict:
             nonlocal session
-            if session is not None:
-                return {"session_id": session.task_id}
-            else:
-                return {}
+            return {"session_id": session.task_id} if session is not None else {}
 
         def data_changed_cb(**kwargs):
             pass

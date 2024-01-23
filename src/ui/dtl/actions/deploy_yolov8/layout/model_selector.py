@@ -77,7 +77,6 @@ def create_model_selector_widgets():
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
-    remote_path_to_custom_models = "/yolov8_train/"
     available_models = yolov8.get_list(g.api, g.TEAM_ID)
     det_models = [
         checkpoint for checkpoint in available_models if checkpoint.task_type == "object detection"
@@ -239,6 +238,8 @@ def create_model_selector_widgets():
             model_selector_sidebar_public_task_type_selector_container,
         ],
     )
+    if len(available_models) == 0:
+        model_selector_sidebar_model_type_tabs.set_active_tab("Pretrained public models")
 
     # SIDEBAR CONTAINER
     model_selector_sidebar_save_btn = create_save_btn()
