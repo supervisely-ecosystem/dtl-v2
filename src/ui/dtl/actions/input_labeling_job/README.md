@@ -1,6 +1,6 @@
 # Input Labeling Job
 
-The `Input Labeling Job` layer allows you to specify the data and annotations from labeling job that will participate in the transformation process.
+The `Input Labeling Job` layer allows you to specify the data and annotations from labeling job that will participate in the transformation process. Only annotations from selected labeling job will be used in the transformation process.
 
 > ✅ Don't worry, original labeling job will remain safe. Any changes you make using all the layers will affect the new resulting project, unless you select to save results with `Add to Existing Project` layer.
 
