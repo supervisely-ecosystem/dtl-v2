@@ -17,7 +17,6 @@ from src.ui.dtl.actions.input_labeling_job.layout.node_layout import create_layo
 import src.ui.dtl.actions.input_labeling_job.layout.utils as utils
 
 
-# ImagesProject
 class InputLabelingJobAction(SourceAction):
     name = "input_labeling_job"
     title = "Input Labeling Job"
@@ -149,19 +148,23 @@ class InputLabelingJobAction(SourceAction):
             return saved_settings
 
         def _set_src_from_json(srcs: List[str]):
-            pass
-            # nonlocal saved_src
-            # data_changed_cb(**{"project_meta": project_meta})
+            nonlocal saved_src
+            saved_src = srcs
 
         def _set_settings_from_json(settings: dict):
+            nonlocal _current_info
             utils.set_settings_from_json(
                 settings,
+                lj_selector_preview_lj_dataset_thumbnail,
                 lj_selector_sidebar_selector,
                 lj_selector_sidebar_lj_info,
                 lj_selector_preview_lj_text,
                 lj_selector_preview_classes,
                 lj_selector_preview_tags,
+                update_preview_btn,
             )
+            _current_info = g.api.labeling_job.get_info_by_id(settings.get("job_id", None))
+            _save_settings()
 
         def create_options(src: List[str], dst: List[str], settings: dict) -> dict:
             _set_src_from_json(src)

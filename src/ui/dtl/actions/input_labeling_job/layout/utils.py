@@ -8,7 +8,7 @@ from supervisely import (
     ProjectInfo,
     DatasetInfo,
 )
-from supervisely.app.widgets import Select, Text, DatasetThumbnail
+from supervisely.app.widgets import Select, Text, DatasetThumbnail, Button
 from supervisely.api.labeling_job_api import LabelingJobInfo
 
 import src.globals as g
@@ -90,6 +90,14 @@ def set_job_tags_preview(
 
 
 # SETTINGS FROM JSON
+def set_job_thumbnail_from_json(
+    job_info: LabelingJobInfo, lj_selector_preview_lj_dataset_thumbnail: DatasetThumbnail
+):
+    project_info = g.api.project.get_info_by_id(job_info.project_id)
+    dataset_info = g.api.dataset.get_info_by_id(job_info.dataset_id)
+    set_job_dataset_preview(project_info, dataset_info, lj_selector_preview_lj_dataset_thumbnail)
+
+
 def set_job_from_json(
     settings: dict,
     lj_selector_sidebar_selector: Select,
@@ -102,11 +110,13 @@ def set_job_from_json(
 
 def set_settings_from_json(
     settings: dict,
+    lj_selector_preview_lj_dataset_thumbnail: DatasetThumbnail,
     lj_selector_sidebar_selector: Select,
     lj_selector_sidebar_lj_info: LabelingJobInfoWidget,
     lj_selector_preview_lj_text: Text,
     lj_selector_preview_classes: ClassesListPreview,
     lj_selector_preview_tags: TagsListPreview,
+    update_preview_btn: Button,
 ):
     job_id = settings.get("job_id", None)
     if job_id is None:
@@ -114,6 +124,7 @@ def set_settings_from_json(
 
     job_info = g.api.labeling_job.get_info_by_id(job_id)
 
+    set_job_thumbnail_from_json(job_info, lj_selector_preview_lj_dataset_thumbnail)
     set_job_from_json(settings, lj_selector_sidebar_selector, lj_selector_sidebar_lj_info)
     set_job_name_preview(job_info.name, lj_selector_preview_lj_text)
 
@@ -125,6 +136,7 @@ def set_settings_from_json(
     tags = settings.get("tags", [])
     job_tags = [tag_meta for tag_meta in job_meta.tag_metas if tag_meta.name in tags]
     set_job_tags_preview(job_tags, lj_selector_preview_tags)
+    update_preview_btn.enable()
 
 
 # --------------------------

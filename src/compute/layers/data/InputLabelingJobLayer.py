@@ -55,12 +55,12 @@ class InputLabelingJobLayer(Layer):
             job_classes = [
                 obj_class
                 for obj_class in self.in_project_meta.obj_classes
-                if obj_class.name in self.settings["classes"]
+                if obj_class.name in self.settings.get("classes", [])
             ]
             job_tags = [
                 tag_meta
                 for tag_meta in self.in_project_meta.tag_metas
-                if tag_meta.name in self.settings["tags"]
+                if tag_meta.name in self.settings.get("tags", [])
             ]
             self.in_project_meta = ProjectMeta(obj_classes=job_classes, tag_metas=job_tags)
 
@@ -131,8 +131,10 @@ class InputLabelingJobLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         if img_desc.info.item_info.id in self.settings["entities_ids"]:
-            ann = g.api.labeling_job.get_annotation_by_image_id(
-                self.settings["job_id"], img_desc.info.item_info.id
+            anns = g.api.labeling_job.get_annotations(
+                self.settings["job_id"], [img_desc.info.item_info.id], self.in_project_meta
             )
+            if len(anns) > 0:
+                ann = anns[0]
             ann = apply_to_labels(ann, self.class_mapper)
             yield (img_desc, ann)
