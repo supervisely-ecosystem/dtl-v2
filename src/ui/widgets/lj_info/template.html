@@ -1,9 +1,11 @@
 <div v-if="data.{{{widget.widget_id}}}.job_info" style="margin: 22px 5px">
 	<div
-		v-for="v, k in data.{{{widget.widget_id}}}.job_info"
+		v-for="k in data.{{{widget.widget_id}}}.job_keys"
 		class="mb10"
 		style="word-break: break-all"
 	>
-		<div style="margin-bottom: 4px"><b>{{ k }}</b>: <span>{{ v }}</span></div>
+		<div style="margin-bottom: 4px">
+			<b>{{ k }}</b>: <span>{{ data.{{{widget.widget_id}}}.job_info[k] }}</span>
+		</div>
 	</div>
 </div>

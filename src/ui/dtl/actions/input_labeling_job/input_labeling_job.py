@@ -163,7 +163,11 @@ class InputLabelingJobAction(SourceAction):
                 lj_selector_preview_tags,
                 update_preview_btn,
             )
-            _current_info = g.api.labeling_job.get_info_by_id(settings.get("job_id", None))
+
+            job_id = settings.get("job_id", None)
+            if job_id is not None:
+                _current_info = g.api.labeling_job.get_info_by_id(job_id)
+
             _save_settings()
 
         def create_options(src: List[str], dst: List[str], settings: dict) -> dict:

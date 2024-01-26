@@ -143,6 +143,14 @@ def set_settings_from_json(
 
 
 def save_settings(job_info: LabelingJobInfo) -> dict:
+    if job_info is None:
+        return {
+            "job_id": None,
+            "job_dataset_id": None,
+            "entities_ids": [],
+            "classes": [],
+            "tags": [],
+        }
     return {
         "job_id": job_info.id,
         "job_dataset_id": job_info.dataset_id,

@@ -29,6 +29,22 @@ class LabelingJobInfoWidget(Widget):
 
     def get_json_data(self):
         data = {}
+        data["job_keys"] = [
+            "Job ID",
+            "Job name",
+            "Job status",
+            "Job owner",
+            "Labeler",
+            "Reviewer",
+            "Project name",
+            "Project ID",
+            "Dataset name",
+            "Dataset ID",
+            "Classes to label",
+            "Tags to label",
+            "Images count",
+            "Finished images count",
+        ]
         data["teamId"] = self._team_id
         if self._job_id is not None:
             if self._job_info is None:
