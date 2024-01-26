@@ -91,11 +91,21 @@ def set_job_tags_preview(
 
 # SETTINGS FROM JSON
 def set_job_thumbnail_from_json(
-    job_info: LabelingJobInfo, lj_selector_preview_lj_dataset_thumbnail: DatasetThumbnail
+    job_info: LabelingJobInfo,
+    lj_selector_preview_lj_dataset_thumbnail: DatasetThumbnail,
+    lj_selector_preview_lj_text: Text,
 ):
     project_info = g.api.project.get_info_by_id(job_info.project_id)
+    if project_info is None:
+        lj_selector_preview_lj_text.set(
+            f"Project: {job_info.project_name} (ID {job_info.project_id}) not found",
+            "warning",
+        )
+        return False
+
     dataset_info = g.api.dataset.get_info_by_id(job_info.dataset_id)
     set_job_dataset_preview(project_info, dataset_info, lj_selector_preview_lj_dataset_thumbnail)
+    return True
 
 
 def set_job_from_json(
@@ -124,7 +134,12 @@ def set_settings_from_json(
 
     job_info = g.api.labeling_job.get_info_by_id(job_id)
 
-    set_job_thumbnail_from_json(job_info, lj_selector_preview_lj_dataset_thumbnail)
+    project_exists = set_job_thumbnail_from_json(
+        job_info, lj_selector_preview_lj_dataset_thumbnail, lj_selector_preview_lj_text
+    )
+    if not project_exists:
+        return
+
     set_job_from_json(settings, lj_selector_sidebar_selector, lj_selector_sidebar_lj_info)
     set_job_name_preview(job_info.name, lj_selector_preview_lj_text)
 
