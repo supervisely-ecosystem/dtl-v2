@@ -20,8 +20,10 @@ import src.ui.dtl.actions.input_labeling_job.layout.utils as utils
 class InputLabelingJobAction(SourceAction):
     name = "input_labeling_job"
     title = "Input Labeling Job"
-    docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
-    description = "Use to specify project and its datasets that will participate in data transformation process."
+    docs_url = ""
+    description = (
+        "Use to specify labeling job data that will participate in data transformation process."
+    )
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
