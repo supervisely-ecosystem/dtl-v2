@@ -44,10 +44,11 @@ def find_layer_id_by_dst(dst: str):
     return None
 
 
-def find_children(parent: Layer):
+def find_children(parent: Layer, all_layers_ids: list):
     children = []
     parent_dst = parent.get_dst()
-    for layer_id, layer in g.layers.items():
+    for layer_id in all_layers_ids:
+        layer = g.layers.get(layer_id)
         for l_src in layer.get_src():
             if l_src in parent_dst:
                 children.append(layer_id)
@@ -248,15 +249,19 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
     return chain
 
 
-def get_layer_children_list(layer_id, layers: list = None):
+def get_layer_children_list(
+    layer_id: str,
+    all_layers_ids: list,
+    layers: list = None,
+):
     if layers is None:
         layers = []
     if layer_id in layers:
         return layers
     layers.append(layer_id)
     layer: Layer = g.layers[layer_id]
-    for child in find_children(layer):
-        get_layer_children_list(child, layers)
+    for child in find_children(layer, all_layers_ids):
+        get_layer_children_list(child, all_layers_ids, layers)
     return layers
 
 
@@ -330,7 +335,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     layer = g.layers[layer_id]
 
     layer.clear_preview()
-    children = get_layer_children_list(layer_id)
+    children = get_layer_children_list(layer_id, all_layers_ids)
     if children:
         for l_id in children:
             g.layers[l_id].clear_preview()
@@ -373,7 +378,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     if layers_id_chain is None:
         layers_idx_whitelist = None
     else:
-        children = get_layer_children_list(layer_id)
+        children = get_layer_children_list(layer_id, all_layers_ids)
         layers_idx_whitelist = [all_layers_ids.index(id) for id in layers_id_chain]
         layers_idx_whitelist.extend([all_layers_ids.index(id) for id in children])
     processing_generator = net.start_iterate(
