@@ -256,7 +256,7 @@ class AddLabelstoExistingProjectLayer(Layer):
 
     def process(
         self,
-        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
+        data_el: Tuple[ImageDescriptor, Annotation],
     ):
         item_desc, ann = data_el
         if not self.net.preview_mode:
