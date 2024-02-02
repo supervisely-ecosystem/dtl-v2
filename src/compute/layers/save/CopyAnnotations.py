@@ -10,7 +10,9 @@ from supervisely import (
     TagValueType,
     TagMetaCollection,
     ProjectInfo,
+    ImageInfo,
 )
+from supervisely.api.app_api import SessionInfo
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
@@ -45,7 +47,7 @@ def _get_source_projects_ids_from_dtl():
     return source_project_id_ds_map
 
 
-def backup_target_project(project_info: ProjectInfo):
+def backup_destination_project(project_info: ProjectInfo) -> SessionInfo:
     app_slug = "supervisely-ecosystem/sys-clone-project"
     module_id = g.api.app.get_ecosystem_module_id(app_slug)
     module_info = g.api.app.get_ecosystem_module_info(module_id)
@@ -55,35 +57,76 @@ def backup_target_project(project_info: ProjectInfo):
     module_params["projectName"] = f"{project_info.name}_backup"
     module_params["teamId"] = g.TEAM_ID
     module_params["workspaceId"] = g.WORKSPACE_ID
-    g.api.app.start(
+    session = g.api.app.start(
         agent_id=agent_id,
         module_id=module_id,
         workspace_id=g.WORKSPACE_ID,
         params=module_params,
         task_name="[Data Nodes] Add labels to existing project backup",
     )
+    return session
 
 
-def map_matching_images_by_name(input_ds_images, target_ds_images):
-    name_to_id_map = {image.name: image.id for image in input_ds_images}
+def match_properties(input_image: ImageInfo, destination_image: ImageInfo) -> bool:
+    if (destination_image.height, destination_image.width) != (
+        input_image.height,
+        input_image.width,
+    ):
+        sly.logger.warn(
+            (
+                f"Image: '{destination_image.name}' (ID: '{destination_image.id}') size mismatch. "
+                f"Original image size: '{input_image.height}x{input_image.width}'. "
+                f"Destination image size: '{destination_image.height}x{destination_image.width}'. "
+                "Skipping..."
+            )
+        )
+        return False
+    if destination_image.link != input_image.link:
+        sly.logger.warn(
+            (
+                f"Image: '{destination_image.name}' (ID: '{destination_image.id}') link mismatch. "
+                f"Original image link: '{input_image.link}'. "
+                f"Destination image link: '{destination_image.link}'. "
+                "Skipping..."
+            )
+        )
+        return False
+    elif destination_image.hash != input_image.hash:
+        sly.logger.warn(
+            (
+                f"Image: '{destination_image.name}' (ID: '{destination_image.id}') hash mismatch. "
+                f"Original image hash: '{input_image.hash}'."
+                f"Destination image hash: '{destination_image.hash}'. "
+                "Skipping..."
+            )
+        )
+        return False
+    return True
+
+
+def map_matching_images_by_name(input_ds_images, destination_ds_images):
+    name_to_id_map = {image.name: image for image in input_ds_images}
     matched_mapping = {}
-
-    for image in target_ds_images:
-        if image.name in name_to_id_map:
-            matched_mapping[name_to_id_map[image.name]] = image.id
-
+    for image in destination_ds_images:
+        if image.name in name_to_id_map and match_properties(name_to_id_map[image.name], image):
+            matched_mapping[name_to_id_map[image.name].id] = image.id
     return matched_mapping
 
 
-class AddLabelstoExistingProjectLayer(Layer):
-    action = "add_labels_to_existing_project"
+class CopyAnnotationsLayer(Layer):
+    action = "copy_annotations"
 
     layer_settings = {
         "required": ["settings"],
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["project_id", "dataset_ids", "add_option", "backup_target_project"],
+                "required": [
+                    "project_id",
+                    "dataset_ids",
+                    "add_option",
+                    "backup_destination_project",
+                ],
                 "properties": {
                     "project_id": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
                     "dataset_ids": {
@@ -93,7 +136,7 @@ class AddLabelstoExistingProjectLayer(Layer):
                         "type": "string",
                         "enum": ["merge", "replace", "keep"],
                     },
-                    "backup_target_project": {"type": "boolean"},
+                    "backup_destination_project": {"type": "boolean"},
                 },
             },
         },
@@ -109,12 +152,12 @@ class AddLabelstoExistingProjectLayer(Layer):
 
         if settings["project_id"] is None:
             raise ValueError(
-                "Target project is not selected in the 'Add labels to existing project' layer"
+                "Destination project is not selected in the 'Add labels to existing project' layer"
             )
 
         if settings["dataset_ids"] is None or len(settings["dataset_ids"]) == 0:
             raise ValueError(
-                "Target dataset is not selected in the 'Add labels to existing project' layer"
+                "Destination dataset is not selected in the 'Add labels to existing project' layer"
             )
 
         super().validate()
@@ -151,9 +194,11 @@ class AddLabelstoExistingProjectLayer(Layer):
 
         dst_meta = ProjectMeta.from_json(g.api.project.get_meta(self.out_project_id))
 
-        if self.settings["backup_target_project"]:
-            backup_target_project(self.sly_project_info)
-            sly.logger.info(f"Project ID: '{self.settings['project_id']}' backup is created")
+        if self.settings["backup_destination_project"]:
+            session = backup_destination_project(self.sly_project_info)
+            sly.logger.info(
+                f"Project ID: '{self.settings['project_id']}' backup is created. Task ID: '{session.task_id}'"
+            )
 
         if self.output_meta != dst_meta:
             updated_tag_metas = []
@@ -182,10 +227,10 @@ class AddLabelstoExistingProjectLayer(Layer):
                 raise GraphError(f"Failed to merge meta: {e}")
 
         # match dataset names
-        target_dataset_infos = [
+        destination_dataset_infos = [
             g.api.dataset.get_info_by_id(ds_id) for ds_id in self.settings["dataset_ids"]
         ]
-        target_ds_map = {ds_info.name: ds_info for ds_info in target_dataset_infos}
+        destination_ds_map = {ds_info.name: ds_info for ds_info in destination_dataset_infos}
         datasets_matches = 0
 
         is_single_input_ds = False
@@ -201,24 +246,26 @@ class AddLabelstoExistingProjectLayer(Layer):
             datasets = input_projects_map[input_project_id]
             for dataset in datasets:
                 if (
-                    dataset.name in list(target_ds_map.keys())
+                    dataset.name in list(destination_ds_map.keys())
                     or len(self.settings["dataset_ids"]) == 1
                 ):
                     total_ds_images = dataset.items_count
                     input_images = g.api.image.get_list(dataset.id)
 
                     if len(self.settings["dataset_ids"]) == 1 and is_single_input_ds:
-                        target_images = g.api.image.get_list(self.settings["dataset_ids"][0])
+                        destination_images = g.api.image.get_list(self.settings["dataset_ids"][0])
                     else:
-                        target_ds = target_ds_map.get(dataset.name)
-                        if target_ds is not None:
-                            target_images = g.api.image.get_list(target_ds_map[dataset.name].id)
+                        destination_ds = destination_ds_map.get(dataset.name)
+                        if destination_ds is not None:
+                            destination_images = g.api.image.get_list(
+                                destination_ds_map[dataset.name].id
+                            )
                         else:
                             sly.logger.warn(
-                                f"Target project does not have dataset '{dataset.name}'. Skipping..."
+                                f"Destination project does not have dataset '{dataset.name}'. Skipping..."
                             )
                             continue
-                    matched_images = map_matching_images_by_name(input_images, target_images)
+                    matched_images = map_matching_images_by_name(input_images, destination_images)
                     if len(matched_images) == 0:
                         sly.logger.warn(
                             f"Dataset '{dataset.name}' (ID '{dataset.id}') has no matching images. Skipping..."
@@ -238,14 +285,18 @@ class AddLabelstoExistingProjectLayer(Layer):
                     datasets_matches += 1
                 else:
                     sly.logger.warn(
-                        f"Target project does not have dataset '{dataset.name}'. Skipping..."
+                        f"Destination project does not have dataset '{dataset.name}'. Skipping..."
                     )
                     continue
 
         if datasets_matches == 0:
-            raise ValueError("No matching datasets found. Please check input and target projects")
+            raise ValueError(
+                "No matching datasets found. Please check input and destination projects"
+            )
         if len(self.ds_map) == 0:
-            raise ValueError("No matching images found. Please check input and target projects")
+            raise ValueError(
+                "No matching images found. Please check input and destination projects"
+            )
 
     def get_or_create_dataset(self, dataset_name):
         return self.ds_map[dataset_name]
@@ -259,30 +310,34 @@ class AddLabelstoExistingProjectLayer(Layer):
     ):
         item_desc, ann = data_el
         if not self.net.preview_mode:
+            local_item_size = item_desc.item_data.shape[:2]
             dataset_id = item_desc.info.item_info.dataset_id
             image_id = item_desc.info.item_info.id
-            target_images_ids = self.ds_map.get(dataset_id)
-            if target_images_ids is not None:
-                target_image_id = target_images_ids.get(image_id)
-                if target_image_id is not None:
-                    image_size = (item_desc.info.item_info.height, item_desc.info.item_info.width)
-                    # check original image size to target image size
-                    target_image = g.api.image.get_info_by_id(target_image_id)
-                    if (target_image.height, target_image.width) != image_size:
+            destination_images_ids = self.ds_map.get(dataset_id)
+            if destination_images_ids is not None:
+                destination_image_id = destination_images_ids.get(image_id)
+                if destination_image_id is not None:
+                    original_image_size = (
+                        item_desc.info.item_info.height,
+                        item_desc.info.item_info.width,
+                    )
+                    # check image size was modified
+                    if local_item_size != original_image_size:
                         sly.logger.warn(
-                            f"Image: '{target_image.name}' (ID: '{target_image_id}') size mismatch. Skipping..."
+                            (
+                                f"Image: '{item_desc.info.item_info.name}' size was modified in the pipeline. "
+                                f"Original size: '{item_desc.info.item_info.height}x{item_desc.info.item_info.width}'. "
+                                f"Modified image size: '{local_item_size[0]}x{local_item_size[1]}' "
+                                "Skipping..."
+                            )
                         )
                     else:
-                        # check original image size for transformations
-                        if image_size != ann.img_size:
-                            ann = ann.resize(image_size)
-
                         add_option = self.settings["add_option"]
                         if add_option == "merge":
-                            ann_json = g.api.annotation.download_json(target_image_id)
-                            target_ann = sly.Annotation.from_json(ann_json, self.output_meta)
-                            ann = ann.merge(target_ann)
-                            g.api.annotation.upload_ann(target_image_id, ann)
+                            ann_json = g.api.annotation.download_json(destination_image_id)
+                            destination_ann = sly.Annotation.from_json(ann_json, self.output_meta)
+                            ann = ann.merge(destination_ann)
+                            g.api.annotation.upload_ann(destination_image_id, ann)
                         else:
-                            g.api.annotation.upload_ann(target_image_id, ann)
+                            g.api.annotation.upload_ann(destination_image_id, ann)
         yield ([item_desc, ann])

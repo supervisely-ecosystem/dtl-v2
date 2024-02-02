@@ -56,8 +56,8 @@ from .actions.apply_nn.apply_nn import ApplyNNAction
 from .actions.filter_images_without_objects.filter_images_without_objects import (
     FilterImageWithoutObjects,
 )
-from .actions.add_labels_to_existing_project.add_labels_to_existing_project import (
-    AddLabelstoExistingProjectAction,
+from .actions.copy_annotations.copy_annotations import (
+    CopyAnnotationsAction,
 )
 
 
@@ -151,7 +151,7 @@ image_actions_list = {
         SuperviselyAction.name,
         ExistingProjectAction.name,
         LabelingJobAction.name,
-        AddLabelstoExistingProjectAction.name,
+        CopyAnnotationsAction.name,
     ],
 }
 
@@ -212,7 +212,7 @@ image_actions_dict = {
     SuperviselyAction.name: SuperviselyAction,
     ExistingProjectAction.name: ExistingProjectAction,
     LabelingJobAction.name: LabelingJobAction,
-    AddLabelstoExistingProjectAction.name: AddLabelstoExistingProjectAction,
+    CopyAnnotationsAction.name: CopyAnnotationsAction,
 }
 
 video_actions_list = {

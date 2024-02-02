@@ -10,20 +10,20 @@ from src.ui.dtl.utils import get_layer_docs
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 
-from src.ui.dtl.actions.add_labels_to_existing_project.layout.node_widgets import (
+from src.ui.dtl.actions.copy_annotations.layout.node_widgets import (
     create_node_widgets,
 )
-from src.ui.dtl.actions.add_labels_to_existing_project.layout.node_layout import (
+from src.ui.dtl.actions.copy_annotations.layout.node_layout import (
     create_node_dst_options,
     create_node_settings_options,
 )
 
 
-class AddLabelstoExistingProjectAction(OutputAction):
-    name = "add_labels_to_existing_project"
-    title = "Add Labels to Existing Project"
+class CopyAnnotationsAction(OutputAction):
+    name = "copy_annotations"
+    title = "Copy Annotations"
     docs_url = ""
-    description = "Save results of data transformations to existing project in current workspace."
+    description = "Copy annotations from one project to another."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -51,8 +51,8 @@ class AddLabelstoExistingProjectAction(OutputAction):
             select_option,
             select_option_field,
             # backup destination
-            backup_target_project_checkbox,
-            backup_target_project_notification,
+            backup_destination_project_checkbox,
+            backup_destination_project_notification,
         ) = create_node_widgets()
 
         # SELECT PROJECT CBs
@@ -70,12 +70,12 @@ class AddLabelstoExistingProjectAction(OutputAction):
         # -----------------------------
 
         # BACKUP DESTINATION CBs
-        @backup_target_project_checkbox.value_changed
-        def on_backup_target_project_checkbox_change(checked):
+        @backup_destination_project_checkbox.value_changed
+        def on_backup_destination_project_checkbox_change(checked):
             if checked:
-                backup_target_project_notification.hide()
+                backup_destination_project_notification.hide()
             else:
-                backup_target_project_notification.show()
+                backup_destination_project_notification.show()
             _save_settings()
 
         # -----------------------------
@@ -102,13 +102,13 @@ class AddLabelstoExistingProjectAction(OutputAction):
             add_option = settings.get("add_option", "merge")
             select_option.set_value(add_option)
 
-            backup_target_project = settings.get("backup_target_project", True)
-            if backup_target_project:
-                backup_target_project_checkbox.check()
-                backup_target_project_notification.hide()
+            backup_destination_project = settings.get("backup_destination_project", True)
+            if backup_destination_project:
+                backup_destination_project_checkbox.check()
+                backup_destination_project_notification.hide()
             else:
-                backup_target_project_checkbox.uncheck()
-                backup_target_project_notification.show()
+                backup_destination_project_checkbox.uncheck()
+                backup_destination_project_notification.show()
 
             _save_settings()
 
@@ -124,13 +124,13 @@ class AddLabelstoExistingProjectAction(OutputAction):
             project_id = select_project_sidebar_dataset_selector.get_selected_project_id()
             dataset_ids = select_project_sidebar_dataset_selector.get_selected_ids()
             add_option = select_option.get_value()
-            backup_target_project = backup_target_project_checkbox.is_checked()
+            backup_destination_project = backup_destination_project_checkbox.is_checked()
 
             settings = {
                 "project_id": project_id,
                 "dataset_ids": dataset_ids,
                 "add_option": add_option,
-                "backup_target_project": backup_target_project,
+                "backup_destination_project": backup_destination_project,
             }
             if project_id:
                 _saved_meta = g.api.project.get_meta(project_id)
@@ -168,8 +168,8 @@ class AddLabelstoExistingProjectAction(OutputAction):
             )
             settings_options = create_node_settings_options(
                 select_option_field,
-                backup_target_project_checkbox,
-                backup_target_project_notification,
+                backup_destination_project_checkbox,
+                backup_destination_project_notification,
             )
             return {
                 "src": [],
