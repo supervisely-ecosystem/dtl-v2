@@ -18,7 +18,7 @@
 
 	![simpleuse](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/10ad7098-3d74-417e-8ee3-06972551926a)
 
-* **Do not use any layers that modify image size:** Layers from **Spatial-level transforms** are not supported, the node will not process the images if you use it, because it will modify the image size. 
+* **Do not use any layers that modify image size:** Layers from **Spatial-level transforms** are not supported, the node will not process the images if you use it, because it will modify the image size.
 
 	![donotuse](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/90ecdc65-79d8-4ddd-bb73-4e8c2013cf34)
 
@@ -29,7 +29,7 @@
 
 * **When Datasets and Images Match by Name:** If there's an image in your destination project that shares its name with an image from the input project, what happens next depends on your chosen settings. You can either add new annotations to the existing image in the destination project or replace its current annotations with the ones from the input project.
 
-* **Matching Images by Name Only:** If both the input and destination projects are working with a single dataset (either because they only contain one or you've selected just one), then images will be matched and processed based solely on their names.
+* **Matching Images by Name Only:** If both the input and destination projects are working with a single dataset (either because they only contain one or you've selected just one), then images will be matched and processed based solely on their properties, excluding the dataset names match.
 
 * **What Happens to Unmatched Images:** If an image from the input project doesn't have a matching name in the destination project, it will not be processed.
 
