@@ -1,6 +1,6 @@
 # Add Labels to Existing Project
 
-`Add Labels to Existing Project` is a `save` node that adds labels from the input project to the target project by matching the dataset and image names.
+`Add Labels to Existing Project` is a `save` node that adds only labels from the input project to the target project by matching the dataset and image names. Any modifications to the images will not be applied to the target project images.
 
 ### How to use:
 
@@ -12,9 +12,9 @@
 
 * **Handling Images of Different Sizes:** If two images share the same name across the input and target projects but differ in size, the node will not process them.
 
-* **Modifying Existing Annotations:** If you're using layers that modify labels or image size, the node will automatically adjust annotation to fit the size of the original image in the input project.
+* **Modifying Existing Annotations:** If you're using layers that modify labels or image size, the node will automatically adjust annotation to fit the size of the original image in the target project.
 
-* **Dealing with Duplicate Projects and the 'Replace' Option:** If you have two input projects that contain the same dataset names and identical images, and you choose the 'replace' option, the labels from the second project will overwrite the labels from the first project in the target project.
+* **Dealing with Duplicate Projects and the 'Replace' Option:** If you have two input projects that contain the same dataset names and identical images, and you choose the 'replace' option, the labels from the second project will overwrite the labels from the first project in the target project. We don't recommend using the 'replace' option in this case.
 
 ### Settings
 
