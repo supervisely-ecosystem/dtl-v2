@@ -15,6 +15,7 @@ import supervisely as sly
 from src.compute.main import main as compute_dtls
 from src.compute.layers.save.SuperviselyLayer import SuperviselyLayer
 from src.compute.layers.save.ExistingProjectLayer import ExistingProjectLayer
+from src.compute.layers.save.AddLabelstoExistingProjectLayer import AddLabelstoExistingProjectLayer
 from src.compute.layers.save.LabelingJobLayer import LabelingJobLayer
 from src.ui.tabs.configure import nodes_flow
 import src.utils as utils
@@ -113,7 +114,11 @@ def run():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)
 
         supervisely_layers = [
-            l for l in net.layers if isinstance(l, (SuperviselyLayer, ExistingProjectLayer))
+            l
+            for l in net.layers
+            if isinstance(
+                l, (SuperviselyLayer, ExistingProjectLayer, AddLabelstoExistingProjectLayer)
+            )
         ]
         labeling_job_layers = [l for l in net.layers if isinstance(l, LabelingJobLayer)]
         results.set_content(
