@@ -14,6 +14,19 @@
 
 ### How to use:
 
+* **Simple use case:** You have a project with images and annotations and you want to copy the annotations from one project to another project. You can use `Images Project` node to set input project and node `Copy Annotations` to set the destination project, then simply run the workflow. The annotations from the input project will be copied to the destination project.
+
+	![simpleuse](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/10ad7098-3d74-417e-8ee3-06972551926a)
+
+* **Do not use any layers that modify image size:** Layers from **Spatial-level transforms** are not supported, the node will not process the images if you use it, because it will modify the image size. 
+
+	![donotuse](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/90ecdc65-79d8-4ddd-bb73-4e8c2013cf34)
+
+
+* **You can use layers that modify annotations:** The node will add new annotations to the existing image in the destination project or replace its current annotations with the ones from the input project.
+
+	![correctuse](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/ac908960-fdaa-41ce-b586-b782a59f336f)
+
 * **When Datasets and Images Match by Name:** If there's an image in your destination project that shares its name with an image from the input project, what happens next depends on your chosen settings. You can either add new annotations to the existing image in the destination project or replace its current annotations with the ones from the input project.
 
 * **Matching Images by Name Only:** If both the input and destination projects are working with a single dataset (either because they only contain one or you've selected just one), then images will be matched and processed based solely on their names.
