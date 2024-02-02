@@ -1,18 +1,17 @@
 # coding: utf-8
 
-from typing import Tuple, Union
+from typing import Tuple
 
 import supervisely as sly
 from supervisely import (
     Annotation,
-    VideoAnnotation,
     ProjectMeta,
     DatasetInfo,
     TagValueType,
     TagMetaCollection,
     ProjectInfo,
 )
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
