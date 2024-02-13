@@ -25,7 +25,9 @@ def create_lj_selector_widgets() -> tuple:
     lj_selector_sidebar_items_items = [
         Select.Item(value=job.id, label=job.name) for job in labeling_jobs
     ]
-    lj_selector_sidebar_selector = Select(lj_selector_sidebar_items_items)
+    lj_selector_sidebar_selector = Select(
+        lj_selector_sidebar_items_items, placeholder="Select Labeling Job"
+    )
 
     lj_selector_sidebar_selector_field = Field(
         title="Select Labeling Job",
@@ -33,9 +35,16 @@ def create_lj_selector_widgets() -> tuple:
         content=lj_selector_sidebar_selector,
     )
 
-    lj_selector_sidebar_lj_info = LabelingJobInfoWidget(
-        g.TEAM_ID, labeling_jobs[0].id, labeling_jobs[0]
-    )
+    if len(labeling_jobs) == 0:
+        lj_selector_sidebar_lj_info = Text(
+            "No Labeling Jobs found. Create Labeling job and create new 'Input Labeling Job' layer",
+            status="warning",
+            font_size=get_text_font_size(),
+        )
+    else:
+        lj_selector_sidebar_lj_info = LabelingJobInfoWidget(
+            g.TEAM_ID, labeling_jobs[0].id, labeling_jobs[0]
+        )
     lj_selector_sidebar_lj_info_field = Field(
         title="Labeling Job Info",
         description="Information about selected Labeling Job",
