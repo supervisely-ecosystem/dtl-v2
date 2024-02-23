@@ -1,17 +1,13 @@
 import os
 from typing import Literal
 from supervisely.app.widgets import (
-    Input,
     Text,
-    Select,
-    RadioGroup,
     RadioTable,
     Button,
     Container,
-    Field,
     RadioTabs,
     TrainedModelsSelector,
-    OneOf,
+    PretrainedModelsSelector,
     Checkbox,
 )
 from supervisely.io.json import load_json_file
@@ -26,7 +22,7 @@ from src.ui.dtl.utils import (
     get_text_font_size,
 )
 import src.ui.dtl.actions.deploy_yolov8.layout.utils as utils
-
+from src.ui.dtl.actions.deploy_yolov8.layout.models import models as pretrained_models
 
 COL_ID = "task id".upper()
 COL_PROJECT = "training data project".upper()
@@ -77,175 +73,36 @@ def create_model_selector_widgets():
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
-    available_models = yolov8.get_list(g.api, g.TEAM_ID)
-    det_models = [
-        checkpoint for checkpoint in available_models if checkpoint.task_type == "object detection"
-    ]
-    seg_models = [
-        checkpoint
-        for checkpoint in available_models
-        if checkpoint.task_type == "instance segmentation"
-    ]
-    pose_models = [
-        checkpoint for checkpoint in available_models if checkpoint.task_type == "pose estimation"
-    ]
-
-    model_selector_sidebar_custom_model_table_detection = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoints=det_models
-    )
-
-    model_selector_sidebar_custom_model_table_segmentation = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoints=seg_models
-    )
-
-    model_selector_sidebar_custom_model_table_pose_estimation = TrainedModelsSelector(
-        team_id=g.TEAM_ID, checkpoints=pose_models
+    custom_models = yolov8.get_list(g.api, g.TEAM_ID)
+    model_selector_sidebar_custom_model_table = TrainedModelsSelector(
+        g.TEAM_ID,
+        custom_models,
+        True,
+        ["object_detection", "instance segmentation", "poseestimation"],
     )
     # ------------------------------
-
-    # CUSTOM MODEL OPTION INPUT
-    model_selector_sidebar_custom_model_input = Input(placeholder="Enter path to model checkpoint")
-    model_selector_sidebar_custom_model_input_field = Field(
-        title="Path to checkpoint",
-        description="Enter path to model checkpoint from Team Files",
-        content=model_selector_sidebar_custom_model_input,
-    )
 
     # PUBLIC MODEL OPTIONS
-    model_selector_sidebar_public_model_table_detection = RadioTable(columns=[], rows=[])
-    get_pretrained_model_table_rows(
-        model_selector_sidebar_public_model_table_detection, task_type="object detection"
-    )
-
-    model_selector_sidebar_public_model_table_segmentation = RadioTable(columns=[], rows=[])
-    get_pretrained_model_table_rows(
-        model_selector_sidebar_public_model_table_segmentation, task_type="instance segmentation"
-    )
-
-    model_selector_sidebar_public_model_table_pose_estimation = RadioTable(columns=[], rows=[])
-    get_pretrained_model_table_rows(
-        model_selector_sidebar_public_model_table_pose_estimation, task_type="pose estimation"
-    )
+    model_selector_sidebar_public_model_table = PretrainedModelsSelector(pretrained_models)
     # ------------------------------
-
-    # TASK TYPE SELECTOR CUSTOM
-    model_selector_sidebar_task_type_selector_items_custom = [
-        RadioGroup.Item(
-            value="object detection",
-            label="Object Detection",
-            content=model_selector_sidebar_custom_model_table_detection,
-        ),
-        RadioGroup.Item(
-            value="instance segmentation",
-            label="Instance Segmentation",
-            content=model_selector_sidebar_custom_model_table_segmentation,
-        ),
-        RadioGroup.Item(
-            value="pose estimation",
-            label="Pose Estimation",
-            content=model_selector_sidebar_custom_model_table_pose_estimation,
-        ),
-    ]
-
-    model_selector_sidebar_task_type_selector_custom = RadioGroup(
-        items=model_selector_sidebar_task_type_selector_items_custom, direction="vertical"
-    )
-
-    model_selector_sidebar_task_type_selector_oneof_custom = OneOf(
-        model_selector_sidebar_task_type_selector_custom
-    )
-
-    model_selector_sidebar_custom_task_type_selector_container = Container(
-        [
-            model_selector_sidebar_task_type_selector_custom,
-            model_selector_sidebar_task_type_selector_oneof_custom,
-        ]
-    )
-    # ------------------------------
-
-    # TASK TYPE SELECTOR PUBLIC
-    model_selector_sidebar_task_type_selector_items_public = [
-        RadioGroup.Item(
-            value="object detection",
-            label="Object Detection",
-            content=model_selector_sidebar_public_model_table_detection,
-        ),
-        RadioGroup.Item(
-            value="instance segmentation",
-            label="Instance Segmentation",
-            content=model_selector_sidebar_public_model_table_segmentation,
-        ),
-        RadioGroup.Item(
-            value="pose estimation",
-            label="Pose Estimation",
-            content=model_selector_sidebar_public_model_table_pose_estimation,
-        ),
-    ]
-
-    model_selector_sidebar_task_type_selector_public = RadioGroup(
-        items=model_selector_sidebar_task_type_selector_items_public, direction="vertical"
-    )
-
-    model_selector_sidebar_task_type_selector_oneof_public = OneOf(
-        model_selector_sidebar_task_type_selector_public
-    )
-
-    model_selector_sidebar_public_task_type_selector_container = Container(
-        [
-            model_selector_sidebar_task_type_selector_public,
-            model_selector_sidebar_task_type_selector_oneof_public,
-        ]
-    )
-
-    # CUSTOM MODEL OPTION
-    model_selector_sidebar_custom_model_option_items = [
-        Select.Item(
-            value="table",
-            label="Select trained model (that you trained in Supervisely)",
-            content=model_selector_sidebar_custom_task_type_selector_container,
-        ),
-        Select.Item(
-            value="checkpoint",
-            label="Custom checkpoint directory",
-            content=model_selector_sidebar_custom_model_input_field,
-        ),
-    ]
-    model_selector_sidebar_custom_model_option_selector = Select(
-        model_selector_sidebar_custom_model_option_items
-    )
-    model_selector_sidebar_custom_model_option_oneof = OneOf(
-        model_selector_sidebar_custom_model_option_selector
-    )
-    model_selector_sidebar_custom_model_option_container = Container(
-        [
-            model_selector_sidebar_custom_model_option_selector,
-            model_selector_sidebar_custom_model_option_oneof,
-        ]
-    )
-
-    model_selector_sidebar_custom_model_option_field = Field(
-        title="Custom model",
-        description="Select whether you want to use a model trained in Supervisely or a custom checkpoint directory",
-        content=model_selector_sidebar_custom_model_option_container,
-    )
 
     # CUSTOM /PUBLIC TABS
-    model_selector_sidebar_model_type_tabs = RadioTabs(
+    model_selector_sidebar_model_source_tabs = RadioTabs(
         titles=["Custom models", "Pretrained public models"],
         descriptions=["Models trained by you", "Models trained by YOLOV8 team"],
         contents=[
-            model_selector_sidebar_custom_model_option_field,
-            model_selector_sidebar_public_task_type_selector_container,
+            model_selector_sidebar_custom_model_table,
+            model_selector_sidebar_public_model_table,
         ],
     )
-    if len(available_models) == 0:
-        model_selector_sidebar_model_type_tabs.set_active_tab("Pretrained public models")
+    if len(custom_models) == 0:
+        model_selector_sidebar_model_source_tabs.set_active_tab("Pretrained public models")
 
     # SIDEBAR CONTAINER
     model_selector_sidebar_save_btn = create_save_btn()
     model_selector_sidebar_container = Container(
         [
-            model_selector_sidebar_model_type_tabs,
+            model_selector_sidebar_model_source_tabs,
             model_selector_sidebar_save_btn,
         ]
     )
@@ -282,30 +139,14 @@ def create_model_selector_widgets():
     )
     # ------------------------------
 
-    utils.set_default_model(
-        model_selector_sidebar_custom_model_table_detection,
-        model_selector_sidebar_custom_model_table_segmentation,
-        model_selector_sidebar_custom_model_table_pose_estimation,
-        model_selector_sidebar_model_type_tabs,
-        model_selector_sidebar_task_type_selector_custom,
-    )
-
     return (
         # sidebar
         # custom options
-        model_selector_sidebar_custom_model_table_detection,
-        model_selector_sidebar_custom_model_table_segmentation,
-        model_selector_sidebar_custom_model_table_pose_estimation,
-        model_selector_sidebar_custom_model_input,
-        model_selector_sidebar_custom_model_option_selector,
-        model_selector_sidebar_task_type_selector_custom,
+        model_selector_sidebar_custom_model_table,
         # public options
-        model_selector_sidebar_public_model_table_detection,
-        model_selector_sidebar_public_model_table_segmentation,
-        model_selector_sidebar_public_model_table_pose_estimation,
-        model_selector_sidebar_task_type_selector_public,
+        model_selector_sidebar_public_model_table,
         # sidebar
-        model_selector_sidebar_model_type_tabs,
+        model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_save_btn,
         model_selector_sidebar_container,
         # preview

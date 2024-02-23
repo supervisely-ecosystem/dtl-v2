@@ -81,19 +81,11 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         (
             # sidebar
             # custom options
-            model_selector_sidebar_custom_model_table_detection,
-            model_selector_sidebar_custom_model_table_segmentation,
-            model_selector_sidebar_custom_model_table_pose_estimation,
-            model_selector_sidebar_custom_model_input,
-            model_selector_sidebar_custom_model_option_selector,
-            model_selector_sidebar_task_type_selector_custom,
+            model_selector_sidebar_custom_model_table,
             # public options
-            model_selector_sidebar_public_model_table_detection,
-            model_selector_sidebar_public_model_table_segmentation,
-            model_selector_sidebar_public_model_table_pose_estimation,
-            model_selector_sidebar_task_type_selector_public,
+            model_selector_sidebar_public_model_table,
             # sidebar
-            model_selector_sidebar_model_type_tabs,
+            model_selector_sidebar_model_source_tabs,
             model_selector_sidebar_save_btn,
             model_selector_sidebar_container,
             # preview
@@ -107,57 +99,14 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         ) = create_model_selector_widgets()
 
         # MODEL SELECTOR CBs
-        @model_selector_sidebar_custom_model_option_selector.value_changed
-        def model_selector_sidebar_custom_model_option_selector_cb(model_option):
-            if model_option == "table":
-                task_type = model_selector_sidebar_task_type_selector_custom.get_value()
-                utils.check_model_avaliability_by_task_type(
-                    task_type,
-                    model_selector_sidebar_custom_model_table_segmentation,
-                    model_selector_sidebar_custom_model_table_detection,
-                    model_selector_sidebar_custom_model_table_pose_estimation,
-                    model_selector_sidebar_save_btn,
-                )
-            else:
-                model_selector_sidebar_save_btn.enable()
-
-        @model_selector_sidebar_model_type_tabs.value_changed
-        def model_selector_sidebar_model_type_tabs_cb(model_type):
-            utils.check_model_avaliability_by_model_type(
-                model_type,
-                model_selector_sidebar_custom_model_option_selector,
-                model_selector_sidebar_custom_model_table_segmentation,
-                model_selector_sidebar_custom_model_table_detection,
-                model_selector_sidebar_custom_model_table_pose_estimation,
-                model_selector_sidebar_save_btn,
-            )
-
-        @model_selector_sidebar_task_type_selector_custom.value_changed
-        def model_selector_sidebar_task_type_selector_custom_cb(task_type):
-            utils.check_model_avaliability_by_task_type(
-                task_type,
-                model_selector_sidebar_custom_model_table_segmentation,
-                model_selector_sidebar_custom_model_table_detection,
-                model_selector_sidebar_custom_model_table_pose_estimation,
-                model_selector_sidebar_save_btn,
-            )
-
         @model_selector_sidebar_save_btn.click
         def model_selector_sidebar_save_btn_cb():
             nonlocal saved_settings
             saved_settings = utils.save_model_settings(
                 saved_settings,
-                model_selector_sidebar_model_type_tabs,
-                model_selector_sidebar_task_type_selector_public,
-                model_selector_sidebar_public_model_table_detection,
-                model_selector_sidebar_public_model_table_segmentation,
-                model_selector_sidebar_public_model_table_pose_estimation,
-                model_selector_sidebar_custom_model_option_selector,
-                model_selector_sidebar_custom_model_input,
-                model_selector_sidebar_task_type_selector_custom,
-                model_selector_sidebar_custom_model_table_detection,
-                model_selector_sidebar_custom_model_table_segmentation,
-                model_selector_sidebar_custom_model_table_pose_estimation,
+                model_selector_sidebar_model_source_tabs,
+                model_selector_sidebar_public_model_table,
+                model_selector_sidebar_custom_model_table,
                 model_selector_stop_model_after_pipeline_checkbox,
             )
             utils.set_model_selector_preview(
@@ -165,7 +114,6 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             )
 
         # -----------------------------
-
         (
             model_serve_preview,
             model_serve_btn,
@@ -205,7 +153,6 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             success = utils.validate_settings(
                 saved_settings,
                 model_serve_preview,
-                model_selector_sidebar_custom_model_option_selector,
             )
             if not success:
                 agent_selector_layout_edit_btn.enable()
@@ -215,15 +162,15 @@ class DeployYOLOV8Action(NeuralNetworkAction):
 
             session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
             utils.set_model_serve_preview("Waiting for app to start...", model_serve_preview)
-            sleep(20)
+            sleep(50)
             try:
                 utils.set_model_serve_preview("Starting...", model_serve_preview)
                 utils.deploy_model(g.api, session.task_id, saved_settings)
                 logger.info(f"Session ID: {session.task_id} has been deployed")
 
                 app_link_message = (
-                    f"Model deployed - ID {session.task_id}"
-                    # f"- <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+                    f"Model deployed - <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+                    f"<br>Session ID: {session.task_id}"
                     f"<br>Press STOP to change model"
                 )
                 utils.set_model_serve_preview(app_link_message, model_serve_preview, "success")
@@ -262,17 +209,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 saved_settings,
                 agent_selector_sidebar_selector,
                 agent_selector_sidebar_device_selector,
-                model_selector_sidebar_model_type_tabs,
-                model_selector_sidebar_task_type_selector_public,
-                model_selector_sidebar_public_model_table_detection,
-                model_selector_sidebar_public_model_table_segmentation,
-                model_selector_sidebar_public_model_table_pose_estimation,
-                model_selector_sidebar_custom_model_option_selector,
-                model_selector_sidebar_custom_model_input,
-                model_selector_sidebar_task_type_selector_custom,
-                model_selector_sidebar_custom_model_table_detection,
-                model_selector_sidebar_custom_model_table_segmentation,
-                model_selector_sidebar_custom_model_table_pose_estimation,
+                model_selector_sidebar_model_source_tabs,
+                model_selector_sidebar_public_model_table,
+                model_selector_sidebar_custom_model_table,
                 model_selector_stop_model_after_pipeline_checkbox,
             )
 

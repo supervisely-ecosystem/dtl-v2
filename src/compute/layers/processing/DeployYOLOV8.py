@@ -32,20 +32,20 @@ class DeployYOLOV8(Layer):
                     "session_id",
                     "agent_id",
                     "device",
-                    "model_type",
-                    "model_name",
+                    "model_source",
+                    "checkpoint_name",
                     "task_type",
-                    "model_path",
+                    "checkpoint_url",
                     "stop_model_session",
                 ],
                 "properties": {
                     "session_id": {"type": "integer"},
                     "agent_id": {"type": "integer"},
                     "device": {"type": "string"},
-                    "model_type": {"type": "string"},
-                    "model_name": {"type": "string"},
+                    "model_source": {"type": "string"},
                     "task_type": {"type": "string"},
-                    "model_path": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "checkpoint_name": {"type": "string"},
+                    "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "stop_model_session": {"type": "boolean"},
                 },
             },
@@ -62,7 +62,7 @@ class DeployYOLOV8(Layer):
             raise ValueError("Select agent in 'Deploy YOLOv8' node'")
         if settings.get("device", None) is None:
             raise ValueError("Select device in 'Deploy YOLOv8' node")
-        if settings.get("model_type", None) is None:
+        if settings.get("model_source", None) is None:
             raise ValueError("Select model in 'Deploy YOLOv8' node")
         if settings.get("session_id", None) is None:
             raise ValueError(
