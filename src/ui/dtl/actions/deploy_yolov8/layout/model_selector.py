@@ -6,7 +6,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     RadioTabs,
-    TrainedModelsSelector,
+    CustomModelsSelector,
     PretrainedModelsSelector,
     Checkbox,
 )
@@ -24,57 +24,13 @@ from src.ui.dtl.utils import (
 import src.ui.dtl.actions.deploy_yolov8.layout.utils as utils
 from src.ui.dtl.actions.deploy_yolov8.layout.models import models as pretrained_models
 
-COL_ID = "task id".upper()
-COL_PROJECT = "training data project".upper()
-COL_CHECKPOINTS = "checkpoints".upper()
-COL_PREVIEW = "preview".upper()
-
-columns = [
-    COL_ID,
-    COL_PROJECT,
-    COL_CHECKPOINTS,
-    COL_PREVIEW,
-]
-
-
-models_dir = os.path.join("src", "ui", "dtl", "actions", "deploy_yolov8", "models")
-det_models_data_path = os.path.join(models_dir, "det_models_data.json")
-seg_models_data_path = os.path.join(models_dir, "seg_models_data.json")
-pose_models_data_path = os.path.join(models_dir, "pose_models_data.json")
-det_models_data = load_json_file(det_models_data_path)
-seg_models_data = load_json_file(seg_models_data_path)
-pose_models_data = load_json_file(pose_models_data_path)
-
-TASK_TYPES_MODELS_INFO_MAP = {
-    "object detection": det_models_data,
-    "instance segmentation": seg_models_data,
-    "pose estimation": pose_models_data,
-}
-
-
-def get_pretrained_model_table_rows(
-    table: RadioTable,
-    task_type: Literal["object detection", "instance segmentation", "pose estimation"],
-):
-    models_data = TASK_TYPES_MODELS_INFO_MAP[task_type]
-    models_table_columns = [key for key in models_data[0].keys()]
-    models_table_subtitles = [None] * len(models_table_columns)
-    models_table_rows = []
-    for element in models_data:
-        models_table_rows.append(list(element.values()))
-    table.set_data(
-        columns=models_table_columns,
-        rows=models_table_rows,
-        subtitles=models_table_subtitles,
-    )
-
 
 def create_model_selector_widgets():
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
     custom_models = yolov8.get_list(g.api, g.TEAM_ID)
-    model_selector_sidebar_custom_model_table = TrainedModelsSelector(
+    model_selector_sidebar_custom_model_table = CustomModelsSelector(
         g.TEAM_ID,
         custom_models,
         True,

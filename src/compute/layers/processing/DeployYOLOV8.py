@@ -1,6 +1,6 @@
 # coding: utf-8
 from typing import Tuple, Union
-
+from time import sleep
 from supervisely import (
     Annotation,
     Label,
@@ -12,12 +12,38 @@ from supervisely import (
     VideoObject,
     FrameCollection,
     VideoObjectCollection,
+    logger,
 )
 
+from supervisely.nn.inference.session import Session
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
+
+
+def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
+    for _ in range(wait_attemtps):
+        is_model_served = session.is_model_served()
+        if is_model_served:
+            return
+        else:
+            sleep(wait_delay_sec)
+            logger.warning("Model is not served yet. Waiting for model to be served")
+
+
+def check_model_served(session: Session):
+    is_model_served = session.is_model_served()
+    if not is_model_served:
+        is_model_served = wait_model_served(session)
+        if not is_model_served:
+            raise ValueError(
+                (
+                    "Selected model is not served in 'Deploy YOLOv8' node. "
+                    "Make sure model is served by visiting app session page. "
+                    # "Press 'SERVE' button to deploy model or close 'Deploy YOLOv8' node to proceed. "
+                )
+            )
 
 
 class DeployYOLOV8(Layer):
@@ -69,6 +95,8 @@ class DeployYOLOV8(Layer):
                 "Selected model is not served in 'Deploy YOLOv8' node. Press'SERVE' button to deploy model or close 'Deploy YOLOv8' node to proceed"
             )
 
+        session = Session(g.api, settings["session_id"])
+        check_model_served(session)
         return super().validate()
 
     def postprocess(self):

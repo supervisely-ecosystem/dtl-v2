@@ -3,6 +3,8 @@ from typing import Optional
 from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
+from supervisely.api.task_api import TaskApi
+
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
@@ -161,10 +163,10 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 return
 
             session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
-            utils.set_model_serve_preview("Waiting for app to start...", model_serve_preview)
-            sleep(50)
+            utils.set_model_serve_preview("Waiting for the app to start...", model_serve_preview)
+            g.api.app.wait_until_ready_for_api_calls(session.task_id, 10, 10)
             try:
-                utils.set_model_serve_preview("Starting...", model_serve_preview)
+                utils.set_model_serve_preview("Deploying model...", model_serve_preview)
                 utils.deploy_model(g.api, session.task_id, saved_settings)
                 logger.info(f"Session ID: {session.task_id} has been deployed")
 
