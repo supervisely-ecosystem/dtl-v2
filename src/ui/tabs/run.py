@@ -24,7 +24,6 @@ import src.globals as g
 from src.exceptions import CustomException, handle_exception
 from src.ui.widgets import CircleProgress
 
-
 show_run_dialog_btn = Button(
     "Run",
     icon="zmdi zmdi-play",
@@ -58,7 +57,7 @@ def run():
 
     run_btn.hide()
     results.hide()
-    progress(message="Running...", total=1)
+    progress(message="Validating...", total=1)
     progress.show()
 
     try:
@@ -79,7 +78,7 @@ def run():
         dtl_json = [g.layers[node_id].to_json() for node_id in nodes_state]
         g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)
-        net = compute_dtls(progress, g.MODALITY_TYPE)
+        net = compute_dtls(progress, circle_progress, g.MODALITY_TYPE)
 
         # Save results
         file_infos = []
@@ -126,7 +125,7 @@ def run():
         results.show()
         circle_progress.set_status("success")
     except CustomException as e:
-        error_notification.set(title="Error", description=str(e))
+        error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
         circle_progress.set_status("exception")
         raise e
@@ -136,5 +135,6 @@ def run():
         circle_progress.set_status("exception")
         raise e
     finally:
+        nodes_flow.enable()
         progress.hide()
         run_btn.show()

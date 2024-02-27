@@ -180,6 +180,10 @@ class ApplyNNAction(NeuralNetworkAction):
         saved_tags_settings = "default"
         default_tags_settings = "default"
 
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            pass
+
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
 

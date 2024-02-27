@@ -146,12 +146,12 @@ image_actions_list = {
     NEURAL_NETWORKS: [ApplyNNAction.name],
     OTHER: [DatasetAction.name, DummyAction.name],
     SAVE_ACTIONS: [
-        SaveAction.name,
-        SaveMasksAction.name,
         SuperviselyAction.name,
         ExistingProjectAction.name,
-        LabelingJobAction.name,
+        SaveAction.name,
+        SaveMasksAction.name,
         CopyAnnotationsAction.name,
+        LabelingJobAction.name,
     ],
 }
 
@@ -207,12 +207,12 @@ image_actions_dict = {
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
     # Save layers
-    SaveAction.name: SaveAction,
-    SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,
     ExistingProjectAction.name: ExistingProjectAction,
-    LabelingJobAction.name: LabelingJobAction,
+    SaveAction.name: SaveAction,
+    SaveMasksAction.name: SaveMasksAction,
     CopyAnnotationsAction.name: CopyAnnotationsAction,
+    LabelingJobAction.name: LabelingJobAction,
 }
 
 video_actions_list = {
@@ -231,9 +231,9 @@ video_actions_list = {
         FilterVideoByDuration.name,
     ],
     SAVE_ACTIONS: [
-        SaveAction.name,
-        ExistingProjectAction.name,
         SuperviselyAction.name,
+        ExistingProjectAction.name,
+        SaveAction.name,
         LabelingJobAction.name,
     ],
 }
@@ -254,9 +254,9 @@ video_actions_dict = {
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,
     # Save layers
-    SaveAction.name: SaveAction,
     SuperviselyAction.name: SuperviselyAction,
     ExistingProjectAction.name: ExistingProjectAction,
+    SaveAction.name: SaveAction,
     LabelingJobAction.name: LabelingJobAction,
 }
 

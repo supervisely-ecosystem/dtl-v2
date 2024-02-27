@@ -50,7 +50,7 @@ class SaveAction(OutputAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            dst_options = [
+            settings_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
                     option_component=NodesFlow.WidgetOptionComponent(save_path_text),
@@ -58,8 +58,6 @@ class SaveAction(OutputAction):
                 NodesFlow.Node.Option(
                     name="dst", option_component=NodesFlow.WidgetOptionComponent(save_path_input)
                 ),
-            ]
-            settings_options = [
                 NodesFlow.Node.Option(
                     name="Visualize",
                     option_component=NodesFlow.WidgetOptionComponent(visualize_checkbox),
@@ -67,7 +65,7 @@ class SaveAction(OutputAction):
             ]
             return {
                 "src": [],
-                "dst": dst_options,
+                "dst": [],
                 "settings": settings_options,
             }
 

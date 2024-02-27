@@ -18,6 +18,7 @@ from src.utils import (
     get_dataset_by_id,
     get_project_by_id,
 )
+from src.ui.widgets import CircleProgress
 import src.globals as g
 from src.utils import LegacyProjectItem
 from src.exceptions import (
@@ -71,7 +72,7 @@ class Net:
         self.annot_archive = None
         self.reset_existing_names()
 
-    def validate(self):
+    def validate(self, circle_progress: CircleProgress):
         graph_has_datal = False
         graph_has_savel = False
         for layer in self.layers:
@@ -79,6 +80,7 @@ class Net:
             try:
                 layer.validate()
             except CustomException as e:
+                circle_progress.hide()
                 e.extra["layer_config"] = layer.config
                 raise e
             except:
@@ -92,11 +94,20 @@ class Net:
                 graph_has_savel = True
 
         if graph_has_datal is False:
-            raise GraphError("Missing Input layer")
+            circle_progress.hide()
+            raise GraphError(
+                "Input layer is required. Select one of the layers from input section."
+            )
         if graph_has_savel is False:
-            raise GraphError("Missing Output layer")
+            circle_progress.hide()
+            raise GraphError(
+                "Output layer is required. Select one of the layers from output section to save results."
+            )
         if len(self.layers) < 2:
-            raise GraphError("Less than two layers")
+            circle_progress.hide()
+            raise GraphError(
+                "You need at least one input and one output layer to run the pipeline."
+            )
         self.check_connections()
 
     def modifies_data(self):

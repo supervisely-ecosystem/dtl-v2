@@ -42,7 +42,13 @@ def create_layout(
     inf_settings_edit_container: Container,
     inf_settings_widgets_container: Container,
     inf_settings_preview_container: Container,
+    # model_separator: NodesFlow.HtmlOptionComponent,
+    # classes_separator: NodesFlow.HtmlOptionComponent,
+    # tags_separator: NodesFlow.HtmlOptionComponent,
 ):
+
+    # model_separator = NodesFlow.HtmlOptionComponent("<hr>")
+    # model_separator.
     settings_options = [
         NodesFlow.Node.Option(
             name="Connect to Model",

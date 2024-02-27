@@ -236,9 +236,9 @@ class ExistingProjectAction(OutputAction):
                 settings["dataset_name"] = dst_dataset_options_new_dataset_input.get_value()
             elif dataset_options == "existing":
                 settings["dataset_option"] = "existing"
-                settings[
-                    "dataset_id"
-                ] = dst_dataset_options_existing_dataset_selector.get_selected_id()
+                settings["dataset_id"] = (
+                    dst_dataset_options_existing_dataset_selector.get_selected_id()
+                )
             else:
                 settings["dataset_option"] = "keep"
 
@@ -275,7 +275,7 @@ class ExistingProjectAction(OutputAction):
 
             _update_preview()
 
-            dst_options = [
+            settings_options = [
                 NodesFlow.Node.Option(
                     name="Select Project",
                     option_component=NodesFlow.WidgetOptionComponent(
@@ -288,8 +288,6 @@ class ExistingProjectAction(OutputAction):
                     name="classes_mapping_preview",
                     option_component=NodesFlow.WidgetOptionComponent(dst_preview_container),
                 ),
-            ]
-            settings_options = [
                 NodesFlow.Node.Option(
                     name="Approve Checkbox",
                     option_component=NodesFlow.WidgetOptionComponent(
@@ -299,7 +297,7 @@ class ExistingProjectAction(OutputAction):
             ]
             return {
                 "src": [],
-                "dst": dst_options,
+                "dst": [],
                 "settings": settings_options,
             }
 
