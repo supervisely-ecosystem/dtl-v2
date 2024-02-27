@@ -52,7 +52,7 @@ def create_connect_to_model_widgets() -> tuple:
 
     connect_nn_model_field = Field(
         title="Select deployed model",
-        description="Select deployed model that will be applied for inference",
+        description="Connect deploy node or deploy model manually via one of the serving apps and then choose it in selector",
         content=connect_nn_model_selector,
     )
 

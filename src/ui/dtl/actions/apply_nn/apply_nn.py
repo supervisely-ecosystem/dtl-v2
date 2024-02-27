@@ -178,6 +178,7 @@ class ApplyNNAction(NeuralNetworkAction):
             )
             update_preview_btn.enable()
             g.updater("metas")
+            g.updater(("nodes", layer_id))
 
         ### -----------------------
 
@@ -262,6 +263,8 @@ class ApplyNNAction(NeuralNetworkAction):
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
+            g.updater("metas")
+            g.updater(("nodes", layer_id))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

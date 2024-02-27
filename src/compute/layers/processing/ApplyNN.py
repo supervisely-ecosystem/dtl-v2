@@ -367,6 +367,7 @@ class ApplyNN(Layer):
                 except:
                     if not self.net.preview_mode:
                         g.api.app.stop(self.settings["session_id"])
+                        # @TODO: need to stop pipeline as well
                         raise ValueError(
                             (
                                 "Something went wrong while applying model to image. "

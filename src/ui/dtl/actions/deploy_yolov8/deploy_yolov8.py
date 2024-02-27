@@ -53,7 +53,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         @agent_selector_sidebar_selector.value_changed
         def agent_selector_sidebar_selector_cb(agent_id):
             agent_selector_sidebar_device_selector.loading = True
-            agents_infos = g.api.agent.get_list_available(g.TEAM_ID)
+            agents_infos = g.api.agent.get_list_available(g.TEAM_ID, True)
             for agent in agents_infos:
                 if agent.id == agent_id:
                     agent_info = agent
