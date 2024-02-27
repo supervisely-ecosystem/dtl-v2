@@ -14,9 +14,44 @@ from supervisely import ProjectMeta, Annotation, ObjClass, TagMeta, TagCollectio
 import supervisely.imaging.image as sly_image
 from supervisely.io.fs import silent_remove, file_exists
 import src.globals as g
+from supervisely.app import show_dialog
+
+# from src.ui.tabs.run import error_notification
 
 
-def postprocess(
+def check_model_is_served(session_id: int, preview_mode: bool = False):
+    try:
+        session = Session(g.api, session_id)
+        is_model_served = session.is_model_served()
+        if not is_model_served:
+            if preview_mode:
+                show_dialog(
+                    title="Model is not served yet. Waiting for model to be served",
+                    description=(
+                        f"Make sure model is served by visiting app session page: <a href='{g.api.server_address}{g.api.app.get_url(session_id)}'>open app</a>"
+                        "<br> If you still have problems, try to check model logs for more info."
+                    ),
+                    status="warning",
+                )
+            raise ValueError("Selected model is not served in 'Apply NN' node. ")
+    except:
+        error_message = (
+            "Model is not deployed in the selected session in 'Apply NN' node. "
+            "Make sure model is served and running by visiting app session page: "
+            f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}'>open app</a> "
+            "<br>Press the 'SERVE' button if the model is not served and try again. "
+            "If the problem persists, try to restart the model or contact support. "
+        )
+        if preview_mode:
+            show_dialog(
+                title="Model is not served yet. Waiting for model to be served",
+                description=error_message,
+                status="warning",
+            )
+        raise ValueError(error_message)
+
+
+def postprocess_ann(
     ann: Annotation,
     project_meta: ProjectMeta,
     model_meta: ProjectMeta,
@@ -159,6 +194,27 @@ def find_item(
                 index += 1
 
 
+def apply_model_to_image(
+    session: Session,
+    image_path: str,
+    image_shape: tuple,
+    image_desc: ImageDescriptor,
+    model_meta: ProjectMeta,
+    output_meta: ProjectMeta,
+    settings: dict,
+):
+    try:
+        pred_ann = session.inference_image_path(image_path)
+        pred_ann, res_meta = postprocess_ann(pred_ann, output_meta, model_meta, settings)
+    except:
+        sly_logger.warn(
+            f"Could not apply model to image: {image_desc.info.item_info.name}(ID: {image_desc.info.item_info.id})"
+        )
+        pred_ann = Annotation(img_size=image_shape[:2])
+    finally:
+        return pred_ann
+
+
 class ApplyNN(Layer):
     action = "apply_nn"
 
@@ -209,6 +265,13 @@ class ApplyNN(Layer):
 
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
+
+    def validate(self):
+        if self.settings["session_id"] is None:
+            raise ValueError("Apply NN layer requires model to be connected")
+
+        check_model_is_served(self.settings["session_id"], self.net.preview_mode)
+        return super().validate()
 
     def requires_item(self):
         return True
@@ -290,15 +353,36 @@ class ApplyNN(Layer):
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
                 sly_image.write(img_path, img)
-                session = Session(g.api, self.settings["session_id"])
                 try:
-                    pred_ann = session.inference_image_path(img_path)
-                    pred_ann, res_meta = postprocess(
-                        pred_ann, self.output_meta, model_meta, self.settings
+                    session = Session(g.api, self.settings["session_id"])
+                    pred_ann = apply_model_to_image(
+                        session,
+                        img_path,
+                        img.shape,
+                        img_desc,
+                        model_meta,
+                        self.output_meta,
+                        self.settings,
                     )
                 except:
-                    sly_logger.debug("Could not apply model to image")
-                    pred_ann = Annotation(img_size=img.shape[:2])
+                    if not self.net.preview_mode:
+                        g.api.app.stop(self.settings["session_id"])
+                        raise ValueError(
+                            (
+                                "Something went wrong while applying model to image. "
+                                f"Shutting down the model session ID: '{self.settings['session_id']}'."
+                            )
+                        )
+                    else:
+                        show_dialog(
+                            title="Couldn't preview image",
+                            description=(
+                                "Model is not served. "
+                                "<br>Check model session logs by visiting app session page: "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(self.settings['session_id'])}'>open app</a> "
+                            ),
+                            status="warning",
+                        )
 
                 if file_exists(img_path):
                     silent_remove(img_path)
@@ -316,8 +400,3 @@ class ApplyNN(Layer):
 
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
-
-    def validate(self):
-        super().validate()
-        if self.settings["session_id"] is None:
-            raise ValueError("Apply NN layer requires model to be connected")

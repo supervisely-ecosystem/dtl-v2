@@ -21,6 +21,8 @@ from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
 
+# from src.ui.tabs.run import error_notification
+
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
     for _ in range(wait_attemtps):
@@ -30,20 +32,33 @@ def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec:
         else:
             sleep(wait_delay_sec)
             logger.warning("Model is not served yet. Waiting for model to be served")
+            # error_notification.set(
+            #     title="Model is not served yet. Waiting for model to be served",
+            #     description=(
+            #         f"Make sure model is served by visiting app session page: <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+            #         "<br> If you still have problems, try to check model logs for more info."
+            #     ),
+            # )
 
 
-def check_model_served(session: Session):
-    is_model_served = session.is_model_served()
-    if not is_model_served:
-        is_model_served = wait_model_served(session)
+def check_model_is_served(session_id: int):
+    error_message = (
+        "Selected model is not served in 'Deploy YOLOv8' node. "
+        "Make sure model is served by visiting app session page: "
+        f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}'>open app</a> "
+        "<br>Press the 'SERVE' button if the model is not served and try again. "
+        "If the problem persists, try to restart the model or contact support. "
+    )
+
+    try:
+        session = Session(g.api, session_id)
+        is_model_served = session.is_model_served()
         if not is_model_served:
-            raise ValueError(
-                (
-                    "Selected model is not served in 'Deploy YOLOv8' node. "
-                    "Make sure model is served by visiting app session page. "
-                    # "Press 'SERVE' button to deploy model or close 'Deploy YOLOv8' node to proceed. "
-                )
-            )
+            is_model_served = wait_model_served(session, 12)
+            if not is_model_served:
+                raise TimeoutError(error_message)
+    except:
+        raise ValueError(error_message)
 
 
 class DeployYOLOV8(Layer):
@@ -92,11 +107,14 @@ class DeployYOLOV8(Layer):
             raise ValueError("Select model in 'Deploy YOLOv8' node")
         if settings.get("session_id", None) is None:
             raise ValueError(
-                "Selected model is not served in 'Deploy YOLOv8' node. Press'SERVE' button to deploy model or close 'Deploy YOLOv8' node to proceed"
+                (
+                    "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
+                    "If you still have problems, try to check model logs for more info or contact support."
+                    "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
+                )
             )
 
-        session = Session(g.api, settings["session_id"])
-        check_model_served(session)
+        check_model_is_served(settings["session_id"])
         return super().validate()
 
     def postprocess(self):

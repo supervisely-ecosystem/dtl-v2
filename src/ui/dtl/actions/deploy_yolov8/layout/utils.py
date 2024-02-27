@@ -152,16 +152,17 @@ def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
 
 
 def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
-    session_info = api.app.start(
-        agent_id=saved_settings["agent_id"],
-        module_id=500,
-        workspace_id=workspace_id,
-        description=f"AutoServe session for Serve YOLOv8",
-        task_name="AutoServe/serve",
-        params={"autostart": False, **saved_settings},
-        app_version="data-nodes-deploy-yolov8-v2",
-        is_branch=True,
-    )
+    app_params = {
+        "agent_id": saved_settings["agent_id"],
+        "module_id": 500,
+        "workspace_id": workspace_id,
+        "description": f"AutoServe session for Serve YOLOv8",
+        "task_name": "AutoServe/serve",
+        "params": {"autostart": False, **saved_settings},
+        "app_version": "data-nodes-deploy-yolov8-v2",
+        "is_branch": True,
+    }
+    session_info = api.app.start(**app_params)
     return session_info
 
 
