@@ -24,16 +24,27 @@ import src.globals as g
 
 ### CONNECT MODEL AND MODEL INFO
 def update_model_info_preview(
-    session_id: int, connect_nn_model_info_empty_text: Text, connect_nn_model_info: ModelInfo
+    session_id: int,
+    connect_nn_model_info_empty_text: Text,
+    connect_nn_model_info: ModelInfo,
+    connect_nn_connect_btn: Button,
 ) -> None:
     connect_nn_model_info_empty_text.loading = True
     try:
         connect_nn_model_info.loading = True
         connect_nn_model_info.set_session_id(session_id)
         connect_nn_model_info.show()
+        connect_nn_connect_btn.enable()
     except:
+        connect_nn_connect_btn.disable()
         connect_nn_model_info_empty_text.set(
-            "Couldn't connect to model. Check deployed model logs", status="error"
+            (
+                "Couldn't connect to the model. "
+                "<br><br>Open app session page and make sure that the model has been successfully deployed - "
+                f'<a href="{g.api.server_address}{g.api.app.get_url(session_id)}" target="_blank">open app</a>. '
+                "<br><br>If the problem still persists, check deployed model logs or contact support"
+            ),
+            status="error",
         )
         connect_nn_model_info.loading = False
         connect_nn_model_info_empty_text.loading = False
@@ -43,7 +54,13 @@ def update_model_info_preview(
     connect_nn_model_info_empty_text.hide()
 
 
-def get_model_settings(session_id: int) -> tuple:
+def get_model_settings(
+    session_id: int,
+    connect_notification: NotificationBox,
+    connect_nn_model_selector: SelectAppSession,
+    connect_nn_model_info: ModelInfo,
+    connect_nn_model_info_empty_text: Text,
+) -> tuple:
     try:
         session = Session(g.api, session_id)
         model_meta = session.get_model_meta()
@@ -51,7 +68,22 @@ def get_model_settings(session_id: int) -> tuple:
         model_info = session_json.get_session_info()
         model_settings = session.get_default_inference_settings()
     except:
-        raise ConnectionError("Couldn't connect to model. Check deployed model logs")
+        error_message = (
+            "<br><br>Open app session page and make sure that the model has been successfully deployed - "
+            f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a>. "
+            "<br><br>If the problem still persists, check deployed model logs, restart app session or contact support"
+        )
+
+        connect_notification.loading = False
+        connect_notification.set(title="Couldn't connect to the model.", description=error_message)
+        connect_nn_model_selector.set_session_id(None)
+        connect_nn_model_selector.enable()
+
+        connect_nn_model_info.hide()
+        connect_nn_model_info_empty_text.set("Select model first", "info")
+        connect_nn_model_info_empty_text.show()
+
+        raise ConnectionError("Couldn't connect to the model. " + error_message)
     return model_meta, model_info, model_settings
 
 
@@ -139,7 +171,9 @@ def set_model_tags_preview(
 
 
 ### LOAD SETTINGS FROM PRESET (JSON)
-def set_deployed_model_from_json(settings: dict, connect_nn_model_selector: Select) -> int:
+def set_deployed_model_from_json(
+    settings: dict, connect_nn_model_selector: SelectAppSession
+) -> int:
     session_id = settings.get("session_id", None)
     if session_id is not None:
         try:
@@ -206,7 +240,8 @@ def set_model_apply_method_from_json(settings: dict, apply_nn_methods_selector: 
 ### SET PREVIEW
 def set_model_preview(model_info: dict, connect_nn_model_preview: Text) -> None:
     model_name = model_info.get("app_name", "Couldn't get model name")
-    connect_nn_model_preview.set(model_name, "text")
+    model_name_w_link = f'<a href="{g.api.server_address}{g.api.app.get_url(model_info["session_id"])}" target="_blank">{model_name}</a>'
+    connect_nn_model_preview.set(model_name_w_link, "text")
 
 
 def set_model_settings_preview(
@@ -260,14 +295,21 @@ def reset_model(
     apply_method_preview: Text,
     connect_notification: NotificationBox,
     update_preview_btn: Button,
+    model_separator: Text,
+    classes_separator: Text,
+    tags_separator: Text,
+    connect_nn_disconnect_btn: Button,
 ):
     # reset model selector
     try:
         connect_nn_model_selector.set_session_id(None)
+        connect_nn_model_selector.enable()
+        connect_nn_disconnect_btn.disable()
         connect_nn_model_info.set_session_id(None)
     except:
         pass
     connect_nn_model_info.hide()
+    connect_nn_model_info_empty_text.set("Select model first", "info")
     connect_nn_model_info_empty_text.show()
     connect_nn_model_preview.set("No model selected", "text")
     connect_nn_model_preview.hide()
@@ -278,12 +320,14 @@ def reset_model(
 
     classes_list_preview.hide()
     classes_list_edit_container.hide()
+    classes_separator.hide()
 
     # reset tags
     tags_list_widget.set([])
     tags_list_preview.set([])
     tags_list_preview.hide()
     tags_list_edit_container.hide()
+    tags_separator.hide()
 
     # reset settings
     inf_settings_edit_container.hide()
@@ -291,8 +335,13 @@ def reset_model(
     use_suffix_preview.hide()
     conflict_method_preview.hide()
     apply_method_preview.hide()
+    model_separator.hide()
 
     # reset layout
+    connect_notification.set(
+        title="Connect to deployed model",
+        description="to select classes, tags and inference settings",
+    )
     connect_notification.show()
     update_preview_btn.disable()
 

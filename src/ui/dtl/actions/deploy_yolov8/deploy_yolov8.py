@@ -171,7 +171,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 logger.info(f"Session ID: {session.task_id} has been deployed")
 
                 app_link_message = (
-                    f"Model deployed - <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
+                    f"Model deployed - <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}' target='_blank'>open app</a>"
                     f"<br>Session ID: {session.task_id}"
                     f"<br>Press STOP to change model"
                 )

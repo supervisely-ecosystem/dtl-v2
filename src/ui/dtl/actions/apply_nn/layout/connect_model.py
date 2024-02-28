@@ -3,14 +3,15 @@ from supervisely.app.widgets import (
     Container,
     Text,
     Field,
+    Flexbox,
     ModelInfo,
     SelectAppSession,
 )
 from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
-    create_save_btn,
     get_text_font_size,
+    create_sidebar_btn_container,
 )
 import src.globals as g
 
@@ -42,7 +43,19 @@ def create_connect_to_model_widgets() -> tuple:
         style=get_set_settings_button_style(),
     )
     connect_nn_edit_container = get_set_settings_container(connect_nn_text, connect_nn_edit_btn)
-    connect_nn_save_btn = create_save_btn()
+    connect_nn_connect_btn = Button(
+        "Connect", icon="zmdi zmdi-play", call_on_click="closeSidebar();"
+    )
+    connect_nn_connect_btn.disable()
+    connect_nn_disconnect_btn = Button(
+        "Disconnect",
+        button_type="info",
+        plain=True,
+        icon="zmdi zmdi-stop",
+        # call_on_click="closeSidebar();",
+    )
+    connect_nn_disconnect_btn.disable()
+
     connect_nn_model_selector = SelectAppSession(team_id=g.TEAM_ID, tags=SESSION_TAGS)
     connect_nn_model_selector_disabled_text = Text(
         "Model has been connected from deploy node. Unplug deploy node if you want to manually select model",
@@ -57,9 +70,9 @@ def create_connect_to_model_widgets() -> tuple:
     )
 
     connect_nn_model_info = ModelInfo()
-    connect_nn_model_info_empty_text = Text("Select model to display info", "text")
+    connect_nn_model_info_empty_text = Text("Select model first", "info")
     connect_nn_model_info_container = Container(
-        [connect_nn_model_info, connect_nn_model_info_empty_text]
+        [connect_nn_model_info, connect_nn_model_info_empty_text], gap=0
     )
     connect_nn_model_info_field = Field(
         title="Model Info",
@@ -71,16 +84,18 @@ def create_connect_to_model_widgets() -> tuple:
             connect_nn_model_field,
             connect_nn_model_selector_disabled_text,
             connect_nn_model_info_field,
-            connect_nn_save_btn,
+            create_sidebar_btn_container(connect_nn_connect_btn, connect_nn_disconnect_btn, True),
         ]
     )
-
+    model_separator = Text("<hr>")
+    model_separator.hide()
     return (
         connect_nn_text,
         connect_nn_model_preview,
         connect_nn_edit_btn,
         connect_nn_edit_container,
-        connect_nn_save_btn,
+        connect_nn_connect_btn,
+        connect_nn_disconnect_btn,
         connect_nn_model_selector,
         connect_nn_model_field,
         connect_nn_model_selector_disabled_text,
@@ -89,4 +104,5 @@ def create_connect_to_model_widgets() -> tuple:
         connect_nn_model_info_container,
         connect_nn_model_info_field,
         connect_nn_widgets_container,
+        model_separator,
     )

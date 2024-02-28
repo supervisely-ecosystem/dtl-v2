@@ -154,9 +154,10 @@ class LabelingJobLayer(Layer):
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0 and self.settings["create_new_project"]:
-            raise GraphError(
-                "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
-            )
+            raise ValueError("Enter title for the Labeling Job in the 'Create Labeling Job' layer")
+            # raise GraphError(
+            #     "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            # )
 
         if self.settings["create_new_project"]:
             dst = self.dsts[0]

@@ -49,7 +49,8 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_nn_model_preview,
             connect_nn_edit_btn,
             connect_nn_edit_container,
-            connect_nn_save_btn,
+            connect_nn_connect_btn,
+            connect_nn_disconnect_btn,
             connect_nn_model_selector,
             connect_nn_model_field,
             connect_nn_model_selector_disabled_text,
@@ -58,6 +59,7 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_nn_model_info_container,
             connect_nn_model_info_field,
             connect_nn_widgets_container,
+            model_separator,
         ) = create_connect_to_model_widgets()
 
         (
@@ -89,6 +91,7 @@ class ApplyNNAction(NeuralNetworkAction):
             classes_list_edit_text,
             classes_list_edit_btn,
             classes_list_edit_container,
+            classes_separator,
         ) = create_classes_selector_widgets()
 
         (
@@ -102,6 +105,7 @@ class ApplyNNAction(NeuralNetworkAction):
             tags_list_edit_text,
             tags_list_edit_btn,
             tags_list_edit_container,
+            tags_separator,
         ) = create_tags_selector_widgets()
 
         connect_notification = create_connect_notification_widget()
@@ -113,14 +117,25 @@ class ApplyNNAction(NeuralNetworkAction):
             if session_id is None:
                 return
             update_model_info_preview(
-                session_id, connect_nn_model_info_empty_text, connect_nn_model_info
+                session_id,
+                connect_nn_model_info_empty_text,
+                connect_nn_model_info,
+                connect_nn_connect_btn,
             )
 
-        @connect_nn_save_btn.click
+        @connect_nn_connect_btn.click
         def confirm_model():
             nonlocal _current_meta, _model_meta
             nonlocal _model_info, _model_settings, _session_id
             nonlocal saved_classes_settings, saved_tags_settings
+
+            connect_nn_model_selector.disable()
+            connect_nn_connect_btn.disable()
+            connect_nn_disconnect_btn.disable()
+
+            classes_separator.hide()
+            tags_separator.hide()
+            model_separator.hide()
 
             connect_notification.loading = True
             update_preview_btn.disable()
@@ -128,13 +143,21 @@ class ApplyNNAction(NeuralNetworkAction):
             _session_id = connect_nn_model_info._session_id
             if _session_id is None:
                 connect_notification.loading = False
+                connect_nn_model_selector.enable()
                 return
 
-            _model_meta, _model_info, _model_settings = get_model_settings(_session_id)
+            _model_meta, _model_info, _model_settings = get_model_settings(
+                _session_id,
+                connect_notification,
+                connect_nn_model_selector,
+                connect_nn_model_info,
+                connect_nn_model_info_empty_text,
+            )
             set_model_preview(_model_info, connect_nn_model_preview)
             set_model_settings(_model_settings, inf_settings_editor)
             connect_nn_model_preview.show()
 
+            classes_separator.show()
             classes_list_edit_text.show()
             saved_classes_settings = set_model_classes(
                 classes_list_widget, [obj_class for obj_class in _model_meta.obj_classes]
@@ -147,6 +170,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 "Model Classes",
             )
 
+            tags_separator.show()
             tags_list_edit_text.show()
             saved_tags_settings = set_model_tags(
                 tags_list_widget, [tag_meta for tag_meta in _model_meta.tag_metas]
@@ -156,6 +180,7 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_notification.hide()
             connect_notification.loading = False
 
+            model_separator.show()
             inf_settings_edit_text.show()
             set_model_settings_preview(
                 model_suffix_input,
@@ -177,8 +202,37 @@ class ApplyNNAction(NeuralNetworkAction):
                 inf_settings_edit_container,
             )
             update_preview_btn.enable()
+            connect_nn_model_selector.disable()
+            connect_nn_connect_btn.disable()
+            connect_nn_disconnect_btn.enable()
             g.updater("metas")
             g.updater(("nodes", layer_id))
+
+        @connect_nn_disconnect_btn.click
+        def disconnect_model():
+            reset_model(
+                connect_nn_model_selector,
+                connect_nn_model_info,
+                connect_nn_model_info_empty_text,
+                connect_nn_model_preview,
+                classes_list_widget,
+                classes_list_preview,
+                classes_list_edit_container,
+                tags_list_widget,
+                tags_list_preview,
+                tags_list_edit_container,
+                inf_settings_edit_container,
+                suffix_preview,
+                use_suffix_preview,
+                conflict_method_preview,
+                apply_method_preview,
+                connect_notification,
+                update_preview_btn,
+                model_separator,
+                classes_separator,
+                tags_separator,
+                connect_nn_disconnect_btn,
+            )
 
         ### -----------------------
 
@@ -238,6 +292,10 @@ class ApplyNNAction(NeuralNetworkAction):
                         apply_method_preview,
                         connect_notification,
                         update_preview_btn,
+                        model_separator,
+                        classes_separator,
+                        tags_separator,
+                        connect_nn_disconnect_btn,
                     )
                     _model_from_deploy_node = False
                     connect_nn_model_selector_disabled_text.hide()
@@ -247,13 +305,17 @@ class ApplyNNAction(NeuralNetworkAction):
                 _model_from_deploy_node = True
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
+                connect_nn_disconnect_btn.disable()
                 if session_id == _session_id:
                     return
                 else:
                     _session_id = session_id
                     connect_nn_model_selector.set_session_id(_session_id)
                     update_model_info_preview(
-                        _session_id, connect_nn_model_info_empty_text, connect_nn_model_info
+                        _session_id,
+                        connect_nn_model_info_empty_text,
+                        connect_nn_model_info,
+                        connect_nn_connect_btn,
                     )
                     confirm_model()
 
@@ -452,6 +514,9 @@ class ApplyNNAction(NeuralNetworkAction):
                 inf_settings_edit_container,
                 inf_settings_widgets_container,
                 inf_settings_preview_container,
+                model_separator,
+                classes_separator,
+                tags_separator,
             )
             return {
                 "src": [],

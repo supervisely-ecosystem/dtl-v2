@@ -2,7 +2,7 @@ from typing import List, Literal, Union
 from os.path import join, exists
 
 from supervisely import ObjClass, ObjClassCollection, TagMeta, TagMetaCollection
-from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty, ClassesTable
+from supervisely.app.widgets import NodesFlow, Container, Text, Button, Empty, ClassesTable, Flexbox
 
 from src.ui.widgets import (
     ClassesMapping,
@@ -551,6 +551,23 @@ def create_save_btn() -> Button:
 
 def create_set_default_btn() -> Button:
     return Button("Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh")
+
+
+def create_sidebar_btn_container(
+    save_btn: Button, default_btn: Button = None, need_separator: bool = True
+):
+    return Container(
+        [
+            Text("<hr>") if need_separator else Empty(),
+            Flexbox(
+                widgets=[
+                    save_btn,
+                    default_btn if default_btn is not None else Empty(),
+                ],
+                gap=110,
+            ),
+        ]
+    )
 
 
 # Layer docs utils

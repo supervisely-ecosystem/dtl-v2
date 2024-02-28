@@ -28,7 +28,7 @@ def check_model_is_served(session_id: int, preview_mode: bool = False):
                 show_dialog(
                     title="Model is not served yet. Waiting for model to be served",
                     description=(
-                        f"Make sure model is served by visiting app session page: <a href='{g.api.server_address}{g.api.app.get_url(session_id)}'>open app</a>"
+                        f"Make sure model is served by visiting app session page: <a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a>"
                         "<br> If you still have problems, try to check model logs for more info."
                     ),
                     status="warning",
@@ -38,7 +38,7 @@ def check_model_is_served(session_id: int, preview_mode: bool = False):
         error_message = (
             "Model is not deployed in the selected session in 'Apply NN' node. "
             "Make sure model is served and running by visiting app session page: "
-            f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}'>open app</a> "
+            f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a> "
             "<br>Press the 'SERVE' button if the model is not served and try again. "
             "If the problem persists, try to restart the model or contact support. "
         )
@@ -380,7 +380,7 @@ class ApplyNN(Layer):
                             description=(
                                 "Model is not served. "
                                 "<br>Check model session logs by visiting app session page: "
-                                f"<a href='{g.api.server_address}{g.api.app.get_url(self.settings['session_id'])}'>open app</a> "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(self.settings['session_id'])}' target='_blank'>open app</a> "
                             ),
                             status="warning",
                         )

@@ -79,9 +79,12 @@ class SaveLayer(Layer):
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0:
-            raise GraphError(
-                "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            raise ValueError(
+                "Enter name for the output archive to the input field in the 'Export Archive' layer"
             )
+            # raise GraphError(
+            # "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            # )
 
         if self.net.modality == "images":
             dst = self.dsts[0]

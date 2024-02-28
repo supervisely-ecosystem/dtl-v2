@@ -35,7 +35,7 @@ def create_job_description_widgets():
     lj_description_markdown_support_text = Text(
         (
             "Markdown supported. Learn more "
-            "<a href='https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax'>about markdown</a>"
+            "<a href='https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax' target='_blank'>about markdown</a>"
         ),
         "text",
         font_size=get_text_font_size(),

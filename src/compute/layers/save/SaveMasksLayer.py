@@ -119,9 +119,12 @@ class SaveMasksLayer(Layer):
             )
         dst = self.dsts[0]
         if len(self.dsts) == 0:
-            raise GraphError(
-                "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            raise ValueError(
+                "Enter name for the output archive to the input field in the 'Export Archive' layer"
             )
+            # raise GraphError(
+            # "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
+            # )
         self.out_project = sly.Project(
             directory=f"{self.output_folder}/{dst}", mode=sly.OpenMode.CREATE
         )

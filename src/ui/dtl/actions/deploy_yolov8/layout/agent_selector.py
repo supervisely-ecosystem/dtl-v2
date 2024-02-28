@@ -19,12 +19,12 @@ def create_agent_selector_widgets():
     # SIDEBAR
     # AGENT SELECTOR
     available_agents = g.api.agent.get_list_available(g.TEAM_ID)
-    agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID, show_only_running=True) 
-    
+    agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID, show_only_running=True)
+
     agent_selector_sidebar_selector_empty_message = Text(
         (
             "No agents available. Follow this "
-            "<a href='https://developer.supervisely.com/getting-started/connect-your-computer'> "
+            "<a href='https://developer.supervisely.com/getting-started/connect-your-computer' target='_blank'> "
             "guide</a> to connect your computer to Supervisely."
         ),
         status="text",

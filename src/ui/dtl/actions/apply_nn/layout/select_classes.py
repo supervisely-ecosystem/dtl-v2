@@ -65,6 +65,8 @@ def create_classes_selector_widgets() -> tuple:
         classes_list_edit_text, classes_list_edit_btn
     )
     classes_list_edit_container.hide()
+    classes_separator = Text("<hr>")
+    classes_separator.hide()
     return (
         classes_list_widget_notification,
         classes_list_widget,
@@ -76,4 +78,5 @@ def create_classes_selector_widgets() -> tuple:
         classes_list_edit_text,
         classes_list_edit_btn,
         classes_list_edit_container,
+        classes_separator,
     )

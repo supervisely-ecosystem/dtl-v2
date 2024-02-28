@@ -60,6 +60,9 @@ def create_tags_selector_widgets() -> tuple:
     )
     tags_list_edit_container = get_set_settings_container(tags_list_edit_text, tags_list_edit_btn)
     tags_list_edit_container.hide()
+
+    tags_separator = Text("<hr>")
+    tags_separator.hide()
     return (
         tags_list_widget_notification,
         tags_list_widget,
@@ -71,4 +74,5 @@ def create_tags_selector_widgets() -> tuple:
         tags_list_edit_text,
         tags_list_edit_btn,
         tags_list_edit_container,
+        tags_separator,
     )
