@@ -11,7 +11,7 @@ from src.compute.dtl_utils import apply_to_labels
 
 
 class DropObjByClassLayer(Layer):
-    action = "drop_obj_by_class"
+    action = "drop_object_by_class"
 
     layer_settings = {
         "required": ["settings"],

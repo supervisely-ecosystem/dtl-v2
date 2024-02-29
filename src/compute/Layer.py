@@ -216,7 +216,7 @@ class Layer:
                         new_name = new_cls_dict["title"]
                         new_shape = new_cls_dict["shape"]
                         new_geometry_type = GET_GEOMETRY_FROM_STR(new_shape)
-                        new_geometry_config = new_cls_dict["geometry_config"]
+                        new_geometry_config = new_cls_dict.get("geometry_config")
                         new_color = new_cls_dict.get("color", None)
                         if new_color is not None and new_color[0] == "#":
                             new_color = hex2rgb(new_color)

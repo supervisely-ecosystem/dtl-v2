@@ -13,10 +13,10 @@ from supervisely.io.fs import get_file_size
 import supervisely as sly
 
 from src.compute.main import main as compute_dtls
-from src.compute.layers.save.SuperviselyLayer import SuperviselyLayer
-from src.compute.layers.save.ExistingProjectLayer import ExistingProjectLayer
-from src.compute.layers.save.CopyAnnotations import CopyAnnotationsLayer
-from src.compute.layers.save.LabelingJobLayer import LabelingJobLayer
+from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
+from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
+from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
+from src.compute.layers.save.CreateLabelingJobLayer import CreateLabelingJobLayer
 from src.ui.tabs.configure import nodes_flow
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -163,13 +163,15 @@ def _run():
         supervisely_layers = [
             l
             for l in net.layers
-            if isinstance(l, (SuperviselyLayer, ExistingProjectLayer, CopyAnnotationsLayer))
+            if isinstance(
+                l, (CreateNewProjectLayer, AddToExistingProjectLayer, CopyAnnotationsLayer)
+            )
         ]
 
         if not g.running_pipeline:
             return
 
-        labeling_job_layers = [l for l in net.layers if isinstance(l, LabelingJobLayer)]
+        labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
         results.set_content(
             ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
         )

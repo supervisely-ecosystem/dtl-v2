@@ -104,7 +104,7 @@ class Layer:
                     style=get_set_settings_button_style(),
                 )
 
-            if self.action.name == "data":
+            if self.action.name == "images_project":
                 if not isinstance(self.output_meta, ProjectMeta):
                     self._update_preview_button.disable()
 
@@ -290,7 +290,7 @@ class Layer:
 
     def get_ann(self):
         return self._res_ann
-    
+
     def get_data(self):
         if self._get_data is None:
             return {}

@@ -6,8 +6,8 @@ from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
 from src.ui.tabs.presets import load_json
 
-from src.ui.dtl.actions.data.data import DataAction
-from src.ui.dtl.actions.video_data.video_data import VideoDataAction
+from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
+from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
 
 
 import src.globals as g
@@ -69,9 +69,9 @@ if g.PROJECT_ID:
     src = [f"{pr.name}/{ds_name}"]
 
     if pr.type == "images":
-        layer = create_new_layer(DataAction.name)
+        layer = create_new_layer(ImagesProjectAction.name)
     elif pr.type == "videos":
-        layer = create_new_layer(VideoDataAction.name)
+        layer = create_new_layer(VideosProjectAction.name)
     else:
         raise NotImplementedError(f"Project type {pr.type} is not supported")
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
