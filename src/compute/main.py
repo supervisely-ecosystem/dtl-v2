@@ -13,6 +13,7 @@ from src.compute.utils import logging_utils
 from src.compute.Net import Net
 from src.exceptions import GraphError, CustomException
 from src.utils import LegacyProjectItem
+import src.globals as g
 
 
 def make_legacy_project_item(project: sly.Project, dataset, item_name):
@@ -61,6 +62,9 @@ def calculate_datasets_conflict_map(helper):
 def main(progress: Progress, modality):
     task_helpers.task_verification(check_in_graph)
 
+    if not g.running_pipeline:
+        return
+
     logger.info("DTL started")
     helper = DtlHelper()
 
@@ -68,8 +72,20 @@ def main(progress: Progress, modality):
         net = Net(helper.graph, helper.paths.results_dir, modality)
         net.validate()
         net.calc_metas()
+
+        if not g.running_pipeline:
+            return
+
         net.preprocess()
+
+        if not g.running_pipeline:
+            return
+
         datasets_conflict_map = calculate_datasets_conflict_map(helper)
+
+        if not g.running_pipeline:
+            return
+
     except CustomException as e:
         # logger.error("Error occurred on DTL-graph initialization step!")
         # e.log()
@@ -84,12 +100,24 @@ def main(progress: Progress, modality):
             "There are no elements to process. Make sure that you selected input project"
         )
     elements_generator = net.get_elements_generator()
+
+    if not g.running_pipeline:
+        return
+
     results_counter = 0
     with progress(message=f"Processing items...", total=total) as pbar:
         for data_el in elements_generator:
             try:
                 export_output_generator = net.start(data_el)
+
+                if not g.running_pipeline:
+                    return
+
                 for res_export in export_output_generator:
+
+                    if not g.running_pipeline:
+                        return
+
                     logger.trace(
                         "item processed",
                         extra={"item_name": res_export[0][0].get_item_name()},
@@ -110,7 +138,14 @@ def main(progress: Progress, modality):
             finally:
                 pbar.update()
 
+    if not g.running_pipeline:
+        return
+
     net.postprocess()
+
+    if not g.running_pipeline:
+        return
+
     logger.info(
         "DTL finished",
         extra={"event_type": EventType.DTL_APPLIED, "new_proj_size": results_counter},

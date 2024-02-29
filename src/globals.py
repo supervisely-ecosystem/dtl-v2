@@ -72,6 +72,9 @@ layers = {}
 
 update_queue = queue.Queue()
 
+running_pipeline = False
+pipeline_thread = None
+
 
 def updater(update: str):
     global update_queue

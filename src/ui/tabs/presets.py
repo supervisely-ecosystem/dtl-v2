@@ -165,6 +165,7 @@ def load_json():
         load_file_selector.enable()
     load_notification_select.set_value("loaded")
     load_dialog.hide()
+    # g.updater(("nodes", None)) # @TODO: PRESET PREVIEW FIX
 
 
 def apply_json(dtl_json):

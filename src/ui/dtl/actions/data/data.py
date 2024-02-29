@@ -133,7 +133,7 @@ class DataAction(SourceAction):
                     ],
                     direction="horizontal",
                     gap=0,
-                    fractions=[1, 0]
+                    fractions=[1, 0],
                     # gap=355,
                 ),
             ]
@@ -236,9 +236,11 @@ class DataAction(SourceAction):
             set_classes_list_preview(
                 classes_mapping_widget,
                 classes_mapping_preview,
-                saved_classes_mapping_settings
-                if saved_classes_mapping_settings == "default"
-                else mapping_to_list(saved_classes_mapping_settings),
+                (
+                    saved_classes_mapping_settings
+                    if saved_classes_mapping_settings == "default"
+                    else mapping_to_list(saved_classes_mapping_settings)
+                ),
                 classes_mapping_edit_text,
             )
 
@@ -292,9 +294,11 @@ class DataAction(SourceAction):
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
-                settings=new_names
-                if saved_classes_mapping_settings == "default"
-                else mapping_to_list(saved_classes_mapping_settings),
+                settings=(
+                    new_names
+                    if saved_classes_mapping_settings == "default"
+                    else mapping_to_list(saved_classes_mapping_settings)
+                ),
             )
             # update settings preview
             _set_classes_mapping_preview()
@@ -372,9 +376,11 @@ class DataAction(SourceAction):
             classes_mapping_settings = settings.get("classes_mapping", "default")
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
-                settings=classes_mapping_settings
-                if classes_mapping_settings == "default"
-                else mapping_to_list(classes_mapping_settings),
+                settings=(
+                    classes_mapping_settings
+                    if classes_mapping_settings == "default"
+                    else mapping_to_list(classes_mapping_settings)
+                ),
             )
             # save settings
             _save_classes_mapping_setting()
@@ -411,9 +417,11 @@ class DataAction(SourceAction):
 
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
-                settings=saved_classes_mapping_settings
-                if saved_classes_mapping_settings == "default"
-                else mapping_to_list(saved_classes_mapping_settings),
+                settings=(
+                    saved_classes_mapping_settings
+                    if saved_classes_mapping_settings == "default"
+                    else mapping_to_list(saved_classes_mapping_settings)
+                ),
             )
 
             _set_classes_mapping_preview()
