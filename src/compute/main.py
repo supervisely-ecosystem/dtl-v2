@@ -63,7 +63,7 @@ def calculate_datasets_conflict_map(helper):
 def main(progress: Progress, circle_progress: CircleProgress, modality: str):
     task_helpers.task_verification(check_in_graph)
 
-    if not g.running_pipeline:
+    if not g.pipeline_running:
         return
 
     logger.info("DTL started")
@@ -74,17 +74,17 @@ def main(progress: Progress, circle_progress: CircleProgress, modality: str):
         net.validate(circle_progress)
         net.calc_metas()
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         net.preprocess()
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         datasets_conflict_map = calculate_datasets_conflict_map(helper)
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
     except CustomException as e:
@@ -104,7 +104,7 @@ def main(progress: Progress, circle_progress: CircleProgress, modality: str):
         )
     elements_generator = net.get_elements_generator()
 
-    if not g.running_pipeline:
+    if not g.pipeline_running:
         return
 
     results_counter = 0
@@ -113,12 +113,12 @@ def main(progress: Progress, circle_progress: CircleProgress, modality: str):
             try:
                 export_output_generator = net.start(data_el)
 
-                if not g.running_pipeline:
+                if not g.pipeline_running:
                     return
 
                 for res_export in export_output_generator:
 
-                    if not g.running_pipeline:
+                    if not g.pipeline_running:
                         return
 
                     logger.trace(
@@ -141,12 +141,12 @@ def main(progress: Progress, circle_progress: CircleProgress, modality: str):
             finally:
                 pbar.update()
 
-    if not g.running_pipeline:
+    if not g.pipeline_running:
         return
 
     net.postprocess()
 
-    if not g.running_pipeline:
+    if not g.pipeline_running:
         return
 
     logger.info(

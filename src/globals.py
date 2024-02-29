@@ -64,7 +64,7 @@ layers = {}
 
 update_queue = queue.Queue()
 
-running_pipeline = False
+pipeline_running = False
 pipeline_thread = None
 
 

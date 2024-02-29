@@ -59,7 +59,7 @@ def _run():
 
     error_notification.hide()
 
-    if not g.running_pipeline:
+    if not g.pipeline_running:
         return
 
     edges = nodes_flow.get_edges_json()
@@ -78,7 +78,7 @@ def _run():
         # destinations are defined in init_layers
         ui_utils.init_src(edges)
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         # prepare results dir
@@ -87,7 +87,7 @@ def _run():
         utils.delete_data_dir()
         utils.create_data_dir()
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         # Run
@@ -95,19 +95,19 @@ def _run():
         g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         net = compute_dtls(progress, circle_progress, g.MODALITY_TYPE)
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
         # Save results
         file_infos = []
         pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
         for i, pr_dir in enumerate(pr_dirs):
 
-            if not g.running_pipeline:
+            if not g.pipeline_running:
                 return
 
             with progress(
@@ -118,7 +118,7 @@ def _run():
                 sly.fs.archive_directory(pr_dir, tar_path)
                 pbar.update(1)
 
-            if not g.running_pipeline:
+            if not g.pipeline_running:
                 return
 
             with progress(
@@ -128,14 +128,14 @@ def _run():
                 total=get_file_size(tar_path),
             ) as pbar:
 
-                if not g.running_pipeline:
+                if not g.pipeline_running:
                     return
 
                 dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{Path(tar_path).name}"
                 if g.api.file.exists(g.TEAM_ID, dst):
                     dst = g.api.file.get_free_name(g.TEAM_ID, dst)
 
-                if not g.running_pipeline:
+                if not g.pipeline_running:
                     return
 
                 file_info = g.api.file.upload(
@@ -145,19 +145,19 @@ def _run():
                     progress_cb=pbar,
                 )
 
-                if not g.running_pipeline:
+                if not g.pipeline_running:
                     return
             # delete after upload?
 
             file_infos.append(file_info)
 
-            if not g.running_pipeline:
+            if not g.pipeline_running:
                 return
 
             if not sly.is_development():
                 g.api.task.set_output_archive(sly.env.task_id(), file_info.id, file_info.name)
 
-            if not g.running_pipeline:
+            if not g.pipeline_running:
                 return
 
         supervisely_layers = [
@@ -168,7 +168,7 @@ def _run():
             )
         ]
 
-        if not g.running_pipeline:
+        if not g.pipeline_running:
             return
 
         labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
@@ -197,9 +197,9 @@ def _run():
 
 
 def run_pipeline():
-    while g.running_pipeline:
+    while g.pipeline_running:
         _run()
-        g.running_pipeline = False
+        g.pipeline_running = False
         g.pipeline_thread = None
 
 
@@ -208,7 +208,7 @@ def run_pipeline():
 def start_pipeline():
     if g.pipeline_thread is not None:
         raise RuntimeError("Pipeline is already running")
-    g.running_pipeline = True
+    g.pipeline_running = True
     g.pipeline_thread = threading.Thread(target=run_pipeline, daemon=True)
     g.pipeline_thread.start()
 
@@ -218,7 +218,7 @@ def start_pipeline():
 def stop_pipeline():
     if g.pipeline_thread.is_alive():
         g.pipeline_thread = None
-        g.running_pipeline = False
+        g.pipeline_running = False
         sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
         error_notification.set(
             "Pipeline was manually stopped", description="Results may be incomplete."

@@ -1,5 +1,6 @@
 import random
 import json
+from time import sleep
 
 from supervisely.app.widgets import (
     Button,
@@ -165,7 +166,6 @@ def load_json():
         load_file_selector.enable()
     load_notification_select.set_value("loaded")
     load_dialog.hide()
-    # g.updater(("nodes", None)) # @TODO: PRESET PREVIEW FIX
 
 
 def apply_json(dtl_json):
@@ -304,6 +304,8 @@ def apply_json(dtl_json):
                         except:
                             pass
     nodes_flow.set_edges(nodes_flow_edges)
+    g.updater(("nodes", None))  # @TODO: PRESET PREVIEW FIX
+    sleep(1)  # delay for previews to load
 
 
 @load_preset_btn.click
