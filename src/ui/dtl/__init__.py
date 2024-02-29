@@ -55,6 +55,9 @@ from .actions.existing_project.existing_project import ExistingProjectAction
 from .actions.filter_images_without_objects.filter_images_without_objects import (
     FilterImageWithoutObjects,
 )
+from .actions.copy_annotations.copy_annotations import (
+    CopyAnnotationsAction,
+)
 
 # Neural networks
 from .actions.deploy_yolov8.deploy_yolov8 import DeployYOLOV8Action
@@ -76,6 +79,7 @@ from .actions.filter_videos_by_tags.filter_videos_by_tags import FilterVideosByT
 # ---
 
 # Labeling job
+from .actions.input_labeling_job.input_labeling_job import InputLabelingJobAction
 from .actions.labeling_job.labeling_job import LabelingJobAction
 
 import src.globals as g
@@ -95,7 +99,7 @@ VIDEO_TRANSFORMS = "Video transforms"
 # ---
 
 image_actions_list = {
-    SOURCE_ACTIONS: [DataAction.name],
+    SOURCE_ACTIONS: [DataAction.name, InputLabelingJobAction.name],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
         BlurAction.name,
@@ -144,10 +148,11 @@ image_actions_list = {
     NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNAction.name],
     OTHER: [DatasetAction.name, DummyAction.name],
     SAVE_ACTIONS: [
-        SaveAction.name,
-        SaveMasksAction.name,
         SuperviselyAction.name,
         ExistingProjectAction.name,
+        SaveAction.name,
+        SaveMasksAction.name,
+        CopyAnnotationsAction.name,
         LabelingJobAction.name,
     ],
 }
@@ -156,6 +161,7 @@ image_actions_list = {
 image_actions_dict = {
     # Data layers
     DataAction.name: DataAction,
+    InputLabelingJobAction.name: InputLabelingJobAction,
     # Pixel-level transforms layers
     AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,
@@ -204,10 +210,11 @@ image_actions_dict = {
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
     # Save layers
-    SaveAction.name: SaveAction,
-    SaveMasksAction.name: SaveMasksAction,
     SuperviselyAction.name: SuperviselyAction,
     ExistingProjectAction.name: ExistingProjectAction,
+    SaveAction.name: SaveAction,
+    SaveMasksAction.name: SaveMasksAction,
+    CopyAnnotationsAction.name: CopyAnnotationsAction,
     LabelingJobAction.name: LabelingJobAction,
 }
 
@@ -227,9 +234,9 @@ video_actions_list = {
         FilterVideoByDuration.name,
     ],
     SAVE_ACTIONS: [
-        SaveAction.name,
-        ExistingProjectAction.name,
         SuperviselyAction.name,
+        ExistingProjectAction.name,
+        SaveAction.name,
         LabelingJobAction.name,
     ],
 }
@@ -250,9 +257,9 @@ video_actions_dict = {
     FilterVideoWithoutAnnotation.name: FilterVideoWithoutAnnotation,
     FilterVideoByDuration.name: FilterVideoByDuration,
     # Save layers
-    SaveAction.name: SaveAction,
     SuperviselyAction.name: SuperviselyAction,
     ExistingProjectAction.name: ExistingProjectAction,
+    SaveAction.name: SaveAction,
     LabelingJobAction.name: LabelingJobAction,
 }
 

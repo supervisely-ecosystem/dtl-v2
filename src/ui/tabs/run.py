@@ -15,6 +15,7 @@ import supervisely as sly
 from src.compute.main import main as compute_dtls
 from src.compute.layers.save.SuperviselyLayer import SuperviselyLayer
 from src.compute.layers.save.ExistingProjectLayer import ExistingProjectLayer
+from src.compute.layers.save.CopyAnnotations import CopyAnnotationsLayer
 from src.compute.layers.save.LabelingJobLayer import LabelingJobLayer
 from src.ui.tabs.configure import nodes_flow
 import src.utils as utils
@@ -23,7 +24,6 @@ import src.globals as g
 from src.exceptions import CustomException, handle_exception
 from src.ui.widgets import CircleProgress
 import threading
-import multiprocessing
 
 show_run_dialog_btn = Button(
     "Run",
@@ -67,7 +67,7 @@ def _run():
 
     run_btn.hide()
     results.hide()
-    progress(message="Running...", total=1)
+    progress(message="Validating...", total=1)
     progress.show()
 
     try:
@@ -98,7 +98,7 @@ def _run():
         if not g.running_pipeline:
             return
 
-        net = compute_dtls(progress, g.MODALITY_TYPE)
+        net = compute_dtls(progress, circle_progress, g.MODALITY_TYPE)
 
         if not g.running_pipeline:
             return
@@ -161,7 +161,9 @@ def _run():
                 return
 
         supervisely_layers = [
-            l for l in net.layers if isinstance(l, (SuperviselyLayer, ExistingProjectLayer))
+            l
+            for l in net.layers
+            if isinstance(l, (SuperviselyLayer, ExistingProjectLayer, CopyAnnotationsLayer))
         ]
 
         if not g.running_pipeline:
@@ -176,7 +178,7 @@ def _run():
         results.show()
         circle_progress.set_status("success")
     except CustomException as e:
-        error_notification.set(title="Error", description=str(e))
+        error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
         circle_progress.set_status("exception")
         raise e
@@ -186,6 +188,7 @@ def _run():
         circle_progress.set_status("exception")
         raise e
     finally:
+        nodes_flow.enable()
         progress.hide()
         run_btn.show()
         stop_btn.hide()

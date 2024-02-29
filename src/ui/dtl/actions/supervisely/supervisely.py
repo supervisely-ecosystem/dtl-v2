@@ -37,7 +37,7 @@ class SuperviselyAction(OutputAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            dst_options = [
+            settings_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
                     option_component=NodesFlow.WidgetOptionComponent(sly_project_name_text),
@@ -49,8 +49,8 @@ class SuperviselyAction(OutputAction):
             ]
             return {
                 "src": [],
-                "dst": dst_options,
-                "settings": [],
+                "dst": [],
+                "settings": settings_options,
             }
 
         return Layer(

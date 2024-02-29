@@ -264,7 +264,8 @@ class SaveMasksAction(OutputAction):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            dst_options = [
+            dst_options = []
+            settings_options = [
                 NodesFlow.Node.Option(
                     name="destination_text",
                     option_component=NodesFlow.WidgetOptionComponent(destination_text),
@@ -272,8 +273,6 @@ class SaveMasksAction(OutputAction):
                 NodesFlow.Node.Option(
                     name="dst", option_component=NodesFlow.WidgetOptionComponent(destination_input)
                 ),
-            ]
-            settings_options = [
                 NodesFlow.Node.Option(
                     name="Add human masks",
                     option_component=NodesFlow.WidgetOptionComponent(add_human_masks_checkbox),
@@ -315,7 +314,7 @@ class SaveMasksAction(OutputAction):
             ]
             return {
                 "src": [],
-                "dst": dst_options,
+                "dst": [],
                 "settings": settings_options,
             }
 

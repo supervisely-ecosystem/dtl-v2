@@ -186,8 +186,11 @@ class Layer:
         def combine_options(options: list):
             result_options = [
                 self._info_option,
-                get_separator(0),
             ]
+
+            if not all([len(options[key]) == 0 for key in ["src", "dst", "settings"]]):
+                result_options.append(get_separator(0))
+
             if len(options["src"]) > 0:
                 result_options.extend(options["src"])
                 result_options.append(get_separator(1))

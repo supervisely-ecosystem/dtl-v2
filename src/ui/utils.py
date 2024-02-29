@@ -44,10 +44,11 @@ def find_layer_id_by_dst(dst: str):
     return None
 
 
-def find_children(parent: Layer):
+def find_children(parent: Layer, all_layers_ids: list):
     children = []
     parent_dst = parent.get_dst()
-    for layer_id, layer in g.layers.items():
+    for layer_id in all_layers_ids:
+        layer = g.layers.get(layer_id)
         for l_src in layer.get_src():
             if l_src in parent_dst:
                 children.append(layer_id)
@@ -259,15 +260,19 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
     return chain
 
 
-def get_layer_children_list(layer_id, layers: list = None):
+def get_layer_children_list(
+    layer_id: str,
+    all_layers_ids: list,
+    layers: list = None,
+):
     if layers is None:
         layers = []
     if layer_id in layers:
         return layers
     layers.append(layer_id)
     layer: Layer = g.layers[layer_id]
-    for child in find_children(layer):
-        get_layer_children_list(child, layers)
+    for child in find_children(layer, all_layers_ids):
+        get_layer_children_list(child, all_layers_ids, layers)
     return layers
 
 
@@ -285,9 +290,15 @@ def load_preview_for_data_layer(layer: Layer):
             f"Error getting project meta", error=e, extra={"project_name": project_name}
         )
 
+    if layer.action.name == "input_labeling_job":
+        layer_settings = layer.get_settings()
+        items_ids = layer_settings.get("entities_ids", None)
+    else:
+        items_ids = None
+
     try:
         item_info, preview_img_path, preview_ann_path = download_preview(
-            project_name, dataset_name, project_meta, g.MODALITY_TYPE
+            project_name, dataset_name, project_meta, g.MODALITY_TYPE, items_ids
         )
     except Exception as e:
         raise CustomException(
@@ -335,7 +346,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     layer = g.layers[layer_id]
 
     layer.clear_preview()
-    children = get_layer_children_list(layer_id)
+    children = get_layer_children_list(layer_id, all_layers_ids)
     if children:
         for l_id in children:
             g.layers[l_id].clear_preview()
@@ -378,7 +389,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     if layers_id_chain is None:
         layers_idx_whitelist = None
     else:
-        children = get_layer_children_list(layer_id)
+        children = get_layer_children_list(layer_id, all_layers_ids)
         layers_idx_whitelist = [all_layers_ids.index(id) for id in layers_id_chain]
         layers_idx_whitelist.extend([all_layers_ids.index(id) for id in children])
     processing_generator = net.start_iterate(

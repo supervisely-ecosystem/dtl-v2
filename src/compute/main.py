@@ -5,6 +5,7 @@ import os
 import supervisely as sly
 from supervisely import sly_logger
 from supervisely.app.widgets.sly_tqdm.sly_tqdm import Progress
+from src.ui.widgets import CircleProgress
 from supervisely.sly_logger import logger, EventType
 
 from src.compute.dtl_utils.dtl_helper import DtlHelper, DtlPaths
@@ -59,7 +60,7 @@ def calculate_datasets_conflict_map(helper):
     return datasets_conflict_map
 
 
-def main(progress: Progress, modality):
+def main(progress: Progress, circle_progress: CircleProgress, modality: str):
     task_helpers.task_verification(check_in_graph)
 
     if not g.running_pipeline:
@@ -70,7 +71,7 @@ def main(progress: Progress, modality):
 
     try:
         net = Net(helper.graph, helper.paths.results_dir, modality)
-        net.validate()
+        net.validate(circle_progress)
         net.calc_metas()
 
         if not g.running_pipeline:
@@ -87,10 +88,12 @@ def main(progress: Progress, modality):
             return
 
     except CustomException as e:
+        circle_progress.hide()
         # logger.error("Error occurred on DTL-graph initialization step!")
         # e.log()
         raise e
     except Exception as e:
+        circle_progress.hide()
         # logger.error("Error occurred on DTL-graph initialization step!", exc_info=str(e))
         raise e
 
