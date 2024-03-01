@@ -26,7 +26,7 @@ import src.globals as g
 
 
 class DeployYOLOV8Action(NeuralNetworkAction):
-    name = "deploy_yolov8"
+    name = "deploy_yolo_v8"
     title = "Deploy YoloV8"
     docs_url = ""
     description = "Deploy YoloV8 models."

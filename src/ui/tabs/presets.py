@@ -304,7 +304,7 @@ def apply_json(dtl_json):
                         except:
                             pass
     nodes_flow.set_edges(nodes_flow_edges)
-    g.updater(("nodes", None))  # @TODO: PRESET PREVIEW FIX
+    g.updater(("nodes", None))
     sleep(1)  # delay for previews to load
 
 

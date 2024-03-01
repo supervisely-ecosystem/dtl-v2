@@ -371,7 +371,7 @@ class ApplyNNLayer(Layer):
                         g.pipeline_running = False
                         raise ValueError(
                             (
-                                "Something went wrong while applying model to image. "
+                                "Something went wrong while applying model to image. Pipeline will be stopped. "
                                 f"Shutting down the model session ID: '{self.settings['session_id']}'."
                             )
                         )

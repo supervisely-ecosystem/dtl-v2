@@ -1,6 +1,6 @@
 import threading
 import time
-from supervisely import Application, ProjectInfo, DatasetInfo
+from supervisely import Application, ProjectInfo, DatasetInfo, Annotation, ProjectMeta, logger
 
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
@@ -8,7 +8,8 @@ from src.ui.tabs.presets import load_json
 
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
-
+from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
+from src.utils import LegacyProjectItem
 
 import src.globals as g
 import src.utils as u
@@ -58,7 +59,6 @@ update_loop = threading.Thread(
     daemon=True,
 )
 
-update_loop.start()
 
 if g.PROJECT_ID:
     ds_name = "*"
@@ -77,6 +77,48 @@ if g.PROJECT_ID:
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)
+
+    # add preview func manually
+    # 48 - update_nodes(u[1])
+    # if g.DATASET_ID:
+    #     items = g.api.image.get_list(g.DATASET_ID)
+    # else:
+    #     dss = g.api.dataset.get_list(g.PROJECT_ID)
+    #     if len(dss) > 0:
+    #         ds = dss[0]
+    #         items = g.api.image.get_list(dss[0].id)
+    #     else:
+    #         items = []
+
+    # if len(items) > 0 and pr.type == "images":
+    #     project_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
+    #     item_info = items[0]
+
+    #     image_path = f"{g.PREVIEW_DIR}/{layer.id}/preview_image.{item_info.ext}"
+    #     g.api.image.download_path(item_info.id, image_path)
+    #     ann_json = g.api.annotation.download_json(item_info.id)
+    #     ann = Annotation.from_json(ann_json, project_meta)
+    #     item_desc = ImageDescriptor(
+    #         LegacyProjectItem(
+    #             project_name=pr.name,
+    #             ds_name=ds.name,
+    #             item_name=".".join(item_info.name.split(".")[:-1]),
+    #             item_info=item_info,
+    #             ia_data={"item_ext": "." + item_info.ext},
+    #             item_path=image_path,
+    #             ann_path="",
+    #         ),
+    #         False,
+    #     )
+    #     logger.info("UPdate proj preview")
+    #     layer.set_preview_loading(True)
+    #     layer.update_preview(item_desc, ann)
+    #     layer.set_preview_loading(False)
+    #     update_nodes(None)
+    #     g.updater(("nodes", None))
+
+
+update_loop.start()
 
 # if g.FILE:
 #     g.updater("load_json")
