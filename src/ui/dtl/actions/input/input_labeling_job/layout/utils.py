@@ -76,14 +76,29 @@ def set_job_dataset_preview(
 def set_job_classes_preview(
     job_classes: Union[List[ObjClass], ObjClassCollection],
     lj_selector_preview_classes: ClassesListPreview,
+    lj_selector_preview_classes_text: Text,
+    show_counter: bool = True,
 ):
     lj_selector_preview_classes.set(job_classes)
+    if show_counter:
+        lj_selector_preview_classes_text.set(
+            f"Classes: {len(job_classes)} / {len(job_classes)}", "text"
+        )
+    else:
+        lj_selector_preview_classes_text.set("Classes", "text")
 
 
 def set_job_tags_preview(
-    job_tags: Union[List[TagMeta], TagMetaCollection], lj_selector_preview_tags: TagsListPreview
+    job_tags: Union[List[TagMeta], TagMetaCollection],
+    lj_selector_preview_tags: TagsListPreview,
+    lj_selector_preview_tags_text: Text,
+    show_counter: bool = True,
 ):
     lj_selector_preview_tags.set(job_tags)
+    if show_counter:
+        lj_selector_preview_tags_text.set(f"Tags: {len(job_tags)} / {len(job_tags)}", "text")
+    else:
+        lj_selector_preview_tags_text.set(f"Tags", "text")
 
 
 # --------------------------

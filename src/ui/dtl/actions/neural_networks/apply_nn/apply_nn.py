@@ -183,7 +183,9 @@ class ApplyNNAction(NeuralNetworkAction):
             saved_tags_settings = set_model_tags(
                 tags_list_widget, [tag_meta for tag_meta in _model_meta.tag_metas]
             )
-            set_model_tags_preview(tags_list_widget, tags_list_preview, saved_tags_settings)
+            set_model_tags_preview(
+                tags_list_widget, tags_list_preview, saved_tags_settings, tags_list_edit_text
+            )
 
             connect_notification.hide()
             connect_notification.loading = False
@@ -416,7 +418,13 @@ class ApplyNNAction(NeuralNetworkAction):
             tags_list_widget.set(_model_meta.tag_metas)
             set_tags_list_settings_from_json(tags_list_widget, tags_list_settings)
             _save_tags_list_settings()
-            set_tags_list_preview(tags_list_widget, tags_list_preview, tags_list_settings)
+            set_tags_list_preview(
+                tags_list_widget,
+                tags_list_preview,
+                tags_list_settings,
+                tags_list_edit_text,
+                "Model Tags",
+            )
             tags_list_widget.loading = False
             # -----------------------
 
@@ -467,14 +475,26 @@ class ApplyNNAction(NeuralNetworkAction):
         @tags_list_save_btn.click
         def tags_list_save_btn_cb():
             _save_tags_list_settings()
-            set_tags_list_preview(tags_list_widget, tags_list_preview, saved_tags_settings)
+            set_tags_list_preview(
+                tags_list_widget,
+                tags_list_preview,
+                saved_tags_settings,
+                tags_list_edit_text,
+                "Model Tags",
+            )
             g.updater("metas")
 
         @tags_list_set_default_btn.click
         def tags_list_set_default_btn_cb():
             _set_default_tags_list_setting()
             set_tags_list_settings_from_json(tags_list_widget, saved_tags_settings)
-            set_tags_list_preview(tags_list_widget, tags_list_preview, saved_tags_settings)
+            set_tags_list_preview(
+                tags_list_widget,
+                tags_list_preview,
+                saved_tags_settings,
+                tags_list_edit_text,
+                "Model Tags",
+            )
             g.updater("metas")
 
         @inf_settings_save_btn.click

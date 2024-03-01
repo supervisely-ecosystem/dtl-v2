@@ -23,8 +23,8 @@ from src.ui.dtl.utils import (
 import src.globals as g
 
 
-class RenameAction(AnnotationAction):
-    name = "rename"
+class RenameClassesAction(AnnotationAction):
+    name = "rename_classes"
     title = "Rename Classes"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rename"
     description = "Rename existing classes."
@@ -55,7 +55,7 @@ class RenameAction(AnnotationAction):
             ]
         )
         classes_mapping_edit_text = Text(
-            "Classes Names", status="text", font_size=get_text_font_size()
+            "Renamed classes: 0 / 0", status="text", font_size=get_text_font_size()
         )
         classes_mapping_edit_btn = Button(
             text="EDIT",
@@ -88,6 +88,8 @@ class RenameAction(AnnotationAction):
                 saved_classes_mapping_settings,
                 default_action="skip",
                 ignore_action="skip",
+                classes_mapping_preview_text=classes_mapping_edit_text,
+                classes_mapping_text_preview_title="Renamed classes",
             )
 
         def _save_classes_mapping_setting():

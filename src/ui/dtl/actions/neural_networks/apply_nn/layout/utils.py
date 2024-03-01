@@ -162,9 +162,14 @@ def set_model_tags(tags_list_widget: TagsList, tag_metas: List[TagMeta]) -> List
 
 
 def set_model_tags_preview(
-    tags_list_widget: TagsList, tags_list_preview: TagsListPreview, saved_tags_settings: List[str]
+    tags_list_widget: TagsList,
+    tags_list_preview: TagsListPreview,
+    saved_tags_settings: List[str],
+    tags_list_edit_text: Text,
 ) -> None:
-    set_tags_list_preview(tags_list_widget, tags_list_preview, saved_tags_settings)
+    set_tags_list_preview(
+        tags_list_widget, tags_list_preview, saved_tags_settings, tags_list_edit_text, "Model Tags"
+    )
 
 
 ### -----------------------------

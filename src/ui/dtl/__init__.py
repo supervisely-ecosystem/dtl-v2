@@ -52,7 +52,7 @@ from .actions.pixel_level_transformations.noise.noise import NoiseAction
 from .actions.annotation_transforms.objects_filter.objects_filter import ObjectsFilterAction
 from .actions.annotation_transforms.polygon_to_mask.polygon_to_mask import PolygonToMaskAction
 from .actions.pixel_level_transformations.random_color.random_color import RandomColorsAction
-from .actions.annotation_transforms.rename.rename import RenameAction
+from .actions.annotation_transforms.rename_classes.rename_classes import RenameClassesAction
 from .actions.annotation_transforms.rasterize.rasterize import RasterizeAction
 from .actions.spatial_level_transforms.resize.resize import ResizeAction
 from .actions.spatial_level_transforms.rotate.rotate import RotateAction
@@ -158,7 +158,7 @@ image_actions_list = {
         ObjectsFilterAction.name,
         PolygonToMaskAction.name,
         RasterizeAction.name,
-        RenameAction.name,
+        RenameClassesAction.name,
         SkeletonizeAction.name,
         SplitMasksAction.name,
         ImageTagAction.name,
@@ -218,7 +218,7 @@ image_actions_dict = {
     ObjectsFilterAction.name: ObjectsFilterAction,
     PolygonToMaskAction.name: PolygonToMaskAction,
     RasterizeAction.name: RasterizeAction,
-    RenameAction.name: RenameAction,
+    RenameClassesAction.name: RenameClassesAction,
     SkeletonizeAction.name: SkeletonizeAction,
     SplitMasksAction.name: SplitMasksAction,
     ImageTagAction.name: ImageTagAction,

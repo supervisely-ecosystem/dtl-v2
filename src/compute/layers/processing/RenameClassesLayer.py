@@ -8,8 +8,8 @@ from src.compute.dtl_utils import apply_to_labels
 from src.exceptions import BadSettingsError
 
 
-class RenameLayer(Layer):
-    action = "rename"
+class RenameClassesLayer(Layer):
+    action = "rename_classes"
 
     layer_settings = {
         "required": ["settings"],

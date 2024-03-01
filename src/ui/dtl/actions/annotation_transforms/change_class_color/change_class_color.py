@@ -41,7 +41,7 @@ class ChangeClassColorAction(AnnotationAction):
             description="Select the classes for which you want to change the color",
         )
         classes_colors_edit_text = Text(
-            "Classes Colors", status="text", font_size=get_text_font_size()
+            "Classes Colors: 0 / 0", status="text", font_size=get_text_font_size()
         )
         classes_colors_edit_btn = Button(
             text="EDIT",
@@ -68,6 +68,9 @@ class ChangeClassColorAction(AnnotationAction):
             obj_classes = classes_colors.get_selected_classes()
             classes_colors_preview.set(
                 obj_classes, {k: rgb2hex(v) for k, v in saved_classes_colors_settings.items()}
+            )
+            classes_colors_edit_text.set(
+                f"Classes Colors: {len(obj_classes)} / {len(_current_meta.obj_classes)}", "text"
             )
 
         def get_settings(options_json: dict) -> dict:

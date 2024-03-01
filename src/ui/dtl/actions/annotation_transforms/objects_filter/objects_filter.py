@@ -106,7 +106,9 @@ class ObjectsFilterAction(AnnotationAction):
         filter_by_inputs = OneOf(filter_by_select)
 
         filter_by_preview_text = Text("", status="text", font_size=get_text_font_size())
-        filter_preview_classes_text = Text("Classes", status="text", font_size=get_text_font_size())
+        filter_preview_classes_text = Text(
+            "Classes: 0 / 0", status="text", font_size=get_text_font_size()
+        )
         classes_preview = ClassesListPreview()
         area_size_preview = Text("", status="text", font_size=get_text_font_size())
         comparator_preview = Text("", status="text", font_size=get_text_font_size())

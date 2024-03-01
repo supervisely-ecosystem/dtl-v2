@@ -105,8 +105,12 @@ class InputLabelingJobAction(SourceAction):
                 dataset_info,
                 lj_selector_preview_lj_dataset_thumbnail,
             )
-            utils.set_job_classes_preview(job_meta.obj_classes, lj_selector_preview_classes)
-            utils.set_job_tags_preview(job_meta.tag_metas, lj_selector_preview_tags)
+            utils.set_job_classes_preview(
+                job_meta.obj_classes, lj_selector_preview_classes, lj_selector_preview_classes_text
+            )
+            utils.set_job_tags_preview(
+                job_meta.tag_metas, lj_selector_preview_tags, lj_selector_preview_tags_text
+            )
             utils.set_job_name_preview(job_info.name, lj_selector_preview_lj_text)
             utils.set_job_status_preview(job_info.status, lj_selector_preview_lj_status)
             utils.set_job_progress_preview(job_info, lj_selector_preview_lj_progress)

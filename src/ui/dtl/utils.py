@@ -177,6 +177,9 @@ def set_classes_mapping_preview(
     default_action: Literal["skip", "keep", "copy"] = "skip",
     ignore_action: Literal["skip", "keep", "empty"] = "skip",
     missing_value: Literal["default", "ignore"] = "ignore",
+    classes_mapping_preview_text: Text = None,
+    classes_mapping_text_preview_title="Classes Mapping",
+    show_counter: bool = True,
 ):
     obj_classes = classes_mapping_widget.get_classes()
     obj_classes_names = [obj_class.name for obj_class in obj_classes]
@@ -189,6 +192,14 @@ def set_classes_mapping_preview(
     classes_mapping_preview_widget.set(
         [obj_class for obj_class in obj_classes if obj_class.name in packed], packed
     )
+
+    if classes_mapping_preview_text is not None:
+        if show_counter:
+            classes_mapping_preview_text.set(
+                f"{classes_mapping_text_preview_title}: {len(packed)} / {len(obj_classes)}", "text"
+            )
+        else:
+            classes_mapping_preview_text.set({classes_mapping_text_preview_title}, "text")
 
 
 def set_classes_mapping_settings_from_json(
@@ -307,6 +318,7 @@ def set_classes_list_preview(
     classes_list_settings: Union[list, str],
     classes_list_text_preview: Text = None,
     classes_list_text_preview_title: str = "Classes",
+    show_counter: bool = True,
 ):
     if isinstance(classes_list_settings, str):
         if classes_list_settings == "default":
@@ -358,10 +370,13 @@ def set_classes_list_preview(
             else:
                 selected_classes_n = len(names)
 
-        classes_list_text_preview.set(
-            f"{classes_list_text_preview_title}: {selected_classes_n} / {total_classes_n}",
-            "text",
-        )
+        if show_counter:
+            classes_list_text_preview.set(
+                f"{classes_list_text_preview_title}: {selected_classes_n} / {total_classes_n}",
+                "text",
+            )
+        else:
+            classes_list_text_preview.set(f"{classes_list_text_preview_title}", "text")
 
 
 def set_classes_list_settings_from_json(
@@ -410,6 +425,9 @@ def set_tags_list_preview(
     tags_list_widget: TagsList,
     tags_list_preview_widget: TagsListPreview,
     tags_list_settings: Union[list, str],
+    tags_list_text_preview: Text = None,
+    tags_list_text_preview_title: str = "Tags",
+    show_counter: bool = True,
 ):
     if isinstance(tags_list_settings, str):
         if tags_list_settings == "default":
@@ -425,6 +443,14 @@ def set_tags_list_preview(
 
     tag_metas = tags_list_widget.get_all_tags()
     tags_list_preview_widget.set([tag_meta for tag_meta in tag_metas if tag_meta.name in names])
+
+    if tags_list_text_preview is not None:
+        if show_counter:
+            tags_list_text_preview.set(
+                f"{tags_list_text_preview_title}: {len(names)} / {len(tag_metas)}", "text"
+            )
+        else:
+            tags_list_text_preview.set(f"{tags_list_text_preview_title}", "text")
 
 
 def get_tags_list_value(tags_list_widget: TagsList, multiple: bool = True):

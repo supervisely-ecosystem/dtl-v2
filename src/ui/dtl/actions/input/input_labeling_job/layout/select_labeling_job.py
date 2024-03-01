@@ -76,10 +76,12 @@ def create_lj_selector_widgets() -> tuple:
     lj_selector_preview_lj_dataset_thumbnail.hide()
 
     lj_selector_preview_classes_text = Text(
-        "Classes", status="text", font_size=get_text_font_size()
+        "Classes: 0 / 0", status="text", font_size=get_text_font_size()
     )
     lj_selector_preview_classes = ClassesListPreview(empty_text="Job has no classes to label")
-    lj_selector_preview_tags_text = Text("Tags", status="text", font_size=get_text_font_size())
+    lj_selector_preview_tags_text = Text(
+        "Tags: 0 / 0", status="text", font_size=get_text_font_size()
+    )
     lj_selector_preview_tags = TagsListPreview(empty_text="Job has no tags to label")
     # --------------------------
 

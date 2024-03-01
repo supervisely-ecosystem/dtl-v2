@@ -126,7 +126,7 @@ class FilterImageByObject(FilterAndConditionAction):
         exclude_preview = ClassesListPreview()
         with_container = Container(
             widgets=[
-                Text("Images has objects:"),
+                Text("Image have objects:"),
                 include_preview,
             ]
         )

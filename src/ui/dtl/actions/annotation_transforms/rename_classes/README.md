@@ -14,11 +14,11 @@ In this example we will change classes so that they are starting with a capital 
   <summary>JSON view</summary>
 ```json
 {
-    "action": "rename",
+    "action": "rename_classes",
     "src": [
         "$data_12"
     ],
-    "dst": "$rename_22",
+    "dst": "$rename_classes_22",
     "settings": {
         "classes_mapping": {
             "cat": "Cat",
