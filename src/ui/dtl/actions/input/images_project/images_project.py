@@ -7,19 +7,26 @@ import src.utils as utils
 from src.ui.dtl import SourceAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
-    classes_list_settings_changed_meta,
     create_save_btn,
-    get_classes_list_value,
+    get_text_font_size,
     get_layer_docs,
+    mapping_to_list,
     get_set_settings_button_style,
     get_set_settings_container,
+    # classes
+    classes_list_to_mapping,
+    get_classes_list_value,
     set_classes_list_preview,
     set_classes_list_settings_from_json,
-    get_text_font_size,
-    classes_list_to_mapping,
-    mapping_to_list,
+    classes_list_settings_changed_meta,
+    # tags
+    tags_list_to_mapping,
+    get_tags_list_value,
+    set_tags_list_preview,
+    set_tags_list_settings_from_json,
+    tags_list_settings_changed_meta,
 )
-from src.ui.widgets import ClassesListPreview
+from src.ui.widgets import ClassesListPreview, TagsListPreview
 from supervisely import ProjectMeta, ProjectType
 from supervisely.app.content import StateJson
 from supervisely.app.widgets import (
@@ -30,6 +37,7 @@ from supervisely.app.widgets import (
     SelectDataset,
     Text,
     ClassesTable,
+    TagsTable,
     ProjectThumbnail,
     Field,
 )
@@ -108,6 +116,7 @@ class ImagesProjectAction(SourceAction):
         #     description="Choose datasets and ensure that source project have classes.",
         # )
 
+        # CLASSES
         classes_mapping_widget = ClassesTable()
         classes_mapping_save_btn = create_save_btn()
         classes_mapping_set_default_btn = Button(
@@ -154,6 +163,57 @@ class ImagesProjectAction(SourceAction):
         classes_mapping_edit_contaniner = get_set_settings_container(
             classes_mapping_edit_text, classes_mapping_edit_btn
         )
+        # -----
+
+        # TAGS
+        tags_mapping_widget = TagsTable()
+        tags_mapping_save_btn = create_save_btn()
+        tags_mapping_set_default_btn = Button(
+            "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
+        )
+        tags_mapping_preview = TagsListPreview()
+
+        tags_mapping_field = Field(
+            content=tags_mapping_widget,
+            title="Tags",
+            description=(
+                "Select tags that will be used in data transformation processes. "
+                "If tag is not selected, it will be ignored."
+            ),
+        )
+        tags_mapping_widgets_container = Container(
+            widgets=[
+                tags_mapping_field,
+                Container(
+                    widgets=[
+                        tags_mapping_save_btn,
+                        tags_mapping_set_default_btn,
+                    ],
+                    direction="horizontal",
+                    gap=0,
+                    fractions=[1, 0],
+                    # gap=355,
+                ),
+            ]
+        )
+        tags_mapping_edit_text = Text("Tags", status="text", font_size=get_text_font_size())
+        tags_mapping_edit_btn = Button(
+            text="EDIT",
+            icon="zmdi zmdi-edit",
+            button_type="text",
+            button_size="small",
+            emit_on_click="openSidebar",
+            style=get_set_settings_button_style(),
+        )
+
+        if g.PROJECT_ID is None:
+            tags_mapping_edit_btn.disable()
+
+        tags_mapping_edit_contaniner = get_set_settings_container(
+            tags_mapping_edit_text, tags_mapping_edit_btn
+        )
+
+        # -----
 
         update_preview_btn = Button(
             text="Update",
@@ -166,6 +226,9 @@ class ImagesProjectAction(SourceAction):
 
         default_classes_mapping_settings = "default"
         saved_classes_mapping_settings = "default"
+
+        default_tags_mapping_settings = "default"
+        saved_tags_mapping_settings = "default"
 
         def _set_src_preview():
             src_preview_text = ""
@@ -232,6 +295,17 @@ class ImagesProjectAction(SourceAction):
                 default_allowed=True,
             )
 
+        def _get_tags_mapping_value():
+            nonlocal _current_meta
+            tags = get_tags_list_value(tags_mapping_widget, multiple=True)
+            all_tags = [oc.name for oc in _current_meta.tag_metas]
+            return classes_list_to_mapping(
+                selected_classes=tags,
+                all_classes=all_tags,
+                other="ignore",
+                default_allowed=True,
+            )
+
         def _set_classes_mapping_preview():
             set_classes_list_preview(
                 classes_mapping_widget,
@@ -244,15 +318,36 @@ class ImagesProjectAction(SourceAction):
                 classes_mapping_edit_text,
             )
 
+        def _set_tags_mapping_preview():
+            set_tags_list_preview(
+                tags_mapping_widget,
+                tags_mapping_preview,
+                (
+                    saved_tags_mapping_settings
+                    if saved_tags_mapping_settings == "default"
+                    else mapping_to_list(saved_tags_mapping_settings)
+                ),
+                tags_mapping_edit_text,
+            )
+
         def _save_classes_mapping_setting():
             # save setting to var
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = _get_classes_mapping_value()
 
+        def _save_tags_mapping_setting():
+            nonlocal saved_tags_mapping_settings
+            saved_tags_mapping_settings = _get_tags_mapping_value()
+
         def _set_default_classes_mapping_setting():
             # save setting to var
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = copy.deepcopy(default_classes_mapping_settings)
+
+        def _set_default_tags_mapping_setting():
+            # save setting to var
+            nonlocal saved_tags_mapping_settings
+            saved_tags_mapping_settings = copy.deepcopy(default_tags_mapping_settings)
 
         def data_changed_cb(**kwargs):
             project_meta = kwargs.get("project_meta", None)
@@ -264,12 +359,20 @@ class ImagesProjectAction(SourceAction):
                 classes_mapping_edit_text.set("Project has no object classes", "text")
                 classes_mapping_edit_btn.disable()
 
+            if _current_info is not None and len(project_meta.tag_metas) == 0:
+                tags_mapping_edit_text.set("Project has no tags", "text")
+                tags_mapping_edit_btn.disable()
+
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
             classes_mapping_widget.loading = True
             new_obj_classes = [cls for cls in project_meta.obj_classes]
-            new_names = [oc.name for oc in new_obj_classes]
+            new_class_names = [oc.name for oc in new_obj_classes]
+
+            tags_mapping_widget.loading = True
+            new_tag_metas = [tag for tag in project_meta.tag_metas]
+            new_tag_names = [tag.name for tag in new_tag_metas]
 
             # set classes to widget
             if _current_info is None:
@@ -278,7 +381,7 @@ class ImagesProjectAction(SourceAction):
                 classes_mapping_widget.read_project_from_id(_current_info.id)
 
             # update settings according to new meta
-            nonlocal saved_classes_mapping_settings
+            nonlocal saved_classes_mapping_settings, saved_tags_mapping_settings
             if saved_classes_mapping_settings != "default":
                 current_classes_list = mapping_to_list(saved_classes_mapping_settings)
                 classes_list = classes_list_settings_changed_meta(
@@ -287,7 +390,25 @@ class ImagesProjectAction(SourceAction):
                 )
                 saved_classes_mapping_settings = classes_list_to_mapping(
                     classes_list,
-                    new_names,
+                    new_class_names,
+                    other="ignore",
+                    default_allowed=False,
+                )
+
+            if _current_info is None:
+                tags_mapping_widget.set_project_meta(project_meta)
+            else:
+                tags_mapping_widget.read_project_from_id(_current_info.id)
+
+            if saved_tags_mapping_settings != "default":
+                current_tags_list = mapping_to_list(saved_tags_mapping_settings)
+                tags_list = tags_list_settings_changed_meta(
+                    current_tags_list,
+                    new_tag_metas,
+                )
+                saved_tags_mapping_settings = tags_list_to_mapping(
+                    tags_list,
+                    new_tag_names,
                     other="ignore",
                     default_allowed=False,
                 )
@@ -295,20 +416,32 @@ class ImagesProjectAction(SourceAction):
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
                 settings=(
-                    new_names
+                    new_class_names
                     if saved_classes_mapping_settings == "default"
                     else mapping_to_list(saved_classes_mapping_settings)
                 ),
             )
-            # update settings preview
             _set_classes_mapping_preview()
+
+            set_tags_list_settings_from_json(
+                tags_list_widget=tags_mapping_widget,
+                settings=(
+                    new_tag_names
+                    if saved_tags_mapping_settings == "default"
+                    else mapping_to_list(saved_tags_mapping_settings)
+                ),
+            )
+            _set_tags_mapping_preview()
 
             if isinstance(_current_meta, ProjectMeta):
                 if len(_current_meta.obj_classes) > 0:
                     classes_mapping_edit_btn.enable()
+                if len(_current_meta.tag_metas) > 0:
+                    tags_mapping_edit_btn.enable()
                 update_preview_btn.enable()
 
             classes_mapping_widget.loading = False
+            tags_mapping_widget.loading = False
 
         def get_src(options_json: dict) -> List[str]:
             return saved_src
@@ -317,6 +450,7 @@ class ImagesProjectAction(SourceAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
                 "classes_mapping": saved_classes_mapping_settings,
+                "tags_mapping": saved_tags_mapping_settings,
             }
 
         def _set_src_from_json(srcs: List[str]):
@@ -370,9 +504,7 @@ class ImagesProjectAction(SourceAction):
 
         def _set_settings_from_json(settings: dict):
             # if settings are empty, set default
-
             classes_mapping_widget.loading = True
-
             classes_mapping_settings = settings.get("classes_mapping", "default")
             set_classes_list_settings_from_json(
                 classes_list_widget=classes_mapping_widget,
@@ -382,11 +514,24 @@ class ImagesProjectAction(SourceAction):
                     else mapping_to_list(classes_mapping_settings)
                 ),
             )
-            # save settings
             _save_classes_mapping_setting()
-            # update settings preview
             _set_classes_mapping_preview()
             classes_mapping_widget.loading = False
+
+            tags_mapping_widget.loading = True
+            tags_mapping_settings = settings.get("tags_mapping", "default")
+
+            set_tags_list_settings_from_json(
+                tags_list_widget=tags_mapping_widget,
+                settings=(
+                    tags_mapping_settings
+                    if tags_mapping_settings == "default"
+                    else mapping_to_list(tags_mapping_settings)
+                ),
+            )
+            _save_tags_mapping_setting()
+            _set_tags_mapping_preview()
+            tags_mapping_widget.loading = False
 
         @src_save_btn.click
         def src_save_btn_cb():
@@ -427,6 +572,28 @@ class ImagesProjectAction(SourceAction):
             _set_classes_mapping_preview()
             g.updater("metas")
 
+        @tags_mapping_save_btn.click
+        def tags_mapping_save_btn_cb():
+            _save_tags_mapping_setting()
+            _set_tags_mapping_preview()
+            g.updater("metas")
+
+        @tags_mapping_set_default_btn.click
+        def tags_mapping_set_default_btn_cb():
+            _set_default_tags_mapping_setting()
+
+            set_tags_list_settings_from_json(
+                tags_list_widget=tags_mapping_widget,
+                settings=(
+                    saved_tags_mapping_settings
+                    if saved_tags_mapping_settings == "default"
+                    else mapping_to_list(saved_tags_mapping_settings)
+                ),
+            )
+
+            _set_tags_mapping_preview()
+            g.updater("metas")
+
         @select_datasets.value_changed
         def select_dataset_changed_handler(args):
             selected = select_datasets.get_selected_ids()
@@ -451,7 +618,7 @@ class ImagesProjectAction(SourceAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="src_preview",
+                    name="Source Preview",
                     option_component=NodesFlow.WidgetOptionComponent(src_preview_widget),
                 ),
             ]
@@ -467,8 +634,22 @@ class ImagesProjectAction(SourceAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="classes_mapping_preview",
+                    name="Classes Preview",
                     option_component=NodesFlow.WidgetOptionComponent(classes_mapping_preview),
+                ),
+                NodesFlow.Node.Option(
+                    name="Set Tags",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=tags_mapping_edit_contaniner,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(
+                            tags_mapping_widgets_container
+                        ),
+                        sidebar_width=750,
+                    ),
+                ),
+                NodesFlow.Node.Option(
+                    name="Tags Preview",
+                    option_component=NodesFlow.WidgetOptionComponent(tags_mapping_preview),
                 ),
             ]
             return {"src": src_options, "dst": [], "settings": settings_options}

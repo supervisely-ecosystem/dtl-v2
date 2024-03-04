@@ -1,7 +1,7 @@
 # coding: utf-8
 from typing import Tuple
 
-from supervisely import Annotation, Label, ProjectMeta
+from supervisely import Annotation, Label, ProjectMeta, TagMetaCollection
 
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
@@ -19,14 +19,20 @@ class ImagesProjectLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["classes_mapping"],
+                "required": ["classes_mapping", "tags_mapping"],
                 "properties": {
                     "classes_mapping": {
                         "oneOf": [
                             {"type": "object", "patternProperties": {".*": {"type": "string"}}},
                             {"type": "string", "enum": ["default"]},
                         ]
-                    }
+                    },
+                    "tags_mapping": {
+                        "oneOf": [
+                            {"type": "object", "patternProperties": {".*": {"type": "string"}}},
+                            {"type": "string", "enum": ["default"]},
+                        ]
+                    },
                 },
             }
         },
@@ -76,6 +82,12 @@ class ImagesProjectLayer(Layer):
         else:
             Layer.define_classes_mapping(self)
 
+    def define_tags_mapping(self):
+        if self.settings.get("tags_mapping", "default") != "default":
+            self.tag_mapping = self.settings["tags_mapping"]
+        else:
+            Layer.define_tags_mapping(self)
+
     def class_mapper(self, label: Label):
         curr_class = label.obj_class.name
 
@@ -84,14 +96,26 @@ class ImagesProjectLayer(Layer):
         else:
             raise BadSettingsError("Can not find mapping for class", extra={"class": curr_class})
 
+        new_tags = self.process_tags(label.tags)
+
         if new_class == ClassConstants.IGNORE:
             return []  # drop the figure
         elif new_class != ClassConstants.DEFAULT:
             obj_class = label.obj_class.clone(name=new_class)  # rename class
-            label = label.clone(obj_class=obj_class)
+            label = label.clone(obj_class=obj_class, tags=new_tags)
         else:
             pass  # don't change
-        return [label]
+        return [label.clone(tags=new_tags)]
+
+    def process_tags(self, tags: TagMetaCollection):
+        new_tags = []
+        curr_tags = tags
+        for tag in curr_tags:
+            if tag.name in self.tag_mapping:
+                if self.tag_mapping[tag.name] == ClassConstants.IGNORE:
+                    continue
+                new_tags.append(tag)
+        return new_tags
 
     def validate_source_connections(self):
         pass
@@ -102,4 +126,6 @@ class ImagesProjectLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         ann = apply_to_labels(ann, self.class_mapper)
+        new_tags = self.process_tags(ann.img_tags)
+        ann = ann.clone(img_tags=new_tags)
         yield (img_desc, ann)

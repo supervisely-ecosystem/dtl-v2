@@ -190,6 +190,8 @@ def _run():
         circle_progress.set_status("exception")
         raise e
     finally:
+        g.pipeline_running = False
+        g.pipeline_thread = None
         nodes_flow.enable()
         progress.hide()
         run_btn.show()
