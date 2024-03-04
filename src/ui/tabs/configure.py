@@ -14,6 +14,7 @@ from supervisely.app.widgets import (
     Input,
     Markdown,
     OneOf,
+    Card,
 )
 from supervisely.app import show_dialog
 
@@ -73,6 +74,12 @@ nodes_flow = NodesFlow(
     context_menu=context_menu_items,
     color_theme="light",
     show_save=False,
+)
+
+nodes_flow_card = Card(
+    content=nodes_flow,
+    lock_message="Pipeline is in progress...",
+    remove_padding=True,
 )
 
 select_items = [
@@ -152,9 +159,10 @@ left_sidebar_widgets = [
     modality_type_text,
     *[left_sidebar_groups_widgets[group_name] for group_name in actions_list.keys()],
 ]
+
 sidebar = Sidebar(
     left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;", gap=15),
-    right_content=nodes_flow,
+    right_content=nodes_flow_card,
     width_percent=20,
     standalone=True,
     height="calc(100vh - 57px)",
@@ -230,12 +238,12 @@ def item_dropped_cb(item):
     action_name = item["item"]["key"]
     add_layer(action_name, position)
     g.context_menu_position = None
-    
+
+
 @nodes_flow.node_removed
 def node_removed(layer_id):
     if layer_id.startswith("deploy"):
         utils.kill_deployed_app_by_layer_id(layer_id)
-
 
 
 @add_layer_from_dialog_btn.click

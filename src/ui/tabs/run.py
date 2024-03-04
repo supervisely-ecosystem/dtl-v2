@@ -17,7 +17,7 @@ from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
 from src.compute.layers.save.CreateLabelingJobLayer import CreateLabelingJobLayer
-from src.ui.tabs.configure import nodes_flow
+from src.ui.tabs.configure import nodes_flow, nodes_flow_card
 import src.utils as utils
 import src.ui.utils as ui_utils
 import src.globals as g
@@ -46,13 +46,23 @@ error_notification = NotificationBox(title="Error", description="", box_type="er
 error_notification.hide()
 
 layout = Container(
-    widgets=[run_btn, stop_btn, progress, error_notification, download_archives_urls, results]
+    widgets=[
+        run_btn,
+        stop_btn,
+        progress,
+        error_notification,
+        g.warn_notification,
+        download_archives_urls,
+        results,
+    ]
 )
 
 
 def _run():
     run_btn.hide()
     stop_btn.show()
+
+    nodes_flow_card.lock()
 
     circle_progress.set_status("none")
     circle_progress.show()
@@ -192,10 +202,12 @@ def _run():
     finally:
         g.pipeline_running = False
         g.pipeline_thread = None
+        g.warn_notification.hide()
         nodes_flow.enable()
         progress.hide()
         run_btn.show()
         stop_btn.hide()
+        nodes_flow_card.unlock()
 
 
 def run_pipeline():
@@ -227,5 +239,4 @@ def stop_pipeline():
         )
         error_notification.show()
         circle_progress.hide()
-        stop_btn.hide()
-        run_btn.show()
+        # other settings are set in finally block of _run

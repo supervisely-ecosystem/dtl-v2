@@ -367,14 +367,33 @@ class ApplyNNLayer(Layer):
                 except:
                     if not self.net.preview_mode:
                         # @TODO: add retry logic for session
-                        g.api.app.stop(self.settings["session_id"])
-                        g.pipeline_running = False
-                        raise ValueError(
-                            (
-                                "Something went wrong while applying model to image. Pipeline will be stopped. "
-                                f"Shutting down the model session ID: '{self.settings['session_id']}'."
-                            )
+                        g.warn_notification.set(
+                            title="Model is not responding. Attempting to reconnect",
+                            description="Make sure that the app session is running and the model is served.",
                         )
+                        g.warn_notification.show()
+                        try:
+                            session = Session(
+                                g.api, self.settings["session_id"]
+                            )  # builtin timeout?
+                            pred_ann = apply_model_to_image(
+                                session,
+                                img_path,
+                                img.shape,
+                                img_desc,
+                                model_meta,
+                                self.output_meta,
+                                self.settings,
+                            )
+                        except:
+                            g.api.app.stop(self.settings["session_id"])
+                            g.pipeline_running = False
+                            raise ValueError(
+                                (
+                                    "Something went wrong while applying model to image. Pipeline will be stopped. "
+                                    f"Shutting down the model session ID: '{self.settings['session_id']}'."
+                                )
+                            )
                     else:
                         show_dialog(
                             title="Couldn't preview image",

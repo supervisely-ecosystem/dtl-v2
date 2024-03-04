@@ -3,7 +3,15 @@ import queue
 from dotenv import load_dotenv
 
 import supervisely as sly
-from supervisely.app.widgets import Dialog, Text, Editor, Container, Button, Flexbox
+from supervisely.app.widgets import (
+    Dialog,
+    Text,
+    Editor,
+    Container,
+    Button,
+    Flexbox,
+    NotificationBox,
+)
 
 
 load_dotenv("local.env")
@@ -111,6 +119,9 @@ error_dialog = Dialog(
     ),
     size="tiny",
 )
+
+warn_notification = NotificationBox(title="", description="", box_type="warning")
+warn_notification.hide()
 
 # Auto-connect to node
 # uncomment to work:
