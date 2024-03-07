@@ -298,7 +298,7 @@ class ApplyNNAction(NeuralNetworkAction):
             elif session_id is None and deploy_layer_name:
                 _session_id = None
                 connect_nn_text.set(
-                    f"{deploy_layer_name} layer detected but model is not deployed", "warning"
+                    f"{deploy_layer_name} detected but model is not deployed", "warning"
                 )
                 _reset_model()
                 _model_from_deploy_node = False
