@@ -58,7 +58,7 @@ def create_connect_to_model_widgets() -> tuple:
 
     connect_nn_model_selector = SelectAppSession(team_id=g.TEAM_ID, tags=SESSION_TAGS)
     connect_nn_model_selector_disabled_text = Text(
-        "Model has been connected from deploy node. Unplug deploy node if you want to manually select model",
+        "Deploy node has been detected. Unplug deploy node if you want to manually select model",
         "info",
     )
     connect_nn_model_selector_disabled_text.hide()

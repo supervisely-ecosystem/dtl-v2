@@ -51,6 +51,7 @@ class ApplyNNAction(NeuralNetworkAction):
         _model_meta = ProjectMeta()
         _model_info = {}
         _model_settings = {}
+        _model_connected = False
 
         (
             connect_nn_text,
@@ -133,8 +134,8 @@ class ApplyNNAction(NeuralNetworkAction):
 
         @connect_nn_connect_btn.click
         def confirm_model():
-            nonlocal _current_meta, _model_meta
-            nonlocal _model_info, _model_settings, _session_id
+            nonlocal _current_meta, _model_meta, _model_from_deploy_node
+            nonlocal _model_info, _model_settings, _model_connected, _session_id
             nonlocal saved_classes_settings, saved_tags_settings
 
             connect_nn_model_selector.disable()
@@ -152,15 +153,27 @@ class ApplyNNAction(NeuralNetworkAction):
             if _session_id is None:
                 connect_notification.loading = False
                 connect_nn_model_selector.enable()
+                _model_connected = False
                 return
 
-            _model_meta, _model_info, _model_settings = get_model_settings(
+            model_meta, model_info, model_settings = get_model_settings(
                 _session_id,
                 connect_notification,
                 connect_nn_model_selector,
                 connect_nn_model_info,
                 connect_nn_model_info_empty_text,
+                _model_from_deploy_node,
             )
+            if model_meta is None and model_info is None and model_settings is None:
+                connect_notification.loading = False
+                connect_nn_model_selector.enable()
+                _model_connected = False
+                return
+            else:
+                _model_meta = model_meta
+                _model_info = model_info
+                _model_settings = model_settings
+
             set_model_preview(_model_info, connect_nn_model_preview)
             set_model_settings(_model_settings, inf_settings_editor)
             connect_nn_model_preview.show()
@@ -215,6 +228,7 @@ class ApplyNNAction(NeuralNetworkAction):
             connect_nn_model_selector.disable()
             connect_nn_connect_btn.disable()
             connect_nn_disconnect_btn.enable()
+            _model_connected = True
             g.updater("metas")
             g.updater(("nodes", layer_id))
 
@@ -285,8 +299,14 @@ class ApplyNNAction(NeuralNetworkAction):
             nonlocal _session_id, _model_from_deploy_node
             nonlocal _current_meta, _model_meta
 
+            connect_nn_model_selector.enable()
+            connect_nn_model_selector_disabled_text.hide()
             session_id = kwargs.get("session_id", None)
             deploy_layer_name = kwargs.get("deploy_layer_name", None)
+
+            model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
+            model_disconnected_text = f"{deploy_layer_name} detected but model is not deployed"
+
             if session_id is None and deploy_layer_name is None:
                 connect_nn_text.set("Connect to Model", "text")
                 if _model_from_deploy_node:
@@ -297,38 +317,41 @@ class ApplyNNAction(NeuralNetworkAction):
                     connect_nn_model_selector.enable()
             elif session_id is None and deploy_layer_name:
                 _session_id = None
-                connect_nn_text.set(
-                    f"{deploy_layer_name} detected but model is not deployed", "warning"
-                )
+                connect_nn_text.set(model_disconnected_text, "warning")
                 _reset_model()
                 _model_from_deploy_node = False
-                connect_nn_model_selector_disabled_text.hide()
-                connect_nn_model_selector.enable()
+                connect_nn_model_selector.disable()
+                connect_nn_model_selector_disabled_text.show()
             else:
                 _model_from_deploy_node = True
-                model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
+                connect_nn_model_selector.disable()
+                connect_nn_model_selector_disabled_text.show()
+                connect_nn_disconnect_btn.disable()
+
                 if connect_nn_text.text != model_connected_text:
                     connect_nn_text.set(
                         f"{deploy_layer_name} layer detected. Connecting to model...", "text"
                     )
-                connect_nn_model_selector.disable()
-                connect_nn_model_selector_disabled_text.show()
-                connect_nn_disconnect_btn.disable()
 
                 if session_id == _session_id:
                     connect_nn_text.set(model_connected_text, "success")
                     return
                 else:
                     _session_id = session_id
-                    connect_nn_model_selector.set_session_id(_session_id)
-                    update_model_info_preview(
-                        _session_id,
-                        connect_nn_model_info_empty_text,
-                        connect_nn_model_info,
-                        connect_nn_connect_btn,
-                    )
-                    confirm_model()
-                    connect_nn_text.set(model_connected_text, "success")
+
+                    try:
+                        session = Session(g.api, _session_id)
+                        connect_nn_model_selector.set_session_id(_session_id)
+                        update_model_info_preview(
+                            _session_id,
+                            connect_nn_model_info_empty_text,
+                            connect_nn_model_info,
+                            connect_nn_connect_btn,
+                        )
+                        confirm_model()
+                        connect_nn_text.set(model_connected_text, "success")
+                    except:
+                        connect_nn_text.set(model_disconnected_text, "warning")
 
             project_meta = kwargs.get("project_meta", None)
             if project_meta is None:

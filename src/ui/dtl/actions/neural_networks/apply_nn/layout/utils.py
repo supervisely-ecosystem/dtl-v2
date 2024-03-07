@@ -42,6 +42,7 @@ def update_model_info_preview(
                 "Couldn't connect to the model. "
                 "<br><br>Open app session page and make sure that the model has been successfully deployed - "
                 f'<a href="{g.api.server_address}{g.api.app.get_url(session_id)}" target="_blank">open app</a>. '
+                "<br>If the model is served, try to re-link Deploy and Apply NN nodes."
                 "<br><br>If the problem still persists, check deployed model logs or contact support"
             ),
             status="error",
@@ -60,6 +61,7 @@ def get_model_settings(
     connect_nn_model_selector: SelectAppSession,
     connect_nn_model_info: ModelInfo,
     connect_nn_model_info_empty_text: Text,
+    is_deploy_connected: bool = False,
 ) -> tuple:
     try:
         session = Session(g.api, session_id)
@@ -69,21 +71,24 @@ def get_model_settings(
         model_settings = session.get_default_inference_settings()
     except:
         error_message = (
-            "<br><br>Open app session page and make sure that the model has been successfully deployed - "
+            "<br>Open app session page and make sure that the model has been successfully deployed - "
             f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a>. "
+            "<br>If the model is served, try to re-link Deploy and Apply NN nodes."
             "<br><br>If the problem still persists, check deployed model logs, restart app session or contact support"
         )
 
         connect_notification.loading = False
         connect_notification.set(title="Couldn't connect to the model.", description=error_message)
         connect_nn_model_selector.set_session_id(None)
-        connect_nn_model_selector.enable()
+        if is_deploy_connected:
+            connect_nn_model_selector.disable()
+        else:
+            connect_nn_model_selector.enable()
 
         connect_nn_model_info.hide()
         connect_nn_model_info_empty_text.set("Select model first", "info")
         connect_nn_model_info_empty_text.show()
-
-        raise ConnectionError("Couldn't connect to the model. " + error_message)
+        return None, None, None
     return model_meta, model_info, model_settings
 
 
