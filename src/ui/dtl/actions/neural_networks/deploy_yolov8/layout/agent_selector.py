@@ -18,7 +18,7 @@ AGENT_STATUS_OTHER_ICON = "<i class='zmdi zmdi-circle' style='color: rgb(225, 75
 def create_agent_selector_widgets():
     # SIDEBAR
     # AGENT SELECTOR
-    available_agents = g.api.agent.get_list_available(g.TEAM_ID)
+    available_agents = g.api.agent.get_list_available(g.TEAM_ID, True)
     agent_selector_sidebar_selector = AgentSelector(g.TEAM_ID, show_only_running=True)
 
     agent_selector_sidebar_selector_empty_message = Text(

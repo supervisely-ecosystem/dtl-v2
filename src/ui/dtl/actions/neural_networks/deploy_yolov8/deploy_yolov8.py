@@ -58,7 +58,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         # AGENT SELECTOR CBs
         @agent_selector_layout_edit_btn.click
         def agent_selector_layout_edit_btn_cb():
-            available_agents = g.api.agent.get_list_available(g.TEAM_ID)
+            available_agents = g.api.agent.get_list_available(g.TEAM_ID, True)
             if len(available_agents) > 0:
                 agent_selector_sidebar_selector.show()
                 agent_selector_sidebar_selector_empty_message.hide()
