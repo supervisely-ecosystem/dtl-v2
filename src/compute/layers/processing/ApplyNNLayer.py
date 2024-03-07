@@ -349,12 +349,13 @@ class ApplyNNLayer(Layer):
                 f"{img_desc.info.item_name}{img_desc.info.ia_data['item_ext']}",
             )
 
+            session_id = self.settings["session_id"]
             model_meta = ProjectMeta().from_json(self.settings["model_meta"])
             apply_method = self.settings["apply_method"]
             if apply_method == "image":
                 sly_image.write(img_path, img)
                 try:
-                    session = Session(g.api, self.settings["session_id"])
+                    session = Session(g.api, session_id)
                     pred_ann = apply_model_to_image(
                         session,
                         img_path,
@@ -366,16 +367,18 @@ class ApplyNNLayer(Layer):
                     )
                 except:
                     if not self.net.preview_mode:
-                        # @TODO: add retry logic for session
                         g.warn_notification.set(
-                            title="Model is not responding. Attempting to reconnect",
-                            description="Make sure that the app session is running and the model is served.",
+                            title="Model is not responding. Attempting to reconnect...",
+                            description=(
+                                "Make sure that the "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>app session</a> "
+                                "is running and the model is served."
+                            ),
                         )
                         g.warn_notification.show()
                         try:
-                            session = Session(
-                                g.api, self.settings["session_id"]
-                            )  # builtin timeout?
+                            session = Session(g.api, session_id)
+                            g.warn_notification.hide()
                             pred_ann = apply_model_to_image(
                                 session,
                                 img_path,
@@ -386,12 +389,12 @@ class ApplyNNLayer(Layer):
                                 self.settings,
                             )
                         except:
-                            g.api.app.stop(self.settings["session_id"])
+                            g.api.app.stop(session_id)
                             g.pipeline_running = False
                             raise ValueError(
                                 (
                                     "Something went wrong while applying model to image. Pipeline will be stopped. "
-                                    f"Shutting down the model session ID: '{self.settings['session_id']}'."
+                                    f"Shutting down the model session ID: '{session_id}'."
                                 )
                             )
                     else:
@@ -400,7 +403,7 @@ class ApplyNNLayer(Layer):
                             description=(
                                 "Model is not served. "
                                 "<br>Check model session logs by visiting app session page: "
-                                f"<a href='{g.api.server_address}{g.api.app.get_url(self.settings['session_id'])}' target='_blank'>open app</a> "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a> "
                             ),
                             status="warning",
                         )

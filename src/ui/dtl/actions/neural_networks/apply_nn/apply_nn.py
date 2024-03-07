@@ -220,29 +220,9 @@ class ApplyNNAction(NeuralNetworkAction):
 
         @connect_nn_disconnect_btn.click
         def disconnect_model():
-            reset_model(
-                connect_nn_model_selector,
-                connect_nn_model_info,
-                connect_nn_model_info_empty_text,
-                connect_nn_model_preview,
-                classes_list_widget,
-                classes_list_preview,
-                classes_list_edit_container,
-                tags_list_widget,
-                tags_list_preview,
-                tags_list_edit_container,
-                inf_settings_edit_container,
-                suffix_preview,
-                use_suffix_preview,
-                conflict_method_preview,
-                apply_method_preview,
-                connect_notification,
-                update_preview_btn,
-                model_separator,
-                classes_separator,
-                tags_separator,
-                connect_nn_disconnect_btn,
-            )
+            nonlocal _session_id
+            _session_id = None
+            _reset_model()
 
         ### -----------------------
 
@@ -251,10 +231,6 @@ class ApplyNNAction(NeuralNetworkAction):
 
         saved_tags_settings = "default"
         default_tags_settings = "default"
-
-        def data_changed_cb(**kwargs):
-            project_meta = kwargs.get("project_meta", None)
-            pass
 
         def _get_classes_list_value():
             return get_classes_list_value(classes_list_widget, multiple=True)
@@ -280,47 +256,67 @@ class ApplyNNAction(NeuralNetworkAction):
             nonlocal saved_tags_settings
             saved_tags_settings = copy.deepcopy(default_tags_settings)
 
+        def _reset_model():
+            reset_model(
+                connect_nn_model_selector,
+                connect_nn_model_info,
+                connect_nn_model_info_empty_text,
+                connect_nn_model_preview,
+                classes_list_widget,
+                classes_list_preview,
+                classes_list_edit_container,
+                tags_list_widget,
+                tags_list_preview,
+                tags_list_edit_container,
+                inf_settings_edit_container,
+                suffix_preview,
+                use_suffix_preview,
+                conflict_method_preview,
+                apply_method_preview,
+                connect_notification,
+                update_preview_btn,
+                model_separator,
+                classes_separator,
+                tags_separator,
+                connect_nn_disconnect_btn,
+            )
+
         def data_changed_cb(**kwargs):
             nonlocal _session_id, _model_from_deploy_node
             nonlocal _current_meta, _model_meta
 
             session_id = kwargs.get("session_id", None)
-            if session_id is None:
+            deploy_layer_name = kwargs.get("deploy_layer_name", None)
+            if session_id is None and deploy_layer_name is None:
+                connect_nn_text.set("Connect to Model", "text")
                 if _model_from_deploy_node:
                     _session_id = None
-                    reset_model(
-                        connect_nn_model_selector,
-                        connect_nn_model_info,
-                        connect_nn_model_info_empty_text,
-                        connect_nn_model_preview,
-                        classes_list_widget,
-                        classes_list_preview,
-                        classes_list_edit_container,
-                        tags_list_widget,
-                        tags_list_preview,
-                        tags_list_edit_container,
-                        inf_settings_edit_container,
-                        suffix_preview,
-                        use_suffix_preview,
-                        conflict_method_preview,
-                        apply_method_preview,
-                        connect_notification,
-                        update_preview_btn,
-                        model_separator,
-                        classes_separator,
-                        tags_separator,
-                        connect_nn_disconnect_btn,
-                    )
+                    _reset_model()
                     _model_from_deploy_node = False
                     connect_nn_model_selector_disabled_text.hide()
                     connect_nn_model_selector.enable()
-
+            elif session_id is None and deploy_layer_name:
+                _session_id = None
+                connect_nn_text.set(
+                    f"{deploy_layer_name} layer detected but model is not deployed", "warning"
+                )
+                _reset_model()
+                _model_from_deploy_node = False
+                connect_nn_model_selector_disabled_text.hide()
+                connect_nn_model_selector.enable()
             else:
                 _model_from_deploy_node = True
+                model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
+                if connect_nn_text.text != model_connected_text:
+                    connect_nn_text.set(
+                        f"{deploy_layer_name} layer detected. Connecting to model...", "text"
+                    )
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
                 connect_nn_disconnect_btn.disable()
+
                 if session_id == _session_id:
+                    connect_nn_text.set(model_connected_text, "success")
                     return
                 else:
                     _session_id = session_id
@@ -332,6 +328,7 @@ class ApplyNNAction(NeuralNetworkAction):
                         connect_nn_connect_btn,
                     )
                     confirm_model()
+                    connect_nn_text.set(model_connected_text, "success")
 
             project_meta = kwargs.get("project_meta", None)
             if project_meta is None:

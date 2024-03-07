@@ -3,25 +3,14 @@ from typing import Tuple, Union
 from time import sleep
 from supervisely import (
     Annotation,
-    Label,
-    Rectangle,
-    ObjClass,
     VideoAnnotation,
-    Frame,
-    VideoFigure,
-    VideoObject,
-    FrameCollection,
-    VideoObjectCollection,
     logger,
 )
 
 from supervisely.nn.inference.session import Session
 from src.compute.Layer import Layer
-from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
-
-# from src.ui.tabs.run import error_notification
 
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
@@ -32,13 +21,6 @@ def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec:
         else:
             sleep(wait_delay_sec)
             logger.warning("Model is not served yet. Waiting for model to be served")
-            # error_notification.set(
-            #     title="Model is not served yet. Waiting for model to be served",
-            #     description=(
-            #         f"Make sure model is served by visiting app session page: <a href='{g.api.server_address}{g.api.app.get_url(session.task_id)}'>open app</a>"
-            #         "<br> If you still have problems, try to check model logs for more info."
-            #     ),
-            # )
 
 
 def check_model_is_served(session_id: int):

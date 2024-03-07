@@ -27,9 +27,9 @@ import src.globals as g
 
 class DeployYOLOV8Action(NeuralNetworkAction):
     name = "deploy_yolo_v8"
-    title = "Deploy YoloV8"
+    title = "Deploy YOLOv8"
     docs_url = ""
-    description = "Deploy YoloV8 models."
+    description = "Deploy YOLOv8 models."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -56,6 +56,16 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         ) = create_agent_selector_widgets()
 
         # AGENT SELECTOR CBs
+        @agent_selector_layout_edit_btn.click
+        def agent_selector_layout_edit_btn_cb():
+            available_agents = g.api.agent.get_list_available(g.TEAM_ID)
+            if len(available_agents) > 0:
+                agent_selector_sidebar_selector.show()
+                agent_selector_sidebar_selector_empty_message.hide()
+            else:
+                agent_selector_sidebar_selector.hide()
+                agent_selector_sidebar_selector_empty_message.show()
+
         @agent_selector_sidebar_selector.value_changed
         def agent_selector_sidebar_selector_cb(agent_id):
             agent_selector_sidebar_device_selector.loading = True
@@ -206,7 +216,11 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         # -----------------------------
         def get_data() -> dict:
             nonlocal session
-            return {"session_id": session.task_id} if session is not None else {}
+            data = {}
+            if session is not None:
+                data["session_id"] = session.task_id
+            data["deploy_layer_name"] = "Deploy YOLOv8"
+            return data
 
         def data_changed_cb(**kwargs):
             pass
