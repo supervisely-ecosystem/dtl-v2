@@ -247,6 +247,18 @@ class DeployYOLOV8Action(NeuralNetworkAction):
 
         def postprocess_cb():
             model_serve_postprocess_message.show()
+            model_serve_btn.text = "SERVE"
+            model_serve_btn.icon = "zmdi zmdi-play"
+            model_serve_btn.enable()
+            agent_selector_layout_edit_btn.enable()
+            model_selector_layout_edit_btn.enable()
+            utils.set_model_serve_preview(
+                "<span style='color: rgb(90, 103, 114);'>Model stopped<br>Reselect model checkpoint</span>",
+                model_serve_preview,
+            )
+            saved_settings["session_id"] = None
+            session = None
+            g.updater("metas")
 
         def _set_settings_from_json(settings: dict):
             pass

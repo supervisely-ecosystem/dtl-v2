@@ -102,6 +102,8 @@ class DeployYOLOv8Layer(Layer):
     def postprocess(self):
         if self.settings["stop_model_session"]:
             g.api.app.stop(self.settings["session_id"])
+            g.running_sessions_ids.remove(self.settings["session_id"])
+            logger.info(f"Session ID: {self.settings["session_id"]} has been stopped")
             self.postprocess_cb()
 
     def modifies_data(self):

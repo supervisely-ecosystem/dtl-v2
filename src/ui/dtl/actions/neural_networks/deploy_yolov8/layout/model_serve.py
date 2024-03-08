@@ -19,7 +19,7 @@ def create_model_serve_widgets():
     model_serve_layout_container = get_set_settings_container(model_serve_preview, model_serve_btn)
     model_serve_postprocess_message = NotificationBox(
         title="App session has been shutdown",
-        description="Model has been automatically stopped. Press 'STOP' button and then 'SERVE' to restart the model and continue",
+        description="Model has been automatically stopped. Press SERVE button to deploy another model and continue",
         box_type="info",
     )
     model_serve_postprocess_message.hide()
