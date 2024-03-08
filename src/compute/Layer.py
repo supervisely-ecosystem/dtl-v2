@@ -86,6 +86,7 @@ class Layer:
         self.dsts = maybe_wrap_in_list(config["dst"])
 
         self.settings = config.get("settings", {})
+        self.postprocess_cb = config.get("postprocess_cb", None)        
 
         self.cls_mapping = {}
         self.tag_mapping = {}

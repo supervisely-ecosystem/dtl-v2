@@ -39,6 +39,7 @@ class Layer:
         id: Optional[str] = None,
         custom_update_btn: Button = None,
         get_data: Optional[callable] = None,
+        postprocess_cb: Optional[callable] = None,
     ):
         self.action = action
         self.id = id
@@ -58,6 +59,7 @@ class Layer:
         self._dst = []
 
         self.output_meta = None
+        self.postprocess_cb = postprocess_cb
 
         md_description = self.action.md_description.replace(
             r"../../assets", r"https://raw.githubusercontent.com/supervisely/docs/master/assets"
@@ -260,7 +262,11 @@ class Layer:
         if self._need_preview:
             return self._res_img_desc
 
-    def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
+    def update_preview(
+        self, img_desc: ImageDescriptor, ann: Annotation, project_meta: ProjectMeta = None
+    ):
+        if project_meta is None:
+            project_meta = self.output_meta
         if not self._need_preview:
             return
         self._res_img_desc = img_desc
@@ -270,10 +276,13 @@ class Layer:
         #     title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
         # )
         self._preview_widget.set(
-            image_url=f"{self._preview_img_url}?{time.time()}",
+            image_url=f"{self._preview_img_url}?q={time.time()}",
             ann=self._res_ann,
-            project_meta=self.output_meta,
+            project_meta=project_meta,
         )
+
+        # print(self._preview_widget.widget_id)
+
         if self._preview_widget.is_empty():
             self._preview_widget.hide()
             self._empty_preview_text.show()

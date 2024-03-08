@@ -1,7 +1,4 @@
-from supervisely.app.widgets import (
-    Text,
-    Button,
-)
+from supervisely.app.widgets import Text, Button, NotificationBox
 
 from src.ui.dtl.utils import (
     get_set_settings_button_style,
@@ -20,4 +17,15 @@ def create_model_serve_widgets():
         style="flex: auto; border: 1px solid #bfcbd9; color: white; background-color: #409eff;",
     )
     model_serve_layout_container = get_set_settings_container(model_serve_preview, model_serve_btn)
-    return model_serve_preview, model_serve_btn, model_serve_layout_container
+    model_serve_postprocess_message = NotificationBox(
+        title="App session has been shutdown",
+        description="Model has been automatically stopped. Press 'STOP' button and then 'SERVE' to restart the model and continue",
+        box_type="info",
+    )
+    model_serve_postprocess_message.hide()
+    return (
+        model_serve_preview,
+        model_serve_btn,
+        model_serve_layout_container,
+        model_serve_postprocess_message,
+    )

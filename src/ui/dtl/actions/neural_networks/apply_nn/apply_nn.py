@@ -298,7 +298,7 @@ class ApplyNNAction(NeuralNetworkAction):
         def data_changed_cb(**kwargs):
             nonlocal _session_id, _model_from_deploy_node
             nonlocal _current_meta, _model_meta
-
+            need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             session_id = kwargs.get("session_id", None)
@@ -306,6 +306,8 @@ class ApplyNNAction(NeuralNetworkAction):
 
             model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
             model_disconnected_text = f"{deploy_layer_name} detected but model is not deployed"
+            model_connecting_text = f"{deploy_layer_name} layer detected. Connecting to model..."
+            model_waiting_text = f"Waiting for the {deploy_layer_name} to deploy model..."
 
             if session_id is None and deploy_layer_name is None:
                 connect_nn_text.set("Connect to Model", "text")
@@ -329,9 +331,7 @@ class ApplyNNAction(NeuralNetworkAction):
                 connect_nn_disconnect_btn.disable()
 
                 if connect_nn_text.text != model_connected_text:
-                    connect_nn_text.set(
-                        f"{deploy_layer_name} layer detected. Connecting to model...", "text"
-                    )
+                    connect_nn_text.set(model_connecting_text, "text")
 
                 if session_id == _session_id:
                     connect_nn_text.set(model_connected_text, "success")
@@ -340,18 +340,14 @@ class ApplyNNAction(NeuralNetworkAction):
                     _session_id = session_id
 
                     try:
+                        need_preview_update = False
                         is_ready = g.api.app.is_ready_for_api_calls(_session_id)
                         if not is_ready:
-                            connect_nn_text.set(
-                                f"Waiting for the {deploy_layer_name} to deploy model...",
-                                "text",
-                            )
+                            connect_nn_text.set(model_waiting_text, "text")
                             g.api.app.wait_until_ready_for_api_calls(_session_id)
 
                         session = Session(g.api, _session_id)
-                        connect_nn_text.set(
-                            f"{deploy_layer_name} layer detected. Connecting to model...", "text"
-                        )
+                        connect_nn_text.set(model_connecting_text, "text")
                         connect_nn_model_selector.set_session_id(_session_id)
                         update_model_info_preview(
                             _session_id,
@@ -370,8 +366,8 @@ class ApplyNNAction(NeuralNetworkAction):
             if project_meta == _current_meta:
                 return
             _current_meta = project_meta
-            g.updater("metas")
-            g.updater(("nodes", layer_id))
+            if need_preview_update:
+                g.updater(("nodes", layer_id))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

@@ -102,13 +102,15 @@ def _run():
 
         # Run
         dtl_json = [g.layers[node_id].to_json() for node_id in nodes_state]
+        postprocess_cb_list = [g.layers[node_id].postprocess_cb for node_id in nodes_state]
+
         g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)
 
         if not g.pipeline_running:
             return
 
-        net = compute_dtls(progress, circle_progress, g.MODALITY_TYPE)
+        net = compute_dtls(progress, circle_progress, g.MODALITY_TYPE, postprocess_cb_list)
 
         if not g.pipeline_running:
             return

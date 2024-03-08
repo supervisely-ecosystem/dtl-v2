@@ -60,7 +60,12 @@ def calculate_datasets_conflict_map(helper):
     return datasets_conflict_map
 
 
-def main(progress: Progress, circle_progress: CircleProgress, modality: str):
+def main(
+    progress: Progress,
+    circle_progress: CircleProgress,
+    modality: str,
+    postprocess_cb_list: list = None,
+):
     task_helpers.task_verification(check_in_graph)
 
     if not g.pipeline_running:
@@ -71,6 +76,11 @@ def main(progress: Progress, circle_progress: CircleProgress, modality: str):
 
     try:
         net = Net(helper.graph, helper.paths.results_dir, modality)
+
+        if postprocess_cb_list is not None:
+            for layer, postprocess_cb in zip(net.layers, postprocess_cb_list):
+                layer.postprocess_cb = postprocess_cb
+
         net.validate(circle_progress)
         net.calc_metas()
 

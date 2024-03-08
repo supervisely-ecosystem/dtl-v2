@@ -1,10 +1,5 @@
 from typing import List
-from supervisely.app.widgets import (
-    NodesFlow,
-    Container,
-    Text,
-    Checkbox,
-)
+from supervisely.app.widgets import NodesFlow, Container, Text, Checkbox, NotificationBox
 
 
 def create_node_layout(
@@ -17,6 +12,7 @@ def create_node_layout(
     model_selector_preview_type: Text,
     model_selector_stop_model_after_pipeline_checkbox: Checkbox,
     model_serve_layout_container: Container,
+    model_serve_postprocess_message: NotificationBox,
 ) -> List[NodesFlow.Node.Option]:
     settings_options = [
         NodesFlow.Node.Option(
@@ -64,6 +60,10 @@ def create_node_layout(
         NodesFlow.Node.Option(
             name="Serve Model Button",
             option_component=NodesFlow.WidgetOptionComponent(model_serve_layout_container),
+        ),
+        NodesFlow.Node.Option(
+            name="Postprocess Message",
+            option_component=NodesFlow.WidgetOptionComponent(model_serve_postprocess_message),
         ),
     ]
 

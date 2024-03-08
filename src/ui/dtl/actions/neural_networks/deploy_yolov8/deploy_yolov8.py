@@ -20,7 +20,9 @@ from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.agent_selector impo
 from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.model_serve import (
     create_model_serve_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import create_node_layout
+from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import (
+    create_node_layout,
+)
 import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
 import src.globals as g
 
@@ -136,6 +138,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             model_serve_preview,
             model_serve_btn,
             model_serve_layout_container,
+            model_serve_postprocess_message,
         ) = create_model_serve_widgets()
         # RUN MODEL
 
@@ -146,6 +149,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             model_serve_btn.disable()
             agent_selector_layout_edit_btn.disable()
             model_selector_layout_edit_btn.disable()
+            model_serve_postprocess_message.hide()
 
             if model_serve_btn.text == "STOP":
                 utils.set_model_serve_preview("Stopping...", model_serve_preview)
@@ -241,6 +245,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return saved_settings
 
+        def postprocess_cb():
+            model_serve_postprocess_message.show()
+
         def _set_settings_from_json(settings: dict):
             pass
 
@@ -256,6 +263,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_selector_preview_type,
                 model_selector_stop_model_after_pipeline_checkbox,
                 model_serve_layout_container,
+                model_serve_postprocess_message,
             )
             return {
                 "src": [],
@@ -270,4 +278,5 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             get_settings=get_settings,
             get_data=get_data,
             need_preview=False,
+            postprocess_cb=postprocess_cb,
         )

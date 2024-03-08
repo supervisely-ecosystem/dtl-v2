@@ -46,7 +46,7 @@ def check_model_is_served(session_id: int):
 class DeployYOLOv8Layer(Layer):
     action = "deploy_yolo_v8"
 
-    layer_settings = layer_settings = {
+    layer_settings = {
         "required": ["settings"],
         "properties": {
             "settings": {
@@ -102,6 +102,7 @@ class DeployYOLOv8Layer(Layer):
     def postprocess(self):
         if self.settings["stop_model_session"]:
             g.api.app.stop(self.settings["session_id"])
+            self.postprocess_cb()
 
     def modifies_data(self):
         return False
