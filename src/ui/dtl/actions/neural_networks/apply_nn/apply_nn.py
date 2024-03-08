@@ -340,7 +340,18 @@ class ApplyNNAction(NeuralNetworkAction):
                     _session_id = session_id
 
                     try:
+                        is_ready = g.api.app.is_ready_for_api_calls(_session_id)
+                        if not is_ready:
+                            connect_nn_text.set(
+                                f"Waiting for the {deploy_layer_name} to deploy model...",
+                                "text",
+                            )
+                            g.api.app.wait_until_ready_for_api_calls(_session_id)
+
                         session = Session(g.api, _session_id)
+                        connect_nn_text.set(
+                            f"{deploy_layer_name} layer detected. Connecting to model...", "text"
+                        )
                         connect_nn_model_selector.set_session_id(_session_id)
                         update_model_info_preview(
                             _session_id,
