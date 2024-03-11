@@ -2,6 +2,8 @@
 
 `Deploy YOLOv8` layer can be used to deploy custom and pretrained YOLOv8 models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained `YOLOv8` models in your Team Files. You can train your own model using `Train YOLOv8` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
+![image](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/4d05e56b-9515-4fdd-a5fb-a139c9124e07)
+
 ### Settings:
 
 ### How to use:
