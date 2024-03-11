@@ -417,7 +417,10 @@ class ApplyNNAction(NeuralNetworkAction):
 
             # model
             _model_info = set_model_info_from_json(
-                settings, connect_nn_model_info_empty_text, connect_nn_model_info
+                settings,
+                connect_nn_model_info_empty_text,
+                connect_nn_model_info,
+                connect_nn_connect_btn,
             )
             set_model_preview(_model_info, connect_nn_model_preview)
             _model_meta = set_model_meta_from_json(settings)

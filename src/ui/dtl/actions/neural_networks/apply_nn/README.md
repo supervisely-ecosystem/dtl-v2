@@ -1,7 +1,11 @@
 # Apply NN
 
-`Apply NN` layer is used to apply a neural network to the input data. Layer connects to deployed model such as Serve YOLOv8 app.
-You can connect to the model using `CONNECT` button. Once connected, you can configure model settings and select model classes and tags, which will be applied to your data.
+`Apply NN` layer is used to apply a neural network to the input data. Layer connects to deployed model such as Serve YOLOv8 app and applies it to the input data.
+
+There are 2 ways to connect model in `Apply NN` layer:
+
+1. Run one of the serving apps manually and then select app session in the model selector or if you already have a running model session, you can just select it.
+2. Add `Deploy XXX` layer to the scene, where `XXX` is the framework name. Deploy model via this layer and simply link this layer to the `Apply NN` layer.
 
 Read our post on [Supervisely blog](https://supervisely.com/blog/) to learn how to effectively train, deploy and use the model on the YOLOv8 example: [No-code tutorial: train and predict YOLOv8 on custom data](https://supervisely.com/blog/train-yolov8-on-custom-data-no-code/).
 

@@ -194,13 +194,19 @@ def set_deployed_model_from_json(
 
 
 def set_model_info_from_json(
-    settings: dict, connect_nn_model_info_empty_text: Text, connect_nn_model_info: ModelInfo
+    settings: dict,
+    connect_nn_model_info_empty_text: Text,
+    connect_nn_model_info: ModelInfo,
+    connect_nn_connect_btn: Button,
 ) -> dict:
     session_id = settings.get("session_id", None)
     model_info = settings.get("model_info", {})
     if model_info != {}:
         update_model_info_preview(
-            session_id, connect_nn_model_info_empty_text, connect_nn_model_info
+            session_id,
+            connect_nn_model_info_empty_text,
+            connect_nn_model_info,
+            connect_nn_connect_btn,
         )
     return model_info
 

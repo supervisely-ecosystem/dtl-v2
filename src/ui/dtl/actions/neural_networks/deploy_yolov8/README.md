@@ -1,6 +1,6 @@
 # Deploy YOLOv8
 
-`Deploy YOLOv8` layer can be used to deploy custom and pretrained YOLOv8 models that you can use with `Apply NN` layer. Custom models will appear in the custom section of the table only if you have any trained `YOLOv8` models in your Team Files. You can train your own model using `Train YOLOv8` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
+`Deploy YOLOv8` layer can be used to deploy custom and pretrained YOLOv8 models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained `YOLOv8` models in your Team Files. You can train your own model using `Train YOLOv8` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
 ### Settings:
 
@@ -12,7 +12,7 @@
 4. Press `SERVE`
 5. Wait until model is deployed, you will see "Model deployed" message in the bottom of the layer card
 6. Connect this layer to `Apply NN` layer and select session
-7. If you want to deploy another model, press `STOP` and repeat steps 3 and 4
+7. If you want to deploy another model, press `STOP` and repeat steps 3, 4, 5 and 6
 
 ### Settings:
 
@@ -23,6 +23,7 @@
     - `Model type` - custom or pretrained
     - `Task type` - select task type from "object detection", "instance segmentation" or "pose estimation"
     - `Checkpoint` - select checkpoint
+- **Auto stop model session** - automatically stop model session when pipeline is finished
 
 ### JSON view
 
