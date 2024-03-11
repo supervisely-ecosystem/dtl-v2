@@ -183,6 +183,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 agent_selector_layout_edit_btn.enable()
                 model_selector_layout_edit_btn.enable()
                 model_serve_btn.enable()
+                model_selector_stop_model_after_pipeline_checkbox.enable()
                 return
 
             session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
