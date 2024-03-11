@@ -146,7 +146,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         @model_serve_btn.click
         def model_serve_btn_cb():
             nonlocal saved_settings, session
+
             model_serve_btn.disable()
+            model_selector_stop_model_after_pipeline_checkbox.disable()
             agent_selector_layout_edit_btn.disable()
             model_selector_layout_edit_btn.disable()
             model_serve_postprocess_message.hide()
@@ -160,6 +162,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_serve_btn.enable()
                 agent_selector_layout_edit_btn.enable()
                 model_selector_layout_edit_btn.enable()
+                model_selector_stop_model_after_pipeline_checkbox.enable()
                 utils.set_model_serve_preview(
                     "<span style='color: rgb(90, 103, 114);'>Model stopped<br>Reselect model checkpoint</span>",
                     model_serve_preview,
@@ -252,6 +255,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             model_serve_btn.enable()
             agent_selector_layout_edit_btn.enable()
             model_selector_layout_edit_btn.enable()
+            model_selector_stop_model_after_pipeline_checkbox.enable()
             utils.set_model_serve_preview(
                 "<span style='color: rgb(90, 103, 114);'>Model stopped<br>Reselect model checkpoint</span>",
                 model_serve_preview,

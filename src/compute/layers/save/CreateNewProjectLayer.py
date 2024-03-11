@@ -50,7 +50,7 @@ class CreateNewProjectLayer(Layer):
             )
         if len(self.dsts) == 0:
             raise ValueError(
-                "Enter name for the output archive to the input field in the 'Export Archive' layer"
+                "Enter name for the output project to the input field in the 'Create New Project' layer"
             )
             # raise GraphError(
             #     "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
