@@ -87,7 +87,7 @@ def main(
         net.validate(circle_progress)
         validation_time_end = time()
         logger.debug(
-            f"Total validation time: {validation_time_end-validation_time_start:.3f} seconds."
+            f"Total validation time: {validation_time_end-validation_time_start:.10f} seconds."
         )
 
         net.calc_metas()
@@ -162,7 +162,7 @@ def main(
 
     processing_time_end = time()
     logger.debug(
-        f"Total items processing time: {processing_time_end-processing_time_start:.3f} seconds."
+        f"Total items processing time: {processing_time_end-processing_time_start:.10f} seconds."
     )
     if not g.pipeline_running:
         return
@@ -171,7 +171,7 @@ def main(
     net.postprocess()
     postprocessing_time_end = time()
     logger.debug(
-        f"Total postprocessing time: {postprocessing_time_end-postprocessing_time_start:.3f} seconds."
+        f"Total postprocessing time: {postprocessing_time_end-postprocessing_time_start:.10f} seconds."
     )
 
     if not g.pipeline_running:
@@ -183,7 +183,7 @@ def main(
     )
     total_pipeline_time_end = time()
     logger.info(
-        f"Total pipeline time: {total_pipeline_time_end-total_pipeline_time_start:.3f} seconds."
+        f"Total pipeline time: {total_pipeline_time_end-total_pipeline_time_start:.10f} seconds."
     )
     return net
 

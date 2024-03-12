@@ -560,7 +560,7 @@ class Layer:
                 result = func(self, *args, **kwargs)
                 end_time = time()
                 logger.debug(
-                    f"{self.action} '{func.__name__}' time: {end_time - start_time:.3f} seconds."
+                    f"{self.action} '{func.__name__}' time: {end_time - start_time:.10f} seconds."
                 )
             return result
 
