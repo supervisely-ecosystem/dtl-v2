@@ -129,17 +129,14 @@ def main(
     processing_time_start = time()
     with progress(message=f"Processing items...", total=total) as pbar:
         for data_el in elements_generator:
+            start_item_processing_time = time()
             try:
                 export_output_generator = net.start(data_el)
-
                 if not g.pipeline_running:
                     return
-
                 for res_export in export_output_generator:
-
                     if not g.pipeline_running:
                         return
-
                     logger.trace(
                         "item processed",
                         extra={"item_name": res_export[0][0].get_item_name()},
@@ -158,6 +155,10 @@ def main(
                     extra=extra,
                 )
             finally:
+                end_item_processing_time = time()
+                logger.debug(
+                    f"{data_el[0].info.item_info.name} processing time: {end_item_processing_time - start_item_processing_time:.10f} seconds."
+                )
                 pbar.update()
 
     processing_time_end = time()

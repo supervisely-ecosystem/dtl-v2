@@ -551,20 +551,19 @@ class Layer:
     def preprocess(self):
         pass
 
-    def process_timer(func):
-        def wrapper(self, *args, **kwargs):
-            if self.net.preview_mode:
-                result = func(self, *args, **kwargs)
-            else:
-                start_time = time()
-                result = func(self, *args, **kwargs)
-                end_time = time()
-                logger.debug(
-                    f"{self.action} '{func.__name__}' time: {end_time - start_time:.10f} seconds."
-                )
-            return result
-
-        return wrapper
+    # def process_timer(func):
+    #     def wrapper(self, *args, **kwargs):
+    #         if self.net.preview_mode:
+    #             result = func(self, *args, **kwargs)
+    #         else:
+    #             start_time = time()
+    #             result = func(self, *args, **kwargs)
+    #             end_time = time()
+    #             logger.debug(
+    #                 f"{self.action} '{func.__name__}' time: {end_time - start_time:.10f} seconds."
+    #             )
+    #         return result
+    # return wrapper
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         raise NotImplementedError()
