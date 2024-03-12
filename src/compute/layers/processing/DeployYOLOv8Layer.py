@@ -110,6 +110,7 @@ class DeployYOLOv8Layer(Layer):
     def modifies_data(self):
         return False
 
+    @Layer.process_timer
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],

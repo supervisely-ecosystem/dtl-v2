@@ -336,6 +336,7 @@ class ApplyNNInferenceLayer(Layer):
         self.tag_mapping[TagConstants.OTHER] = TagConstants.DEFAULT
         self.tag_mapping[TagConstants.NEW] = new_tag_metas
 
+    @Layer.process_timer
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img = img_desc.read_image()

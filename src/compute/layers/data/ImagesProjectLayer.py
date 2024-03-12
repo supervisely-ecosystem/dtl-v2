@@ -123,6 +123,7 @@ class ImagesProjectLayer(Layer):
     def modifies_data(self):
         return False
 
+    @Layer.process_timer
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         ann = apply_to_labels(ann, self.class_mapper)

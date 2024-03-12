@@ -78,6 +78,7 @@ class CreateNewProjectLayer(Layer):
         else:
             return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
 
+    @Layer.process_timer
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],

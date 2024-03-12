@@ -5,6 +5,7 @@ from os.path import join
 import shutil
 from copy import deepcopy
 from typing import Tuple
+from time import time
 
 import jsonschema
 
@@ -35,6 +36,7 @@ def check_connection_name(connection_name):
 
 class Layer:
     null = "null"
+    # action = "layer"
 
     base_params = {
         "definitions": {
@@ -86,7 +88,7 @@ class Layer:
         self.dsts = maybe_wrap_in_list(config["dst"])
 
         self.settings = config.get("settings", {})
-        self.postprocess_cb = config.get("postprocess_cb", None)        
+        self.postprocess_cb = config.get("postprocess_cb", None)
 
         self.cls_mapping = {}
         self.tag_mapping = {}
@@ -548,6 +550,18 @@ class Layer:
 
     def preprocess(self):
         pass
+
+    def process_timer(func):
+        def wrapper(self, *args, **kwargs):
+            start_time = time()
+            result = func(self, *args, **kwargs)
+            end_time = time()
+            logger.debug(
+                f"{self.action} '{func.__name__}' time: {end_time - start_time:.3f} seconds."
+            )
+            return result
+
+        return wrapper
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         raise NotImplementedError()

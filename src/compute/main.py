@@ -15,6 +15,7 @@ from src.compute.Net import Net
 from src.exceptions import GraphError, CustomException
 from src.utils import LegacyProjectItem
 import src.globals as g
+from time import time
 
 
 def make_legacy_project_item(project: sly.Project, dataset, item_name):
@@ -66,6 +67,7 @@ def main(
     modality: str,
     postprocess_cb_list: list = None,
 ):
+    total_pipeline_time_start = time()
     task_helpers.task_verification(check_in_graph)
 
     if not g.pipeline_running:
@@ -81,7 +83,13 @@ def main(
             for layer, postprocess_cb in zip(net.layers, postprocess_cb_list):
                 layer.postprocess_cb = postprocess_cb
 
+        validation_time_start = time()
         net.validate(circle_progress)
+        validation_time_end = time()
+        logger.debug(
+            f"Total validation time: {validation_time_end-validation_time_start:.3f} seconds."
+        )
+
         net.calc_metas()
 
         if not g.pipeline_running:
@@ -118,6 +126,7 @@ def main(
         return
 
     results_counter = 0
+    processing_time_start = time()
     with progress(message=f"Processing items...", total=total) as pbar:
         for data_el in elements_generator:
             try:
@@ -151,10 +160,19 @@ def main(
             finally:
                 pbar.update()
 
+    processing_time_end = time()
+    logger.debug(
+        f"Total items processing time: {processing_time_end-processing_time_start:.3f} seconds."
+    )
     if not g.pipeline_running:
         return
 
+    postprocessing_time_start = time()
     net.postprocess()
+    postprocessing_time_end = time()
+    logger.debug(
+        f"Total postprocessing time: {postprocessing_time_end-postprocessing_time_start:.3f} seconds."
+    )
 
     if not g.pipeline_running:
         return
@@ -162,6 +180,10 @@ def main(
     logger.info(
         "DTL finished",
         extra={"event_type": EventType.DTL_APPLIED, "new_proj_size": results_counter},
+    )
+    total_pipeline_time_end = time()
+    logger.info(
+        f"Total pipeline time: {total_pipeline_time_end-total_pipeline_time_start:.3f} seconds."
     )
     return net
 
