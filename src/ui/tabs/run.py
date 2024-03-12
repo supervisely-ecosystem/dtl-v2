@@ -207,6 +207,9 @@ def _run():
         g.warn_notification.hide()
         nodes_flow.enable()
         progress.hide()
+        with progress(message="Ready for new pipeline", total=1) as pbar:
+            pbar.update(1)
+
         run_btn.show()
         stop_btn.hide()
         nodes_flow_card.unlock()
