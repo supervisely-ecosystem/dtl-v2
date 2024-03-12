@@ -215,8 +215,8 @@ def apply_model_to_image(
         return pred_ann
 
 
-class ApplyNNLayer(Layer):
-    action = "apply_nn"
+class ApplyNNInferenceLayer(Layer):
+    action = "apply_nn_inference"
 
     layer_settings = {
         "required": ["settings"],

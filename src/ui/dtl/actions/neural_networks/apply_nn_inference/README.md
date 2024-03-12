@@ -1,11 +1,11 @@
-# Apply NN
+# Apply NN Inference
 
-`Apply NN` layer is used to apply a neural network to the input data. Layer connects to deployed model such as Serve YOLOv8 app and applies it to the input data.
+`Apply NN Inference` layer is used to apply a neural network to the input data. Layer connects to deployed model such as Serve YOLOv8 app and applies it to the input data.
 
-There are 2 ways to connect model in `Apply NN` layer:
+There are 2 ways to connect model in `Apply NN Inference` layer:
 
 1. Run one of the serving apps manually and then select app session in the model selector or if you already have a running model session, you can just select it.
-2. Add `Deploy XXX` layer to the scene, where `XXX` is the framework name. Deploy model via this layer and simply link this layer to the `Apply NN` layer.
+2. Add `Deploy` layer to the scene and deploy model via this layer and simply link this layer to the `Apply NN Inference` layer.
 
 Read our post on [Supervisely blog](https://supervisely.com/blog/) to learn how to effectively train, deploy and use the model on the YOLOv8 example: [No-code tutorial: train and predict YOLOv8 on custom data](https://supervisely.com/blog/train-yolov8-on-custom-data-no-code/).
 
@@ -61,11 +61,11 @@ Supported models:
 
 ```json
 {
-	"action": "apply_nn",
+	"action": "apply_nn_inference",
 	"src": [
 		"$data_1"
 	],
-	"dst": "$apply_nn_2",
+	"dst": "$apply_nn_inference_2",
 	"settings": {
 		"current_meta": {
 			"classes": [],

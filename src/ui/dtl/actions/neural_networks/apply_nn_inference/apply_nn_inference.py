@@ -3,6 +3,7 @@ from typing import Optional
 from os.path import realpath, dirname
 
 from supervisely import ProjectMeta
+from supervisely.app.widgets import NodesFlow
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
@@ -14,34 +15,41 @@ from src.ui.dtl.utils import (
 )
 import src.globals as g
 
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.connect_model import (
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.connect_model import (
     create_connect_to_model_widgets,
 )
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.select_classes import (
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.select_classes import (
     create_classes_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.select_tags import (
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.select_tags import (
     create_tags_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.inference_settings import (
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.inference_settings import (
     create_inference_settings_widgets,
 )
 
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.node_layout import (
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.node_layout import (
     create_preview_button_widget,
     create_connect_notification_widget,
     create_layout,
 )
 
-from src.ui.dtl.actions.neural_networks.apply_nn.layout.utils import *
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.utils import *
 
 
-class ApplyNNAction(NeuralNetworkAction):
-    name = "apply_nn"
-    title = "Apply NN"
+class ApplyNNInferenceAction(NeuralNetworkAction):
+    name = "apply_nn_inference"
+    title = "Apply NN Inference"
     docs_url = ""
     description = "Connect to deployed model and apply it to images."
     md_description = get_layer_docs(dirname(realpath(__file__)))
+
+    # @classmethod
+    # def create_inputs(cls):
+    #     return [
+    #         NodesFlow.Node.Input("deployed_model", "Deployed model", color="#000000"),
+    #         NodesFlow.Node.Input("source", "Input", color="#000000"),
+    #     ]
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
