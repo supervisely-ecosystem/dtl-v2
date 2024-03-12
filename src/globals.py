@@ -1,5 +1,9 @@
 import os
-import queue
+
+
+# from asyncio import Queue
+from queue import Queue
+
 from dotenv import load_dotenv
 
 import supervisely as sly
@@ -70,7 +74,7 @@ layers_count = 0
 layers = {}
 
 
-update_queue = queue.Queue()
+update_queue = Queue()
 
 pipeline_running = False
 pipeline_thread = None
