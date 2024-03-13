@@ -88,16 +88,17 @@ class DeployYOLOv8Layer(Layer):
             raise BadSettingsError("Select device in 'Deploy YOLOv8' node")
         if settings.get("model_source", None) is None:
             raise BadSettingsError("Select model in 'Deploy YOLOv8' node")
-        if settings.get("session_id", None) is None:
-            raise BadSettingsError(
-                (
-                    "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
-                    "If you still have problems, try to check model logs for more info or contact support."
-                    "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
+        if not self.net.preview_mode:
+            if settings.get("session_id", None) is None:
+                raise BadSettingsError(
+                    (
+                        "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
+                        "If you still have problems, try to check model logs for more info or contact support."
+                        "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
+                    )
                 )
-            )
-        check_model_is_served(settings["session_id"])
-        return super().validate()
+            check_model_is_served(settings["session_id"])
+            return super().validate()
 
     def postprocess(self):
         if self.settings["stop_model_session"]:

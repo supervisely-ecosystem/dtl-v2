@@ -269,11 +269,11 @@ class ApplyNNInferenceLayer(Layer):
         Layer.__init__(self, config, net=net)
 
     def validate(self):
-        if self.settings["session_id"] is None:
-            raise GraphError("Apply NN layer requires model to be connected")
-
-        check_model_is_served(self.settings["session_id"], self.net.preview_mode)
-        return super().validate()
+        if not self.net.preview_mode:
+            if self.settings["session_id"] is None:
+                raise GraphError("Apply NN layer requires model to be connected")
+            check_model_is_served(self.settings["session_id"], self.net.preview_mode)
+            return super().validate()
 
     def requires_item(self):
         return True
