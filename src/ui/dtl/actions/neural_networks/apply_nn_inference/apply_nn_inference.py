@@ -378,6 +378,12 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if need_preview_update:
                 g.updater(("nodes", layer_id))
 
+        def postprocess_cb():
+            nonlocal _session_id
+            is_ready = g.api.app.is_ready_for_api_calls(_session_id)
+            if not is_ready:
+                _reset_model()
+
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             nonlocal saved_classes_settings, saved_tags_settings
@@ -602,4 +608,5 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             get_settings=get_settings,
             data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
+            postprocess_cb=postprocess_cb,
         )
