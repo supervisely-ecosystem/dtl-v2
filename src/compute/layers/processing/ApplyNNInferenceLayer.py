@@ -427,5 +427,5 @@ class ApplyNNInferenceLayer(Layer):
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
-    def postprocess(self):
-        self.postprocess_cb()
+    # def postprocess(self):
+    #     self.postprocess_cb()

@@ -380,12 +380,11 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if need_preview_update:
                 g.updater(("nodes", layer_id))
 
-        def postprocess_cb():
-            nonlocal _kill_deployed_model_after_pipeline
-            if _kill_deployed_model_after_pipeline:
-                connect_nn_text.set("Deploy layer detected but model is not deployed", "warning")
-                _reset_model()
-                # g.updater(("nodes", layer_id))
+        # def postprocess_cb(): # casues file not found error
+        #     nonlocal _kill_deployed_model_after_pipeline
+        #     if _kill_deployed_model_after_pipeline:
+        #         connect_nn_text.set("Deploy layer detected but model is not deployed", "warning")
+        #         _reset_model()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -611,5 +610,5 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             get_settings=get_settings,
             data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
-            postprocess_cb=postprocess_cb,
+            # postprocess_cb=postprocess_cb,
         )
