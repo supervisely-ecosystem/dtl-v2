@@ -61,6 +61,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         _model_info = {}
         _model_settings = {}
         _model_connected = False
+        _kill_deployed_model_after_pipeline = False
 
         (
             connect_nn_text,
@@ -306,12 +307,13 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
         def data_changed_cb(**kwargs):
             nonlocal _session_id, _model_from_deploy_node
-            nonlocal _current_meta, _model_meta
+            nonlocal _current_meta, _model_meta, _kill_deployed_model_after_pipeline
             need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             session_id = kwargs.get("session_id", None)
             deploy_layer_name = kwargs.get("deploy_layer_name", None)
+            _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
             model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
             model_disconnected_text = f"{deploy_layer_name} detected but model is not deployed"
@@ -379,9 +381,8 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                 g.updater(("nodes", layer_id))
 
         def postprocess_cb():
-            nonlocal _session_id
-            is_ready = g.api.app.is_ready_for_api_calls(_session_id)
-            if not is_ready:
+            nonlocal _kill_deployed_model_after_pipeline
+            if _kill_deployed_model_after_pipeline:
                 _reset_model()
 
         def get_settings(options_json: dict) -> dict:

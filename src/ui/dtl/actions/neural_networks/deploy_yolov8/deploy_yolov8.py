@@ -232,6 +232,9 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             if session is not None:
                 data["session_id"] = session.task_id
             data["deploy_layer_name"] = "Deploy YOLOv8"
+            data["deploy_layer_terminate"] = (
+                model_selector_stop_model_after_pipeline_checkbox.is_checked()
+            )
             return data
 
         def data_changed_cb(**kwargs):
