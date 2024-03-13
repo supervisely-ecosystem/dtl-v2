@@ -383,9 +383,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         def postprocess_cb():
             nonlocal _kill_deployed_model_after_pipeline
             if _kill_deployed_model_after_pipeline:
-                _reset_model()
                 connect_nn_text.set("Deploy layer detected but model is not deployed", "warning")
-                g.updater(("nodes", layer_id))
+                _reset_model()
+                # g.updater(("nodes", layer_id))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
