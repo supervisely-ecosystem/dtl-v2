@@ -2,7 +2,7 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely import ProjectMeta
+from supervisely import ProjectMeta, logger
 from supervisely.app.widgets import NodesFlow
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
@@ -382,7 +382,11 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
         def postprocess_cb():
             nonlocal _kill_deployed_model_after_pipeline
+            logger.info(
+                f"Kill deployed model after pipeline: {_kill_deployed_model_after_pipeline}"
+            )
             if _kill_deployed_model_after_pipeline:
+                logger.info("Reset deployed model")
                 _reset_model()
 
         def get_settings(options_json: dict) -> dict:
