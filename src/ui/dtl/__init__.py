@@ -242,6 +242,26 @@ image_actions_dict = {
     CreateLabelingJobAction.name: CreateLabelingJobAction,
 }
 
+image_actions_legacy_dict = {
+    ImagesProjectAction.legacy_name: ImagesProjectAction.name,
+    ApplyNNInferenceAction.legacy_name: ApplyNNInferenceAction.name,
+    BboxToPolygonAction.legacy_name: BboxToPolygonAction.name,
+    ChangeClassColorAction.legacy_name: ChangeClassColorAction.name,
+    DropObjectByClassAction.legacy_name: DropObjectByClassAction.name,
+    ImageTagAction.legacy_name: ImageTagAction.name,
+    LineToMaskAction.legacy_name: LineToMaskAction.name,
+    MaskToLinesAction.legacy_name: MaskToLinesAction.name,
+    MaskToPolygonAction.legacy_name: MaskToPolygonAction.name,
+    MergeMasksAction.legacy_name: MergeMasksAction.name,
+    PolygonToMaskAction.legacy_name: PolygonToMaskAction.name,
+    RenameClassesAction.legacy_name: RenameClassesAction.name,
+    AddToExistingProjectAction.legacy_name: AddToExistingProjectAction.name,
+    CreateLabelingJobAction.legacy_name: InputLabelingJobAction.name,
+    CreateNewProjectAction.legacy_name: CreateNewProjectAction.name,
+    ExportArchiveAction.legacy_name: ExportArchiveAction.name,
+    ExportArchiveWithMasksAction.legacy_name: ExportArchiveWithMasksAction.name,
+}
+
 video_actions_list = {
     SOURCE_ACTIONS: [VideosProjectAction.name],
     ANNOTATION_TRANSFORMS: [
@@ -287,8 +307,19 @@ video_actions_dict = {
     CreateLabelingJobAction.name: CreateLabelingJobAction,
 }
 
+video_actions_legacy_dict = {
+    VideosProjectAction.legacy_name: VideosProjectAction.name,
+    CreateNewProjectAction.legacy_name: CreateNewProjectAction.name,
+    AddToExistingProjectAction.legacy_name: AddToExistingProjectAction.name,
+    ExportArchiveAction.legacy_name: ExportArchiveAction.name,
+    CreateLabelingJobAction.legacy_name: CreateLabelingJobAction.name,
+}
+
+
 modality_dict = {"images": image_actions_dict, "videos": video_actions_dict}
 modality_list = {"images": image_actions_list, "videos": video_actions_list}
+modality_dict_legacy = {"images": image_actions_legacy_dict, "videos": video_actions_legacy_dict}
 
 actions_dict = modality_dict[g.MODALITY_TYPE]
 actions_list = modality_list[g.MODALITY_TYPE]
+actions_dict_legacy = modality_dict_legacy[g.MODALITY_TYPE]
