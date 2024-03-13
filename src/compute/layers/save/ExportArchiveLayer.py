@@ -25,6 +25,7 @@ from src.exceptions import GraphError
 # save to archive
 class ExportArchiveLayer(Layer):
     action = "export_archive"
+    legacy_action = "save"
 
     layer_settings = {
         "required": ["settings"],

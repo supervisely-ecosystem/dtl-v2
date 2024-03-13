@@ -43,6 +43,7 @@ def _filter_meta(dataset_id: int, classes_to_label: List[str], tags_to_label: Li
 
 class CreateLabelingJobLayer(Layer):
     action = "create_labeling_job"
+    legacy_action = "labeling_job"
 
     layer_settings = {
         "required": ["settings"],

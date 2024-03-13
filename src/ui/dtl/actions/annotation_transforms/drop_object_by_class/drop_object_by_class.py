@@ -25,6 +25,7 @@ import src.globals as g
 
 class DropObjectByClassAction(AnnotationAction):
     name = "drop_object_by_class"
+    legacy_name = "drop_obj_by_class"
     title = "Drop Object by Class"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/drop_obj_by_class"
     description = "Removes annotations of specified classes."

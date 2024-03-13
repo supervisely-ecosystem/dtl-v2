@@ -218,6 +218,7 @@ def apply_model_to_image(
 
 class ApplyNNInferenceLayer(Layer):
     action = "apply_nn_inference"
+    legacy_action = "apply_nn"
 
     layer_settings = {
         "required": ["settings"],

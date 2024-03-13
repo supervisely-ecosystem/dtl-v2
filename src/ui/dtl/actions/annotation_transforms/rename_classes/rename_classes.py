@@ -25,6 +25,7 @@ import src.globals as g
 
 class RenameClassesAction(AnnotationAction):
     name = "rename_classes"
+    legacy_name = "rename"
     title = "Rename Classes"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/rename"
     description = "Rename existing classes."

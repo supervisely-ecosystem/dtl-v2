@@ -22,6 +22,7 @@ from src.exceptions import WrongGeometryError
 
 class BBoxToPolygonLayer(Layer):
     action = "bbox_to_polygon"
+    legacy_action = "bbox2poly"
 
     layer_settings = {
         "required": ["settings"],

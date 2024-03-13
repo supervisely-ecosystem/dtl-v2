@@ -25,6 +25,7 @@ def _get_source_projects_ids_from_dtl():
 
 class CreateNewProjectLayer(Layer):
     action = "create_new_project"
+    legacy_action = "supervisely"
 
     layer_settings = {"required": ["settings"], "properties": {"settings": {}}}
 

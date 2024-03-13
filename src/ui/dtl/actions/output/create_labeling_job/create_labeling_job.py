@@ -21,8 +21,6 @@ from src.ui.dtl.utils import (
     get_members_list_value,
 )
 
-import src.globals as g
-
 from src.ui.dtl.actions.output.create_labeling_job.layout.job_description import (
     create_job_description_widgets,
 )
@@ -44,6 +42,7 @@ import src.ui.dtl.actions.output.create_labeling_job.layout.utils as lj_utils
 
 class CreateLabelingJobAction(OutputAction):
     name = "create_labeling_job"
+    legacy_name = "labeling_job"
     title = "Create Labeling Job"
     docs_url = ""
     description = "Creates Labeling Job with given parameters."

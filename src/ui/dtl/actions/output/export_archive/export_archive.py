@@ -11,6 +11,7 @@ import src.globals as g
 
 class ExportArchiveAction(OutputAction):
     name = "export_archive"
+    legacy_name = "save"
     title = "Export Archive"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/save"
     description = "Export annotations and images to Team Files."

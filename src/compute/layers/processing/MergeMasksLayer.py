@@ -12,6 +12,7 @@ from src.exceptions import WrongGeometryError
 
 class MergeMasksLayer(Layer):
     action = "merge_masks"
+    legacy_action = "merge_bitmap_masks"
 
     layer_settings = {
         "required": ["settings"],

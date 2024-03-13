@@ -27,6 +27,7 @@ import src.globals as g
 
 class MaskToPolygonAction(AnnotationAction):
     name = "mask_to_polygon"
+    legacy_name = "bitmap2poly"
     title = "Mask to Polygon"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/find_contours"

@@ -12,6 +12,7 @@ from src.compute.dtl_utils import apply_to_labels
 # converts ALL types to FigureBitmap
 class PolygonToMaskLayer(Layer):
     action = "polygon_to_mask"
+    legacy_action = "poly2bitmap"
 
     layer_settings = {
         "required": ["settings"],

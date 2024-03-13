@@ -22,6 +22,7 @@ import src.globals as g
 
 class AddToExistingProjectLayer(Layer):
     action = "add_to_existing_project"
+    legacy_action = "existing_project"
 
     layer_settings = {
         "required": ["settings"],

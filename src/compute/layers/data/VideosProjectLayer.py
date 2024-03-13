@@ -21,6 +21,7 @@ from src.exceptions import BadSettingsError
 
 class VideosProjectLayer(Layer):
     action = "videos_project"
+    legacy_action = "video_data"
 
     layer_settings = {
         "required": ["settings"],

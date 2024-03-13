@@ -16,6 +16,7 @@ from src.exceptions import WrongGeometryError
 # FigureBitmap to FigurePolygon
 class MaskToPolygonLayer(Layer):
     action = "mask_to_polygon"
+    legacy_action = "bitmap2poly"
 
     layer_settings = {
         "required": ["settings"],

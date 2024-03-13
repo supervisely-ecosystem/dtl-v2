@@ -13,6 +13,7 @@ from src.exceptions import BadSettingsError
 
 class ImagesProjectLayer(Layer):
     action = "images_project"
+    legacy_action = "data"
 
     layer_settings = {
         "required": ["settings"],

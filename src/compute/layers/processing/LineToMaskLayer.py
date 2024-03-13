@@ -14,6 +14,7 @@ from src.compute.dtl_utils import apply_to_labels
 # converts ALL types to Bitmap
 class LineToMaskLayer(Layer):
     action = "line_to_mask"
+    legacy_action = "line2bitmap"
 
     layer_settings = {
         "required": ["settings"],

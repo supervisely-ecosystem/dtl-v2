@@ -11,6 +11,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 class CreateNewProjectAction(OutputAction):
     name = "create_new_project"
+    legacy_name = "supervisely"
     title = "Create New Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/save-layers/supervisely"
     description = "Save results of data transformations to a new project in current workspace."

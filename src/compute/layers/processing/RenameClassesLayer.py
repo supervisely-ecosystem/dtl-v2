@@ -10,6 +10,7 @@ from src.exceptions import BadSettingsError
 
 class RenameClassesLayer(Layer):
     action = "rename_classes"
+    legacy_action = "rename"
 
     layer_settings = {
         "required": ["settings"],

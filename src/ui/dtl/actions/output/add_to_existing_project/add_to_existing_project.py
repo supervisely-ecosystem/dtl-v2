@@ -1,5 +1,4 @@
 from typing import Optional
-import json
 from os.path import realpath, dirname
 
 import src.globals as g
@@ -36,6 +35,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 class AddToExistingProjectAction(OutputAction):
     name = "add_to_existing_project"
+    legacy_name = "existing_project"
     title = "Add to Existing Project"
     docs_url = ""
     description = "Save results of data transformations to existing project in current workspace."

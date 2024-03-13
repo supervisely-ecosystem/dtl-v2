@@ -19,6 +19,7 @@ from src.ui.dtl.utils import (
 
 class ChangeClassColorAction(AnnotationAction):
     name = "change_class_color"
+    legacy_name = "color_class"
     title = "Change Class Color"
     description = "Use for changing colors of the classes. Add this layer at the end of graph, before data saving."
     docs_url = (

@@ -16,6 +16,7 @@ from src.ui.dtl.utils import (
 
 class ImageTagAction(AnnotationAction):
     name = "image_tag"
+    legacy_name = "tag"
     title = "Image Tag"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/transformation-layers/tag"
     description = "Add or remove tags from images."

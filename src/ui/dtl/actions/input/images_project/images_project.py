@@ -46,6 +46,7 @@ from supervisely.app.widgets import (
 # ImagesProject
 class ImagesProjectAction(SourceAction):
     name = "images_project"
+    legacy_name = "data"
     title = "Images Project"
     docs_url = "https://docs.supervisely.com/data-manipulation/index/data-layers/data"
     description = "Use to specify project and its datasets that will participate in data transformation process."

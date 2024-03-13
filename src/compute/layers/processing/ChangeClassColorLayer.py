@@ -11,6 +11,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 class ChangeClassColorLayer(Layer):
     action = "change_class_color"
+    legacy_action = "color_class"
 
     layer_settings = {
         "required": ["settings"],

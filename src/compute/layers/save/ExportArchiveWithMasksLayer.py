@@ -17,6 +17,7 @@ from src.exceptions import GraphError, ValidationError
 # save to archive, with GTs and checks
 class ExportArchiveWithMasksLayer(Layer):
     action = "export_archive_with_masks"
+    legacy_action = "save_masks"
 
     # out_dir, flag_name, mapping_name
     odir_flag_mapping = [

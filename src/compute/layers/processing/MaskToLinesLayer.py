@@ -89,6 +89,7 @@ def _get_all_diameters(G: nx.Graph):
 # FigureBitmap to FigureLine
 class MaskToLinesLayer(Layer):
     action = "mask_to_lines"
+    legacy_action = "bitmap2lines"
 
     layer_settings = {
         "required": ["settings"],

@@ -27,6 +27,7 @@ from src.ui.dtl.utils import (
 
 class MaskToLinesAction(AnnotationAction):
     name = "mask_to_lines"
+    legacy_name = "bitmap2lines"
     title = "Mask to Lines"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bitmap2lines"

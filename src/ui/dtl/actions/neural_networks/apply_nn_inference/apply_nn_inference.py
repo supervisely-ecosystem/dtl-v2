@@ -39,6 +39,7 @@ from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.utils import *
 
 class ApplyNNInferenceAction(NeuralNetworkAction):
     name = "apply_nn_inference"
+    legacy_name = "apply_nn"
     title = "Apply NN Inference"
     docs_url = ""
     description = "Connect to deployed model and apply it to images."

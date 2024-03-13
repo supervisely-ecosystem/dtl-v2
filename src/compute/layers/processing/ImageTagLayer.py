@@ -10,6 +10,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 class ImageTagLayer(Layer):
     action = "image_tag"
+    legacy_action = "tag"
 
     # TODO add a way to specify meta information for the added tag.
     # TODO support all tag value types.

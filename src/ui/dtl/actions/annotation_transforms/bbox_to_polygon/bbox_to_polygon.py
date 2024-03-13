@@ -27,6 +27,7 @@ import src.globals as g
 
 class BboxToPolygonAction(AnnotationAction):
     name = "bbox_to_polygon"
+    legacy_name = "bbox2poly"
     title = "BBox to Polygon"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/bbox2poly"

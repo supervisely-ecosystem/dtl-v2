@@ -26,6 +26,7 @@ import src.globals as g
 
 class MergeMasksAction(AnnotationAction):
     name = "merge_masks"
+    legacy_name = "merge_bitmap_masks"
     title = "Merge Masks"
     docs_url = (
         "https://docs.supervisely.com/data-manipulation/index/transformation-layers/merge_masks"
