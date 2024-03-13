@@ -382,11 +382,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
         def postprocess_cb():
             nonlocal _kill_deployed_model_after_pipeline
-            logger.info(
-                f"Kill deployed model after pipeline: {_kill_deployed_model_after_pipeline}"
-            )
             if _kill_deployed_model_after_pipeline:
-                logger.info("Reset deployed model")
                 _reset_model()
 
         def get_settings(options_json: dict) -> dict:
