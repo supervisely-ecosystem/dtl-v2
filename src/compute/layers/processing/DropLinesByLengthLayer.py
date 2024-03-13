@@ -8,7 +8,7 @@ from supervisely import Polyline, Annotation, Label
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
-from src.exceptions import BadSettingsError
+from src.exceptions import ValidationError
 
 
 def distance(p1, p2) -> float:
@@ -89,7 +89,7 @@ class DropLinesByLengthLayer(Layer):
         min_length = self.settings.get("min_length", None)
         max_length = self.settings.get("max_length", None)
         if (min_length is not None) and (max_length is not None) and (min_length > max_length):
-            raise BadSettingsError(
+            raise ValidationError(
                 '"min_length" should be less than "max_length" for "delete_lines_by_length" layer',
             )
 

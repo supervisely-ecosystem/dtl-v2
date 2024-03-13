@@ -11,6 +11,7 @@ from supervisely.nn.inference.session import Session
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
+from src.exceptions import ValidationError
 
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
@@ -38,9 +39,9 @@ def check_model_is_served(session_id: int):
         if not is_model_served:
             is_model_served = wait_model_served(session, 12)
             if not is_model_served:
-                raise TimeoutError(error_message)
+                raise ValidationError(error_message)
     except:
-        raise ValueError(error_message)
+        raise ValidationError(error_message)
 
 
 class DeployYOLOv8Layer(Layer):
@@ -82,13 +83,13 @@ class DeployYOLOv8Layer(Layer):
         settings = self.settings
 
         if settings.get("agent_id", None) is None:
-            raise ValueError("Select agent in 'Deploy YOLOv8' node'")
+            raise ValidationError("Select agent in 'Deploy YOLOv8' node'")
         if settings.get("device", None) is None:
-            raise ValueError("Select device in 'Deploy YOLOv8' node")
+            raise ValidationError("Select device in 'Deploy YOLOv8' node")
         if settings.get("model_source", None) is None:
-            raise ValueError("Select model in 'Deploy YOLOv8' node")
+            raise ValidationError("Select model in 'Deploy YOLOv8' node")
         if settings.get("session_id", None) is None:
-            raise ValueError(
+            raise ValidationError(
                 (
                     "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
                     "If you still have problems, try to check model logs for more info or contact support."

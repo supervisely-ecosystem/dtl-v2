@@ -12,7 +12,7 @@ from src.compute.dtl_utils.dtl_helper import DtlHelper, DtlPaths
 from src.compute.tasks import task_helpers
 from src.compute.utils import logging_utils
 from src.compute.Net import Net
-from src.exceptions import GraphError, CustomException
+from src.exceptions import CustomException, ValidationError
 from src.utils import LegacyProjectItem
 import src.globals as g
 from time import time
@@ -84,7 +84,13 @@ def main(
                 layer.postprocess_cb = postprocess_cb
 
         validation_time_start = time()
-        net.validate(circle_progress)
+
+        try:
+            net.validate(circle_progress)
+        except:
+            circle_progress.hide()
+            raise
+
         validation_time_end = time()
         logger.debug(
             f"Total validation time: {validation_time_end-validation_time_start:.10f} seconds."
@@ -117,7 +123,7 @@ def main(
 
     total = net.get_total_elements()
     if total == 0:
-        raise GraphError(
+        raise ValidationError(
             "There are no elements to process. Make sure that you selected input project"
         )
     elements_generator = net.get_elements_generator()

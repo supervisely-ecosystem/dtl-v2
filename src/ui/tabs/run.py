@@ -21,7 +21,7 @@ from src.ui.tabs.configure import nodes_flow, nodes_flow_card
 import src.utils as utils
 import src.ui.utils as ui_utils
 import src.globals as g
-from src.exceptions import CustomException, handle_exception
+from src.exceptions import ValidationError, CustomException, handle_exception
 from src.ui.widgets import CircleProgress
 import threading
 
@@ -191,6 +191,12 @@ def _run():
         results.reload()
         results.show()
         circle_progress.set_status("success")
+    except ValidationError as e:
+        error_notification.set("Validation Error", description=str(e))
+        error_notification.show()
+        circle_progress.set_status("exception")
+        circle_progress.hide()
+        raise e
     except CustomException as e:
         error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
@@ -201,6 +207,7 @@ def _run():
         error_notification.show()
         circle_progress.set_status("exception")
         raise e
+
     finally:
         g.pipeline_running = False
         g.pipeline_thread = None

@@ -3,7 +3,7 @@
 import numpy as np
 
 from src.compute.Layer import Layer
-from src.exceptions import BadSettingsError
+from src.exceptions import ValidationError
 
 
 class ContrastBrightnessLayer(Layer):
@@ -46,7 +46,7 @@ class ContrastBrightnessLayer(Layer):
 
         def check_min_max(dictionary, text):
             if dictionary["min"] > dictionary["max"]:
-                raise BadSettingsError('"min" should be <= than "max" for "{}"'.format(text))
+                raise ValidationError('"min" should be <= than "max" for "{}"'.format(text))
 
         check_min_max(self.settings["contrast"], "contrast")
         check_min_max(self.settings["brightness"], "brightness")

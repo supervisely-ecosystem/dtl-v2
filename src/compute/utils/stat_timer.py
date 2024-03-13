@@ -4,10 +4,7 @@
 import os
 import time
 
-# from asyncio import Lock
 from threading import Lock
-
-
 from supervisely.sly_logger import logger
 
 

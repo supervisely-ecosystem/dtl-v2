@@ -26,6 +26,7 @@ from src.exceptions import (
     BadSettingsError,
     CreateMetaError,
     GraphError,
+    ValidationError,
     CustomException,
 )
 
@@ -80,7 +81,6 @@ class Net:
             try:
                 layer.validate()
             except CustomException as e:
-                circle_progress.hide()
                 e.extra["layer_config"] = layer.config
                 raise e
             except:
@@ -94,18 +94,15 @@ class Net:
                 graph_has_savel = True
 
         if graph_has_datal is False:
-            circle_progress.hide()
-            raise GraphError(
+            raise ValidationError(
                 "Input layer is required. Select one of the layers from input section."
             )
         if graph_has_savel is False:
-            circle_progress.hide()
-            raise GraphError(
+            raise ValidationError(
                 "Output layer is required. Select one of the layers from output section to save results."
             )
         if len(self.layers) < 2:
-            circle_progress.hide()
-            raise GraphError(
+            raise ValidationError(
                 "You need at least one input and one output layer to run the pipeline."
             )
         self.check_connections()

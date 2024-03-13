@@ -1,7 +1,5 @@
 import os
 
-
-# from asyncio import Queue
 from queue import Queue
 
 from dotenv import load_dotenv

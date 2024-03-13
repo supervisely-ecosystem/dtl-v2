@@ -15,7 +15,7 @@ from supervisely import (
 from supervisely.api.app_api import SessionInfo
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
-from src.exceptions import GraphError
+from src.exceptions import GraphError, ValidationError
 import src.globals as g
 
 
@@ -151,12 +151,12 @@ class CopyAnnotationsLayer(Layer):
         settings = self.settings
 
         if settings["project_id"] is None:
-            raise ValueError(
+            raise ValidationError(
                 "Destination project is not selected in the 'Add labels to existing project' layer"
             )
 
         if settings["dataset_ids"] is None or len(settings["dataset_ids"]) == 0:
-            raise ValueError(
+            raise ValidationError(
                 "Destination dataset is not selected in the 'Add labels to existing project' layer"
             )
 
