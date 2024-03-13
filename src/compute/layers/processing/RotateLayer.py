@@ -9,7 +9,7 @@ from supervisely import aug
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.dtl_utils import apply_to_labels
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 class RotateLayer(Layer):
@@ -51,7 +51,7 @@ class RotateLayer(Layer):
             self.settings["rotate_angles"]["min_degrees"]
             > self.settings["rotate_angles"]["max_degrees"]
         ):
-            raise ValidationError('"min_degrees" should be <= "max_degrees"')
+            raise BadSettingsError('"min_degrees" should be <= "max_degrees"')
 
     def requires_item(self):
         return True

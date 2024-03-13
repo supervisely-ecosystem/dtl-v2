@@ -15,7 +15,7 @@ import supervisely.imaging.image as sly_image
 from supervisely.io.fs import silent_remove, file_exists
 import src.globals as g
 from supervisely.app import show_dialog
-from src.exceptions import ValidationError
+from src.exceptions import GraphError
 
 # from src.ui.tabs.run import error_notification
 
@@ -34,7 +34,7 @@ def check_model_is_served(session_id: int, preview_mode: bool = False):
                     ),
                     status="warning",
                 )
-            raise ValidationError("Selected model is not served in 'Apply NN' node. ")
+            raise GraphError("Selected model is not served in 'Apply NN' node. ")
     except:
         error_message = (
             "Model is not deployed in the selected session in 'Apply NN' node. "
@@ -49,7 +49,7 @@ def check_model_is_served(session_id: int, preview_mode: bool = False):
                 description=error_message,
                 status="warning",
             )
-        raise ValidationError(error_message)
+        raise GraphError(error_message)
 
 
 def postprocess_ann(
@@ -270,7 +270,7 @@ class ApplyNNInferenceLayer(Layer):
 
     def validate(self):
         if self.settings["session_id"] is None:
-            raise ValidationError("Apply NN layer requires model to be connected")
+            raise GraphError("Apply NN layer requires model to be connected")
 
         check_model_is_served(self.settings["session_id"], self.net.preview_mode)
         return super().validate()

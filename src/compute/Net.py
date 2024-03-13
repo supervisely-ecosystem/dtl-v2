@@ -26,7 +26,6 @@ from src.exceptions import (
     BadSettingsError,
     CreateMetaError,
     GraphError,
-    ValidationError,
     CustomException,
 )
 
@@ -94,15 +93,15 @@ class Net:
                 graph_has_savel = True
 
         if graph_has_datal is False:
-            raise ValidationError(
+            raise GraphError(
                 "Input layer is required. Select one of the layers from input section."
             )
         if graph_has_savel is False:
-            raise ValidationError(
+            raise GraphError(
                 "Output layer is required. Select one of the layers from output section to save results."
             )
         if len(self.layers) < 2:
-            raise ValidationError(
+            raise GraphError(
                 "You need at least one input and one output layer to run the pipeline."
             )
         self.check_connections()

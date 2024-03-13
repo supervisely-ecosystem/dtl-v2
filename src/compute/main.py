@@ -12,7 +12,7 @@ from src.compute.dtl_utils.dtl_helper import DtlHelper, DtlPaths
 from src.compute.tasks import task_helpers
 from src.compute.utils import logging_utils
 from src.compute.Net import Net
-from src.exceptions import CustomException, ValidationError
+from src.exceptions import CustomException, GraphError
 from src.utils import LegacyProjectItem
 import src.globals as g
 from time import time
@@ -123,7 +123,7 @@ def main(
 
     total = net.get_total_elements()
     if total == 0:
-        raise ValidationError(
+        raise GraphError(
             "There are no elements to process. Make sure that you selected input project"
         )
     elements_generator = net.get_elements_generator()

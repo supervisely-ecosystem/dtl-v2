@@ -27,6 +27,11 @@ DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
 STATIC_DIR = "static"
+
+sly.fs.mkdir(DATA_DIR)
+sly.fs.mkdir(RESULTS_DIR)
+sly.fs.mkdir(PREVIEW_DIR)
+
 TEAM_FILES_PATH = "data-nodes"
 PROJECT_ID = sly.env.project_id(raise_not_found=False)
 DATASET_ID = sly.env.dataset_id(raise_not_found=False)

@@ -50,12 +50,9 @@ class CreateNewProjectLayer(Layer):
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0:
-            raise ValueError(
+            raise GraphError(
                 "Enter name for the output project to the input field in the 'Create New Project' layer"
             )
-            # raise GraphError(
-            #     "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
-            # )
         dst = self.dsts[0]
         self.out_project_name = dst
 

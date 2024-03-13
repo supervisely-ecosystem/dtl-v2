@@ -16,7 +16,7 @@ import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
-from src.exceptions import GraphError, ValidationError
+from src.exceptions import GraphError
 import src.globals as g
 
 
@@ -53,32 +53,32 @@ class AddToExistingProjectLayer(Layer):
 
         if settings["dataset_option"] == "new":
             if settings["dataset_name"] is None or settings["dataset_name"] == "":
-                raise ValidationError("Dataset name is empty")
+                raise GraphError("Dataset name is empty")
 
         if settings["dataset_option"] == "existing":
             if settings["dataset_id"] is None:
-                raise ValidationError("Dataset is not selected")
+                raise GraphError("Dataset is not selected")
 
         super().validate()
 
     def validate_dest_connections(self):
         if len(self.dsts) != 1:
-            raise ValidationError("Destination ID in '{}' layer is empty!".format(self.action))
+            raise GraphError("Destination ID in '{}' layer is empty!".format(self.action))
         try:
             if not isinstance(self.dsts[0], int):
                 self.dsts[0] = int(self.dsts[0])
         except Exception as e:
-            raise ValidationError(error=e)
+            raise GraphError(error=e)
 
     def preprocess(self):
         if self.net.preview_mode:
             return
         if self.output_meta is None:
-            raise ValidationError(
+            raise GraphError(
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0:
-            raise ValidationError(
+            raise GraphError(
                 "Select destination project or dataset in the 'Add to Existing Project' layer"
             )
             # raise GraphError(
@@ -88,11 +88,11 @@ class AddToExistingProjectLayer(Layer):
         dst = self.dsts[0]
         self.out_project_id = dst
         if self.out_project_id is None:
-            raise ValidationError("Project is not selected")
+            raise GraphError("Project is not selected")
 
         self.sly_project_info = g.api.project.get_info_by_id(self.out_project_id)
         if self.sly_project_info is None:
-            raise ValidationError("Selected project does not exist.")
+            raise GraphError("Selected project does not exist.")
 
         dst_meta = ProjectMeta.from_json(g.api.project.get_meta(self.out_project_id))
 

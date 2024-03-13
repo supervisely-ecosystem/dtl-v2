@@ -6,7 +6,7 @@ from supervisely import logger
 from supervisely.aug.aug import crop
 
 from src.compute.Layer import Layer
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 class CropLayer(Layer):
@@ -86,7 +86,7 @@ class CropLayer(Layer):
             keep_aspect_ratio = random_part.get("keep_aspect_ratio", False)
             if keep_aspect_ratio:
                 if random_part["height"] != random_part["width"]:
-                    raise ValidationError(
+                    raise BadSettingsError(
                         "When 'keep_aspect_ratio' is 'true', 'height' and 'width' should be equal"
                     )
 

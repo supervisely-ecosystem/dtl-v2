@@ -8,7 +8,7 @@ from supervisely import Annotation
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 class BlurLayer(Layer):
@@ -67,11 +67,11 @@ class BlurLayer(Layer):
     def validate(self):
         super().validate()
         if (self.settings["name"] == "median") and (self.settings["kernel"] % 2 == 0):
-            raise ValidationError("Kernel for median blur must be odd")
+            raise BadSettingsError("Kernel for median blur must be odd")
 
         def check_min_max(dictionary, text):
             if dictionary["min"] > dictionary["max"]:
-                raise ValidationError('"min" should be <= than "max" for "{}"'.format(text))
+                raise BadSettingsError('"min" should be <= than "max" for "{}"'.format(text))
 
         if self.settings["name"] == "gaussian":
             check_min_max(self.settings["sigma"], "sigma")

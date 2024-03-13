@@ -7,7 +7,7 @@ from supervisely.aug.aug import resize
 
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 class ResizeLayer(Layer):
@@ -38,12 +38,12 @@ class ResizeLayer(Layer):
     def validate(self):
         super().validate()
         if self.settings["height"] * self.settings["width"] == 0:
-            raise ValidationError(self, '"height" and "width" should be != 0')
+            raise BadSettingsError(self, '"height" and "width" should be != 0')
         if self.settings["height"] + self.settings["width"] == -2:
-            raise ValidationError(self, '"height" and "width" cannot be both set to -1')
+            raise BadSettingsError(self, '"height" and "width" cannot be both set to -1')
         if self.settings["height"] * self.settings["width"] < 0:
             if not self.settings["aspect_ratio"]["keep"]:
-                raise ValidationError(
+                raise BadSettingsError(
                     self,
                     '"keep" "aspect_ratio" should be set to "true" '
                     'when "width" or "height" is -1',

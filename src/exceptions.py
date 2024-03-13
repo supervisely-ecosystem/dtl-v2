@@ -132,12 +132,6 @@ class GraphError(CustomException):
         super().__init__(message, error=error, extra=extra)
 
 
-class ValidationError(CustomException):
-    def __init__(self, message, error: Exception = None, extra: Optional[dict] = {}):
-        message = "Validation Error. " + message
-        super().__init__(message, error=error, extra=extra)
-
-
 class CreateMetaError(CustomException):
     def __init__(self, message, error: Exception = None, extra: Optional[dict] = {}):
         message = "Create Meta Error. " + message

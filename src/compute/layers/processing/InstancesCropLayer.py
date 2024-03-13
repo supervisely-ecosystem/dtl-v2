@@ -9,7 +9,7 @@ from supervisely.aug.aug import instance_crop
 from src.compute.Layer import Layer
 from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 class InstancesCropLayer(Layer):
@@ -55,9 +55,11 @@ class InstancesCropLayer(Layer):
     def validate(self):
         super().validate()
         if len(self.classes_to_crop) == 0:
-            raise ValidationError("InstancesCropLayer: classes array can not be empty")
+            raise BadSettingsError("InstancesCropLayer: classes array can not be empty")
         if len(set(self.classes_to_crop) & set(self.classes_to_save)) > 0:
-            raise ValidationError("InstancesCropLayer: classes and save_classes must not intersect")
+            raise BadSettingsError(
+                "InstancesCropLayer: classes and save_classes must not intersect"
+            )
 
     def _get_cls_lists(self):
         return self.settings["classes"], self.settings.get("save_classes", [])

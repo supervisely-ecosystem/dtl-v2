@@ -11,7 +11,7 @@ import supervisely as sly
 
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
-from src.exceptions import GraphError, ValidationError
+from src.exceptions import GraphError, BadSettingsError
 
 
 # save to archive, with GTs and checks
@@ -91,12 +91,12 @@ class ExportArchiveWithMasksLayer(Layer):
                 # if np.min(col) != np.max(col):
                 #     raise ValueError('"gt_machine_color"s should have equal rgb values, e.g.: [3, 3, 3].')
                 if np.min(col) < 0:
-                    raise ValidationError('Minimum "gt_machine_color" should be [0, 0, 0].')
+                    raise BadSettingsError('Minimum "gt_machine_color" should be [0, 0, 0].')
 
         for _, flag_name, mapping_name in self.odir_flag_mapping:
             if self.settings[flag_name]:
                 if mapping_name not in self.settings:
-                    raise ValidationError(
+                    raise BadSettingsError(
                         "Color mapping {} required if {} is true.".format(mapping_name, flag_name)
                     )
                 # @TODO: maybe check if all classes are present
@@ -104,7 +104,7 @@ class ExportArchiveWithMasksLayer(Layer):
         target_arr = ["masks_machine", "masks_human"]
         target_determ = any((self.settings[x] for x in target_arr))
         if not target_determ:
-            raise ValidationError(
+            raise BadSettingsError(
                 "Some output target ({}) should be set to true.".format(", ".join(target_arr))
             )
 

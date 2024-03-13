@@ -20,7 +20,7 @@ from supervisely.imaging.color import hex2rgb
 
 from src.compute.classes_utils import ClassConstants
 from src.compute.tags_utils import TagConstants
-from src.exceptions import CustomException, GraphError, CreateMetaError, ValidationError
+from src.exceptions import CustomException, GraphError, CreateMetaError
 
 
 def maybe_wrap_in_list(v):
@@ -108,11 +108,11 @@ class Layer:
             # v = jsonschema.Draft202012Validator(self.params)
             # for error in v.iter_errors(self._config):
             #     extra.setdefault("errors", []).append(str(error))
-            raise ValidationError("Layer not valid", error=e, extra=extra)
+            raise GraphError("Layer not valid", error=e, extra=extra)
         try:
             self.validate_source_connections()
             self.validate_dest_connections()
-        except ValidationError as e:
+        except GraphError as e:
             e.extra["layer_config"] = self._config
             raise e
 

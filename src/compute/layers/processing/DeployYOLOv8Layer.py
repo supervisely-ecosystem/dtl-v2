@@ -11,7 +11,7 @@ from supervisely.nn.inference.session import Session
 from src.compute.Layer import Layer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
-from src.exceptions import ValidationError
+from src.exceptions import BadSettingsError
 
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
@@ -39,9 +39,9 @@ def check_model_is_served(session_id: int):
         if not is_model_served:
             is_model_served = wait_model_served(session, 12)
             if not is_model_served:
-                raise ValidationError(error_message)
+                raise TimeoutError(error_message)
     except:
-        raise ValidationError(error_message)
+        raise RuntimeError(error_message)
 
 
 class DeployYOLOv8Layer(Layer):
@@ -83,20 +83,19 @@ class DeployYOLOv8Layer(Layer):
         settings = self.settings
 
         if settings.get("agent_id", None) is None:
-            raise ValidationError("Select agent in 'Deploy YOLOv8' node'")
+            raise BadSettingsError("Select agent in 'Deploy YOLOv8' node'")
         if settings.get("device", None) is None:
-            raise ValidationError("Select device in 'Deploy YOLOv8' node")
+            raise BadSettingsError("Select device in 'Deploy YOLOv8' node")
         if settings.get("model_source", None) is None:
-            raise ValidationError("Select model in 'Deploy YOLOv8' node")
+            raise BadSettingsError("Select model in 'Deploy YOLOv8' node")
         if settings.get("session_id", None) is None:
-            raise ValidationError(
+            raise BadSettingsError(
                 (
                     "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
                     "If you still have problems, try to check model logs for more info or contact support."
                     "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
                 )
             )
-
         check_model_is_served(settings["session_id"])
         return super().validate()
 

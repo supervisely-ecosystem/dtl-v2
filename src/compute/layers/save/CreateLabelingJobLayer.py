@@ -7,7 +7,7 @@ import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
-from src.exceptions import GraphError, ValidationError
+from src.exceptions import BadSettingsError
 import src.globals as g
 
 
@@ -107,42 +107,44 @@ class CreateLabelingJobLayer(Layer):
 
         job_name = settings.get("job_name", "")
         if job_name == "" or job_name is None:
-            raise ValidationError("Labeling Job name is not set")
+            raise BadSettingsError("Labeling Job name is not set")
         elif len(job_name) > 256:
-            raise ValidationError("Labeling Job name is too long")
+            raise BadSettingsError("Labeling Job name is too long")
 
         if settings["reviewer_id"] is None:
-            raise ValidationError("Reviewer is not set")
+            raise BadSettingsError("Reviewer is not set")
 
         if settings["user_ids"] is None or len(settings["user_ids"]) == 0:
-            raise ValidationError("Labelers are not set")
+            raise BadSettingsError("Labelers are not set")
 
         if (settings["classes_to_label"] is None or len(settings["classes_to_label"]) == 0) and (
             settings["tags_to_label"] is None or len(settings["tags_to_label"]) == 0
         ):
-            raise ValidationError("Set at least one class or tag to label")
+            raise BadSettingsError("Set at least one class or tag to label")
 
         if settings["create_new_project"]:
             if settings["project_name"] is None or settings["project_name"] == "":
-                raise ValidationError("Project name is not set")
+                raise BadSettingsError("Project name is not set")
 
             if len(settings["project_name"]) > 256:
-                raise ValidationError("Project name is too long")
+                raise BadSettingsError("Project name is too long")
 
             if not settings["keep_original_ds"]:
                 if settings["dataset_name"] is None or settings["dataset_name"] == "":
-                    raise ValidationError(
+                    raise BadSettingsError(
                         "Dataset name is not set. Enter dataset name or check 'Keep original datasets structure' checkbox"
                     )
 
                 if len(settings["dataset_name"]) > 256:
-                    raise ValidationError("Dataset name is too long")
+                    raise BadSettingsError("Dataset name is too long")
         super().validate()
 
     def validate_dest_connections(self):
         for dst in self.dsts:
             if len(dst) == 0:
-                raise ValueError("Destination name in '{}' layer is empty!".format(self.action))
+                raise BadSettingsError(
+                    "Destination name in '{}' layer is empty!".format(self.action)
+                )
 
     def modifies_data(self):
         return False
@@ -151,11 +153,13 @@ class CreateLabelingJobLayer(Layer):
         if self.net.preview_mode:
             return
         if self.output_meta is None:
-            raise GraphError(
+            raise BadSettingsError(
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
         if len(self.dsts) == 0 and self.settings["create_new_project"]:
-            raise ValueError("Enter title for the Labeling Job in the 'Create Labeling Job' layer")
+            raise BadSettingsError(
+                "Enter title for the Labeling Job in the 'Create Labeling Job' layer"
+            )
             # raise GraphError(
             #     "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
             # )
