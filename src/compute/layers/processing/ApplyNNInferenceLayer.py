@@ -426,3 +426,11 @@ class ApplyNNInferenceLayer(Layer):
 
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
+
+    def postprocess(self):
+        self.postprocess_cb()
+        # if self.settings["stop_model_session"]:
+        # session_id = self.settings["session_id"]
+        # g.api.app.stop(session_id)
+        # g.running_sessions_ids.remove(session_id)
+        # logger.info(f"Session ID: {session_id} has been stopped")
