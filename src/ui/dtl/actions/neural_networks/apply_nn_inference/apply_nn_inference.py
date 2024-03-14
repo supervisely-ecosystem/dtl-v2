@@ -383,11 +383,12 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
         def postprocess_cb():  # causes file not found error
             nonlocal _session_id, _kill_deployed_model_after_pipeline
-            if _kill_deployed_model_after_pipeline:
-                _session_id = None
-                connect_nn_text.set(
-                    f"{_deploy_layer_name} detected but model is not deployed", "warning"
-                )
+            pass
+            # if _kill_deployed_model_after_pipeline:
+            #     _session_id = None
+            #     connect_nn_text.set(
+            #         f"{_deploy_layer_name} detected but model is not deployed", "warning"
+            #     )
             # _reset_model()
 
         def get_settings(options_json: dict) -> dict:
