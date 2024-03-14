@@ -385,7 +385,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             nonlocal _session_id, _kill_deployed_model_after_pipeline
             if _kill_deployed_model_after_pipeline:
                 _session_id = None
-                data_changed_cb()
+                data_changed_cb(session_id=_session_id)
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

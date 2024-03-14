@@ -344,7 +344,10 @@ class ApplyNNInferenceLayer(Layer):
         img = img.astype(np.uint8)
 
         if self.settings["session_id"] is None:
-            raise ValueError("Apply NN layer requires model to be connected")
+            if not self.net.preview_mode:
+                raise ValueError("Apply NN layer requires model to be connected")
+            else:
+                sly_logger.warn("Model is not connected. Couldn't apply model to preview image.")
         else:
             img_path = join(
                 f"{g.PREVIEW_DIR}",
@@ -425,7 +428,7 @@ class ApplyNNInferenceLayer(Layer):
                 ann = pred_ann
 
             new_img_desc = img_desc.clone_with_item(img)
-            yield new_img_desc, ann
+        yield new_img_desc, ann
 
     def postprocess(self):
         self.postprocess_cb()
