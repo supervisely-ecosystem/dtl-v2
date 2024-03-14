@@ -258,6 +258,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             return data
 
         def postprocess_cb():
+            nonlocal session
             model_serve_postprocess_message.show()
             model_serve_btn.text = "SERVE"
             model_serve_btn.icon = "zmdi zmdi-play"

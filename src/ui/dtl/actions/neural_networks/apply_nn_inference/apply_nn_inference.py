@@ -396,51 +396,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             nonlocal _session_id, _kill_deployed_model_after_pipeline
             if _kill_deployed_model_after_pipeline:
                 _session_id = "reset"
-
-                try:
-                    connect_nn_model_selector.set_session_id(None)
-                    connect_nn_model_selector.enable()
-                    connect_nn_disconnect_btn.disable()
-                    connect_nn_model_info.set_session_id(None)
-                except:
-                    pass
-
-                connect_nn_model_info.hide()
-                connect_nn_model_info_empty_text.set("Select model first", "info")
-                connect_nn_model_info_empty_text.show()
-                connect_nn_model_preview.set("No model selected", "text")
-                connect_nn_model_preview.hide()
-
-                # reset classes
-                classes_list_widget.set([])
-                classes_list_preview.set([])
-
-                classes_list_preview.hide()
-                classes_list_edit_container.hide()
-                classes_separator.hide()
-
-                # reset tags
-                tags_list_widget.set([])
-                tags_list_preview.set([])
-                tags_list_preview.hide()
-                tags_list_edit_container.hide()
-                tags_separator.hide()
-
-                # reset settings
-                inf_settings_edit_container.hide()
-                suffix_preview.hide()
-                use_suffix_preview.hide()
-                conflict_method_preview.hide()
-                apply_method_preview.hide()
-                model_separator.hide()
-
-                # reset layout
-                connect_notification.set(
-                    title="Connect to deployed model",
-                    description="to select classes, tags and inference settings",
-                )
-                connect_notification.show()
-                update_preview_btn.disable()
+                data_changed_cb()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
