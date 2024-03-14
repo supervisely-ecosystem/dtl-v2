@@ -611,5 +611,5 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             get_settings=get_settings,
             data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
-            postprocess_cb=postprocess_cb,
+            # postprocess_cb=postprocess_cb,
         )

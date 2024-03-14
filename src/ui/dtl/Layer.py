@@ -116,7 +116,7 @@ class Layer:
 
         self._preview_options = []
         if self._need_preview:
-            if self.action.name == "data":
+            if self.action.name == "images_project":
                 preview_text = NodesFlow.Node.Option(
                     name="update_preview_btn",
                     option_component=NodesFlow.WidgetOptionComponent(
