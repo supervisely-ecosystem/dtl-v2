@@ -312,26 +312,16 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
-
-            logger.info(f"kwargs: {kwargs}")
-            logger.info(f"before session_id: {kwargs}")
-
             if _session_id == "reset":
                 session_id = None
             else:
                 session_id = kwargs.get("session_id", None)
-            logger.info(f"after session_id: {kwargs}")
-            logger.info(f"after session_id: {session_id}")
-            logger.info(f"after _session_id: {_session_id}")
-
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
-
             model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
             model_disconnected_text = f"{_deploy_layer_name} detected but model is not deployed"
             model_connecting_text = f"{_deploy_layer_name} layer detected. Connecting to model..."
             model_waiting_text = f"Waiting for the {_deploy_layer_name} to deploy model..."
-
             if session_id is None and _deploy_layer_name is None:
                 connect_nn_text.set("Connect to Model", "text")
                 if _model_from_deploy_node:

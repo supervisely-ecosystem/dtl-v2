@@ -16,7 +16,7 @@ from src.exceptions import BadSettingsError
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
     for _ in range(wait_attemtps):
-        is_model_served = session.is_model_served()
+        is_model_served = session.is_model_deployed()
         if is_model_served:
             return
         else:
@@ -24,7 +24,7 @@ def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec:
             logger.warning("Model is not served yet. Waiting for model to be served")
 
 
-def check_model_is_served(session_id: int):
+def check_model_is_deployed(session_id: int):
     error_message = (
         "Selected model is not served in 'Deploy YOLOv8' node. "
         "Make sure model is served by visiting app session page: "
@@ -35,7 +35,7 @@ def check_model_is_served(session_id: int):
 
     try:
         session = Session(g.api, session_id)
-        is_model_served = session.is_model_served()
+        is_model_served = session.is_model_deployed()
         if not is_model_served:
             is_model_served = wait_model_served(session, 12)
             if not is_model_served:
@@ -97,7 +97,7 @@ class DeployYOLOv8Layer(Layer):
                         "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
                     )
                 )
-            check_model_is_served(settings["session_id"])
+            check_model_is_deployed(settings["session_id"])
             return super().validate()
 
     def postprocess(self):

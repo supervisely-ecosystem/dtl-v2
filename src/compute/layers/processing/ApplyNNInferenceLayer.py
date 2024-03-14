@@ -20,10 +20,10 @@ from src.exceptions import GraphError
 # from src.ui.tabs.run import error_notification
 
 
-def check_model_is_served(session_id: int, preview_mode: bool = False):
+def check_model_is_deployed(session_id: int, preview_mode: bool = False):
     try:
         session = Session(g.api, session_id)
-        is_model_served = session.is_model_served()
+        is_model_served = session.is_model_deployed()
         if not is_model_served:
             if preview_mode:
                 show_dialog(
@@ -272,7 +272,7 @@ class ApplyNNInferenceLayer(Layer):
         if not self.net.preview_mode:
             if self.settings["session_id"] is None:
                 raise GraphError("Apply NN layer requires model to be connected")
-            check_model_is_served(self.settings["session_id"], self.net.preview_mode)
+            check_model_is_deployed(self.settings["session_id"], self.net.preview_mode)
             return super().validate()
 
     def requires_item(self):
