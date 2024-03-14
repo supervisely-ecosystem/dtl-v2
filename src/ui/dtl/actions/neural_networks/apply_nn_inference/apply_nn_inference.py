@@ -315,9 +315,15 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
             logger.info(f"kwargs: {kwargs}")
             logger.info(f"before session_id: {kwargs}")
-            session_id = kwargs.get("session_id", None)
+
+            if _session_id == "reset":
+                session_id = None
+                _session_id = None
+            else:
+                session_id = kwargs.get("session_id", None)
             logger.info(f"after session_id: {kwargs}")
             logger.info(f"after session_id: {session_id}")
+            logger.info(f"after _session_id: {_session_id}")
 
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
@@ -390,8 +396,8 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         def postprocess_cb():  # causes file not found error
             nonlocal _session_id, _kill_deployed_model_after_pipeline
             if _kill_deployed_model_after_pipeline:
-                _session_id = None
-                data_changed_cb({"session_id": None})
+                _session_id = "reset"
+                data_changed_cb()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
