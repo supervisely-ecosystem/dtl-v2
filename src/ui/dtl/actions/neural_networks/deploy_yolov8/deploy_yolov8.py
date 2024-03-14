@@ -271,6 +271,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
             saved_settings["session_id"] = None
             session = None
             g.updater("metas")
+            g.updater(("nodes", layer_id))
 
         def _set_settings_from_json(settings: dict):
             pass

@@ -313,7 +313,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             session_id = kwargs.get("session_id", None)
-            _deploy_layer_name = kwargs.get("deploy_layer_name", "")
+            _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
             model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
@@ -381,13 +381,11 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if need_preview_update:
                 g.updater(("nodes", layer_id))
 
-        def postprocess_cb():  # causes file not found error
-            nonlocal _kill_deployed_model_after_pipeline, _deploy_layer_name
-            if _kill_deployed_model_after_pipeline:
-                connect_nn_text.set(
-                    f"{_deploy_layer_name} detected but model is not deployed", "warning"
-                )
-                _reset_model()
+        # def postprocess_cb(): # causes file not found error
+        #     nonlocal _kill_deployed_model_after_pipeline, _deploy_layer_name
+        #     if _kill_deployed_model_after_pipeline:
+        #         connect_nn_text.set(f"{_deploy_layer_name} detected but model is not deployed", "warning")
+        #         _reset_model()
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""

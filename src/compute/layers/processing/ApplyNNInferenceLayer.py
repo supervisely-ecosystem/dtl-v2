@@ -343,13 +343,8 @@ class ApplyNNInferenceLayer(Layer):
         img = img_desc.read_image()
         img = img.astype(np.uint8)
 
-        sly_logger.debug(f"Processing image: {img_desc.info.item_name}")
         if self.settings["session_id"] is None:
-            if self.net.preview_mode:
-                sly_logger.warn("Model is not connected. Predict will not be applied.")
-                yield img_desc, ann
-            else:
-                raise ValueError("Apply NN layer requires model to be connected")
+            raise ValueError("Apply NN layer requires model to be connected")
         else:
             img_path = join(
                 f"{g.PREVIEW_DIR}",
@@ -431,6 +426,3 @@ class ApplyNNInferenceLayer(Layer):
 
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
-
-    def postprocess(self):
-        self.postprocess_cb()
