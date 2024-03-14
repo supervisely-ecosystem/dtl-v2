@@ -381,14 +381,13 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if need_preview_update:
                 g.updater(("nodes", layer_id))
 
-        def postprocess_cb():  # casues file not found error
+        def postprocess_cb():  # causes file not found error
             nonlocal _kill_deployed_model_after_pipeline, _deploy_layer_name
             if _kill_deployed_model_after_pipeline:
                 connect_nn_text.set(
                     f"{_deploy_layer_name} detected but model is not deployed", "warning"
                 )
                 _reset_model()
-                g.updater(("nodes", layer_id))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
