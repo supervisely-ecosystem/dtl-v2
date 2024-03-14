@@ -397,10 +397,13 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if _kill_deployed_model_after_pipeline:
                 _session_id = "reset"
 
-                connect_nn_model_selector.set_session_id(None)
-                connect_nn_model_selector.enable()
-                connect_nn_disconnect_btn.disable()
-                connect_nn_model_info.set_session_id(None)
+                try:
+                    connect_nn_model_selector.set_session_id(None)
+                    connect_nn_model_selector.enable()
+                    connect_nn_disconnect_btn.disable()
+                    connect_nn_model_info.set_session_id(None)
+                except:
+                    pass
 
                 connect_nn_model_info.hide()
                 connect_nn_model_info_empty_text.set("Select model first", "info")
