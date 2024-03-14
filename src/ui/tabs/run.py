@@ -218,8 +218,8 @@ def _run():
         with progress(message="Ready for new pipeline", total=1) as pbar:
             pbar.update(1)
 
-        run_btn.show()
         stop_btn.hide()
+        run_btn.show()
         nodes_flow_card.unlock()
 
 

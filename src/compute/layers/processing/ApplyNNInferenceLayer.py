@@ -344,6 +344,7 @@ class ApplyNNInferenceLayer(Layer):
         img = img.astype(np.uint8)
 
         if self.settings["session_id"] is None:
+            new_img_desc = img_desc.clone_with_item(img)
             if not self.net.preview_mode:
                 raise ValueError("Apply NN layer requires model to be connected")
             else:
