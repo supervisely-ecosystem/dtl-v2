@@ -226,16 +226,6 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 model_serve_btn.enable()
 
         # -----------------------------
-        def get_data() -> dict:
-            nonlocal session
-            data = {}
-            if session is not None:
-                data["session_id"] = session.task_id
-            data["deploy_layer_name"] = "Deploy YOLOv8"
-            data["deploy_layer_terminate"] = (
-                model_selector_stop_model_after_pipeline_checkbox.is_checked()
-            )
-            return data
 
         def data_changed_cb(**kwargs):
             pass
@@ -255,6 +245,17 @@ class DeployYOLOV8Action(NeuralNetworkAction):
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return saved_settings
+
+        def get_data() -> dict:
+            nonlocal session
+            data = {}
+            if session is not None:
+                data["session_id"] = session.task_id
+            data["deploy_layer_name"] = "Deploy YOLOv8"
+            data["deploy_layer_terminate"] = (
+                model_selector_stop_model_after_pipeline_checkbox.is_checked()
+            )
+            return data
 
         def postprocess_cb():
             model_serve_postprocess_message.show()
