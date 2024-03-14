@@ -318,7 +318,6 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
             if _session_id == "reset":
                 session_id = None
-                _session_id = None
             else:
                 session_id = kwargs.get("session_id", None)
             logger.info(f"after session_id: {kwargs}")
