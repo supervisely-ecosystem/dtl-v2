@@ -117,12 +117,12 @@ def _run():
             return
         # Save results
         file_infos = []
-        # pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
+        pr_dirs = []
         if os.path.exists(g.RESULTS_DIR):
-            pr_dirs = []
             for pr_dir in os.listdir(g.RESULTS_DIR):
                 if os.path.isdir(pr_dir):
                     pr_dirs.append(pr_dir)
+        # pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
 
         for i, pr_dir in enumerate(pr_dirs):
 
