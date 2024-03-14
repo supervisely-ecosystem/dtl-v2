@@ -62,6 +62,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         _model_settings = {}
         _model_connected = False
         _kill_deployed_model_after_pipeline = False
+        _deploy_layer_name = ""
 
         (
             connect_nn_text,
@@ -306,21 +307,21 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             )
 
         def data_changed_cb(**kwargs):
-            nonlocal _session_id, _model_from_deploy_node
+            nonlocal _session_id, _model_from_deploy_node, _deploy_layer_name
             nonlocal _current_meta, _model_meta, _kill_deployed_model_after_pipeline
             need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             session_id = kwargs.get("session_id", None)
-            deploy_layer_name = kwargs.get("deploy_layer_name", None)
+            _deploy_layer_name = kwargs.get("deploy_layer_name", "")
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
-            model_connected_text = f"Model has been connected from {deploy_layer_name} layer"
-            model_disconnected_text = f"{deploy_layer_name} detected but model is not deployed"
-            model_connecting_text = f"{deploy_layer_name} layer detected. Connecting to model..."
-            model_waiting_text = f"Waiting for the {deploy_layer_name} to deploy model..."
+            model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
+            model_disconnected_text = f"{_deploy_layer_name} detected but model is not deployed"
+            model_connecting_text = f"{_deploy_layer_name} layer detected. Connecting to model..."
+            model_waiting_text = f"Waiting for the {_deploy_layer_name} to deploy model..."
 
-            if session_id is None and deploy_layer_name is None:
+            if session_id is None and _deploy_layer_name is None:
                 connect_nn_text.set("Connect to Model", "text")
                 if _model_from_deploy_node:
                     _session_id = None
@@ -328,7 +329,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                     _model_from_deploy_node = False
                     connect_nn_model_selector_disabled_text.hide()
                     connect_nn_model_selector.enable()
-            elif session_id is None and deploy_layer_name:
+            elif session_id is None and _deploy_layer_name:
                 _session_id = None
                 connect_nn_text.set(model_disconnected_text, "warning")
                 _reset_model()
@@ -380,11 +381,14 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if need_preview_update:
                 g.updater(("nodes", layer_id))
 
-        # def postprocess_cb(): # casues file not found error
-        #     nonlocal _kill_deployed_model_after_pipeline
-        #     if _kill_deployed_model_after_pipeline:
-        #         connect_nn_text.set("Deploy layer detected but model is not deployed", "warning")
-        #         _reset_model()
+        def postprocess_cb():  # casues file not found error
+            nonlocal _kill_deployed_model_after_pipeline, _deploy_layer_name
+            if _kill_deployed_model_after_pipeline:
+                connect_nn_text.set(
+                    f"{_deploy_layer_name} detected but model is not deployed", "warning"
+                )
+                _reset_model()
+                g.updater(("nodes", layer_id))
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
@@ -610,5 +614,5 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             get_settings=get_settings,
             data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
-            # postprocess_cb=postprocess_cb,
+            postprocess_cb=postprocess_cb,
         )
