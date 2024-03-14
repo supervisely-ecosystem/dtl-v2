@@ -312,7 +312,13 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
+
+            logger.info(f"kwargs: {kwargs}")
+            logger.info(f"before session_id: {kwargs}")
             session_id = kwargs.get("session_id", None)
+            logger.info(f"after session_id: {kwargs}")
+            logger.info(f"after session_id: {session_id}")
+
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
@@ -385,7 +391,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             nonlocal _session_id, _kill_deployed_model_after_pipeline
             if _kill_deployed_model_after_pipeline:
                 _session_id = None
-                data_changed_cb(session_id=_session_id)
+                data_changed_cb({"session_id": None})
 
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
