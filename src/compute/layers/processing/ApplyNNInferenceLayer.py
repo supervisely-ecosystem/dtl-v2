@@ -346,7 +346,7 @@ class ApplyNNInferenceLayer(Layer):
         if self.settings["session_id"] is None:
             if self.net.preview_mode:
                 sly_logger.warn("Model is not connected. Predict will not be applied.")
-                yield new_img_desc, ann
+                yield img_desc, ann
             else:
                 raise ValueError("Apply NN layer requires model to be connected")
         else:
