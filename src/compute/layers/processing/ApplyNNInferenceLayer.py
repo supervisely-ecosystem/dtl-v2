@@ -343,6 +343,7 @@ class ApplyNNInferenceLayer(Layer):
         img = img_desc.read_image()
         img = img.astype(np.uint8)
 
+        sly_logger.debug(f"Processing image: {img_desc.info.item_name}")
         if self.settings["session_id"] is None:
             if self.net.preview_mode:
                 sly_logger.warn("Model is not connected. Predict will not be applied.")
