@@ -47,7 +47,9 @@ def create_job_settings_tags_widgets() -> tuple:
         ]
     )
 
-    lj_settings_tags_list_edit_text = Text("Tags", status="text", font_size=get_text_font_size())
+    lj_settings_tags_list_edit_text = Text(
+        "Tags: 0 / 0", status="text", font_size=get_text_font_size()
+    )
     lj_settings_tags_list_edit_btn = Button(
         text="EDIT",
         icon="zmdi zmdi-edit",
@@ -69,5 +71,7 @@ def create_job_settings_tags_widgets() -> tuple:
         # preview
         lj_settings_tags_list_preview,
         # layout
+        lj_settings_tags_list_edit_text,
+        lj_settings_tags_list_edit_btn,
         lj_settings_tags_list_edit_container,
     )

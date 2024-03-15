@@ -128,6 +128,8 @@ class CreateLabelingJobAction(OutputAction):
             # preview
             lj_settings_classes_list_preview,
             # layout
+            lj_settings_classes_list_edit_text,
+            lj_settings_classes_list_edit_btn,
             lj_settings_classes_list_edit_container,
         ) = create_job_settings_classes_widgets()
 
@@ -139,6 +141,7 @@ class CreateLabelingJobAction(OutputAction):
                 lj_settings_classes_list_widget,
                 lj_settings_classes_list_preview,
                 saved_classes_settings,
+                lj_settings_classes_list_edit_text,
             )
             _save_settings()
 
@@ -167,6 +170,8 @@ class CreateLabelingJobAction(OutputAction):
             # preview
             lj_settings_tags_list_preview,
             # layout
+            lj_settings_tags_list_edit_text,
+            lj_settings_tags_list_edit_btn,
             lj_settings_tags_list_edit_container,
         ) = create_job_settings_tags_widgets()
 
@@ -175,7 +180,10 @@ class CreateLabelingJobAction(OutputAction):
         def tags_save_btn_cb():
             _save_tags_list_settings()
             set_tags_list_preview(
-                lj_settings_tags_list_widget, lj_settings_tags_list_preview, saved_tags_settings
+                lj_settings_tags_list_widget,
+                lj_settings_tags_list_preview,
+                saved_tags_settings,
+                lj_settings_tags_list_edit_text,
             )
             _save_settings()
 

@@ -49,7 +49,7 @@ def create_job_settings_classes_widgets() -> tuple:
     )
 
     lj_settings_classes_list_edit_text = Text(
-        "Classes", status="text", font_size=get_text_font_size()
+        "Classes: 0 / 0", status="text", font_size=get_text_font_size()
     )
     lj_settings_classes_list_edit_btn = Button(
         text="EDIT",
@@ -72,5 +72,7 @@ def create_job_settings_classes_widgets() -> tuple:
         # preview
         lj_settings_classes_list_preview,
         # layout
+        lj_settings_classes_list_edit_text,
+        lj_settings_classes_list_edit_btn,
         lj_settings_classes_list_edit_container,
     )
