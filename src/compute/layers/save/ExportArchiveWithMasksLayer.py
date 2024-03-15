@@ -105,7 +105,9 @@ class ExportArchiveWithMasksLayer(Layer):
         target_determ = any((self.settings[x] for x in target_arr))
         if not target_determ:
             raise BadSettingsError(
-                "Some output target ({}) should be set to true.".format(", ".join(target_arr))
+                "At least one of the options ({}) should be set to true.".format(
+                    ", ".join(target_arr)
+                )
             )
 
     def modifies_data(self):
@@ -185,11 +187,12 @@ class ExportArchiveWithMasksLayer(Layer):
                 cv2.imwrite(output_img_path, img)
 
             dataset_name = img_desc.get_res_ds_name()
-            if not self.out_project.datasets.has_key(dataset_name):
+            # @TODO: update dataset creation later
+            out_ds_path = osp.join("results", self.out_project.name, dataset_name)
+            if not self.out_project.datasets.has_key(out_ds_path):
                 self.out_project.create_dataset(dataset_name)
-            out_dataset = self.out_project.datasets.get(dataset_name)
-
-            out_item_name = free_name + img_desc.get_image_ext()
+            out_dataset = self.out_project.datasets.get(out_ds_path)
+            out_item_name = free_name + img_desc.get_item_ext()
 
             # net _always_ downloads images
             if img_desc.need_write():

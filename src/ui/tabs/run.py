@@ -120,17 +120,18 @@ def _run():
         pr_dirs = []
         if os.path.exists(g.RESULTS_DIR):
             for pr_dir in os.listdir(g.RESULTS_DIR):
+                pr_dir = os.path.join(g.RESULTS_DIR, pr_dir)
                 if os.path.isdir(pr_dir):
                     pr_dirs.append(pr_dir)
         # pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
 
         for i, pr_dir in enumerate(pr_dirs):
-
+            pr_dir_name = os.path.basename(pr_dir)
             if not g.pipeline_running:
                 return
 
             with progress(
-                message=[f'[{i+1}/{len(pr_dirs)}] Archiving result project "{pr_dir.name}"'],
+                message=[f'[{i+1}/{len(pr_dirs)}] Archiving result project "{pr_dir_name}"'],
                 total=1,
             ) as pbar:
                 tar_path = str(pr_dir) + ".tar"
@@ -141,7 +142,7 @@ def _run():
                 return
 
             with progress(
-                message=f'[{i+1}/{len(pr_dirs)}] Uploading result project "{pr_dir.name}"',
+                message=f'[{i+1}/{len(pr_dirs)}] Uploading result project "{pr_dir_name}"',
                 unit="B",
                 unit_scale=True,
                 total=get_file_size(tar_path),
