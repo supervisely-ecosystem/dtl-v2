@@ -18,13 +18,15 @@ from supervisely import ProjectMeta
 
 from src.ui.dtl import FilterAndConditionAction
 from src.ui.dtl.Layer import Layer
-from src.ui.widgets import ClassesList, ClassesListPreview, TagsListPreview
+from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagsListPreview
 from src.ui.dtl.utils import (
     get_set_settings_button_style,
     get_set_settings_container,
     get_layer_docs,
     create_save_btn,
     get_text_font_size,
+    set_tags_list_preview,
+    get_tags_list_value,
 )
 
 
@@ -66,6 +68,9 @@ class IfAction(FilterAndConditionAction):
                 self.set_preview_func()
 
         _current_meta = ProjectMeta()
+
+        saved_tags_settings = "default"
+        default_tags_settings = "default"
 
         # probability
         _prob_input = InputNumber(value=20, min=0, max=100, precision=3)
@@ -151,9 +156,8 @@ class IfAction(FilterAndConditionAction):
         )
 
         # tags
-        _select_tags_input = SelectTagMeta(
-            project_meta=ProjectMeta(), multiselect=True, show_label=False, size="small"
-        )
+        _select_tags_input = TagsList(multiple=True)
+
         _select_tags_widget = Field(
             title="Include Tags",
             description="Select one or more tags that are assigned to image to split data. Images with selected tags will be sent to the 'True' output, others to the 'False' output",
@@ -161,19 +165,30 @@ class IfAction(FilterAndConditionAction):
         )
 
         def _set_tags_value(condition_json):
-            _select_tags_input.set_names(condition_json["tags"])
+            # _select_tags_input.set_names(condition_json["tags"])
+            _select_tags_input.set(condition_json["tags"])
 
         _tags_preview_widget = TagsListPreview()
 
         def _set_tags_preview():
-            names = _get_tags_value()
-            _tags_preview_widget.set(
-                [_select_tags_input.get_tag_meta_by_name(name) for name in names]
+            nonlocal saved_tags_settings
+            _save_tags_list_settings
+            set_tags_list_preview(
+                _select_tags_input,
+                _tags_preview_widget,
+                saved_tags_settings,
+                _include_tags_text,
+                "Include Tags",
             )
 
         def _get_tags_value():
-            return [name for name in _select_tags_input.get_selected_names() if name]
+            return get_tags_list_value(_select_tags_input, multiple=True)
 
+        def _save_tags_list_settings():
+            nonlocal saved_tags_settings
+            saved_tags_settings = _get_tags_value()
+
+        _include_tags_text = (Text("Include Tags", status="text", font_size=get_text_font_size()),)
         select_tags_condition = Condition(
             name="tags",
             title="Tags",
@@ -182,7 +197,7 @@ class IfAction(FilterAndConditionAction):
             set_func=_set_tags_value,
             preview_widget=Container(
                 widgets=[
-                    Text("Include Tags", status="text", font_size=get_text_font_size()),
+                    _include_tags_text,
                     _tags_preview_widget,
                 ],
                 gap=1,
@@ -364,7 +379,7 @@ class IfAction(FilterAndConditionAction):
             _include_classes_input.loading = True
             _select_tags_input.loading = True
             _include_classes_input.set(project_meta.obj_classes)
-            _select_tags_input.set_project_meta(project_meta=project_meta)
+            _select_tags_input.set(project_meta.tag_metas)
             _include_classes_input.loading = False
             _select_tags_input.loading = False
 

@@ -38,6 +38,7 @@ from src.ui.dtl.actions.output.create_labeling_job.layout.job_output import (
     create_job_output_widgets,
 )
 import src.ui.dtl.actions.output.create_labeling_job.layout.utils as lj_utils
+import src.globals as g
 
 
 class CreateLabelingJobAction(OutputAction):
@@ -144,6 +145,7 @@ class CreateLabelingJobAction(OutputAction):
                 lj_settings_classes_list_edit_text,
             )
             _save_settings()
+            g.updater("metas")
 
         @lj_settings_classes_list_set_default_btn.click
         def classes_set_default_btn_cb():
@@ -151,12 +153,13 @@ class CreateLabelingJobAction(OutputAction):
             set_classes_list_settings_from_json(
                 lj_settings_classes_list_widget, saved_classes_settings
             )
-            set_classes_list_preview(
-                lj_settings_classes_list_widget,
-                lj_settings_classes_list_preview,
-                saved_classes_settings,
-            )
+            # set_classes_list_preview(
+            #     lj_settings_classes_list_widget,
+            #     lj_settings_classes_list_preview,
+            #     saved_classes_settings,
+            # )
             _save_settings()
+            g.updater("metas")
 
         # ----------------------------
 
@@ -186,15 +189,17 @@ class CreateLabelingJobAction(OutputAction):
                 lj_settings_tags_list_edit_text,
             )
             _save_settings()
+            g.updater("metas")
 
         @lj_settings_tags_list_set_default_btn.click
         def tags_set_default_btn_cb():
             _set_default_tags_list_setting()
             set_tags_list_settings_from_json(lj_settings_tags_list_widget, saved_tags_settings)
-            set_tags_list_preview(
-                lj_settings_tags_list_widget, lj_settings_tags_list_preview, saved_tags_settings
-            )
+            # set_tags_list_preview(
+            #     lj_settings_tags_list_widget, lj_settings_tags_list_preview, saved_tags_settings
+            # )
             _save_settings()
+            g.updater("metas")
 
         # ----------------------------
 
@@ -318,9 +323,11 @@ class CreateLabelingJobAction(OutputAction):
 
             obj_classes = project_meta.obj_classes
             lj_settings_classes_list_widget.set(obj_classes)
+            lj_settings_classes_list_edit_text.set(f"Classes: 0 / {len(obj_classes)}", "text")
 
             tag_metas = project_meta.tag_metas
             lj_settings_tags_list_widget.set(tag_metas)
+            lj_settings_tags_list_edit_text.set(f"Tags: 0 / {len(tag_metas)}", "text")
 
             nonlocal saved_classes_settings
             saved_classes_settings = classes_list_settings_changed_meta(
@@ -369,7 +376,9 @@ class CreateLabelingJobAction(OutputAction):
             if "project_meta" in kwargs:
                 project_meta = kwargs.get("project_meta", ProjectMeta())
                 meta_change_cb(project_meta)
+
             _save_settings()
+            g.updater("metas")
 
         def _save_settings():
             nonlocal saved_settings, saved_classes_settings, saved_tags_settings

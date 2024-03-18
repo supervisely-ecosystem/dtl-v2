@@ -402,6 +402,7 @@ def update_state():
 
 
 def update_nodes_cb():
+    # @TODO: list input nodes -> update their dst.
     g.updater(("nodes", None))
 
 
