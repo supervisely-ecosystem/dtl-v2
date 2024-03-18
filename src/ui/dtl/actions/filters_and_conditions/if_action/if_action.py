@@ -69,9 +69,6 @@ class IfAction(FilterAndConditionAction):
 
         _current_meta = ProjectMeta()
 
-        saved_tags_settings = "default"
-        default_tags_settings = "default"
-
         # probability
         _prob_input = InputNumber(value=20, min=0, max=100, precision=3)
         _probability_condition_widget = Field(
@@ -166,29 +163,28 @@ class IfAction(FilterAndConditionAction):
 
         def _set_tags_value(condition_json):
             # _select_tags_input.set_names(condition_json["tags"])
-            _select_tags_input.set(condition_json["tags"])
+            nonlocal _current_meta
+            selected_tags = condition_json["tags"]
+            _select_tags_input.set(_current_meta.tag_metas)
+            _select_tags_input.select(selected_tags)
 
         _tags_preview_widget = TagsListPreview()
 
         def _set_tags_preview():
-            nonlocal saved_tags_settings
-            _save_tags_list_settings
-            set_tags_list_preview(
-                _select_tags_input,
-                _tags_preview_widget,
-                saved_tags_settings,
-                _include_tags_text,
-                "Include Tags",
-            )
+            nonlocal _current_meta
+            tags_to_set = []
+            selected_tags = _select_tags_input.get_selected_tags()
+            selected_tags_names = [tag.name for tag in selected_tags]
+            if _current_meta is not None:
+                for tag in _current_meta.tag_metas:
+                    if tag.name in selected_tags_names:
+                        tags_to_set.append(tag)
+            _tags_preview_widget.set(tags_to_set)
 
         def _get_tags_value():
             return get_tags_list_value(_select_tags_input, multiple=True)
 
-        def _save_tags_list_settings():
-            nonlocal saved_tags_settings
-            saved_tags_settings = _get_tags_value()
-
-        _include_tags_text = (Text("Include Tags", status="text", font_size=get_text_font_size()),)
+        _include_tags_text = Text("Include Tags", status="text", font_size=get_text_font_size())
         select_tags_condition = Condition(
             name="tags",
             title="Tags",
@@ -226,6 +222,9 @@ class IfAction(FilterAndConditionAction):
         def _set_include_classes_preview():
             _include_classes_preview_widget.set(_include_classes_input.get_selected_classes())
 
+        include_classes_text = Text(
+            "Include Classes:", status="text", font_size=get_text_font_size()
+        )
         select_classes_condition = Condition(
             name="include_classes",
             title="Include classes",
@@ -234,7 +233,7 @@ class IfAction(FilterAndConditionAction):
             set_func=_set_include_classes_value,
             preview_widget=Container(
                 widgets=[
-                    Text("Include Classes:", status="text", font_size=get_text_font_size()),
+                    include_classes_text,
                     _include_classes_preview_widget,
                 ],
                 gap=1,
