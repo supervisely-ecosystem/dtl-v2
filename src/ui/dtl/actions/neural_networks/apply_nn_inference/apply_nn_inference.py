@@ -63,6 +63,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         _model_connected = False
         _kill_deployed_model_after_pipeline = False
         _deploy_layer_name = ""
+        _need_preview_update = True
 
         (
             connect_nn_text,
@@ -145,7 +146,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
 
         @connect_nn_connect_btn.click
         def confirm_model():
-            nonlocal _current_meta, _model_meta, _model_from_deploy_node
+            nonlocal _current_meta, _model_meta, _model_from_deploy_node, _need_preview_update
             nonlocal _model_info, _model_settings, _model_connected, _session_id
             nonlocal saved_classes_settings, saved_tags_settings
 
@@ -241,7 +242,8 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             connect_nn_disconnect_btn.enable()
             _model_connected = True
             g.updater("metas")
-            g.updater(("nodes", layer_id))
+            if _need_preview_update:
+                g.updater(("nodes", layer_id))
 
         @connect_nn_disconnect_btn.click
         def disconnect_model():
@@ -316,8 +318,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             _current_meta = project_meta
 
         def data_changed_cb(**kwargs):
+            nonlocal _current_meta, _model_meta
             nonlocal _session_id, _model_from_deploy_node, _deploy_layer_name
-            nonlocal _current_meta, _model_meta, _kill_deployed_model_after_pipeline
+            nonlocal _need_preview_update, _kill_deployed_model_after_pipeline
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             if _session_id == "reset":
@@ -375,7 +378,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                             connect_nn_model_info,
                             connect_nn_connect_btn,
                         )
+                        _need_preview_update = False
                         confirm_model()
+                        _need_preview_update = True
                         connect_nn_text.set(model_connected_text, "success")
                     except:
                         connect_nn_text.set(model_disconnected_text, "warning")
