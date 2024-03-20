@@ -338,7 +338,12 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     layer = g.layers[layer_id]
     layer.clear_preview()
 
-    layer_idx = all_layers_ids.index(layer_id)
+    try:
+        layer_idx = all_layers_ids.index(layer_id)
+    except:
+        # hack, fix later
+        g.layers.pop(layer_id)
+        return
 
     net.preview_mode = True
     net.calc_metas()
