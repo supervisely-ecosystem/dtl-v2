@@ -248,6 +248,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             nonlocal _session_id
             _session_id = None
             _reset_model()
+            g.updater(("nodes", layer_id))
 
         ### -----------------------
 
@@ -306,10 +307,17 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                 connect_nn_disconnect_btn,
             )
 
+        def meta_change_cb(project_meta: ProjectMeta):
+            nonlocal _current_meta
+            if project_meta is None:
+                return
+            if project_meta == _current_meta:
+                return
+            _current_meta = project_meta
+
         def data_changed_cb(**kwargs):
             nonlocal _session_id, _model_from_deploy_node, _deploy_layer_name
             nonlocal _current_meta, _model_meta, _kill_deployed_model_after_pipeline
-            need_preview_update = True
             connect_nn_model_selector.enable()
             connect_nn_model_selector_disabled_text.hide()
             if _session_id == "reset":
@@ -353,7 +361,6 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                     _session_id = session_id
 
                     try:
-                        need_preview_update = False
                         is_ready = g.api.app.is_ready_for_api_calls(_session_id)
                         if not is_ready:
                             connect_nn_text.set(model_waiting_text, "text")
@@ -373,14 +380,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                     except:
                         connect_nn_text.set(model_disconnected_text, "warning")
 
-            project_meta = kwargs.get("project_meta", None)
-            if project_meta is None:
-                return
-            if project_meta == _current_meta:
-                return
-            _current_meta = project_meta
-            if need_preview_update:
-                g.updater(("nodes", layer_id))
+            if "project_meta" in kwargs:
+                project_meta = kwargs.get("project_meta", None)
+                meta_change_cb(project_meta)
 
         def postprocess_cb():  # causes file not found error
             nonlocal _session_id, _kill_deployed_model_after_pipeline
