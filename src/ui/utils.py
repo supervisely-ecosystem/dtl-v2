@@ -115,6 +115,7 @@ def init_src(edges: list):
         except KeyError:
             raise LayerNotFoundError(to_node_id)
         layer: Layer
+        # if source already in layer -> pass
         layer.add_source(from_node_id, from_node_interface)
 
 
@@ -614,4 +615,3 @@ def show_error(message: str, error: CustomException):
     g.error_description.text = description
     g.error_extra.set_text(extra_text)
     g.error_dialog.show()
-

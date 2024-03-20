@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 
 # import random
 from supervisely.app.widgets import (
@@ -17,6 +18,7 @@ from supervisely.app.widgets import (
     Card,
 )
 from supervisely.app import show_dialog
+from src.ui.dtl.Action import SourceAction
 
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import actions_dict, actions_list
@@ -244,6 +246,7 @@ def item_dropped_cb(item):
 def node_removed(layer_id):
     if layer_id.startswith("deploy"):
         utils.kill_deployed_app_by_layer_id(layer_id)
+    g.layers.pop(layer_id)
 
 
 @add_layer_from_dialog_btn.click
@@ -339,6 +342,7 @@ def update_nodes(layer_id: str = None):
             net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
             net.preview_mode = True
 
+            ui_utils.init_nodes_state(net, data_layers_ids, all_layers_ids, nodes_state, edges)
             ui_utils.update_preview(net, data_layers_ids, all_layers_ids, layer_id)
 
     except CustomException as e:
@@ -402,14 +406,38 @@ def update_state():
 
 
 def update_nodes_cb():
-    # @TODO: list input nodes -> update their dst.
-    g.updater(("nodes", None))
+    layer_sources = defaultdict(list)
+
+    layers_to_update = []
+    edges = nodes_flow.get_edges_json()
+    for edge in edges:
+        from_node_id = edge["output"]["node"]
+        from_node_interface = edge["output"]["interface"]
+        to_node_id = edge["input"]["node"]
+        try:
+            layer = g.layers[to_node_id]
+        except:
+            continue
+        layer: Layer
+        src_name = layer._connection_name(from_node_id, from_node_interface)
+        layer_sources[to_node_id].append(src_name)
+
+    for layer_id, layer in g.layers.items():
+        layer: Layer
+        if issubclass(layer.action, SourceAction):
+            continue
+
+        src_names = layer_sources[layer_id]
+        if set(src_names) != set(layer._src):
+            layers_to_update.append(layer.id)
+    for layer_id in layers_to_update:
+        g.updater(("nodes", layer_id))
 
 
 def update_metas_cb():
     g.updater("metas")
 
 
-nodes_flow.flow_changed(update_metas_cb)
+nodes_flow.flow_changed(update_nodes_cb)
 nodes_flow.flow_state_changed(update_metas_cb)
 nodes_flow.on_save(update_metas_cb)
