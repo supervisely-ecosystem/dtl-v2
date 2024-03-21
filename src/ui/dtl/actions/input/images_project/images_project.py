@@ -645,7 +645,7 @@ class ImagesProjectAction(SourceAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             tags_mapping_widgets_container
                         ),
-                        sidebar_width=750,
+                        sidebar_width=870,
                     ),
                 ),
                 NodesFlow.Node.Option(
