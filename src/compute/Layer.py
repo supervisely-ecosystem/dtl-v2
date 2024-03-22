@@ -4,7 +4,7 @@ from __future__ import division
 from os.path import join
 import shutil
 from copy import deepcopy
-from typing import Tuple
+from typing import Tuple, List
 from time import time
 
 import jsonschema
@@ -563,20 +563,49 @@ class Layer:
     #                 f"{self.action} '{func.__name__}' time: {end_time - start_time:.10f} seconds."
     #             )
     #         return result
-    # return wrapper
+    #     return wrapper
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         raise NotImplementedError()
 
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
+        raise NotImplementedError()
+
+    def has_batch_processing(self) -> bool:
+        return False
+
     def postprocess(self):
         pass
 
-    def process_timed(self, data_el: Tuple[ImageDescriptor, Annotation]):
+    def process_timed(self, data_batch: List[Tuple[ImageDescriptor, Annotation]]):
         tm = TinyTimer()
-        for layer_output in self.process(data_el):
-            global_timer.add_value(self.__class__.action, tm.get_sec())
-            tm = TinyTimer()
-            yield layer_output
+        if self.has_batch_processing():
+            for layer_outputs in self.process_batch(data_batch):
+                global_timer.add_value(
+                    {
+                        "action_name": self.__class__.action,
+                        "id": id(self),
+                        "items_count": len(data_batch),
+                    },
+                    tm.get_sec(),
+                )
+                tm = TinyTimer()
+                yield layer_outputs
+        else:
+            layer_outputs = []
+            for data_el, ann in data_batch:
+                for layer_output in self.process((data_el, ann)):
+                    global_timer.add_value(
+                        {
+                            "action_name": self.__class__.action,
+                            "id": id(self),
+                            "items_count": len(data_batch),
+                        },
+                        tm.get_sec(),
+                    )
+                    tm = TinyTimer()
+                    layer_outputs.append(layer_output)
+            yield layer_outputs
 
     @staticmethod
     def get_params(cls):

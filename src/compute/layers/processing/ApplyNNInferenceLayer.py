@@ -1,6 +1,6 @@
 # coding: utf-8
 from supervisely import logger as sly_logger
-from typing import Tuple
+from typing import Tuple, List
 import numpy as np
 from os.path import join
 
@@ -214,6 +214,36 @@ def apply_model_to_image(
         pred_ann = Annotation(img_size=image_shape[:2])
     finally:
         return pred_ann
+
+
+def apply_model_to_images(
+    session: Session,
+    image_paths: List[str],
+    image_shapes: List[tuple],
+    image_desc: List[ImageDescriptor],
+    model_meta: ProjectMeta,
+    output_meta: ProjectMeta,
+    settings: dict,
+):
+    # pred_anns = []
+    try:
+        pred_anns = session.inference_image_paths(image_paths)
+    #     for image_path in image_paths:
+    #         pred_ann = session.inference_image_path(image_path)
+    #         pred_anns.append(pred_ann)
+
+    #     for pred_ann in pred_anns:
+    #         pred_ann, res_meta = postprocess_ann(pred_ann, output_meta, model_meta, settings)
+    #         pred_anns.append(pred_ann)
+    except:
+        # FIX FOR BATCH
+        sly_logger.warn(
+            f"Could not apply model to image: {image_desc.info.item_info.name}(ID: {image_desc.info.item_info.id})"
+        )
+
+        pred_anns = [Annotation(img_size=image_shape[:2]) for image_shape in image_shapes]
+    finally:
+        return pred_anns
 
 
 class ApplyNNInferenceLayer(Layer):
@@ -431,10 +461,113 @@ class ApplyNNInferenceLayer(Layer):
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor | Annotation]]):
+        item_descs, anns = zip(*data_els)
+
+        if self.settings["session_id"] is None:
+            new_item_descs = item_descs
+            if not self.net.preview_mode:
+                raise ValueError("Apply NN layer requires model to be connected")
+            else:
+                sly_logger.warn("Model is not connected. Couldn't apply model to preview image.")
+        else:
+            session_id = self.settings["session_id"]
+            model_meta = ProjectMeta().from_json(self.settings["model_meta"])
+            apply_method = self.settings["apply_method"]
+            if apply_method == "image":
+                item_shapes = []
+                item_paths = []
+                new_item_descs = []
+
+                for item_desc in item_descs:
+                    item_desc: ImageDescriptor
+                    item = item_desc.read_image()
+                    item = item.astype(np.uint8)
+                    item_path = join(
+                        f"{g.PREVIEW_DIR}",
+                        f"{item_desc.info.item_name}{item_desc.info.ia_data['item_ext']}",
+                    )
+                    sly_image.write(item_path, item)
+                    new_item_desc = item_desc.clone_with_item(item)
+
+                    item_shapes.append(item.shape)
+                    item_paths.append(item_path)
+                    new_item_descs.append(new_item_desc)
+                try:
+                    session = Session(g.api, session_id)
+                    pred_anns = apply_model_to_images(
+                        session,
+                        item_paths,
+                        item_shapes,
+                        item_descs,
+                        model_meta,
+                        self.output_meta,
+                        self.settings,
+                    )
+                except:
+                    if not self.net.preview_mode:
+                        g.warn_notification.set(
+                            title="Model is not responding. Attempting to reconnect...",
+                            description=(
+                                "Make sure that the "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>app session</a> "
+                                "is running and the model is served."
+                            ),
+                        )
+                        g.warn_notification.show()
+                        try:
+                            session = Session(g.api, session_id)
+                            g.warn_notification.hide()
+                            pred_anns = apply_model_to_images(
+                                session,
+                                item_paths,
+                                item_shapes,
+                                item_descs,
+                                model_meta,
+                                self.output_meta,
+                                self.settings,
+                            )
+                        except:
+                            g.api.app.stop(session_id)
+                            g.pipeline_running = False
+                            raise ValueError(
+                                (
+                                    "Something went wrong while applying model to images batch. Pipeline will be stopped. "
+                                    f"Shutting down the model session ID: '{session_id}'."
+                                )
+                            )
+                    else:
+                        show_dialog(
+                            title="Couldn't preview image",
+                            description=(
+                                "Model is not served. "
+                                "<br>Check model session logs by visiting app session page: "
+                                f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a> "
+                            ),
+                            status="warning",
+                        )
+
+                for item_path in item_paths:
+                    if file_exists(item_path):
+                        silent_remove(item_path)
+
+            elif apply_method == "roi":
+                pass
+            elif apply_method == "sliding_window":
+                pass
+
+            add_pred_ann_method = self.settings["add_pred_ann_method"]
+            if add_pred_ann_method == "merge":
+                new_anns = []
+                for ann, pred_ann in zip(anns, pred_anns):
+                    ann = ann.merge(pred_ann)
+                    new_anns.append(ann)
+            elif add_pred_ann_method == "replace":
+                new_anns = pred_anns
+            yield tuple(zip(new_item_descs, new_anns))
+
+    def has_batch_processing(self):
+        return True
+
     def postprocess(self):
         self.postprocess_cb()
-        # if self.settings["stop_model_session"]:
-        # session_id = self.settings["session_id"]
-        # g.api.app.stop(session_id)
-        # g.running_sessions_ids.remove(session_id)
-        # logger.info(f"Session ID: {session_id} has been stopped")

@@ -126,18 +126,17 @@ def main(
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project"
         )
-    elements_generator = net.get_elements_generator()
-
+    elements_generator_batched = net.get_elements_generator_batched(batch_size=50)
     if not g.pipeline_running:
         return
 
     results_counter = 0
     processing_time_start = time()
     with progress(message=f"Processing items...", total=total) as pbar:
-        for data_el in elements_generator:
+        for data_batch in elements_generator_batched:
             start_item_processing_time = time()
             try:
-                export_output_generator = net.start(data_el)
+                export_output_generator = net.start(data_batch)
                 if not g.pipeline_running:
                     return
                 for res_export in export_output_generator:
@@ -149,10 +148,11 @@ def main(
                     )
                     results_counter += 1
             except Exception as e:
+                # fix later data_batch[0][0] to actual item
                 extra = {
-                    "project_name": data_el[0].get_pr_name(),
-                    "ds_name": data_el[0].get_ds_name(),
-                    "item_name": data_el[0].get_item_name(),
+                    "project_name": data_batch[0][0].get_pr_name(),
+                    "ds_name": data_batch[0][0].get_ds_name(),
+                    "item_name": data_batch[0][0].get_item_name(),
                     "exc_str": str(e),
                 }
                 logger.warn(
@@ -163,9 +163,10 @@ def main(
             finally:
                 end_item_processing_time = time()
                 logger.debug(
-                    f"{data_el[0].info.item_info.name} processing time: {end_item_processing_time - start_item_processing_time:.10f} seconds."
+                    f"Batch processing time: {end_item_processing_time - start_item_processing_time:.10f} seconds."
                 )
-                pbar.update()
+                pbar.update(len(data_batch))
+                # pbar.update()
 
     processing_time_end = time()
     logger.debug(

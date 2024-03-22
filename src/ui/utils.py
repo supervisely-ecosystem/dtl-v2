@@ -391,7 +391,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
         )
 
-    data_el = (img_desc, preview_ann)
+    data_el = [(img_desc, preview_ann)]  # make list to match batch
     if layers_id_chain is None:
         layers_idx_whitelist = None
     else:

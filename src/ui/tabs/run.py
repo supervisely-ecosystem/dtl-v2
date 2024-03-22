@@ -223,6 +223,11 @@ def _run():
         run_btn.show()
         nodes_flow_card.unlock()
 
+        # dump log of processing time
+        from src.compute.utils.stat_timer import global_timer
+
+        global_timer.dump()
+
 
 def run_pipeline():
     while g.pipeline_running:
