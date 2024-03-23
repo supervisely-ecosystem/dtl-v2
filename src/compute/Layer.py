@@ -593,18 +593,30 @@ class Layer:
                 yield layer_outputs
         else:
             layer_outputs = []
+            logger.debug(
+                f"'{self.__class__.action}' doesn't have batch processing. Items will be processed 1 by 1."
+            )
             for data_el, ann in data_batch:
                 for layer_output in self.process((data_el, ann)):
-                    global_timer.add_value(
-                        {
-                            "action_name": self.__class__.action,
-                            "id": id(self),
-                            "items_count": len(data_batch),
-                        },
-                        tm.get_sec(),
-                    )
+                    # uncomment for time logs for each item
+                    # global_timer.add_value(
+                    #     {
+                    #         "action_name": self.__class__.action,
+                    #         "id": id(self),
+                    #         "items_count": 1,
+                    #     },
+                    #     tm.get_sec(),
+                    # )
                     tm = TinyTimer()
                     layer_outputs.append(layer_output)
+                global_timer.add_value(
+                    {
+                        "action_name": self.__class__.action,
+                        "id": id(self),
+                        "items_count": len(data_batch),
+                    },
+                    tm.get_sec(),
+                )
             yield layer_outputs
 
     @staticmethod

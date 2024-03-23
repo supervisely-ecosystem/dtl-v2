@@ -411,12 +411,12 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
                 continue
             layer = g.layers[all_layers_ids[layer_indx]]
             layer: Layer
-            if len(data_el) == 1:
+            if len(data_el[0]) == 1:
                 img_desc, ann = data_el[0]
-            elif len(data_el) == 3:
-                img_desc, ann, _ = data_el
+            elif len(data_el[0]) == 3:
+                img_desc, ann, _ = data_el[0]
             else:
-                img_desc, ann = data_el
+                img_desc, ann = data_el[0]
             if not is_starting_layer:
                 layer.set_src_img_desc(prev_img_desc)
                 layer.set_src_ann(prev_ann)

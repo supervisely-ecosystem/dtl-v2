@@ -228,8 +228,8 @@ class Net:
                 yield output
 
     def start_batch(self, data_batch, layers_idx_whitelist=None):
-        img_pr_name = data_el[0][0].get_pr_name()
-        img_ds_name = data_el[0][0].get_ds_name()
+        img_pr_name = data_batch[0][0].get_pr_name()
+        img_ds_name = data_batch[0][0].get_ds_name()
 
         start_layer_indxs = set()
         for idx, layer in enumerate(self.layers):
@@ -240,7 +240,9 @@ class Net:
             ):
                 start_layer_indxs.add(idx)
         if len(start_layer_indxs) == 0:
-            raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
+            raise RuntimeError(
+                "Can not find data layer for the image: {}".format(data_batch[0][0])
+            )  # add name
 
         for start_layer_indx in start_layer_indxs:
             output_generator = self.process(
@@ -278,13 +280,13 @@ class Net:
             for output in output_generator:
                 yield output
 
-    def push(self, indx, data_el, branch, layers_idx_whitelist=None):
+    def push(self, indx, data_batch, branch, layers_idx_whitelist=None):
         next_layer_indxs = self.get_next_layer_indxs(
             indx, branch=branch, layers_idx_whitelist=layers_idx_whitelist
         )
         for next_layer_indx in next_layer_indxs:
             for x in self.process(
-                next_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+                next_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
@@ -304,13 +306,14 @@ class Net:
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
-            if len(layer_output) == 3:
-                new_data_el = layer_output[:2]
+            # FIX check every data_el in batch?
+            if len(layer_output[0]) == 3:  # filter layers with 2 outputs
+                new_data_batch = [output[:2] for output in layer_output]
                 branch = layer_output[-1]
-            elif len(layer_output) == 2:
-                new_data_el = layer_output
+            elif len(layer_output[0]) == 2:  # layers with 1 output
+                new_data_batch = layer_output
                 branch = 0
-            elif len(layer_output) == 1:
+            elif len(layer_output[0]) == 1:  # output layers
                 yield layer_output
                 continue
             else:
@@ -319,8 +322,9 @@ class Net:
                         layer, len(layer_output)
                     )
                 )
+
             for x in self.push(
-                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+                indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
@@ -337,13 +341,13 @@ class Net:
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
-            if len(layer_output) == 3:
-                new_data_el = layer_output[:2]
+            if len(layer_output[0]) == 3:  # filter layers with 2 outputs
+                new_data_batch = [output[:2] for output in layer_output]
                 branch = layer_output[-1]
-            elif len(layer_output) == 2:
-                new_data_el = layer_output
+            elif len(layer_output[0]) == 2:  # layers with 1 output
+                new_data_batch = layer_output
                 branch = 0
-            elif len(layer_output) == 1:
+            elif len(layer_output[0]) == 1:  # output layers
                 yield layer_output, indx
                 continue
             else:
@@ -354,7 +358,7 @@ class Net:
                 )
             yield layer_output, indx
             for x in self.push_iterate(
-                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+                indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
