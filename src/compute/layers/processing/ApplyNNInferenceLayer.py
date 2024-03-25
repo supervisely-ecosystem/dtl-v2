@@ -225,16 +225,12 @@ def apply_model_to_images(
     output_meta: ProjectMeta,
     settings: dict,
 ):
-    # pred_anns = []
+    pred_anns = []
     try:
-        pred_anns = session.inference_image_paths(image_paths)
-    #     for image_path in image_paths:
-    #         pred_ann = session.inference_image_path(image_path)
-    #         pred_anns.append(pred_ann)
-
-    #     for pred_ann in pred_anns:
-    #         pred_ann, res_meta = postprocess_ann(pred_ann, output_meta, model_meta, settings)
-    #         pred_anns.append(pred_ann)
+        predictions = session.inference_image_paths(image_paths)
+        for pred_ann in predictions:
+            pred_ann, res_meta = postprocess_ann(pred_ann, output_meta, model_meta, settings)
+            pred_anns.append(pred_ann)
     except:
         # FIX FOR BATCH
         sly_logger.warn(

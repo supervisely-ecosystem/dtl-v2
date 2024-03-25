@@ -609,14 +609,14 @@ class Layer:
                     # )
                     tm = TinyTimer()
                     layer_outputs.append(layer_output)
-                global_timer.add_value(
-                    {
-                        "action_name": self.__class__.action,
-                        "id": id(self),
-                        "items_count": len(data_batch),
-                    },
-                    tm.get_sec(),
-                )
+            global_timer.add_value(
+                {
+                    "action_name": self.__class__.action,
+                    "id": id(self),
+                    "items_count": len(data_batch),
+                },
+                tm.get_sec(),
+            )
             yield layer_outputs
 
     @staticmethod

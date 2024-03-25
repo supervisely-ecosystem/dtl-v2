@@ -259,6 +259,11 @@ class AddToExistingProjectAction(OutputAction):
             dst = [str(project_id)]
             return dst
 
+        def postprocess_cb():
+            propject_id = dst_project_selector.get_selected_id()
+            project_info = g.api.project.get_info_by_id(propject_id)
+            dst_project_preview.set(project_info)
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
 
@@ -309,6 +314,7 @@ class AddToExistingProjectAction(OutputAction):
             get_settings=get_settings,
             get_dst=get_dst,
             need_preview=False,
+            postprocess_cb=postprocess_cb,
         )
 
     @classmethod
