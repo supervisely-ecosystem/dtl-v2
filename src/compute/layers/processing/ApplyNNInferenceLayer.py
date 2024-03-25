@@ -457,7 +457,7 @@ class ApplyNNInferenceLayer(Layer):
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
-    def process_batch(self, data_els: List[Tuple[ImageDescriptor | Annotation]]):
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         item_descs, anns = zip(*data_els)
 
         if self.settings["session_id"] is None:
