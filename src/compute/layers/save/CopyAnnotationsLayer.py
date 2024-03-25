@@ -17,6 +17,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
+from supervisely.io.fs import get_file_name
 
 
 def _get_source_projects_ids_from_dtl():
@@ -52,7 +53,8 @@ def backup_destination_project(project_info: ProjectInfo) -> SessionInfo:
     module_id = g.api.app.get_ecosystem_module_id(app_slug)
     module_info = g.api.app.get_ecosystem_module_info(module_id)
 
-    agent_id = sly.env.agent_id(raise_not_found=False) or 1
+    agent_id = sly.env.agent_id(raise_not_found=False) or None
+    agent_id = None
     module_params = module_info.get_arguments(images_project=project_info.id)
     module_params["projectName"] = f"{project_info.name}_backup"
     module_params["teamId"] = g.TEAM_ID
@@ -105,11 +107,12 @@ def match_properties(input_image: ImageInfo, destination_image: ImageInfo) -> bo
 
 
 def map_matching_images_by_name(input_ds_images, destination_ds_images):
-    name_to_id_map = {image.name: image for image in input_ds_images}
+    name_to_id_map = {get_file_name(image.name): image for image in input_ds_images}
     matched_mapping = {}
     for image in destination_ds_images:
-        if image.name in name_to_id_map and match_properties(name_to_id_map[image.name], image):
-            matched_mapping[name_to_id_map[image.name].id] = image.id
+        image_name = get_file_name(image.name)
+        if image_name in name_to_id_map and match_properties(name_to_id_map[image_name], image):
+            matched_mapping[name_to_id_map[image_name].id] = image.id
     return matched_mapping
 
 

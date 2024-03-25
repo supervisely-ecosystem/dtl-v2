@@ -9,6 +9,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescript
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
+from supervisely.io.fs import get_file_ext
 
 
 def _get_source_projects_ids_from_dtl():
@@ -133,7 +134,7 @@ class CreateNewProjectLayer(Layer):
                     self.get_free_name(
                         item_desc.get_item_name(), dataset_name, self.out_project_name
                     )
-                    + item_desc.get_item_ext()
+                    + get_file_ext(item_desc.info.item_info.name)
                     for item_desc, _ in ds_item_map[ds_name]
                 ]
                 if self.sly_project_info is not None:

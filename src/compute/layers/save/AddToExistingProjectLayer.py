@@ -18,6 +18,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescript
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
+from supervisely.io.fs import get_file_ext
 
 
 class AddToExistingProjectLayer(Layer):
@@ -233,7 +234,7 @@ class AddToExistingProjectLayer(Layer):
                         self.get_free_name(
                             item_desc.get_item_name(), dataset_name, self.sly_project_info.name
                         )
-                        + item_desc.get_item_ext()
+                        + get_file_ext(item_desc.info.item_info.name)
                         for item_desc in item_descs
                     ]
                     if self.net.modality == "images":
@@ -274,7 +275,7 @@ class AddToExistingProjectLayer(Layer):
                             self.get_free_name(
                                 item_desc.get_item_name(), dataset_name, self.sly_project_info.name
                             )
-                            + item_desc.get_item_ext()
+                            + get_file_ext(item_desc.info.item_info.name)
                             for item_desc, _ in ds_item_map[ds_name]
                         ]
 
