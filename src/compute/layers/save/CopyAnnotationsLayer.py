@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import Tuple
+from typing import Tuple, List
 
 import supervisely as sly
 from supervisely import (
@@ -341,3 +341,53 @@ class CopyAnnotationsLayer(Layer):
                         else:
                             g.api.annotation.upload_ann(destination_image_id, ann)
         yield ([item_desc, ann])
+
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
+        if self.net.preview_mode:
+            yield data_els
+        else:
+            item_descs, anns = zip(*data_els)
+            ds_item_map = {}
+            for item_desc, ann in zip(item_descs, anns):
+                dataset_name = item_desc.get_res_ds_name()
+                if dataset_name not in ds_item_map:
+                    ds_item_map[dataset_name] = []
+                ds_item_map[dataset_name].append((item_desc, ann))
+
+            for ds_name in ds_item_map:
+                items = ds_item_map[ds_name]
+                checked_items = []
+                for img_desc, ann in items:
+                    local_item_size = item_desc.item_data.shape[:2]
+                    original_image_size = (
+                        item_desc.info.item_info.height,
+                        item_desc.info.item_info.width,
+                    )
+                    if local_item_size == original_image_size:
+                        checked_items.append((img_desc, ann))
+
+                for img_desc, ann in checked_items:
+                    dataset_id = item_desc.info.item_info.dataset_id
+                    destination_images_ids = self.ds_map.get(dataset_id)
+                    if destination_images_ids is not None:
+                        add_option = self.settings["add_option"]
+                        if add_option == "merge":
+                            ann_jsons = g.api.annotation.download_json_batch(
+                                dataset_id, destination_images_ids
+                            )
+                            dest_anns = [
+                                sly.Annotation.from_json(ann_json, self.output_meta)
+                                for ann_json in ann_jsons
+                            ]
+
+                            anns = []
+                            for dest_ann in dest_anns:
+                                ann = ann.merge(dest_ann)
+                                anns.append(ann)
+                            g.api.annotation.upload_anns(destination_images_ids, anns)
+                        else:
+                            g.api.annotation.upload_anns(destination_images_ids, anns)
+            yield tuple(zip(item_descs, anns))
+
+    def has_batch_processing(self) -> bool:
+        return True

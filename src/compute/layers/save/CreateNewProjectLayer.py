@@ -116,7 +116,7 @@ class CreateNewProjectLayer(Layer):
 
         yield ([item_desc, ann])
 
-    def process_batch(self, data_els: List[Tuple[ImageDescriptor | Annotation]]):
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         if self.net.preview_mode:
             yield data_els
         else:
@@ -174,7 +174,6 @@ class CreateNewProjectLayer(Layer):
                             g.api.video.annotation.upload_paths(
                                 [video_info.id], [ann_path], self.output_meta
                             )
-
             yield tuple(zip(item_descs, anns))
 
     def has_batch_processing(self):
