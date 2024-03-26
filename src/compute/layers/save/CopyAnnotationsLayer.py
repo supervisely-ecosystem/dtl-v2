@@ -151,6 +151,9 @@ class CopyAnnotationsLayer(Layer):
         self.ds_map = {}
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         settings = self.settings
 
         if settings["project_id"] is None:
@@ -372,6 +375,7 @@ class CopyAnnotationsLayer(Layer):
                 for img_desc, ann in checked_items:
                     dataset_id = item_desc.info.item_info.dataset_id
                     destination_images_ids = self.ds_map.get(dataset_id)
+                    destination_images_ids = list(destination_images_ids.values())
                     if destination_images_ids is not None:
                         add_option = self.settings["add_option"]
                         if add_option == "merge":
