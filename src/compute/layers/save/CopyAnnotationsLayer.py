@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from typing import Tuple, List
-
+from collections import defaultdict
 import supervisely as sly
 from supervisely import (
     Annotation,
@@ -353,47 +353,58 @@ class CopyAnnotationsLayer(Layer):
             yield data_els
         else:
             item_descs, anns = zip(*data_els)
-            ds_item_map = {}
+
+            dst_item_id_map = defaultdict(list)
+            dst_item_ann_map = defaultdict(list)
             for item_desc, ann in zip(item_descs, anns):
-                dataset_name = item_desc.get_res_ds_name()
-                if dataset_name not in ds_item_map:
-                    ds_item_map[dataset_name] = []
-                ds_item_map[dataset_name].append((item_desc, ann))
-
-            for ds_name in ds_item_map:
-                items = ds_item_map[ds_name]
-                checked_items = []
-                for img_desc, ann in items:
-                    local_item_size = item_desc.item_data.shape[:2]
-                    original_image_size = (
-                        item_desc.info.item_info.height,
-                        item_desc.info.item_info.width,
-                    )
-                    if local_item_size == original_image_size:
-                        checked_items.append((img_desc, ann))
-
-                for img_desc, ann in checked_items:
-                    dataset_id = item_desc.info.item_info.dataset_id
-                    destination_images_ids = self.ds_map.get(dataset_id)
-                    destination_images_ids = list(destination_images_ids.values())
-                    if destination_images_ids is not None:
-                        add_option = self.settings["add_option"]
-                        if add_option == "merge":
-                            ann_jsons = g.api.annotation.download_json_batch(
-                                dataset_id, destination_images_ids
+                local_item_size = item_desc.item_data.shape[:2]
+                dataset_id = item_desc.info.item_info.dataset_id
+                image_id = item_desc.info.item_info.id
+                destination_images_ids = self.ds_map.get(dataset_id)
+                if destination_images_ids is not None:
+                    destination_image_id = destination_images_ids.get(image_id)
+                    if destination_image_id is not None:
+                        original_image_size = (
+                            item_desc.info.item_info.height,
+                            item_desc.info.item_info.width,
+                        )
+                        # check image size was modified
+                        if local_item_size != original_image_size:
+                            sly.logger.warn(
+                                (
+                                    f"Image: '{item_desc.info.item_info.name}' size was modified in the pipeline. "
+                                    f"Original size: '{item_desc.info.item_info.height}x{item_desc.info.item_info.width}'. "
+                                    f"Modified image size: '{local_item_size[0]}x{local_item_size[1]}' "
+                                    "Skipping..."
+                                )
                             )
-                            dest_anns = [
-                                sly.Annotation.from_json(ann_json, self.output_meta)
-                                for ann_json in ann_jsons
-                            ]
-
-                            anns = []
-                            for dest_ann in dest_anns:
-                                ann = ann.merge(dest_ann)
-                                anns.append(ann)
-                            g.api.annotation.upload_anns(destination_images_ids, anns)
+                            continue
                         else:
-                            g.api.annotation.upload_anns(destination_images_ids, anns)
+                            dst_item_id_map[dataset_id].append(destination_image_id)
+                            dst_item_ann_map[dataset_id].append(ann)
+
+            for dataset_id in dst_item_id_map:
+                destination_images_ids = dst_item_id_map[dataset_id]
+                image_anns = dst_item_ann_map[dataset_id]
+
+                add_option = self.settings["add_option"]
+                if add_option == "merge":
+                    ann_jsons = g.api.annotation.download_json_batch(
+                        dataset_id, destination_images_ids
+                    )
+                    destination_anns = [
+                        Annotation.from_json(ann_json, self.output_meta) for ann_json in ann_jsons
+                    ]
+                    anns = [
+                        ann.merge(destination_ann)
+                        for ann, destination_ann in zip(image_anns, destination_anns)
+                    ]
+
+                    g.api.annotation.upload_anns(destination_images_ids, anns)
+                else:
+                    anns = image_anns
+                    g.api.annotation.upload_anns(destination_images_ids, anns)
+
             yield tuple(zip(item_descs, anns))
 
     def has_batch_processing(self) -> bool:

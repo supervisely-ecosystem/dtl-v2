@@ -371,7 +371,9 @@ def update_state():
         labeling_jobs_layers_ids = [
             layer_id
             for layer_id in all_layers_ids
-            if g.layers[layer_id].action.name.startswith("labeling_job")
+            if g.layers[layer_id].action.name.startswith(
+                "create_labeling_job"
+            )  # use action.name instead of hardcoded string
         ]
 
         # Init sources

@@ -605,6 +605,13 @@ class ImagesProjectAction(SourceAction):
                 src_save_btn.enable()
                 empty_dataset_notification.hide()
 
+        def postprocess_cb():
+            nonlocal _current_info
+            project_id = select_datasets.get_selected_project_id()
+            project_info = g.api.project.get_info_by_id(project_id)
+            src_preview_widget_thumbnail.set(project_info)
+            _current_info = project_info
+
         def create_options(src: List[str], dst: List[str], settings: dict) -> dict:
             _set_src_from_json(src)
             _set_settings_from_json(settings)
@@ -663,4 +670,5 @@ class ImagesProjectAction(SourceAction):
             get_settings=get_settings,
             data_changed_cb=data_changed_cb,
             custom_update_btn=update_preview_btn,
+            postprocess_cb=postprocess_cb,
         )

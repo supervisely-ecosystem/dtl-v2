@@ -8,6 +8,7 @@ import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import BadSettingsError
+from supervisely.io.fs import get_file_ext
 import src.globals as g
 
 
@@ -103,6 +104,9 @@ class CreateLabelingJobLayer(Layer):
         self.created_labeling_jobs = []
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         settings = self.settings
 
         job_name = settings.get("job_name", "")
@@ -241,6 +245,109 @@ class CreateLabelingJobLayer(Layer):
                     )
 
         yield ([item_desc, ann])
+
+    def process_batch(
+        self,
+        data_els: List[
+            Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]]
+        ],
+    ):
+        if self.net.preview_mode:
+            yield data_els
+        else:
+
+            if self.sly_project_info is not None:
+                if self.settings["create_new_project"]:
+                    item_descs, anns = zip(*data_els)
+                    if not self.settings["keep_original_ds"]:
+                        dataset_name = self.settings["dataset_name"]
+                        ds_item_map = {dataset_name: []}
+                        for item_desc, ann in zip(item_descs, anns):
+                            ds_item_map[dataset_name].append((item_desc, ann))
+                    else:
+                        ds_item_map = {}
+                        for item_desc, ann in zip(item_descs, anns):
+                            dataset_name = item_desc.get_res_ds_name()
+                            if dataset_name not in ds_item_map:
+                                ds_item_map[dataset_name] = []
+                            ds_item_map[dataset_name].append((item_desc, ann))
+
+                    for dataset_name in ds_item_map:
+                        out_item_names = [
+                            self.get_free_name(
+                                item_desc.get_item_name(), dataset_name, self.out_project_name
+                            )
+                            + get_file_ext(item_desc.info.item_info.name)
+                            for item_desc, _ in ds_item_map[dataset_name]
+                        ]
+
+                        dataset_info = self.get_or_create_dataset(dataset_name)
+                        if self.net.modality == "images":
+                            if self.net.may_require_items():
+                                item_infos = g.api.image.upload_nps(
+                                    dataset_info.id,
+                                    out_item_names,
+                                    [
+                                        item_desc.read_image()
+                                        for item_desc, _ in ds_item_map[dataset_name]
+                                    ],
+                                )
+                            else:
+                                item_infos = g.api.image.upload_ids(
+                                    dataset_info.id,
+                                    out_item_names,
+                                    [
+                                        item_desc.info.item_info.id
+                                        for item_desc, _ in ds_item_map[dataset_name]
+                                    ],
+                                )
+
+                            # @TODO: BATCH UPLOAD
+                            # for item_info, (_, ann) in zip(item_infos, ds_item_map[dataset_name]):
+                            #     g.api.annotation.upload_ann(item_info.id, ann)
+                            g.api.annotation.upload_anns(
+                                [item_info.id for item_info in item_infos],
+                                [ann for _, ann in ds_item_map[dataset_name]],
+                            )
+                        elif self.net.modality == "videos":
+                            item_infos = g.api.video.upload_paths(
+                                dataset_info.id,
+                                out_item_names,
+                                [item_desc.item_data for item_desc, _ in ds_item_map[dataset_name]],
+                            )
+                            ann_paths = [
+                                f"{item_desc.item_data}.json"
+                                for item_desc, _ in ds_item_map[dataset_name]
+                            ]
+                            for ann, ann_path, video_info in zip(
+                                [ann for _, ann in ds_item_map[dataset_name]], ann_paths, item_infos
+                            ):
+                                if not sly_fs.file_exists(ann_path):
+                                    ann_json = ann.to_json(KeyIdMap())
+                                    sly_json.dump_json_file(ann_json, ann_path)
+                                g.api.video.annotation.upload_paths(
+                                    [video_info.id], [ann_path], self.output_meta
+                                )
+                        item_ids = [image_info.id for image_info in item_infos]
+                        self._labeling_job_map[dataset_info.id].extend(item_ids)
+                else:
+                    ds_map = {}
+                    for item_desc, ann in data_els:
+                        dataset_name = item_desc.get_res_ds_name()
+                        if dataset_name not in ds_map:
+                            ds_map[dataset_name] = []
+                        ds_map[dataset_name].append((item_desc, ann))
+
+                    for dataset_name in ds_map:
+                        dataset_info = self.get_or_create_dataset(dataset_name)
+                        item_ids = [
+                            item_desc.info.item_info.id for item_desc, _ in ds_map[dataset_name]
+                        ]
+                        self._labeling_job_map[dataset_info.id].extend(item_ids)
+            yield tuple(zip(item_descs, anns))
+
+    def has_batch_processing(self) -> bool:
+        return True
 
     def postprocess(self):
         name = self.settings.get("job_name", None)

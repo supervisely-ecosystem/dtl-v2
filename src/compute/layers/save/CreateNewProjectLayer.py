@@ -93,14 +93,14 @@ class CreateNewProjectLayer(Layer):
                 dataset_info = self.get_or_create_dataset(dataset_name)
                 if self.net.modality == "images":
                     if self.net.may_require_items():
-                        image_info = g.api.image.upload_np(
+                        item_info = g.api.image.upload_np(
                             dataset_info.id, out_item_name, item_desc.read_image()
                         )
                     else:
-                        image_info = g.api.image.upload_id(
+                        item_info = g.api.image.upload_id(
                             dataset_info.id, out_item_name, item_desc.info.item_info.id
                         )
-                    g.api.annotation.upload_ann(image_info.id, ann)
+                    g.api.annotation.upload_ann(item_info.id, ann)
                 elif self.net.modality == "videos":
                     video_info = g.api.video.upload_path(
                         dataset_info.id, out_item_name, item_desc.item_data
@@ -141,13 +141,13 @@ class CreateNewProjectLayer(Layer):
                     dataset_info = self.get_or_create_dataset(ds_name)
                     if self.net.modality == "images":
                         if self.net.may_require_items():
-                            image_infos = g.api.image.upload_nps(
+                            item_infos = g.api.image.upload_nps(
                                 dataset_info.id,
                                 out_item_names,
                                 [item_desc.read_image() for item_desc, _ in ds_item_map[ds_name]],
                             )
                         else:
-                            image_infos = g.api.image.upload_ids(
+                            item_infos = g.api.image.upload_ids(
                                 dataset_info.id,
                                 out_item_names,
                                 [
@@ -155,10 +155,12 @@ class CreateNewProjectLayer(Layer):
                                     for item_desc, _ in ds_item_map[ds_name]
                                 ],
                             )
-                        for image_info, (_, ann) in zip(image_infos, ds_item_map[ds_name]):
-                            g.api.annotation.upload_ann(image_info.id, ann)
+                        g.api.annotation.upload_anns(
+                            [item_info.id for item_info in item_infos],
+                            [ann for _, ann in ds_item_map[ds_name]],
+                        )
                     elif self.net.modality == "videos":
-                        video_infos = g.api.video.upload_paths(
+                        item_infos = g.api.video.upload_paths(
                             dataset_info.id,
                             out_item_names,
                             [item_desc.item_data for item_desc, _ in ds_item_map[ds_name]],
@@ -167,7 +169,7 @@ class CreateNewProjectLayer(Layer):
                             f"{item_desc.item_data}.json" for item_desc, _ in ds_item_map[ds_name]
                         ]
                         for ann, ann_path, video_info in zip(
-                            [ann for _, ann in ds_item_map[ds_name]], ann_paths, video_infos
+                            [ann for _, ann in ds_item_map[ds_name]], ann_paths, item_infos
                         ):
                             if not sly_fs.file_exists(ann_path):
                                 ann_json = ann.to_json(KeyIdMap())
