@@ -200,4 +200,4 @@ class ExportArchiveWithMasksLayer(Layer):
             else:
                 out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
 
-        yield ([img_desc, ann],)
+        yield ([img_desc, ann])

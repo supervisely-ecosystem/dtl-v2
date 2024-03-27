@@ -497,7 +497,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
         img_desc = img_desc.clone_with_item(preview_img)
         img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
 
-        data_el = (img_desc, preview_ann)
+        data_el = [(img_desc, preview_ann)]
 
         processing_generator = net.start_iterate(data_el)
         for data_el, layer_indx in processing_generator:

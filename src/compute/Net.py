@@ -347,7 +347,7 @@ class Net:
 
             if len(layer_output[0]) == 3:  # filter layers with 2 outputs
                 new_data_batch = [output[:2] for output in layer_output]
-                branch = layer_output[-1]
+                branch = -1  # layer_output[-1]
             elif len(layer_output[0]) == 2:  # layers with 1 output
                 new_data_batch = layer_output
                 branch = 0
