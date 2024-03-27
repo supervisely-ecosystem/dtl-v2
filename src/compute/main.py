@@ -142,22 +142,26 @@ def main(
                     if not g.pipeline_running:
                         return
                     logger.trace(
-                        "item processed",
-                        extra={"item_name": res_export[0][0].get_item_name()},
+                        "items processed",
+                        extra={
+                            "items_names": [
+                                res_export_item[0].get_item_name() for res_export_item in res_export
+                            ]
+                        },
                     )
                     results_counter += 1
             except Exception as e:
                 # fix later data_batch[0][0] to actual item
-                extra = {
-                    "project_name": data_batch[0][0].get_pr_name(),
-                    "ds_name": data_batch[0][0].get_ds_name(),
-                    "item_name": data_batch[0][0].get_item_name(),
-                    "exc_str": str(e),
-                }
+                # extra = {
+                #     "project_name": data_batch[0][0].get_pr_name(),
+                #     "ds_name": data_batch[0][0].get_ds_name(),
+                #     "item_name": data_batch[0][0].get_item_name(),
+                #     "exc_str": str(e),
+                # }
                 logger.warn(
-                    "Item was skipped because some error occurred",
+                    f"Item was skipped because some error occurred. Error: {e}",
                     exc_info=True,
-                    extra=extra,
+                    # extra=extra,
                 )
             finally:
                 pbar.update(len(data_batch))
