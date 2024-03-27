@@ -142,12 +142,12 @@ class ExportArchiveWithMasksLayer(Layer):
                 )
 
     def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
-        img_desc, ann = data_el
+        item_desc, ann = data_el
         if not self.net.preview_mode:
             free_name = self.get_free_name(
-                img_desc.get_item_name(), img_desc.get_ds_name(), self.out_project.name
+                item_desc.get_item_name(), item_desc.get_ds_name(), self.out_project.name
             )
-            new_dataset_name = img_desc.get_res_ds_name()
+            new_dataset_name = item_desc.get_res_ds_name()
 
             for out_dir, flag_name, mapping_name in self.odir_flag_mapping:
                 if not self.settings[flag_name]:
@@ -163,7 +163,7 @@ class ExportArchiveWithMasksLayer(Layer):
                 img = self.draw_colored_mask(ann, cls_mapping)
 
                 if flag_name == "masks_human":
-                    orig_img = img_desc.read_image()
+                    orig_img = item_desc.read_image()
                     comb_img = self.overlay_images(orig_img, img, 0.5)
 
                     sep = np.array([[[0, 255, 0]]] * orig_img.shape[0], dtype=np.uint8)
@@ -186,18 +186,19 @@ class ExportArchiveWithMasksLayer(Layer):
 
                 cv2.imwrite(output_img_path, img)
 
-            dataset_name = img_desc.get_res_ds_name()
+            dataset_name = item_desc.get_res_ds_name()
             # @TODO: update dataset creation later
             out_ds_path = osp.join("results", self.out_project.name, dataset_name)
             if not self.out_project.datasets.has_key(out_ds_path):
                 self.out_project.create_dataset(dataset_name)
             out_dataset = self.out_project.datasets.get(out_ds_path)
-            out_item_name = free_name + img_desc.get_item_ext()
+            out_item_name = free_name + item_desc.get_item_ext()
 
             # net _always_ downloads images
-            if img_desc.need_write():
-                out_dataset.add_item_np(out_item_name, img_desc.image_data, ann=ann)
+            if item_desc.need_write() and item_desc.item_data is not None:
+                out_dataset: sly.Dataset
+                out_dataset.add_item_np(out_item_name, item_desc.image_data, ann=ann)
             else:
-                out_dataset.add_item_file(out_item_name, img_desc.get_img_path(), ann=ann)
+                out_dataset.add_item_file(out_item_name, item_desc.get_img_path(), ann=ann)
 
-        yield ([img_desc, ann])
+        yield ([item_desc, ann])

@@ -167,7 +167,7 @@ class ExportArchiveLayer(Layer):
                 out_item_name = free_name + item_desc.get_item_ext()
 
                 # net _always_ downloads images
-                if item_desc.need_write():
+                if item_desc.need_write() and item_desc.item_data is not None:
                     out_dataset: Dataset
                     out_dataset.add_item_np(out_item_name, item_desc.item_data, ann=ann)
                 else:
