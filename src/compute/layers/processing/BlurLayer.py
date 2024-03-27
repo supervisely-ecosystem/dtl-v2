@@ -96,26 +96,3 @@ class BlurLayer(Layer):
         img = np.clip(res_img, 0, 255).astype(np.uint8)
         new_img_desc = img_desc.clone_with_item(img)
         yield new_img_desc, ann
-
-    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
-        item_descs, anns = zip(*data_els)
-        new_data_els = []
-        for item_desc, ann in zip(item_descs, anns):
-            img = item_desc.read_image()
-            img = img.astype(np.uint8)
-            if self.settings["name"] == "gaussian":
-                sigma_b = self.settings["sigma"]
-                sigma_value = np.random.uniform(sigma_b["min"], sigma_b["max"])
-                res_img = cv2.GaussianBlur(img, ksize=(0, 0), sigmaX=sigma_value)
-            elif self.settings["name"] == "median":
-                res_img = cv2.medianBlur(img, ksize=self.settings["kernel"])
-            else:
-                raise NotImplementedError()
-
-            img = np.clip(res_img, 0, 255).astype(np.uint8)
-            new_img_desc = item_desc.clone_with_item(img)
-            new_data_els.append((new_img_desc, ann))
-        yield new_data_els
-
-    def has_batch_processing(self) -> bool:
-        return True
