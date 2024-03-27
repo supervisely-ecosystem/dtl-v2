@@ -598,16 +598,6 @@ class Layer:
             )
             for data_el, ann in data_batch:
                 for layer_output in self.process((data_el, ann)):
-                    # uncomment for time logs for each item
-                    # global_timer.add_value(
-                    #     {
-                    #         "action_name": self.__class__.action,
-                    #         "id": id(self),
-                    #         "items_count": 1,
-                    #     },
-                    #     tm.get_sec(),
-                    # )
-                    tm = TinyTimer()
                     layer_outputs.append(layer_output)
             global_timer.add_value(
                 {
@@ -617,6 +607,7 @@ class Layer:
                 },
                 tm.get_sec(),
             )
+            tm = TinyTimer()
             yield layer_outputs
 
     @staticmethod

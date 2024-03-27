@@ -134,7 +134,6 @@ def main(
     processing_time_start = time()
     with progress(message=f"Processing items...", total=total) as pbar:
         for data_batch in elements_generator_batched:
-            start_item_processing_time = time()
             try:
                 export_output_generator = net.start(data_batch)
                 if not g.pipeline_running:
@@ -161,10 +160,6 @@ def main(
                     extra=extra,
                 )
             finally:
-                end_item_processing_time = time()
-                logger.debug(
-                    f"Batch processing time: {end_item_processing_time - start_item_processing_time:.10f} seconds."
-                )
                 pbar.update(len(data_batch))
                 # pbar.update()
 
