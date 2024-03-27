@@ -50,6 +50,9 @@ class AddToExistingProjectLayer(Layer):
         self.ds_map = {}
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         settings = self.settings
 
         if settings["dataset_option"] == "new":
@@ -239,16 +242,16 @@ class AddToExistingProjectLayer(Layer):
                     ]
                     if self.net.modality == "images":
                         if self.net.may_require_items():
-                            image_nps = [
-                                item_desc.read_image() for item_desc, _ in ds_item_map[dataset_name]
-                            ]
                             image_info = g.api.image.upload_nps(
-                                dataset_info.id, out_item_names, image_nps
+                                dataset_info.id,
+                                out_item_names,
+                                [item_desc.read_image() for item_desc in item_descs],
                             )
                         else:
-                            item_ids = [item_desc.info.item_info.id for item_desc in item_descs]
                             image_info = g.api.image.upload_ids(
-                                dataset_info.id, out_item_names, item_ids
+                                dataset_info.id,
+                                out_item_names,
+                                [item_desc.info.item_info.id for item_desc in item_descs],
                             )
 
                         new_item_ids = [image_info.id for image_info in image_info]
