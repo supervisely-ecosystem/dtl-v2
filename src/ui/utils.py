@@ -391,7 +391,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
         )
 
-    data_el = (img_desc, preview_ann)
+    data_el = [(img_desc, preview_ann)]  # make list to match batch
     if layers_id_chain is None:
         layers_idx_whitelist = None
     else:
@@ -411,12 +411,12 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
                 continue
             layer = g.layers[all_layers_ids[layer_indx]]
             layer: Layer
-            if len(data_el) == 1:
+            if len(data_el[0]) == 1:
                 img_desc, ann = data_el[0]
-            elif len(data_el) == 3:
-                img_desc, ann, _ = data_el
+            elif len(data_el[0]) == 3:
+                img_desc, ann, _ = data_el[0]
             else:
-                img_desc, ann = data_el
+                img_desc, ann = data_el[0]
             if not is_starting_layer:
                 layer.set_src_img_desc(prev_img_desc)
                 layer.set_src_ann(prev_ann)
@@ -497,7 +497,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
         img_desc = img_desc.clone_with_item(preview_img)
         img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
 
-        data_el = (img_desc, preview_ann)
+        data_el = [(img_desc, preview_ann)]
 
         processing_generator = net.start_iterate(data_el)
         for data_el, layer_indx in processing_generator:

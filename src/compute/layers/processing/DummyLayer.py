@@ -1,6 +1,9 @@
 # coding: utf-8
 
+from typing import List, Tuple
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
+from supervisely import Annotation
 
 
 class DummyLayer(Layer):
@@ -16,3 +19,9 @@ class DummyLayer(Layer):
 
     def process(self, data_el):
         yield data_el
+
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
+        yield data_els
+
+    def has_batch_processing(self) -> bool:
+        return True

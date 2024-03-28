@@ -26,25 +26,27 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 Input:
 
-- [Images Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/data/README.md#images-project)
+- [Images Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/images-project/README.md#images-project)
+- [Videos Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/videos-project/README.md#videos-project)
+- [Input Labeling Job](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/input-labeling-job/README.md#input-labeling-job)
 
 Pixel-level transformations:
 
-- [Anonymize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/anonymize/readme.md#anonymize)
-- [Blur](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/blur/README.md#blur)
-- [Contrast Brightness](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/contrast_brightness/README.md#contrast-and-brightness)
-- [Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/noise/README.md#noise)
-- [Random Color](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/random_color/README.md#random_color)
+- [Anonymize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/anonymize/readme.md#anonymize)
+- [Blur](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/blur/README.md#blur)
+- [Contrast Brightness](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/contrast_brightness/README.md#contrast-and-brightness)
+- [Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/noise/README.md#noise)
+- [Random Color](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/random_color/README.md#random_color)
 
 Spatial-level transformations:
 
-- [Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/crop/README.md#crop)
-- [Flip](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/flip/README.md#flip)
-- [Instances Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/instances_crop/README.md#instances-crop)
-- [Multiply](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/multiply/README.md#multiply)
-- [Resize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/resize/README.md#resize)
-- [Rotate](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/rotate/README.md#rotate)
-- [Sliding Window](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/sliding_window/README.md#sliding-window)
+- [Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/crop/README.md#crop)
+- [Flip](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/flip/README.md#flip)
+- [Instances Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/instances_crop/README.md#instances-crop)
+- [Multiply](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/multiply/README.md#multiply)
+- [Resize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/resize/README.md#resize)
+- [Rotate](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/rotate/README.md#rotate)
+- [Sliding Window](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/sliding_window/README.md#sliding-window)
 
 Annotation-level transformations:
 
@@ -72,27 +74,28 @@ Annotation-level transformations:
 
 Filter and conditions:
 
-- [Filter Image by Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_image_by_object/readme.md#filter-image-by-object-action)
-- [Filter Image by Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_image_by_tag/readme.md#filter-images-by-tag-action)
-- [Filter Image without Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filter_images_without_objects/README.md#filter-image-without-objects)
-- [If](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/if_action/README.md#if-action)
+- [Filter Image by Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_image_by_object/readme.md#filter-image-by-object-action)
+- [Filter Image by Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_image_by_tag/readme.md#filter-images-by-tag-action)
+- [Filter Image without Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_images_without_objects/README.md#filter-image-without-objects)
+- [If](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/if_action/README.md#if-action)
 
 Neural networks:
 
-- [Apply NN](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/apply_nn/README.md#apply-nn)
+- [Deploy YOLOv8](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/neural_networks/deploy_yolov8/README.md#deploy-yolov8)
+- [Apply NN](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/neural_networks/apply_nn/README.md#apply-nn)
 
 Other:
 
-- [Dataset](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dataset/README.md#dataset)
-- [Dummy](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/dummy/README.md#dummy)
+- [Dataset](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/other/dataset/README.md#dataset)
+- [Dummy](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/other/dummy/README.md#dummy)
 
 Output:
 
-- [Export Archive](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save/README.md#export-archive)
-- [Labeling Job](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/labeling_job/README.md#labeling-job)
-- [Export Archive with Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/save_masks/README.md#export-archive-with-masks)- 
-- [Add to Existing Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/existing_project/README.md#add-to-existing-project)
-- [Create New Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/supervisely/README.md#create-new-project)
+- [Export Archive](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/save/README.md#export-archive)
+- [Labeling Job](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/labeling_job/README.md#labeling-job)
+- [Export Archive with Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/save_masks/README.md#export-archive-with-masks)
+- [Add to Existing Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/existing_project/README.md#add-to-existing-project)
+- [Create New Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/supervisely/README.md#create-new-project)
 
 </details>
 

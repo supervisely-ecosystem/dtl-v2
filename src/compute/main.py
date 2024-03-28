@@ -126,46 +126,37 @@ def main(
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project"
         )
-    elements_generator = net.get_elements_generator()
-
+    elements_generator_batched = net.get_elements_generator_batched(batch_size=g.BATCH_SIZE)
     if not g.pipeline_running:
         return
 
     results_counter = 0
     processing_time_start = time()
     with progress(message=f"Processing items...", total=total) as pbar:
-        for data_el in elements_generator:
-            start_item_processing_time = time()
+        for data_batch in elements_generator_batched:
             try:
-                export_output_generator = net.start(data_el)
+                export_output_generator = net.start(data_batch)
                 if not g.pipeline_running:
                     return
                 for res_export in export_output_generator:
                     if not g.pipeline_running:
                         return
                     logger.trace(
-                        "item processed",
-                        extra={"item_name": res_export[0][0].get_item_name()},
+                        "items processed",
+                        extra={
+                            "items_names": [
+                                res_export_item[0].get_item_name() for res_export_item in res_export
+                            ]
+                        },
                     )
                     results_counter += 1
             except Exception as e:
-                extra = {
-                    "project_name": data_el[0].get_pr_name(),
-                    "ds_name": data_el[0].get_ds_name(),
-                    "item_name": data_el[0].get_item_name(),
-                    "exc_str": str(e),
-                }
                 logger.warn(
-                    "Item was skipped because some error occurred",
+                    f"Item was skipped because some error occurred. Error: {e}",
                     exc_info=True,
-                    extra=extra,
                 )
             finally:
-                end_item_processing_time = time()
-                logger.debug(
-                    f"{data_el[0].info.item_info.name} processing time: {end_item_processing_time - start_item_processing_time:.10f} seconds."
-                )
-                pbar.update()
+                pbar.update(len(data_batch))
 
     processing_time_end = time()
     logger.debug(

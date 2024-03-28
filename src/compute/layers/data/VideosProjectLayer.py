@@ -152,3 +152,6 @@ class VideosProjectLayer(Layer):
         else:
             ann = apply_to_frames(ann, self.class_mapper)
         yield (item_desc, ann)
+
+    def postprocess(self):
+        self.postprocess_cb()

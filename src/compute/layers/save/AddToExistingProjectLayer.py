@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 from supervisely.io.fs import get_file_name
 from supervisely import (
@@ -18,6 +18,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescript
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
+from supervisely.io.fs import get_file_ext
 
 
 class AddToExistingProjectLayer(Layer):
@@ -49,6 +50,9 @@ class AddToExistingProjectLayer(Layer):
         self.ds_map = {}
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         settings = self.settings
 
         if settings["dataset_option"] == "new":
@@ -132,9 +136,18 @@ class AddToExistingProjectLayer(Layer):
                 entities_info_list = g.api.video.get_list(self.settings["dataset_id"])
             dataset_info = self.get_dataset_by_id(self.settings["dataset_id"])
             existing_names = set(get_file_name(info.name) for info in entities_info_list)
-            self.existing_names[f"{self.sly_project_info.name}/{dataset_info.name}"].update(
-                existing_names
+
+            existing_dataset = self.existing_names.get(
+                f"{self.sly_project_info.name}/{dataset_info.name}"
             )
+            if existing_dataset is None:
+                self.existing_names[f"{self.sly_project_info.name}/{dataset_info.name}"] = (
+                    existing_names
+                )
+            else:
+                self.existing_names[f"{self.sly_project_info.name}/{dataset_info.name}"].update(
+                    existing_names
+                )
 
     def get_or_create_dataset(self, dataset_name):
         if dataset_name not in self.ds_map:
@@ -192,3 +205,121 @@ class AddToExistingProjectLayer(Layer):
                     sly_json.dump_json_file(ann_json, ann_path)
                 g.api.video.annotation.upload_paths([video_info.id], [ann_path], self.output_meta)
         yield ([item_desc, ann])
+
+    def process_batch(
+        self,
+        data_els: List[
+            Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]]
+        ],
+    ):
+        if not self.net.preview_mode:
+            item_descs, anns = zip(*data_els)
+
+            ds_item_map = None
+            dataset_option = self.settings["dataset_option"]
+            if not self.net.preview_mode:
+                if dataset_option == "new":
+                    dataset_name = self.settings["dataset_name"]
+                    dataset_info = self.get_or_create_dataset(dataset_name)
+                elif dataset_option == "existing":
+                    dataset_info = self.get_dataset_by_id(self.settings["dataset_id"])
+                    dataset_name = dataset_info.name
+                else:
+                    ds_item_map = {}
+                    for item_desc, ann in zip(item_descs, anns):
+                        dataset_name = item_desc.get_res_ds_name()
+                        if dataset_name not in ds_item_map:
+                            ds_item_map[dataset_name] = []
+                        ds_item_map[dataset_name].append((item_desc, ann))
+
+                if ds_item_map is None:
+                    out_item_names = [
+                        self.get_free_name(
+                            item_desc.get_item_name(), dataset_name, self.sly_project_info.name
+                        )
+                        + get_file_ext(item_desc.info.item_info.name)
+                        for item_desc in item_descs
+                    ]
+                    if self.net.modality == "images":
+                        if self.net.may_require_items():
+                            image_info = g.api.image.upload_nps(
+                                dataset_info.id,
+                                out_item_names,
+                                [item_desc.read_image() for item_desc in item_descs],
+                            )
+                        else:
+                            image_info = g.api.image.upload_ids(
+                                dataset_info.id,
+                                out_item_names,
+                                [item_desc.info.item_info.id for item_desc in item_descs],
+                            )
+
+                        new_item_ids = [image_info.id for image_info in image_info]
+                        g.api.annotation.upload_anns(new_item_ids, anns)
+                    elif self.net.modality == "videos":
+                        video_info = g.api.video.upload_paths(
+                            dataset_info.id, out_item_names, item_desc.item_data
+                        )
+                        ann_paths = [f"{item_desc.item_data}.json" for item_desc in item_descs]
+                        for ann_path in ann_paths:
+                            if not sly_fs.file_exists(ann_path):
+                                ann_json = ann.to_json(KeyIdMap())
+                                sly_json.dump_json_file(ann_json, ann_path)
+                            g.api.video.annotation.upload_paths(
+                                [video_info.id], [ann_path], self.output_meta
+                            )
+
+                else:
+                    for ds_name in ds_item_map:
+                        dataset_info = self.get_or_create_dataset(ds_name)
+                        dataset_name = dataset_info.name
+
+                        out_item_names = [
+                            self.get_free_name(
+                                item_desc.get_item_name(), dataset_name, self.sly_project_info.name
+                            )
+                            + get_file_ext(item_desc.info.item_info.name)
+                            for item_desc, _ in ds_item_map[ds_name]
+                        ]
+
+                        if self.net.modality == "images":
+                            if self.net.may_require_items():
+                                image_nps = [
+                                    item_desc.read_image() for item_desc, _ in ds_item_map[ds_name]
+                                ]
+                                image_info = g.api.image.upload_nps(
+                                    dataset_info.id, out_item_names, image_nps
+                                )
+                            else:
+                                item_ids = [item_desc.info.item_info.id for item_desc in item_descs]
+                                image_info = g.api.image.upload_ids(
+                                    dataset_info.id, out_item_names, item_ids
+                                )
+                            g.api.annotation.upload_anns(item_ids, anns)
+                        elif self.net.modality == "videos":
+                            video_datas = [
+                                item_desc.item_data for item_desc, _ in ds_item_map[dataset_name]
+                            ]
+                            video_info = g.api.video.upload_paths(
+                                dataset_info.id, out_item_names, video_datas
+                            )
+
+                            ann_paths = [
+                                f"{item_desc.item_data}.json"
+                                for item_desc, _ in ds_item_map[dataset_name]
+                            ]
+                            for ann_path in ann_paths:
+                                if not sly_fs.file_exists(ann_path):
+                                    ann_json = ann.to_json(KeyIdMap())
+                                    sly_json.dump_json_file(ann_json, ann_path)
+                                g.api.video.annotation.upload_paths(
+                                    [video_info.id], [ann_path], self.output_meta
+                                )
+
+        yield data_els
+
+    def has_batch_processing(self) -> bool:
+        return True
+
+    def postprocess(self):
+        self.postprocess_cb()

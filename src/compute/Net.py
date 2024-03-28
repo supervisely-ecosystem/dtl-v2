@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -202,31 +202,35 @@ class Net:
     def reset_existing_names(self):
         self.existing_names = {}
 
-    def start(self, data_el, layers_idx_whitelist=None):
-        img_pr_name = data_el[0].get_pr_name()
-        img_ds_name = data_el[0].get_ds_name()
+    def start(self, data_batch, layers_idx_whitelist=None):
+        if len(data_batch) == 0:
+            logger.debug("Empty data batch.")
+            yield []
+        else:
+            # get project and ds name from the first item in the batch
+            img_pr_name = data_batch[0][0].get_pr_name()
+            img_ds_name = data_batch[0][0].get_ds_name()
 
-        start_layer_indxs = set()
-        for idx, layer in enumerate(self.layers):
-            if layer.type != "data":
-                continue
-            if layer.project_name == img_pr_name and (
-                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
-            ):
-                start_layer_indxs.add(idx)
-        if len(start_layer_indxs) == 0:
-            raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
+            start_layer_indxs = set()
+            for idx, layer in enumerate(self.layers):
+                if layer.type != "data":
+                    continue
+                if layer.project_name == img_pr_name and (
+                    "*" in layer.dataset_names or img_ds_name in layer.dataset_names
+                ):
+                    start_layer_indxs.add(idx)
+            if len(start_layer_indxs) == 0:
+                raise RuntimeError("Can not find data layer")
+            for start_layer_indx in start_layer_indxs:
+                output_generator = self.process(
+                    start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
+                )
+                for output in output_generator:
+                    yield output
 
-        for start_layer_indx in start_layer_indxs:
-            output_generator = self.process(
-                start_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
-            )
-            for output in output_generator:
-                yield output
-
-    def start_iterate(self, data_el, layer_idx: int = None, layers_idx_whitelist: list = None):
-        img_pr_name = data_el[0].get_pr_name()
-        img_ds_name = data_el[0].get_ds_name()
+    def start_iterate(self, data_batch, layer_idx: int = None, layers_idx_whitelist: list = None):
+        img_pr_name = data_batch[0][0].get_pr_name()
+        img_ds_name = data_batch[0][0].get_ds_name()
 
         if layer_idx is not None:
             start_layer_indxs = [layer_idx]
@@ -242,48 +246,51 @@ class Net:
                 ):
                     start_layer_indxs.add(idx)
             if len(start_layer_indxs) == 0:
-                raise RuntimeError("Can not find data layer for the image: {}".format(data_el))
+                raise RuntimeError(
+                    "Can not find data layer for the image: {}".format(data_batch[0][0])
+                )
 
         for start_layer_indx in start_layer_indxs:
             output_generator = self.process_iterate(
-                start_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+                start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
             )
             for output in output_generator:
                 yield output
 
-    def push(self, indx, data_el, branch, layers_idx_whitelist=None):
+    def push(self, indx, data_batch, branch, layers_idx_whitelist=None):
         next_layer_indxs = self.get_next_layer_indxs(
             indx, branch=branch, layers_idx_whitelist=layers_idx_whitelist
         )
         for next_layer_indx in next_layer_indxs:
             for x in self.process(
-                next_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+                next_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
-    def push_iterate(self, indx, data_el, branch, layers_idx_whitelist=None):
+    def push_iterate(self, indx, data_batch, branch, layers_idx_whitelist=None):
         next_layer_indxs = self.get_next_layer_indxs(
             indx, branch=branch, layers_idx_whitelist=layers_idx_whitelist
         )
         for next_layer_indx in next_layer_indxs:
             for x in self.process_iterate(
-                next_layer_indx, data_el, layers_idx_whitelist=layers_idx_whitelist
+                next_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
-    def process(self, indx, data_el, layers_idx_whitelist=None):
-        layer = self.layers[indx]
-        for layer_output in layer.process_timed(data_el):
+    def process(self, indx, data_batch, layers_idx_whitelist=None):
+        layer: Layer = self.layers[indx]
+        for layer_output in layer.process_timed(data_batch):
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
-            if len(layer_output) == 3:
-                new_data_el = layer_output[:2]
+            # FIX check every data_el in batch?
+            if len(layer_output[0]) == 3:  # filter layers with 2 outputs
+                new_data_batch = [output[:2] for output in layer_output]
                 branch = layer_output[-1]
-            elif len(layer_output) == 2:
-                new_data_el = layer_output
+            elif len(layer_output[0]) == 2:  # layers with 1 output
+                new_data_batch = layer_output
                 branch = 0
-            elif len(layer_output) == 1:
+            elif len(layer_output[0]) == 1:  # output layers
                 yield layer_output
                 continue
             else:
@@ -292,12 +299,13 @@ class Net:
                         layer, len(layer_output)
                     )
                 )
+
             for x in self.push(
-                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+                indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
-    def process_iterate(self, indx, data_el, layers_idx_whitelist=None):
+    def process_iterate(self, indx, data_batch, layers_idx_whitelist=None):
         layer = self.layers[indx]
         try:
             layer.validate()
@@ -306,17 +314,17 @@ class Net:
             raise e
         except:
             raise
-        for layer_output in layer.process_timed(data_el):
+        for layer_output in layer.process_timed(data_batch):
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
-            if len(layer_output) == 3:
-                new_data_el = layer_output[:2]
-                branch = layer_output[-1]
-            elif len(layer_output) == 2:
-                new_data_el = layer_output
+            if len(layer_output[0]) == 3:  # filter layers with 2 outputs
+                new_data_batch = [output[:2] for output in layer_output]
+                branch = -1  # layer_output[-1]
+            elif len(layer_output[0]) == 2:  # layers with 1 output
+                new_data_batch = layer_output
                 branch = 0
-            elif len(layer_output) == 1:
+            elif len(layer_output[0]) == 1:  # output layers
                 yield layer_output, indx
                 continue
             else:
@@ -327,7 +335,7 @@ class Net:
                 )
             yield layer_output, indx
             for x in self.push_iterate(
-                indx, new_data_el, branch, layers_idx_whitelist=layers_idx_whitelist
+                indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
             ):
                 yield x
 
@@ -442,6 +450,95 @@ class Net:
                             )
                             data_el = (vid_desc, ann)
                             yield data_el
+
+    def get_elements_generator_batched(self, batch_size):
+        require_items = self.may_require_items()
+        data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
+        project_datasets = {}
+        added = set()
+        for data_layer_idx in data_layers_idxs:
+            data_layer = self.layers[data_layer_idx]
+            for src in data_layer.srcs:
+                project_name, dataset_name = src.split("/")
+                project = get_project_by_name(project_name)
+                if dataset_name == "*":
+                    project_datasets.setdefault(project.id, [])
+                    for dataset in get_all_datasets(project.id):
+                        if dataset.id not in added:
+                            project_datasets[project.id].append(dataset.id)
+                            added.add(dataset.id)
+                else:
+                    dataset = get_dataset_by_name(dataset_name, project.id)
+                    if dataset.id not in added:
+                        project_datasets.setdefault(project.id, []).append(dataset.id)
+                        added.add(dataset.id)
+        for project_id, dataset_ids in project_datasets.items():
+            project_meta = get_project_meta(project_id)
+            project_info = get_project_by_id(project_id)
+            for dataset_id in dataset_ids:
+                dataset_info = get_dataset_by_id(dataset_id)
+                if self.modality == "images":
+                    for batch in g.api.image.get_list_generator(
+                        dataset_id=dataset_id, batch_size=batch_size
+                    ):
+                        items_batch = []
+                        for img_info in batch:
+                            img_data = np.zeros(
+                                (img_info.height, img_info.width, 3), dtype=np.uint8
+                            )
+                            if require_items:
+                                img_data = g.api.image.download_np(img_info.id)
+                            img_desc = ImageDescriptor(
+                                LegacyProjectItem(
+                                    project_name=project_info.name,
+                                    ds_name=dataset_info.name,
+                                    item_name=".".join(img_info.name.split(".")[:-1]),
+                                    item_info=img_info,
+                                    ia_data={"item_ext": "." + img_info.ext},
+                                    item_path="",
+                                    ann_path="",
+                                ),
+                                False,
+                            )
+                            img_desc.update_item(img_data)
+                            ann = Annotation.from_json(
+                                g.api.annotation.download(img_info.id).annotation, project_meta
+                            )
+                            data_el = (img_desc, ann)
+                            items_batch.append(data_el)
+                        yield items_batch
+                elif self.modality == "videos":
+                    for batch in g.api.video.get_list_generator(
+                        dataset_id=dataset_id, batch_size=batch_size
+                    ):
+                        items_batch = []
+                        for vid_info in batch:
+                            vid_ext = get_file_ext(vid_info.name)
+                            vid_desc = VideoDescriptor(
+                                LegacyProjectItem(
+                                    project_name=project_info.name,
+                                    ds_name=dataset_info.name,
+                                    item_name=".".join(vid_info.name.split(".")[:-1]),
+                                    item_info=vid_info,
+                                    ia_data={"item_ext": vid_ext},
+                                    item_path="",
+                                    ann_path="",
+                                ),
+                                False,
+                            )
+
+                            video_path = os.path.join(g.DATA_DIR, vid_info.name)
+                            g.api.video.download_path(vid_info.id, video_path)
+                            vid_desc.update_item(video_path)
+                            ann_json = g.api.video.annotation.download(vid_info.id)
+                            ann = VideoAnnotation.from_json(
+                                ann_json,
+                                project_meta,
+                                KeyIdMap(),
+                            )
+                            data_el = (vid_desc, ann)
+                            items_batch.append(data_el)
+                        yield items_batch
 
     def get_result_project_meta(self):
         return self._output_meta

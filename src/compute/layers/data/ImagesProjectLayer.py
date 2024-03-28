@@ -130,3 +130,6 @@ class ImagesProjectLayer(Layer):
         new_tags = self.process_tags(ann.img_tags)
         ann = ann.clone(img_tags=new_tags)
         yield (img_desc, ann)
+
+    def postprocess(self):
+        self.postprocess_cb()

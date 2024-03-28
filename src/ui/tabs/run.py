@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+from src.compute.utils.stat_timer import global_timer
+
 
 from supervisely.app.widgets import (
     Button,
@@ -211,10 +213,6 @@ def _run():
         raise e
 
     finally:
-        g.pipeline_running = False
-        g.pipeline_thread = None
-        g.warn_notification.hide()
-        nodes_flow.enable()
         progress.hide()
         with progress(message="Ready for new pipeline", total=1) as pbar:
             pbar.update(1)
@@ -222,6 +220,11 @@ def _run():
         stop_btn.hide()
         run_btn.show()
         nodes_flow_card.unlock()
+        g.warn_notification.hide()
+        nodes_flow.enable()
+        g.pipeline_running = False
+        g.pipeline_thread = None
+        global_timer.dump()
 
 
 def run_pipeline():
@@ -244,13 +247,25 @@ def start_pipeline():
 @stop_btn.click
 @handle_exception
 def stop_pipeline():
-    if g.pipeline_thread.is_alive():
-        g.pipeline_thread = None
+    if g.pipeline_thread is not None:
+        if g.pipeline_thread.is_alive():
+            g.pipeline_thread = None
+            g.pipeline_running = False
+            sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
+            error_notification.set(
+                "Pipeline was manually stopped", description="Results may be incomplete."
+            )
+            error_notification.show()
+            circle_progress.hide()
+            # other settings are set in finally block of _run
+    else:
+        progress.hide()
+        with progress(message="Ready for new pipeline", total=1) as pbar:
+            pbar.update(1)
+        stop_btn.hide()
+        run_btn.show()
+        nodes_flow_card.unlock()
+        g.warn_notification.hide()
+        nodes_flow.enable()
         g.pipeline_running = False
-        sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
-        error_notification.set(
-            "Pipeline was manually stopped", description="Results may be incomplete."
-        )
-        error_notification.show()
-        circle_progress.hide()
-        # other settings are set in finally block of _run
+        g.pipeline_thread = None

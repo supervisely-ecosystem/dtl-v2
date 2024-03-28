@@ -1,7 +1,7 @@
 # coding: utf-8
 
-from typing import Tuple
-
+from typing import Tuple, List
+from collections import defaultdict
 import supervisely as sly
 from supervisely import (
     Annotation,
@@ -17,6 +17,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError
 import src.globals as g
+from supervisely.io.fs import get_file_name
 
 
 def _get_source_projects_ids_from_dtl():
@@ -52,7 +53,8 @@ def backup_destination_project(project_info: ProjectInfo) -> SessionInfo:
     module_id = g.api.app.get_ecosystem_module_id(app_slug)
     module_info = g.api.app.get_ecosystem_module_info(module_id)
 
-    agent_id = sly.env.agent_id(raise_not_found=False) or 1
+    agent_id = sly.env.agent_id(raise_not_found=False) or None
+    agent_id = None
     module_params = module_info.get_arguments(images_project=project_info.id)
     module_params["projectName"] = f"{project_info.name}_backup"
     module_params["teamId"] = g.TEAM_ID
@@ -105,11 +107,12 @@ def match_properties(input_image: ImageInfo, destination_image: ImageInfo) -> bo
 
 
 def map_matching_images_by_name(input_ds_images, destination_ds_images):
-    name_to_id_map = {image.name: image for image in input_ds_images}
+    name_to_id_map = {get_file_name(image.name): image for image in input_ds_images}
     matched_mapping = {}
     for image in destination_ds_images:
-        if image.name in name_to_id_map and match_properties(name_to_id_map[image.name], image):
-            matched_mapping[name_to_id_map[image.name].id] = image.id
+        image_name = get_file_name(image.name)
+        if image_name in name_to_id_map and match_properties(name_to_id_map[image_name], image):
+            matched_mapping[name_to_id_map[image_name].id] = image.id
     return matched_mapping
 
 
@@ -148,6 +151,9 @@ class CopyAnnotationsLayer(Layer):
         self.ds_map = {}
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         settings = self.settings
 
         if settings["project_id"] is None:
@@ -341,3 +347,65 @@ class CopyAnnotationsLayer(Layer):
                         else:
                             g.api.annotation.upload_ann(destination_image_id, ann)
         yield ([item_desc, ann])
+
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
+        if self.net.preview_mode:
+            yield data_els
+        else:
+            item_descs, anns = zip(*data_els)
+
+            dst_item_id_map = defaultdict(list)
+            dst_item_ann_map = defaultdict(list)
+            for item_desc, ann in zip(item_descs, anns):
+                local_item_size = item_desc.item_data.shape[:2]
+                dataset_id = item_desc.info.item_info.dataset_id
+                image_id = item_desc.info.item_info.id
+                destination_images_ids = self.ds_map.get(dataset_id)
+                if destination_images_ids is not None:
+                    destination_image_id = destination_images_ids.get(image_id)
+                    if destination_image_id is not None:
+                        original_image_size = (
+                            item_desc.info.item_info.height,
+                            item_desc.info.item_info.width,
+                        )
+                        # check image size was modified
+                        if local_item_size != original_image_size:
+                            sly.logger.warn(
+                                (
+                                    f"Image: '{item_desc.info.item_info.name}' size was modified in the pipeline. "
+                                    f"Original size: '{item_desc.info.item_info.height}x{item_desc.info.item_info.width}'. "
+                                    f"Modified image size: '{local_item_size[0]}x{local_item_size[1]}' "
+                                    "Skipping..."
+                                )
+                            )
+                            continue
+                        else:
+                            dst_item_id_map[dataset_id].append(destination_image_id)
+                            dst_item_ann_map[dataset_id].append(ann)
+
+            for dataset_id in dst_item_id_map:
+                destination_images_ids = dst_item_id_map[dataset_id]
+                image_anns = dst_item_ann_map[dataset_id]
+
+                add_option = self.settings["add_option"]
+                if add_option == "merge":
+                    ann_jsons = g.api.annotation.download_json_batch(
+                        dataset_id, destination_images_ids
+                    )
+                    destination_anns = [
+                        Annotation.from_json(ann_json, self.output_meta) for ann_json in ann_jsons
+                    ]
+                    anns = [
+                        ann.merge(destination_ann)
+                        for ann, destination_ann in zip(image_anns, destination_anns)
+                    ]
+
+                    g.api.annotation.upload_anns(destination_images_ids, anns)
+                else:
+                    anns = image_anns
+                    g.api.annotation.upload_anns(destination_images_ids, anns)
+
+            yield tuple(zip(item_descs, anns))
+
+    def has_batch_processing(self) -> bool:
+        return True

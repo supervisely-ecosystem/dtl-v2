@@ -1,5 +1,5 @@
 # coding: utf-8
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from time import sleep
 from supervisely import (
     Annotation,
@@ -82,6 +82,9 @@ class DeployYOLOv8Layer(Layer):
     def validate(self):
         settings = self.settings
 
+        if self.net.preview_mode:
+            return
+
         if settings.get("agent_id", None) is None:
             raise BadSettingsError("Select agent in 'Deploy YOLOv8' node'")
         if settings.get("device", None) is None:
@@ -117,3 +120,9 @@ class DeployYOLOv8Layer(Layer):
     ):
         item_desc, ann = data_el
         yield item_desc, ann
+
+    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
+        yield data_els
+
+    def has_batch_processing(self) -> bool:
+        return True
