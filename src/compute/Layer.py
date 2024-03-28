@@ -593,9 +593,9 @@ class Layer:
                 yield layer_outputs
         else:
             layer_outputs = []
-            logger.debug(
-                f"'{self.__class__.action}' doesn't have batch processing. Items will be processed 1 by 1."
-            )
+            # logger.debug(
+            #     f"'{self.__class__.action}' doesn't have batch processing. Items will be processed 1 by 1."
+            # )
             for data_el, ann in data_batch:
                 for layer_output in self.process((data_el, ann)):
                     layer_outputs.append(layer_output)
