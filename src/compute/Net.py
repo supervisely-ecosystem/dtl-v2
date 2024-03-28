@@ -220,40 +220,13 @@ class Net:
                 ):
                     start_layer_indxs.add(idx)
             if len(start_layer_indxs) == 0:
-                raise RuntimeError(
-                    "Can not find data layer for the image: {}".format(data_batch[0][0])
-                )  # fix later to actual item
-
+                raise RuntimeError("Can not find data layer")
             for start_layer_indx in start_layer_indxs:
                 output_generator = self.process(
                     start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
                 )
                 for output in output_generator:
                     yield output
-
-    def start_batch(self, data_batch, layers_idx_whitelist=None):
-        img_pr_name = data_batch[0][0].get_pr_name()
-        img_ds_name = data_batch[0][0].get_ds_name()
-
-        start_layer_indxs = set()
-        for idx, layer in enumerate(self.layers):
-            if layer.type != "data":
-                continue
-            if layer.project_name == img_pr_name and (
-                "*" in layer.dataset_names or img_ds_name in layer.dataset_names
-            ):
-                start_layer_indxs.add(idx)
-        if len(start_layer_indxs) == 0:
-            raise RuntimeError(
-                "Can not find data layer for the image: {}".format(data_batch[0][0])
-            )  # add name
-
-        for start_layer_indx in start_layer_indxs:
-            output_generator = self.process(
-                start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
-            )
-            for output in output_generator:
-                yield output
 
     def start_iterate(self, data_batch, layer_idx: int = None, layers_idx_whitelist: list = None):
         img_pr_name = data_batch[0][0].get_pr_name()

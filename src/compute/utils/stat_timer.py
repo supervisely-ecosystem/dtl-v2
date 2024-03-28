@@ -6,6 +6,7 @@ import time
 
 from threading import Lock
 from supervisely.sly_logger import logger
+from supervisely.io.json import dump_json_file
 
 
 class TinyTimer:
@@ -46,8 +47,6 @@ class StatTimer:
         self.lock.release()
 
     def dump(self):
-        from supervisely.io.json import dump_json_file
-
         dump_json_file(self._q_dct, "stat_timer.json")
         self._q_dct = {}
 
