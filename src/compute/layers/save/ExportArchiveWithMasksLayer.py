@@ -83,6 +83,9 @@ class ExportArchiveWithMasksLayer(Layer):
         pass
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         super().validate()
         if "gt_machine_color" in self.settings:
             for cls in self.settings["gt_machine_color"]:
@@ -197,8 +200,8 @@ class ExportArchiveWithMasksLayer(Layer):
             # net _always_ downloads images
             if item_desc.need_write() and item_desc.item_data is not None:
                 out_dataset: sly.Dataset
-                out_dataset.add_item_np(out_item_name, item_desc.image_data, ann=ann)
+                out_dataset.add_item_np(out_item_name, item_desc.item_data, ann=ann)
             else:
-                out_dataset.add_item_file(out_item_name, item_desc.get_img_path(), ann=ann)
+                out_dataset.add_item_file(out_item_name, item_desc.get_item_path(), ann=ann)
 
         yield ([item_desc, ann])
