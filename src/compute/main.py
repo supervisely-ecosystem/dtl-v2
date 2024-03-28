@@ -126,7 +126,7 @@ def main(
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project"
         )
-    elements_generator_batched = net.get_elements_generator_batched(batch_size=50)
+    elements_generator_batched = net.get_elements_generator_batched(batch_size=g.BATCH_SIZE)
     if not g.pipeline_running:
         return
 

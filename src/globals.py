@@ -61,6 +61,10 @@ if PROJECT_ID is not None:
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
+if MODALITY_TYPE == "images":
+    BATCH_SIZE = 50
+else:
+    BATCH_SIZE = 1
 
 cache = {
     "workspace_info": {},
