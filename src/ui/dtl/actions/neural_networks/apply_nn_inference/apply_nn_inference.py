@@ -350,15 +350,15 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                 else:
                     connect_nn_text.set("Connect to Model", "text")
                 # if _model_from_deploy_node and _deploy_node_is_connected:
-                _session_id = None
-                _reset_model()
-                _model_from_deploy_node = False
-                connect_nn_model_selector_disabled_text.hide()
-                connect_nn_model_selector.enable()
+                # _session_id = None
+                # _reset_model()
+                # _model_from_deploy_node = False
+                # connect_nn_model_selector_disabled_text.hide()
+                # connect_nn_model_selector.enable()
             elif session_id is None and _deploy_layer_name and _deploy_node_is_connected:
                 _session_id = None
                 connect_nn_text.set(model_disconnected_text, "warning")
-                _reset_model()
+                # _reset_model()
                 _model_from_deploy_node = False
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
