@@ -328,7 +328,6 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             else:
                 session_id = kwargs.get("session_id", None)
 
-            _session_id = session_id
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
@@ -349,9 +348,8 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                     pass
                 else:
                     connect_nn_text.set("Connect to Model", "text")
-                # if _model_from_deploy_node and _deploy_node_is_connected:
                 _session_id = None
-                # _reset_model()
+                _reset_model()
                 _model_from_deploy_node = False
                 connect_nn_model_selector_disabled_text.hide()
                 connect_nn_model_selector.enable()
