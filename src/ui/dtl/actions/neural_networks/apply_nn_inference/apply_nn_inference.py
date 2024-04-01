@@ -48,7 +48,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
     @classmethod
     def create_inputs(cls):
         return [
-            NodesFlow.Node.Input("deployed_model", "Deployed model", color="#000000"),
+            NodesFlow.Node.Input("deployed_model", "Deployed model (optional)", color="#000000"),
             NodesFlow.Node.Input("source", "Input", color="#000000"),
         ]
 
@@ -64,6 +64,8 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         _kill_deployed_model_after_pipeline = False
         _deploy_layer_name = ""
         _need_preview_update = True
+        _prev_connections = []
+        _deploy_node_is_connected = False
 
         (
             connect_nn_text,
@@ -318,37 +320,49 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             _current_meta = project_meta
 
         def data_changed_cb(**kwargs):
-            nonlocal _current_meta, _model_meta
+            nonlocal _deploy_node_is_connected
             nonlocal _session_id, _model_from_deploy_node, _deploy_layer_name
             nonlocal _need_preview_update, _kill_deployed_model_after_pipeline
-            connect_nn_model_selector.enable()
-            connect_nn_model_selector_disabled_text.hide()
             if _session_id == "reset":
                 session_id = None
             else:
                 session_id = kwargs.get("session_id", None)
+
+            _session_id = session_id
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
+
             model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
             model_disconnected_text = f"{_deploy_layer_name} detected but model is not deployed"
             model_connecting_text = f"{_deploy_layer_name} layer detected. Connecting to model..."
             model_waiting_text = f"Waiting for the {_deploy_layer_name} to deploy model..."
-            if session_id is None and _deploy_layer_name is None:
-                connect_nn_text.set("Connect to Model", "text")
-                if _model_from_deploy_node:
-                    _session_id = None
-                    _reset_model()
-                    _model_from_deploy_node = False
-                    connect_nn_model_selector_disabled_text.hide()
-                    connect_nn_model_selector.enable()
-            elif session_id is None and _deploy_layer_name:
+            if (
+                session_id is None
+                and _deploy_layer_name is None
+                and _deploy_node_is_connected is False
+            ):
+                if connect_nn_text.text == "Connected layer is not a deploy model layer":
+                    pass
+                elif (
+                    connect_nn_text.text == "Multiple connections to deployed model are not allowed"
+                ):
+                    pass
+                else:
+                    connect_nn_text.set("Connect to Model", "text")
+                # if _model_from_deploy_node and _deploy_node_is_connected:
+                #     _session_id = None
+                #     _reset_model()
+                #     _model_from_deploy_node = False
+                #     connect_nn_model_selector_disabled_text.hide()
+                #     connect_nn_model_selector.enable()
+            elif session_id is None and _deploy_layer_name and _deploy_node_is_connected:
                 _session_id = None
                 connect_nn_text.set(model_disconnected_text, "warning")
                 _reset_model()
                 _model_from_deploy_node = False
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
-            else:
+            elif session_id and _deploy_layer_name and _deploy_node_is_connected:
                 _model_from_deploy_node = True
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
@@ -388,6 +402,41 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             if "project_meta" in kwargs:
                 project_meta = kwargs.get("project_meta", None)
                 meta_change_cb(project_meta)
+
+        def update_sources_cb(connections: List[tuple]) -> List[bool]:
+            nonlocal _prev_connections, _deploy_node_is_connected
+
+            need_append = [True] * len(connections)
+            if connections == _prev_connections:
+                return need_append
+
+            _deploy_node_is_connected = False
+            _prev_connections = connections
+            deployed_model_connections = []
+            for idx, (src_name, to_node_interface) in enumerate(connections):
+                if to_node_interface == "deployed_model":
+                    deployed_model_connections.append(src_name)
+                    need_append[idx] = False
+
+            if len(deployed_model_connections) > 1:
+                connect_nn_text.set(
+                    "Multiple connections to deployed model are not allowed",
+                    "warning",
+                )
+                _deploy_node_is_connected = False
+                return need_append
+
+            elif len(deployed_model_connections) == 1:
+                src_name = deployed_model_connections[0]
+                if src_name.startswith("$deploy_"):
+                    _deploy_node_is_connected = True
+                else:
+                    _deploy_node_is_connected = False
+                    connect_nn_text.set(
+                        "Connected layer is not a deploy model layer",
+                        "warning",
+                    )
+            return need_append
 
         def postprocess_cb():  # causes file not found error
             nonlocal _session_id, _kill_deployed_model_after_pipeline
@@ -585,33 +634,6 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                 connect_nn_model_preview,
             )
             g.updater("metas")
-
-        def update_sources_cb(connections: List[tuple]) -> List[bool]:
-            need_append = [True] * len(connections)
-
-            deployed_model_connections = []
-            for idx, (src_name, to_node_interface) in enumerate(connections):
-                if to_node_interface == "deployed_model":
-                    deployed_model_connections.append(src_name)
-                    need_append[idx] = False
-
-            if len(deployed_model_connections) > 1:
-                connect_nn_text.set(
-                    "Multiple connections to deployed model are not allowed",
-                    "warning",
-                )
-                return need_append
-
-            elif len(deployed_model_connections) == 1:
-                src_name = deployed_model_connections[0]
-                if src_name.startswith("$deploy_"):
-                    connect_nn_text.set("Deploy node is connected", "success")
-                else:
-                    connect_nn_text.set("Connected layer is not a deploy layer", "warning")
-            else:
-                connect_nn_text.set("Connect to Model", "text")
-
-            return need_append
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
