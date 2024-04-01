@@ -328,6 +328,10 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             else:
                 session_id = kwargs.get("session_id", None)
 
+            model_from_apply_node = False
+            if _session_id is not None and _session_id != "reset":
+                model_from_apply_node = True
+
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
@@ -337,6 +341,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             model_waiting_text = f"Waiting for the {_deploy_layer_name} to deploy model..."
             if (
                 session_id is None
+                and model_from_apply_node is False
                 and _deploy_layer_name is None
                 and _deploy_node_is_connected is False
             ):
@@ -396,6 +401,18 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                         connect_nn_text.set(model_connected_text, "success")
                     except:
                         connect_nn_text.set(model_disconnected_text, "warning")
+
+            elif (
+                _session_id is not None
+                and _session_id != "reset"
+                and model_from_apply_node is True
+                and _deploy_layer_name is None
+                and _deploy_node_is_connected is False
+            ):
+                # model set from apply nn layer
+                # _session_id = session_id
+                print("model set from apply nn layer")
+                pass
 
             if "project_meta" in kwargs:
                 project_meta = kwargs.get("project_meta", None)

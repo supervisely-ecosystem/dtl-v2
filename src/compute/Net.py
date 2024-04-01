@@ -546,6 +546,11 @@ class Net:
     def calc_metas(self):
         cur_level_layers = {layer for layer in self.layers if layer.type == "data"}
         datalevel_metas = {}
+
+        for layer in self.layers:
+            if layer.action == "deploy_yolo_v8":
+                datalevel_metas[layer.dsts[0]] = ProjectMeta()
+
         for data_layer in cur_level_layers:
             try:
                 input_meta = data_layer.in_project_meta

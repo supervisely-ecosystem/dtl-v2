@@ -4,6 +4,7 @@ from time import sleep
 from supervisely import (
     Annotation,
     VideoAnnotation,
+    ProjectMeta,
     logger,
 )
 
@@ -46,7 +47,6 @@ def check_model_is_deployed(session_id: int):
 
 class DeployYOLOv8Layer(Layer):
     action = "deploy_yolo_v8"
-
     layer_settings = {
         "required": ["settings"],
         "properties": {
@@ -78,6 +78,7 @@ class DeployYOLOv8Layer(Layer):
 
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
+        self.output_meta = ProjectMeta()
 
     def validate(self):
         settings = self.settings
