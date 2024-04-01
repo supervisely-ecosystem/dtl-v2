@@ -254,6 +254,8 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         return chain
     src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
+        if not issubclass(g.layers[src_layer].action, SourceAction):
+            continue
         if src_layer is None:
             continue
         if src_layer in chain:
