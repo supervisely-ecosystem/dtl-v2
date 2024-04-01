@@ -436,6 +436,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                         "Connected layer is not a deploy model layer",
                         "warning",
                     )
+            else:
+                _deploy_node_is_connected = False
+                connect_nn_text.set("Connect to Model", "text")
             return need_append
 
         def postprocess_cb():  # causes file not found error
