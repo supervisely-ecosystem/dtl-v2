@@ -160,7 +160,7 @@ class ExportArchiveLayer(Layer):
                 dataset_name = item_desc.get_res_ds_name()
 
                 # @TODO: update dataset creation later
-                out_ds_path = osp.join("results", self.out_project.name, dataset_name)
+                out_ds_path = osp.join(g.RESULTS_DIR, self.out_project.name, dataset_name)
                 if not self.out_project.datasets.has_key(out_ds_path):
                     self.out_project.create_dataset(dataset_name)
                 out_dataset = self.out_project.datasets.get(out_ds_path)
