@@ -121,17 +121,11 @@ def _run():
         file_infos = []
         pr_dirs = []
 
-        print(g.RESULTS_DIR)
         if os.path.exists(g.RESULTS_DIR):
-            print("Res Dir Exists: True")
             for pr_dir in os.listdir(g.RESULTS_DIR):
-                print(f"project dir: {pr_dir}")
                 pr_dir = os.path.join(g.RESULTS_DIR, pr_dir)
-                print(f"project: {pr_dir}")
                 if os.path.isdir(pr_dir):
-                    print("project exists: True")
                     pr_dirs.append(pr_dir)
-                    print(f"{os.listdir(pr_dir)}")
         # pr_dirs = [p for p in Path(g.RESULTS_DIR).iterdir() if p.is_dir()]
 
         for i, pr_dir in enumerate(pr_dirs):
