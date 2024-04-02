@@ -66,6 +66,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         _need_preview_update = True
         _prev_connections = []
         _deploy_node_is_connected = False
+        _model_from_apply_node = False  # when connect button is pressed
 
         (
             connect_nn_text,
@@ -150,8 +151,9 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
         def confirm_model():
             nonlocal _current_meta, _model_meta, _model_from_deploy_node, _need_preview_update
             nonlocal _model_info, _model_settings, _model_connected, _session_id
-            nonlocal saved_classes_settings, saved_tags_settings
+            nonlocal saved_classes_settings, saved_tags_settings, _model_from_apply_node
 
+            _model_from_apply_node = False
             connect_nn_model_selector.disable()
             connect_nn_connect_btn.disable()
             connect_nn_disconnect_btn.disable()
@@ -243,6 +245,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             connect_nn_connect_btn.disable()
             connect_nn_disconnect_btn.enable()
             _model_connected = True
+            _model_from_apply_node = True
             g.updater("metas")
             if _need_preview_update:
                 g.updater(("nodes", layer_id))
@@ -320,7 +323,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             _current_meta = project_meta
 
         def data_changed_cb(**kwargs):
-            nonlocal _deploy_node_is_connected
+            nonlocal _deploy_node_is_connected, _model_from_apply_node
             nonlocal _session_id, _model_from_deploy_node, _deploy_layer_name
             nonlocal _need_preview_update, _kill_deployed_model_after_pipeline
             if _session_id == "reset":
@@ -331,22 +334,13 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
 
-            model_from_apply_node = False
-            if (
-                _session_id is not None
-                and _session_id != "reset"
-                and _deploy_layer_name is None
-                and _deploy_node_is_connected is False
-            ):
-                model_from_apply_node = True
-
             model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
             model_disconnected_text = f"{_deploy_layer_name} detected but model is not deployed"
             model_connecting_text = f"{_deploy_layer_name} layer detected. Connecting to model..."
             model_waiting_text = f"Waiting for the {_deploy_layer_name} to deploy model..."
             if (
                 session_id is None
-                and model_from_apply_node is False
+                and _model_from_apply_node is False
                 and _deploy_layer_name is None
                 and _deploy_node_is_connected is False
             ):
@@ -367,10 +361,12 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                 _session_id = None
                 connect_nn_text.set(model_disconnected_text, "warning")
                 _reset_model()
+                _model_from_apply_node = False
                 _model_from_deploy_node = False
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
             elif session_id and _deploy_layer_name and _deploy_node_is_connected:
+                _model_from_apply_node = False
                 _model_from_deploy_node = True
                 connect_nn_model_selector.disable()
                 connect_nn_model_selector_disabled_text.show()
@@ -402,6 +398,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
                         )
                         _need_preview_update = False
                         confirm_model()
+                        _model_from_apply_node = False
                         _need_preview_update = True
                         connect_nn_text.set(model_connected_text, "success")
                     except:
@@ -410,7 +407,7 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             elif (
                 _session_id is not None
                 and _session_id != "reset"
-                and model_from_apply_node is True
+                and _model_from_apply_node is True
                 and _deploy_layer_name is None
                 and _deploy_node_is_connected is False
             ):
