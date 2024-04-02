@@ -190,11 +190,9 @@ class ExportArchiveWithMasksLayer(Layer):
                 cv2.imwrite(output_img_path, img)
 
             dataset_name = item_desc.get_res_ds_name()
-            # @TODO: update dataset creation later
-            out_ds_path = osp.join("results", self.out_project.name, dataset_name)
-            if not self.out_project.datasets.has_key(out_ds_path):
+            if not self.out_project.datasets.has_key(dataset_name):
                 self.out_project.create_dataset(dataset_name)
-            out_dataset = self.out_project.datasets.get(out_ds_path)
+            out_dataset = self.out_project.datasets.get(dataset_name)
             out_item_name = free_name + item_desc.get_item_ext()
 
             # net _always_ downloads images
