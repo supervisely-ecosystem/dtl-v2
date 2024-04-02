@@ -328,12 +328,17 @@ class ApplyNNInferenceAction(NeuralNetworkAction):
             else:
                 session_id = kwargs.get("session_id", None)
 
-            model_from_apply_node = False
-            if _session_id is not None and _session_id != "reset":
-                model_from_apply_node = True
-
             _deploy_layer_name = kwargs.get("deploy_layer_name", None)
             _kill_deployed_model_after_pipeline = kwargs.get("deploy_layer_terminate", False)
+
+            model_from_apply_node = False
+            if (
+                _session_id is not None
+                and _session_id != "reset"
+                and _deploy_layer_name is None
+                and _deploy_node_is_connected is False
+            ):
+                model_from_apply_node = True
 
             model_connected_text = f"Model has been connected from {_deploy_layer_name} layer"
             model_disconnected_text = f"{_deploy_layer_name} detected but model is not deployed"
