@@ -219,10 +219,12 @@ def _run():
             pbar.update(1)
 
         stop_btn.hide()
-        sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
-        error_notification.set(
-            "Pipeline was manually stopped", description="Results may be incomplete."
-        )
+
+        if error_notification.title == "Pipeline will be stopped":
+            sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
+            error_notification.set(
+                "Pipeline was manually stopped", description="Results may be incomplete."
+            )
         stop_btn.enable()
         run_btn.show()
         nodes_flow_card.unlock()
