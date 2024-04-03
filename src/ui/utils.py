@@ -180,7 +180,9 @@ def init_nodes_state(
                 # update ui layer meta and data
                 merged_meta = utils.merge_input_metas(cur_layer_input_metas.values())
                 ui_layer_id = all_layers_ids[cur_layer_idx]
-                ui_layer = g.layers[ui_layer_id]
+                ui_layer = g.layers.get(ui_layer_id)
+                if ui_layer is None:
+                    continue  # layer has been deleted
                 ui_layer: Layer
                 merged_data = {}
                 # gather data from all sources
