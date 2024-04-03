@@ -5,7 +5,7 @@
 There are 2 ways to connect model in `Apply NN Inference` layer:
 
 1. Run one of the serving apps manually and then select app session in the model selector or if you already have a running model session, you can just select it.
-2. Add `Deploy` layer to the scene and deploy model via this layer and simply link this layer to the `Apply NN Inference` layer.
+2. Add `Deploy` layer to the scene and deploy model via this layer then simply link this layer to the `Apply NN Inference` layer's `Deployed model (optional)` socket.
 
 Read our post on [Supervisely blog](https://supervisely.com/blog/) to learn how to effectively train, deploy and use the model on the YOLOv8 example: [No-code tutorial: train and predict YOLOv8 on custom data](https://supervisely.com/blog/train-yolov8-on-custom-data-no-code/).
 
