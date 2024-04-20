@@ -1,63 +1,63 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Uvicorn",
-            "type": "python",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "src.main:app",
-                "--host",
-                "0.0.0.0",
-                "--port",
-                "8000",
-                "--ws",
-                "websockets",
-                "--reload"
-            ],
-            "jinja": true,
-            "justMyCode": false,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
-                "LOG_LEVEL": "DEBUG",
-            }
-        },
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}${pathSeparator}${env:PYTHONPATH}"
-            }
-        },
-        {
-            "name": "Advanced Debug in Supervisely platform",
-            "type": "python",
-            "request": "launch",
-            "module": "uvicorn",
-            "args": [
-                "src.main:m.app",
-                "--host",
-                "0.0.0.0",
-                "--port",
-                "8000",
-                "--ws",
-                "websockets"
-            ],
-            "jinja": true,
-            "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
-                "LOG_LEVEL": "DEBUG",
-                "ENV": "production",
-                "DEBUG_WITH_SLY_NET": "1",
-                "SLY_APP_DATA_DIR": "${workspaceFolder}/app_data",
-                "TEAM_ID": "473"
-            }
-        }
-    ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Uvicorn",
+			"type": "python",
+			"request": "launch",
+			"module": "uvicorn",
+			"args": [
+				"src.main:app",
+				"--host",
+				"0.0.0.0",
+				"--port",
+				"8000",
+				"--ws",
+				"websockets",
+				"--reload"
+			],
+			"jinja": true,
+			"justMyCode": false,
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
+				"LOG_LEVEL": "DEBUG"
+			}
+		},
+		{
+			"name": "Python: Current File",
+			"type": "python",
+			"request": "launch",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			"justMyCode": false,
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}${pathSeparator}${env:PYTHONPATH}"
+			}
+		},
+		{
+			"name": "Advanced Debug in Supervisely platform",
+			"type": "python",
+			"request": "launch",
+			"module": "uvicorn",
+			"args": [
+				"src.main:m.app",
+				"--host",
+				"0.0.0.0",
+				"--port",
+				"8000",
+				"--ws",
+				"websockets"
+			],
+			"jinja": true,
+			"justMyCode": true,
+			"env": {
+				"PYTHONPATH": "${workspaceFolder}:${PYTHONPATH}",
+				"LOG_LEVEL": "DEBUG",
+				"ENV": "production",
+				"DEBUG_WITH_SLY_NET": "1",
+				"SLY_APP_DATA_DIR": "${workspaceFolder}/app_data",
+				"TEAM_ID": "473"
+			}
+		}
+	]
 }

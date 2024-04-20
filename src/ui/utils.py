@@ -106,21 +106,25 @@ def init_layers(nodes_state: dict):
 
 
 def init_src(edges: list):
+    layer_connections = {}
     for edge in edges:
         from_node_id = edge["output"]["node"]
         from_node_interface = edge["output"]["interface"]
+        to_node_interface = edge["input"]["interface"]
         to_node_id = edge["input"]["node"]
-        try:
-            layer = g.layers[to_node_id]
-        except KeyError:
-            raise LayerNotFoundError(to_node_id)
-        layer: Layer
-        layer.add_source(from_node_id, from_node_interface)
+        layer_connections.setdefault(to_node_id, []).append(
+            (from_node_id, from_node_interface, to_node_interface)
+        )
+
+    for layer in g.layers.values():
+        layer.update_sources(layer_connections.get(layer.id, []))
 
 
-def init_output_metas(
+def init_nodes_state(
     net: Net, data_layers_ids: list, all_layers_ids: list, nodes_state: dict, edges: list
 ):
+    """Update nodes project meta and data"""
+
     def calc_metas(net):
         # Call meta changed callbacks for Data layers
         for layer_id in data_layers_ids:
@@ -136,9 +140,9 @@ def init_output_metas(
             layer.update_project_meta(layer_input_meta)
 
         cur_level_layers_idxs = {
-            idx for idx, layer in enumerate(net.layers) if layer.type == "data"
+            idx for idx, layer in enumerate(net.layers) if layer.type == "data" or not layer.srcs
         }
-        datalevel_metas = {}
+        metas_dict = {}
         for data_layer_idx in cur_level_layers_idxs:
             data_layer = net.layers[data_layer_idx]
             try:
@@ -148,7 +152,7 @@ def init_output_metas(
             except KeyError:
                 input_meta = ProjectMeta()
             for src in data_layer.srcs:
-                datalevel_metas[src] = input_meta
+                metas_dict[src] = input_meta
 
         def get_dest_layers_idxs(the_layer_idx):
             the_layer = net.layers[the_layer_idx]
@@ -160,8 +164,9 @@ def init_output_metas(
 
         def layer_input_metas_are_calculated(the_layer_idx):
             the_layer = net.layers[the_layer_idx]
-            return all((x in datalevel_metas for x in the_layer.srcs))
+            return all((x in metas_dict for x in the_layer.srcs))
 
+        datas_dict = {}
         processed_layers = set()
         while len(cur_level_layers_idxs) != 0:
             next_level_layers_idxs = set()
@@ -170,14 +175,24 @@ def init_output_metas(
                 cur_layer = net.layers[cur_layer_idx]
                 processed_layers.add(cur_layer_idx)
                 # TODO no need for dict here?
-                cur_layer_input_metas = {src: datalevel_metas[src] for src in cur_layer.srcs}
+                cur_layer_input_metas = {src: metas_dict[src] for src in cur_layer.srcs}
 
-                # update ui layer meta
+                # update ui layer meta and data
                 merged_meta = utils.merge_input_metas(cur_layer_input_metas.values())
                 ui_layer_id = all_layers_ids[cur_layer_idx]
-                ui_layer = g.layers[ui_layer_id]
+                ui_layer = g.layers.get(ui_layer_id)
+                if ui_layer is None:
+                    continue  # layer has been deleted
                 ui_layer: Layer
-                ui_layer.update_project_meta(merged_meta)
+                merged_data = {}
+                # gather data from all sources
+                for src in ui_layer.get_src():
+                    merged_data.update(datas_dict.get(find_layer_id_by_dst(src), {}))
+                # update data in node
+                ui_layer.update_data({**merged_data, "project_meta": merged_meta})
+                # get update data to use in next nodes
+                merged_data.update(ui_layer.get_data())
+                datas_dict[ui_layer_id] = merged_data
 
                 # update settings according to new meta
                 node_options = nodes_state.get(ui_layer_id, {})
@@ -208,7 +223,7 @@ def init_output_metas(
                 ui_layer.output_meta = cur_layer_res_meta
 
                 for dst in cur_layer.dsts:
-                    datalevel_metas[dst] = cur_layer_res_meta
+                    metas_dict[dst] = cur_layer_res_meta
 
                 # yield cur_layer_res_meta, cur_layer_idx
 
@@ -226,7 +241,7 @@ def init_output_metas(
         if layer_idx not in processed_layers:
             ui_layer_id = all_layers_ids[layer_idx]
             ui_layer = g.layers[ui_layer_id]
-            ui_layer.update_project_meta(ProjectMeta())
+            ui_layer.update_data({"project_meta": ProjectMeta()})
     return net
 
 
@@ -241,6 +256,8 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         return chain
     src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
+        if src_layer.startswith("deploy_"):
+            continue
         if src_layer is None:
             continue
         if src_layer in chain:
@@ -326,7 +343,12 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     layer = g.layers[layer_id]
     layer.clear_preview()
 
-    layer_idx = all_layers_ids.index(layer_id)
+    try:
+        layer_idx = all_layers_ids.index(layer_id)
+    except:
+        # hack, fix later
+        g.layers.pop(layer_id)
+        return
 
     net.preview_mode = True
     net.calc_metas()
@@ -374,7 +396,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
         )
 
-    data_el = (img_desc, preview_ann)
+    data_el = [(img_desc, preview_ann)]  # make list to match batch
     if layers_id_chain is None:
         layers_idx_whitelist = None
     else:
@@ -394,12 +416,12 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
                 continue
             layer = g.layers[all_layers_ids[layer_indx]]
             layer: Layer
-            if len(data_el) == 1:
+            if len(data_el[0]) == 1:
                 img_desc, ann = data_el[0]
-            elif len(data_el) == 3:
-                img_desc, ann, _ = data_el
+            elif len(data_el[0]) == 3:
+                img_desc, ann, _ = data_el[0]
             else:
-                img_desc, ann = data_el
+                img_desc, ann = data_el[0]
             if not is_starting_layer:
                 layer.set_src_img_desc(prev_img_desc)
                 layer.set_src_ann(prev_ann)
@@ -480,7 +502,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
         img_desc = img_desc.clone_with_item(preview_img)
         img_desc.write_image_local(f"{preview_path}/preview_image.jpg")
 
-        data_el = (img_desc, preview_ann)
+        data_el = [(img_desc, preview_ann)]
 
         processing_generator = net.start_iterate(data_el)
         for data_el, layer_indx in processing_generator:

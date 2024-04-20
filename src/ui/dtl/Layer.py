@@ -1,7 +1,7 @@
 import os
 import copy
 import time
-from typing import Optional
+from typing import Optional, List
 import random
 
 from supervisely import Annotation, ProjectMeta
@@ -38,6 +38,9 @@ class Layer:
         need_preview: bool = True,
         id: Optional[str] = None,
         custom_update_btn: Button = None,
+        get_data: Optional[callable] = None,
+        postprocess_cb: Optional[callable] = None,
+        update_sources_cb: Optional[callable] = None,
     ):
         self.action = action
         self.id = id
@@ -50,12 +53,15 @@ class Layer:
         self._get_dst = get_dst
         self._data_changed_cb = data_changed_cb
         self._need_preview = need_preview
+        self._get_data = get_data
 
         self._src = []
         self._settings = {}
         self._dst = []
 
         self.output_meta = None
+        self.postprocess_cb = postprocess_cb
+        self.update_sources_cb = update_sources_cb
 
         md_description = self.action.md_description.replace(
             r"../../assets", r"https://raw.githubusercontent.com/supervisely/docs/master/assets"
@@ -102,7 +108,7 @@ class Layer:
                     style=get_set_settings_button_style(),
                 )
 
-            if self.action.name == "data":
+            if self.action.name == "images_project":
                 if not isinstance(self.output_meta, ProjectMeta):
                     self._update_preview_button.disable()
 
@@ -112,7 +118,7 @@ class Layer:
 
         self._preview_options = []
         if self._need_preview:
-            if self.action.name == "data":
+            if self.action.name == "images_project":
                 preview_text = NodesFlow.Node.Option(
                     name="update_preview_btn",
                     option_component=NodesFlow.WidgetOptionComponent(
@@ -184,8 +190,11 @@ class Layer:
         def combine_options(options: list):
             result_options = [
                 self._info_option,
-                get_separator(0),
             ]
+
+            if not all([len(options[key]) == 0 for key in ["src", "dst", "settings"]]):
+                result_options.append(get_separator(0))
+
             if len(options["src"]) > 0:
                 result_options.extend(options["src"])
                 result_options.append(get_separator(1))
@@ -225,9 +234,24 @@ class Layer:
         self._update_dst(node_options)
         self._update_settings(node_options)
 
-    def add_source(self, from_node_id, from_node_interface):
-        src_name = self._connection_name(from_node_id, from_node_interface)
-        self._src.append(src_name)
+    def update_sources(self, connections: List[tuple]):
+        new_sources = []
+        src_names = []
+        for from_node_id, from_node_interface, to_node_interface in connections:
+            src_name = self._connection_name(from_node_id, from_node_interface)
+            src_names.append((src_name, to_node_interface))
+
+        need_append = [True] * len(src_names)
+        if self.update_sources_cb is not None:
+            need_append = self.update_sources_cb(src_names)
+
+        # fix var naming
+        for (src_name, _), to_append in zip(src_names, need_append):
+            if to_append:
+                new_sources.append(src_name)
+
+        if len(new_sources) > 0:
+            self._src = new_sources
 
     def clear_preview(self):
         self._img_desc = None
@@ -255,7 +279,11 @@ class Layer:
         if self._need_preview:
             return self._res_img_desc
 
-    def update_preview(self, img_desc: ImageDescriptor, ann: Annotation):
+    def update_preview(
+        self, img_desc: ImageDescriptor, ann: Annotation, project_meta: ProjectMeta = None
+    ):
+        if project_meta is None:
+            project_meta = self.output_meta
         if not self._need_preview:
             return
         self._res_img_desc = img_desc
@@ -265,10 +293,13 @@ class Layer:
         #     title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
         # )
         self._preview_widget.set(
-            image_url=f"{self._preview_img_url}?{time.time()}",
+            image_url=f"{self._preview_img_url}?q={time.time()}",
             ann=self._res_ann,
-            project_meta=self.output_meta,
+            project_meta=project_meta,
         )
+
+        # print(self._preview_widget.widget_id)
+
         if self._preview_widget.is_empty():
             self._preview_widget.hide()
             self._empty_preview_text.show()
@@ -285,6 +316,15 @@ class Layer:
 
     def get_ann(self):
         return self._res_ann
+
+    def get_data(self):
+        if self._get_data is None:
+            return {}
+        return self._get_data()
+
+    def update_data(self, data: dict):
+        if self._data_changed_cb is not None:
+            self._data_changed_cb(**data)
 
     def update_project_meta(self, project_meta: ProjectMeta):
         if self._data_changed_cb is not None:

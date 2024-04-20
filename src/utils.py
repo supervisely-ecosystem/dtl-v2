@@ -3,11 +3,11 @@ from typing import Callable, List, Optional, Tuple, Union
 from collections import namedtuple
 import json
 import os
-import shutil
 from tqdm import tqdm
 
 import supervisely as sly
-from supervisely import ProjectMeta, KeyIdMap, ImageInfo
+from supervisely import ProjectMeta, KeyIdMap, ImageInfo, logger
+from supervisely.io.fs import remove_dir
 
 
 import src.globals as g
@@ -232,7 +232,7 @@ def ensure_dir(dir_path):
 
 def delete_dir(dir_path):
     if os.path.exists(dir_path):
-        shutil.rmtree(dir_path, ignore_errors=False)
+        remove_dir(dir_path)
 
 
 def save_dtl_json(dtl_json):
@@ -302,6 +302,26 @@ def clean_static_dir(static_dir):
         item_path = os.path.join(static_dir, item)
         if os.path.isdir(item_path):
             if item != ignore_dir:
-                shutil.rmtree(item_path)
+                remove_dir(item_path)
         else:
             os.remove(item_path)
+
+
+def kill_serving_app():
+    for task_id in g.running_sessions_ids:
+        g.api.task.stop(task_id)
+        logger.info(f"Session ID: {task_id} has been stopped")
+
+
+def kill_deployed_app_by_layer_id(id: str):
+    layer = g.layers[id]
+    settings = layer._settings
+    session_id = settings.get("session_id", None)
+    if session_id is not None:
+        g.api.app.stop(session_id)
+    else:
+        return
+
+
+def on_app_shutdown():
+    kill_serving_app()
