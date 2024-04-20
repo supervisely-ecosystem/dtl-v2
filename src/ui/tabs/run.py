@@ -120,6 +120,7 @@ def _run():
         # Save results
         file_infos = []
         pr_dirs = []
+
         if os.path.exists(g.RESULTS_DIR):
             for pr_dir in os.listdir(g.RESULTS_DIR):
                 pr_dir = os.path.join(g.RESULTS_DIR, pr_dir)
@@ -218,6 +219,13 @@ def _run():
             pbar.update(1)
 
         stop_btn.hide()
+
+        if error_notification.title == "Pipeline will be stopped":
+            sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
+            error_notification.set(
+                "Pipeline was manually stopped", description="Results may be incomplete."
+            )
+        stop_btn.enable()
         run_btn.show()
         nodes_flow_card.unlock()
         g.warn_notification.hide()
@@ -247,13 +255,14 @@ def start_pipeline():
 @stop_btn.click
 @handle_exception
 def stop_pipeline():
+    stop_btn.disable()
     if g.pipeline_thread is not None:
         if g.pipeline_thread.is_alive():
             g.pipeline_thread = None
             g.pipeline_running = False
-            sly.logger.info("Pipeline was manually stopped. Results may be incomplete.")
+            sly.logger.info("Pipeline will be stopped. Results may be incomplete.")
             error_notification.set(
-                "Pipeline was manually stopped", description="Results may be incomplete."
+                "Pipeline will be stopped", description="Results may be incomplete."
             )
             error_notification.show()
             circle_progress.hide()

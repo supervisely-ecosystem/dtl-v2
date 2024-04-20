@@ -460,6 +460,7 @@ class ApplyNNInferenceLayer(Layer):
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         item_descs, anns = zip(*data_els)
 
+        pred_anns = []
         if self.settings["session_id"] is None:
             new_item_descs = item_descs
             if not self.net.preview_mode:

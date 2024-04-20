@@ -106,17 +106,18 @@ def init_layers(nodes_state: dict):
 
 
 def init_src(edges: list):
+    layer_connections = {}
     for edge in edges:
         from_node_id = edge["output"]["node"]
         from_node_interface = edge["output"]["interface"]
+        to_node_interface = edge["input"]["interface"]
         to_node_id = edge["input"]["node"]
-        try:
-            layer = g.layers[to_node_id]
-        except KeyError:
-            raise LayerNotFoundError(to_node_id)
-        layer: Layer
-        # if source already in layer -> pass
-        layer.add_source(from_node_id, from_node_interface)
+        layer_connections.setdefault(to_node_id, []).append(
+            (from_node_id, from_node_interface, to_node_interface)
+        )
+
+    for layer in g.layers.values():
+        layer.update_sources(layer_connections.get(layer.id, []))
 
 
 def init_nodes_state(
@@ -179,7 +180,9 @@ def init_nodes_state(
                 # update ui layer meta and data
                 merged_meta = utils.merge_input_metas(cur_layer_input_metas.values())
                 ui_layer_id = all_layers_ids[cur_layer_idx]
-                ui_layer = g.layers[ui_layer_id]
+                ui_layer = g.layers.get(ui_layer_id)
+                if ui_layer is None:
+                    continue  # layer has been deleted
                 ui_layer: Layer
                 merged_data = {}
                 # gather data from all sources
@@ -253,6 +256,8 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         return chain
     src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
+        if src_layer.startswith("deploy_"):
+            continue
         if src_layer is None:
             continue
         if src_layer in chain:

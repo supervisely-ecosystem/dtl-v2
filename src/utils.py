@@ -3,11 +3,11 @@ from typing import Callable, List, Optional, Tuple, Union
 from collections import namedtuple
 import json
 import os
-import shutil
 from tqdm import tqdm
 
 import supervisely as sly
 from supervisely import ProjectMeta, KeyIdMap, ImageInfo, logger
+from supervisely.io.fs import remove_dir
 
 
 import src.globals as g
@@ -232,7 +232,7 @@ def ensure_dir(dir_path):
 
 def delete_dir(dir_path):
     if os.path.exists(dir_path):
-        shutil.rmtree(dir_path, ignore_errors=False)
+        remove_dir(dir_path)
 
 
 def save_dtl_json(dtl_json):
@@ -302,7 +302,7 @@ def clean_static_dir(static_dir):
         item_path = os.path.join(static_dir, item)
         if os.path.isdir(item_path):
             if item != ignore_dir:
-                shutil.rmtree(item_path)
+                remove_dir(item_path)
         else:
             os.remove(item_path)
 
