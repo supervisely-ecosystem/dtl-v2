@@ -8,6 +8,8 @@ from src.ui.tabs.presets import load_json
 
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
+from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredProjectAction
+
 from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
 from src.utils import LegacyProjectItem
 
@@ -95,7 +97,7 @@ def generate_preview_for_project(layer):
         layer.set_preview_loading(False)
 
 
-if g.PROJECT_ID:
+if g.PROJECT_ID and not g.USE_FILTERED_ITEMS:
     ds_name = "*"
     if g.DATASET_ID:
         ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
@@ -109,6 +111,15 @@ if g.PROJECT_ID:
         layer = create_new_layer(VideosProjectAction.name)
     else:
         raise NotImplementedError(f"Project type {pr.type} is not supported")
+    layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
+    node = layer.create_node()
+    nodes_flow.add_node(node)
+    generate_preview_for_project(layer)
+
+if g.PROJECT_ID and g.USE_FILTERED_ITEMS:
+    pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
+    src = [f"{pr.name}"]
+    layer = create_new_layer(FilteredProjectAction.name)
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)

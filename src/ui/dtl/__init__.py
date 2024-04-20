@@ -100,6 +100,8 @@ from .actions.filters_and_conditions.filter_videos_by_tags.filter_videos_by_tags
     FilterVideosByTag,
 )
 
+from .actions.input.filtered_project.filtered_project import FilteredProjectAction
+
 # ---
 
 # Labeling job
@@ -123,7 +125,11 @@ VIDEO_TRANSFORMS = "Video transforms"
 # ---
 
 image_actions_list = {
-    SOURCE_ACTIONS: [ImagesProjectAction.name, InputLabelingJobAction.name],
+    SOURCE_ACTIONS: [
+        ImagesProjectAction.name,
+        InputLabelingJobAction.name,
+        # FilteredProjectAction.name,
+    ],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
         BlurAction.name,
@@ -186,6 +192,7 @@ image_actions_dict = {
     # Data layers
     ImagesProjectAction.name: ImagesProjectAction,
     InputLabelingJobAction.name: InputLabelingJobAction,
+    # FilteredProjectAction.name: FilteredProjectAction,
     # Pixel-level transforms layers
     AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,
@@ -323,3 +330,5 @@ modality_dict_legacy = {"images": image_actions_legacy_dict, "videos": video_act
 actions_dict = modality_dict[g.MODALITY_TYPE]
 actions_list = modality_list[g.MODALITY_TYPE]
 actions_dict_legacy = modality_dict_legacy[g.MODALITY_TYPE]
+
+hidden_actions_dict = {FilteredProjectAction.name: FilteredProjectAction}

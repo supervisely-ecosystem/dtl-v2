@@ -3,7 +3,7 @@ import os
 from queue import Queue
 
 from dotenv import load_dotenv
-
+from distutils.util import strtobool
 import supervisely as sly
 from supervisely.app.widgets import (
     Dialog,
@@ -42,6 +42,17 @@ SUPPORTED_MODALITIES_MAP = {
     "images": sly.ProjectType.IMAGES,
     "videos": sly.ProjectType.VIDEOS,
 }
+
+
+USE_FILTERED_ITEMS = bool(strtobool(os.getenv("modal.state.filteredItems", "false")))
+FILTERED_ITEMS_IDS = []
+
+if USE_FILTERED_ITEMS is True and PROJECT_ID is None:
+    raise ValueError("Project ID is required for filtered items functionality")
+else:
+    FILTERED_ITEMS_IDS = (
+        os.getenv("modal.state.filteredItemsIds", []).lstrip("[").rstrip("]").split(",")
+    )
 
 
 api = sly.Api()
