@@ -21,5 +21,6 @@
 			"videos_project",
 			"videos_dataset"
 		]
-	}
+	},
+  "min_instance_version": "6.9.4"
 }
