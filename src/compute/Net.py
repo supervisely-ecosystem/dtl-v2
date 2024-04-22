@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger, batched
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -343,6 +343,9 @@ class Net:
     # Process classes begin
     ############################################################################################################
     def get_total_elements(self):
+        if g.FILTERED_ITEMS_IDS is not None and len(g.FILTERED_ITEMS_IDS) > 0:
+            return len(g.FILTERED_ITEMS_IDS)
+
         total = 0
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         datasets = []
@@ -477,7 +480,45 @@ class Net:
             project_info = get_project_by_id(project_id)
             for dataset_id in dataset_ids:
                 dataset_info = get_dataset_by_id(dataset_id)
-                if self.modality == "images":
+                if self.modality == "images" and g.USE_FILTERED_ITEMS:
+                    datasets = g.api.dataset.get_list(project_id)
+                    all_item_infos = []
+                    for dataset in datasets:
+                        item_list = g.api.image.get_list(dataset.id)
+                        all_item_infos.extend(item_list)
+                    filtered_item_infos = [
+                        item_info
+                        for item_info in all_item_infos
+                        if item_info.id in g.FILTERED_ITEMS_IDS
+                    ]
+                    for batch in batched(filtered_item_infos, batch_size):
+                        items_batch = []
+                        for img_info in batch:
+                            img_data = np.zeros(
+                                (img_info.height, img_info.width, 3), dtype=np.uint8
+                            )
+                            if require_items:
+                                img_data = g.api.image.download_np(img_info.id)
+                            img_desc = ImageDescriptor(
+                                LegacyProjectItem(
+                                    project_name=project_info.name,
+                                    ds_name=dataset_info.name,
+                                    item_name=".".join(img_info.name.split(".")[:-1]),
+                                    item_info=img_info,
+                                    ia_data={"item_ext": "." + img_info.ext},
+                                    item_path="",
+                                    ann_path="",
+                                ),
+                                False,
+                            )
+                            img_desc.update_item(img_data)
+                            ann = Annotation.from_json(
+                                g.api.annotation.download(img_info.id).annotation, project_meta
+                            )
+                            data_el = (img_desc, ann)
+                            items_batch.append(data_el)
+                        yield items_batch
+                elif self.modality == "images":
                     for batch in g.api.image.get_list_generator(
                         dataset_id=dataset_id, batch_size=batch_size
                     ):
@@ -507,6 +548,7 @@ class Net:
                             data_el = (img_desc, ann)
                             items_batch.append(data_el)
                         yield items_batch
+
                 elif self.modality == "videos":
                     for batch in g.api.video.get_list_generator(
                         dataset_id=dataset_id, batch_size=batch_size

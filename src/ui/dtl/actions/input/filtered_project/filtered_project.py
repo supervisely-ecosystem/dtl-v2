@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from os.path import realpath, dirname
 from supervisely.app.widgets import ProjectThumbnail, NodesFlow, Text, Button, Container, FastTable
 from supervisely import ProjectMeta
@@ -66,22 +66,52 @@ class FilteredProjectAction(SourceAction):
         )
         tags_preview = TagsListPreview([obj_class for obj_class in _current_meta.tag_metas])
 
-        # def data_changed_cb(**kwargs):
-        #     nonlocal _current_info, _current_meta
-        #     classes_preview.set(_current_meta.obj_classes)
-        #     tags_preview.set(_current_meta.tag_metas)
+        def data_changed_cb(**kwargs):
+            pass
+
+        def get_src(options_json: dict) -> List[str]:
+            return [f"{_current_info.name}/*"]
 
         def get_settings(options_json: dict) -> dict:
-            return {}
+            return {
+                "project_id": g.PROJECT_ID,
+                "filtered_entities_ids": g.FILTERED_ITEMS_IDS,
+                "classes_mapping": "default",
+                "tags_mapping": "default",
+            }
+
+        def _set_settings_from_json(settings: dict):
+            nonlocal _current_info, _current_meta
+
+            project_id = settings.get("project_id", None)
+            if project_id is not None:
+                g.PROJECT_ID = project_id
+                _current_info = g.api.project.get_info_by_id(g.PROJECT_ID)
+                _current_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
+
+            filtered_entities_ids = settings.get("filtered_entities_ids", [])
+            if filtered_entities_ids is not None and len(filtered_entities_ids) > 0:
+                g.FILTERED_ITEMS_IDS = filtered_entities_ids
+
+            if (
+                project_id is not None
+                and filtered_entities_ids is not None
+                and len(filtered_entities_ids) > 0
+            ):
+                filtered_table_data = build_filtered_table(
+                    g.api, g.PROJECT_ID, g.FILTERED_ITEMS_IDS
+                )
+                filtered_table.read_pandas(filtered_table_data)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             src_options = [
                 NodesFlow.Node.Option(
                     name="Source Preview",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=show_data_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(filtered_data_container),
-                        sidebar_width=300,
+                        sidebar_width=625,
                     ),
                 ),
             ]
@@ -114,6 +144,8 @@ class FilteredProjectAction(SourceAction):
             action=cls,
             id=layer_id,
             create_options=create_options,
+            get_src=get_src,
             get_settings=get_settings,
             need_preview=True,
+            data_changed_cb=data_changed_cb,
         )

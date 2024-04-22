@@ -53,6 +53,8 @@ else:
     FILTERED_ITEMS_IDS = (
         os.getenv("modal.state.filteredItemsIds", []).lstrip("[").rstrip("]").split(",")
     )
+    if len(FILTERED_ITEMS_IDS) > 0:
+        FILTERED_ITEMS_IDS = list(map(int, FILTERED_ITEMS_IDS))
 
 
 api = sly.Api()

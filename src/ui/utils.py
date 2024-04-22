@@ -299,6 +299,13 @@ def load_preview_for_data_layer(layer: Layer):
     if layer.action.name == "input_labeling_job":
         layer_settings = layer.get_settings()
         items_ids = layer_settings.get("entities_ids", None)
+    elif layer.action.name == "filtered_project":
+        layer_settings = layer.get_settings()
+        items_ids = g.FILTERED_ITEMS_IDS
+        if len(items_ids) == 0:
+            items_ids = layer_settings.get("filtered_entities_ids", None)
+            if items_ids is None or len(items_ids) == 0:
+                items_ids = None
     else:
         items_ids = None
 
