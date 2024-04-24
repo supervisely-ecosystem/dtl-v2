@@ -50,6 +50,10 @@
     margin-left: 10px;
 }
 
+.sly-nodes-flow-widget .tailwind.fast-table input.pl-8.px-3 {
+    padding-left: 2rem !important;
+}
+
 body {
     margin: 0px !important;
 }

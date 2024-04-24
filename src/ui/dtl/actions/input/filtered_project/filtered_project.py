@@ -36,9 +36,7 @@ class FilteredProjectAction(SourceAction):
 
         filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ENTITIES)
         filtered_table = FastTable(data=filtered_table_data)
-        filtered_data_btn = Button(
-            "Continue", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();"
-        )
+        filtered_data_btn = Button("Close", call_on_click="closeSidebar();")
 
         filtered_data_container = Container([filtered_table, filtered_data_btn])
 

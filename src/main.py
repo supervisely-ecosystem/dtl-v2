@@ -63,7 +63,9 @@ update_loop = threading.Thread(
 
 
 def generate_preview_for_project(layer):
-    if g.DATASET_ID:
+    if len(g.FILTERED_ENTITIES) > 0:
+        items = [g.api.image.get_info_by_id(g.FILTERED_ENTITIES[0])]
+    elif g.DATASET_ID:
         items = g.api.image.get_list(g.DATASET_ID)
     else:
         dss = g.api.dataset.get_list(g.PROJECT_ID)
