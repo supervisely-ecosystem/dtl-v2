@@ -85,13 +85,6 @@ class FilteredProjectLayer(Layer):
         self.dataset_names = list(dataset_names)
 
     def preprocess(self):
-        all_image_infos = []
-        datasets = g.api.dataset.get_list(g.PROJECT_ID)
-        for dataset in datasets:
-            all_image_infos.extend(g.api.image.get_list(dataset.id))
-        filtered_image_infos = [
-            image_info for image_info in all_image_infos if image_info.id in g.FILTERED_ITEMS_IDS
-        ]
         return super().preprocess()
 
     def modifies_data(self):

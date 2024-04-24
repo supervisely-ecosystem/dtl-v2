@@ -3,23 +3,15 @@ from typing import List
 from supervisely import Api, ImageInfo
 
 
-def build_filtered_table(api: Api, project_id: int, filtered_items_ids: List[int]) -> pd.DataFrame:
+def build_filtered_table(
+    api: Api, project_id: int, filtered_items: List[ImageInfo]
+) -> pd.DataFrame:
     datasets = api.dataset.get_list(project_id)
     datasets_map = {ds.id: ds.name for ds in datasets}
 
-    all_item_infos = []
-    for dataset in datasets:
-        item_list = api.image.get_list(dataset.id)
-        # for images
-        all_item_infos.extend(item_list)
-
-    filtered_item_infos = [
-        item_info for item_info in all_item_infos if item_info.id in filtered_items_ids
-    ]
-
     columns = ["Name", "Dataset", "Shape (WxH)", "Classes", "Tags"]
     data = []
-    for item_info in filtered_item_infos:
+    for item_info in filtered_items:
         # for images
         item_info: ImageInfo
         item_data = []

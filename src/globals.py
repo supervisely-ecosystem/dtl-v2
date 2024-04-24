@@ -16,10 +16,11 @@ from supervisely.app.widgets import (
     NotificationBox,
 )
 
+if sly.is_development():
+    load_dotenv("local.env")
+    load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-load_dotenv("local.env")
-load_dotenv(os.path.expanduser("~/supervisely.env"))
-
+api = sly.Api()
 
 TEAM_ID = sly.env.team_id()
 WORKSPACE_ID = sly.env.workspace_id()
@@ -44,21 +45,6 @@ SUPPORTED_MODALITIES_MAP = {
     "videos": sly.ProjectType.VIDEOS,
 }
 
-
-USE_FILTERED_ITEMS = bool(strtobool(os.getenv("modal.state.filteredItems", "false")))
-FILTERED_ITEMS_IDS = []
-
-if USE_FILTERED_ITEMS is True and PROJECT_ID is None:
-    raise ValueError("Project ID is required for filtered items functionality")
-
-filtered_items_str = os.getenv("modal.state.filteredItemsIds", "")
-if filtered_items_str:
-    FILTERED_ITEMS_IDS = ast.literal_eval(filtered_items_str)
-else:
-    FILTERED_ITEMS_IDS = []
-
-
-api = sly.Api()
 ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
 
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
@@ -72,6 +58,24 @@ if PROJECT_ID is not None:
     MODALITY_TYPE = project_type
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
+
+if PROJECT_ID is not None:
+    entities_filters = os.getenv("modal.state.entitiesFilter", [])
+    entities_filters = [
+        # {"type": "images_filename", "data": {"value": "0748"}},
+        {"type": "images_filename", "data": {"value": "2084"}},
+    ]
+
+    if len(entities_filters) > 0:
+        if DATASET_ID:
+            dataset_ids = [DATASET_ID]
+        else:
+            dataset_ids = [dataset.id for dataset in api.dataset.get_list(PROJECT_ID)]
+        FILTERED_ENTITIES = []
+        for dataset_id in dataset_ids:
+            images = api.image.get_filtered_list(dataset_id, filters=entities_filters)
+            FILTERED_ENTITIES.extend(images)
+
 
 if MODALITY_TYPE == "images":
     BATCH_SIZE = 50

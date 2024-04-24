@@ -98,7 +98,7 @@ def generate_preview_for_project(layer):
         layer.set_preview_loading(False)
 
 
-if g.PROJECT_ID and not g.USE_FILTERED_ITEMS:
+if g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     ds_name = "*"
     if g.DATASET_ID:
         ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
@@ -117,7 +117,7 @@ if g.PROJECT_ID and not g.USE_FILTERED_ITEMS:
     nodes_flow.add_node(node)
     generate_preview_for_project(layer)
 
-if g.PROJECT_ID and g.USE_FILTERED_ITEMS:
+if g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
     src = [f"{pr.name}/*"]
     layer = create_new_layer(FilteredProjectAction.name)

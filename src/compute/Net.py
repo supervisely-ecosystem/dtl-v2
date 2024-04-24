@@ -343,12 +343,8 @@ class Net:
     # Process classes begin
     ############################################################################################################
     def get_total_elements(self):
-        if (
-            g.USE_FILTERED_ITEMS
-            and g.FILTERED_ITEMS_IDS is not None
-            and len(g.FILTERED_ITEMS_IDS) > 0
-        ):
-            return len(g.FILTERED_ITEMS_IDS)
+        if len(g.FILTERED_ENTITIES) > 0:
+            return len(g.FILTERED_ENTITIES)
 
         total = 0
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
@@ -489,17 +485,8 @@ class Net:
                         dataset_id=dataset_id, batch_size=batch_size
                     ):
                         # check if we need to filter items
-                        if (
-                            g.USE_FILTERED_ITEMS
-                            and g.FILTERED_ITEMS_IDS is not None
-                            and len(g.FILTERED_ITEMS_IDS) > 0
-                        ):
-                            filtered_batch = [
-                                item_info
-                                for item_info in batch
-                                if item_info.id in g.FILTERED_ITEMS_IDS
-                            ]
-                            batch = filtered_batch
+                        if len(g.FILTERED_ENTITIES) > 0:
+                            batch = g.FILTERED_ENTITIES
 
                         items_batch = []
                         for img_info in batch:

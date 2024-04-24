@@ -34,7 +34,7 @@ class FilteredProjectAction(SourceAction):
         _current_info = g.api.project.get_info_by_id(g.PROJECT_ID)
         _current_meta: ProjectMeta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
 
-        filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ITEMS_IDS)
+        filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ENTITIES)
         filtered_table = FastTable(data=filtered_table_data)
         filtered_data_btn = Button(
             "Continue", icon="zmdi zmdi-floppy", call_on_click="closeSidebar();"
@@ -44,7 +44,7 @@ class FilteredProjectAction(SourceAction):
 
         filtered_project_preview = ProjectThumbnail(
             info=_current_info,
-            description=f"{len(g.FILTERED_ITEMS_IDS)} {_current_info.type} selected via filters",
+            description=f"{len(g.FILTERED_ENTITIES)} {_current_info.type} selected via filters",
         )
         show_filtered_data_btn = Button(
             text="SHOW",
@@ -78,7 +78,7 @@ class FilteredProjectAction(SourceAction):
         def get_settings(options_json: dict) -> dict:
             return {
                 "project_id": g.PROJECT_ID,
-                "filtered_entities_ids": g.FILTERED_ITEMS_IDS,
+                "filtered_entities_ids": [image_info.id for image_info in g.FILTERED_ENTITIES],
                 "classes_mapping": "default",
                 "tags_mapping": "default",
             }
@@ -93,17 +93,13 @@ class FilteredProjectAction(SourceAction):
                 _current_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
 
             filtered_entities_ids = settings.get("filtered_entities_ids", [])
-            if filtered_entities_ids is not None and len(filtered_entities_ids) > 0:
-                g.FILTERED_ITEMS_IDS = filtered_entities_ids
+            if len(filtered_entities_ids) > 0:
+                g.FILTERED_ENTITIES = [
+                    g.api.image.get_info_by_id(image_id) for image_id in filtered_entities_ids
+                ]
 
-            if (
-                project_id is not None
-                and filtered_entities_ids is not None
-                and len(filtered_entities_ids) > 0
-            ):
-                filtered_table_data = build_filtered_table(
-                    g.api, g.PROJECT_ID, g.FILTERED_ITEMS_IDS
-                )
+            if project_id is not None and len(filtered_entities_ids) > 0:
+                filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ENTITIES)
                 filtered_table.read_pandas(filtered_table_data)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:

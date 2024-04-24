@@ -49,8 +49,7 @@ class MoveLayer(Layer):
     def postprocess(self):
         g.api.image.remove_batch(list(self.entity_ids_to_remove))
         self.entity_ids_to_remove = set()
-        g.USE_FILTERED_ITEMS = False
-        g.FILTERED_ITEMS_IDS = []
+        g.FILTERED_ENTITIES = []
 
     def has_batch_processing(self) -> bool:
         return True
