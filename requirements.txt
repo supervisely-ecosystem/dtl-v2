@@ -8,3 +8,6 @@ cacheout
 markdown
 json2html
 moviepy
+# other augmentation
+imagecorruptions
+imgaug 
