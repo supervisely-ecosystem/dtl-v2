@@ -9,4 +9,4 @@ RUN apt-get update && apt-get install -y
 # RUN pip3 install imgaug==0.4.0 imagecorruptions==1.1.2
 
 COPY dev_requirements.txt dev_requirements.txt
-RUN pip install -r dev_requirements.txt
+RUN pip3 install -r dev_requirements.txt
