@@ -40,6 +40,7 @@ class FilteredProjectAction(SourceAction):
 
         filtered_data_container = Container([filtered_table, filtered_data_btn])
 
+        filtered_project_text = Text("Selected Project", font_size=get_text_font_size())
         filtered_project_preview = ProjectThumbnail(
             info=_current_info,
             description=f"{len(g.FILTERED_ENTITIES)} {_current_info.type} selected via filters",
@@ -53,7 +54,7 @@ class FilteredProjectAction(SourceAction):
             style=get_set_settings_button_style(),
         )
         show_data_container = get_set_settings_container(
-            filtered_project_preview, show_filtered_data_btn
+            filtered_project_text, show_filtered_data_btn
         )
 
         classes_preview_text = Text(
@@ -102,11 +103,17 @@ class FilteredProjectAction(SourceAction):
             _set_settings_from_json(settings)
             src_options = [
                 NodesFlow.Node.Option(
-                    name="Source Preview",
+                    name="Source Preview Text",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=show_data_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(filtered_data_container),
                         sidebar_width=625,
+                    ),
+                ),
+                NodesFlow.Node.Option(
+                    name="Source Project Preview",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=filtered_project_preview,
                     ),
                 ),
             ]
