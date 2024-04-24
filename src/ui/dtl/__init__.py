@@ -100,11 +100,16 @@ from .actions.filters_and_conditions.filter_videos_by_tags.filter_videos_by_tags
     FilterVideosByTag,
 )
 
+
 # ---
 
 # Labeling job
 from .actions.input.input_labeling_job.input_labeling_job import InputLabelingJobAction
 from .actions.output.create_labeling_job.create_labeling_job import CreateLabelingJobAction
+
+# New
+from .actions.input.filtered_project.filtered_project import FilteredProjectAction
+from .actions.other.move.move import MoveAction
 
 import src.globals as g
 
@@ -123,7 +128,11 @@ VIDEO_TRANSFORMS = "Video transforms"
 # ---
 
 image_actions_list = {
-    SOURCE_ACTIONS: [ImagesProjectAction.name, InputLabelingJobAction.name],
+    SOURCE_ACTIONS: [
+        ImagesProjectAction.name,
+        InputLabelingJobAction.name,
+        # FilteredProjectAction.name,
+    ],
     PIXEL_LEVEL_TRANSFORMS: [
         AnonymizeAction.name,
         BlurAction.name,
@@ -170,7 +179,7 @@ image_actions_list = {
         IfAction.name,
     ],
     NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNInferenceAction.name],
-    OTHER: [DatasetAction.name, DummyAction.name],
+    OTHER: [DatasetAction.name, DummyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
         CreateNewProjectAction.name,
         AddToExistingProjectAction.name,
@@ -186,6 +195,7 @@ image_actions_dict = {
     # Data layers
     ImagesProjectAction.name: ImagesProjectAction,
     InputLabelingJobAction.name: InputLabelingJobAction,
+    # FilteredProjectAction.name: FilteredProjectAction,
     # Pixel-level transforms layers
     AnonymizeAction.name: AnonymizeAction,
     BlurAction.name: BlurAction,
@@ -233,6 +243,7 @@ image_actions_dict = {
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
+    MoveAction.name: MoveAction,
     # Save layers
     CreateNewProjectAction.name: CreateNewProjectAction,
     AddToExistingProjectAction.name: AddToExistingProjectAction,
@@ -323,3 +334,5 @@ modality_dict_legacy = {"images": image_actions_legacy_dict, "videos": video_act
 actions_dict = modality_dict[g.MODALITY_TYPE]
 actions_list = modality_list[g.MODALITY_TYPE]
 actions_dict_legacy = modality_dict_legacy[g.MODALITY_TYPE]
+
+hidden_actions_dict = {FilteredProjectAction.name: FilteredProjectAction}

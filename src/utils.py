@@ -155,13 +155,12 @@ def get_project_by_id(id: int) -> sly.ProjectInfo:
 
 
 def get_dataset_by_id(id: int = None) -> sly.DatasetInfo:
-    if id not in g.cache["dataset_info"]:
-        try:
-            dataset_info = g.api.dataset.get_info_by_id(id, raise_error=True)
-        except:
-            raise RuntimeError(f"Dataset {id} not found")
-        g.cache["dataset_info"][id] = dataset_info
-        g.cache["dataset_id"][(dataset_info.project_id, dataset_info.name)] = dataset_info.id
+    try:
+        dataset_info = g.api.dataset.get_info_by_id(id, raise_error=True)
+    except:
+        raise RuntimeError(f"Dataset {id} not found")
+    g.cache["dataset_info"][id] = dataset_info
+    g.cache["dataset_id"][(dataset_info.project_id, dataset_info.name)] = dataset_info.id
     return g.cache["dataset_info"][id]
 
 
