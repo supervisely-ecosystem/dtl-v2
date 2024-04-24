@@ -60,22 +60,9 @@ if PROJECT_ID is not None:
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
 if PROJECT_ID is not None:
-    entities_filters = os.getenv("modal.state.entitiesFilter", [])
-    entities_filters = [
-        # {"type": "images_filename", "data": {"value": "0748"}},
-        {"type": "images_filename", "data": {"value": "2084"}},
-    ]
-
-    if len(entities_filters) > 0:
-        if DATASET_ID:
-            dataset_ids = [DATASET_ID]
-        else:
-            dataset_ids = [dataset.id for dataset in api.dataset.get_list(PROJECT_ID)]
-        FILTERED_ENTITIES = []
-        for dataset_id in dataset_ids:
-            images = api.image.get_filtered_list(dataset_id, filters=entities_filters)
-            FILTERED_ENTITIES.extend(images)
-
+    FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])
+    if FILTERED_ENTITIES != []:
+        FILTERED_ENTITIES = ast.literal_eval(FILTERED_ENTITIES)
 
 if MODALITY_TYPE == "images":
     BATCH_SIZE = 50

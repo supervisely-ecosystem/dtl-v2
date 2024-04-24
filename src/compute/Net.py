@@ -486,7 +486,12 @@ class Net:
                     ):
                         # check if we need to filter items
                         if len(g.FILTERED_ENTITIES) > 0:
-                            batch = g.FILTERED_ENTITIES
+                            filtered_batch = [
+                                item_info
+                                for item_info in batch
+                                if item_info.id in g.FILTERED_ENTITIES
+                            ]
+                            batch = filtered_batch
 
                         items_batch = []
                         for img_info in batch:

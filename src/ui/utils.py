@@ -301,7 +301,7 @@ def load_preview_for_data_layer(layer: Layer):
         items_ids = layer_settings.get("entities_ids", None)
     elif layer.action.name == "filtered_project":
         layer_settings = layer.get_settings()
-        items_ids = [image_info.id for image_info in g.FILTERED_ENTITIES]
+        items_ids = g.FILTERED_ENTITIES
         if len(items_ids) == 0:
             items_ids = layer_settings.get("filtered_entities_ids", [])
             if len(items_ids) == 0:
