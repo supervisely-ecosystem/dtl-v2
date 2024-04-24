@@ -24,7 +24,7 @@ class MoveLayer(Layer):
 
     def __init__(self, config, net):
         Layer.__init__(self, config, net=net)
-        self.entity_ids_to_remove = []
+        self.entity_ids_to_remove = set()
 
     def validate(self):
         if not self.settings.get("move_confirmation"):
@@ -43,12 +43,14 @@ class MoveLayer(Layer):
             item_descs, anns = zip(*data_els)
             for item in item_descs:
                 item: ImageDescriptor
-                self.entity_ids_to_remove.append(item.info.item_info.id)
+                self.entity_ids_to_remove.add(item.info.item_info.id)
             yield tuple(zip(item_descs, anns))
 
     def postprocess(self):
-        g.api.image.remove_batch(self.entity_ids_to_remove)
-        # need to remove ids from g.FILTERED_IDS?
+        g.api.image.remove_batch(list(self.entity_ids_to_remove))
+        self.entity_ids_to_remove = set()
+        g.USE_FILTERED_ITEMS = False
+        g.FILTERED_ITEMS_IDS = []
 
     def has_batch_processing(self) -> bool:
         return True

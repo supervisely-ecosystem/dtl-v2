@@ -75,6 +75,7 @@ def generate_preview_for_project(layer):
     if len(items) > 0 and pr.type == "images":
         project_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
         item_info = items[0]
+        dataset_name = g.api.dataset.get_info_by_id(item_info.dataset_id).name
         image_path = f"{g.PREVIEW_DIR}/{layer.id}/preview_image.{item_info.ext}"
         g.api.image.download_path(item_info.id, image_path)
         ann_json = g.api.annotation.download_json(item_info.id)
@@ -82,7 +83,7 @@ def generate_preview_for_project(layer):
         item_desc = ImageDescriptor(
             LegacyProjectItem(
                 project_name=pr.name,
-                ds_name=ds.name,
+                ds_name=dataset_name,
                 item_name=".".join(item_info.name.split(".")[:-1]),
                 item_info=item_info,
                 ia_data={"item_ext": "." + item_info.ext},
@@ -118,7 +119,7 @@ if g.PROJECT_ID and not g.USE_FILTERED_ITEMS:
 
 if g.PROJECT_ID and g.USE_FILTERED_ITEMS:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
-    src = [f"{pr.name}"]
+    src = [f"{pr.name}/*"]
     layer = create_new_layer(FilteredProjectAction.name)
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()

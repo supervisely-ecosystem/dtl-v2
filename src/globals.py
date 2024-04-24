@@ -1,4 +1,5 @@
 import os
+import ast
 
 from queue import Queue
 
@@ -49,17 +50,15 @@ FILTERED_ITEMS_IDS = []
 
 if USE_FILTERED_ITEMS is True and PROJECT_ID is None:
     raise ValueError("Project ID is required for filtered items functionality")
+
+filtered_items_str = os.getenv("modal.state.filteredItemsIds", "")
+if filtered_items_str:
+    FILTERED_ITEMS_IDS = ast.literal_eval(filtered_items_str)
 else:
-    FILTERED_ITEMS_IDS = (
-        os.getenv("modal.state.filteredItemsIds", []).lstrip("[").rstrip("]").split(",")
-    )
-    if len(FILTERED_ITEMS_IDS) > 0:
-        FILTERED_ITEMS_IDS = list(map(int, FILTERED_ITEMS_IDS))
+    FILTERED_ITEMS_IDS = []
 
 
 api = sly.Api()
-
-
 ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
 
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")

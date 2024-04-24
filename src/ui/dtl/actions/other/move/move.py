@@ -11,16 +11,19 @@ class MoveAction(OtherAction):
     name = "move"
     title = "Move"
     docs_url = ""
-    description = "Move items from the source to the destination. Items in the source will be removed after the move operation is completed"
+    description = (
+        "Move items from the source to the destination. "
+        "Items in the source will be removed after the move operation is successfully completed"
+    )
     md_description = get_layer_docs(dirname(realpath(__file__)))
     width = 380
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         move_notification = NotificationBox(
-            title="Move items from the destination to the target.",
+            title="Move items from the source to the destination",
             description=(
-                "Items in the destination will be removed after the move operation is completed."
+                "Items in the source project will be removed after the move operation is successfully completed"
             ),
             box_type="info",
         )

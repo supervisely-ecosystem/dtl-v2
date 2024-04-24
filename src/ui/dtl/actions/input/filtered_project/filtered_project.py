@@ -42,7 +42,10 @@ class FilteredProjectAction(SourceAction):
 
         filtered_data_container = Container([filtered_table, filtered_data_btn])
 
-        filtered_project_preview = ProjectThumbnail(_current_info)
+        filtered_project_preview = ProjectThumbnail(
+            info=_current_info,
+            description=f"{len(g.FILTERED_ITEMS_IDS)} {_current_info.type} selected via filters",
+        )
         show_filtered_data_btn = Button(
             text="SHOW",
             icon="zmdi zmdi-folder",
