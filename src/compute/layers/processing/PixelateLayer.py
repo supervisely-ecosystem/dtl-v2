@@ -53,4 +53,4 @@ class PixelateLayer(Layer):
         yield tuple(zip(item_descs, anns))
 
     def has_batch_processing(self) -> bool:
-        return True
+        return False
