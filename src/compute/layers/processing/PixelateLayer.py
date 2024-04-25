@@ -47,7 +47,7 @@ class PixelateLayer(Layer):
         pixelated_images = aug.augment_images(original_images)
 
         # тут еще проверить надо что длина item_descs == pixelated_images
-        if len(item_desc) == len(pixelated_images):
+        if len(item_descs) == len(pixelated_images):
             for item_desc, pix_img in zip(item_descs, pixelated_images):
                 item_desc.update_item(pix_img)
         yield tuple(zip(item_descs, anns))
