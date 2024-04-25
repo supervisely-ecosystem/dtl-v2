@@ -122,7 +122,7 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 ## How To Run
 
-You can run the application from the ecosystem, project or saved preset file.
+There are several ways to run the application:
 
 <details open>
 <summary><b>1. Run App from Ecosystem</b></summary>
@@ -131,10 +131,24 @@ You can run the application from the ecosystem, project or saved preset file.
 
 </details>
 
-<details open>
-<summary><b>2. Run App from Project</b></summary>
+<details>
+<summary><b>2. Run App from the context menu of the Project</b></summary>
 
 ![run-from-project-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c92ecdc6-c038-4f86-880c-b974183dc6ab)
+
+</details>
+
+<details>
+<summary><b>3. Run App from the context menu of the Dataset</b></summary>
+
+![run-from-project-min]()
+
+</details>
+
+<details>
+<summary><b>4. Run App from Filters</b></summary>
+
+![run-from-project-min]()
 
 </details>
 
