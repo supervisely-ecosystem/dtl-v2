@@ -8,7 +8,7 @@ import imgaug.augmenters as iaa
 
 
 class ElasticTransformLayer(Layer):
-    action = "elastictransform"
+    action = "elastic_transform"
 
     layer_settings = {
         "required": ["settings"],

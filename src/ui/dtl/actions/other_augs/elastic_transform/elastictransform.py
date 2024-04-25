@@ -13,7 +13,7 @@ from supervisely.app.widgets import (
 
 
 class ElasticTransformAction(OtherAugmentationsAction):
-    name = "elastictransform"
+    name = "elastic_transform"
     title = "Elastic Transform"
     docs_url = ""
     description = ""
