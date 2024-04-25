@@ -27,8 +27,7 @@ class PixelateAction(OtherAugmentationsAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        _cur_kernel = 2
-        severity_input = InputNumber(value=_cur_kernel, min=1, max=5, step=1, size="small")
+        severity_input = InputNumber(value=2, min=1, max=5, step=1, size="small")
         severity_field = Field(
             title="Severity",
             description="",

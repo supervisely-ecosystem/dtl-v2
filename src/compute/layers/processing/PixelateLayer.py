@@ -40,7 +40,17 @@ class PixelateLayer(Layer):
         yield (img_desc, ann)
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
-        yield data_els
+        item_descs, anns = zip(*data_els)
+        aug = iaa.imgcorruptlike.Pixelate(severity=self.settings["severity"])
+
+        original_images = [item_desc.item_data for item_desc in item_descs]
+        pixelated_images = aug.augment_images(original_images)
+
+        # тут еще проверить надо что длина item_descs == pixelated_images
+        if len(item_desc) == len(pixelated_images):
+            for item_desc, pix_img in zip(item_descs, pixelated_images):
+                item_desc.update_item(pix_img)
+        yield tuple(zip(item_descs, anns))
 
     def has_batch_processing(self) -> bool:
-        return False
+        return True
