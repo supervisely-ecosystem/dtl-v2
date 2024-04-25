@@ -122,35 +122,49 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 ## How To Run
 
-There are several ways to run the application:
+There are several ways to run the application, depending on your needs and preferences:
 
 <details open>
 <summary><b>1. Run App from Ecosystem</b></summary>
 
-![run-from-ecosystem-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/4dc28226-74d6-4603-a282-bdb94270d893)
+![run-from-ecosystem](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/f9d5ab6d-68e0-40d4-96a4-571eea41a383)
 
 </details>
 
 <details>
 <summary><b>2. Run App from the context menu of the Project</b></summary>
 
-![run-from-project-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c92ecdc6-c038-4f86-880c-b974183dc6ab)
+![run-from-project](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/1df4ad60-4969-4c2a-b2bb-6cb9032fa13c)
 
 </details>
 
 <details>
 <summary><b>3. Run App from the context menu of the Dataset</b></summary>
 
-![run-from-project-min]()
+![run-from-dataset](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/ec9b955e-8abc-4908-821c-768eb7bcdd68)
+
+</details>
+
+<!-- <details>
+<summary><b>4. Run Pipeline from Project</b></summary>
+
+![run-pipeline-from-project](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/0bbf3f31-2a03-4f7c-b8a1-38eeaa314a99)
 
 </details>
 
 <details>
-<summary><b>4. Run App from Filters</b></summary>
+<summary><b>5. Run Pipeline from Dataset</b></summary>
 
-![run-from-project-min]()
+![run-pipeline-from-dataset](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/0a2da1c9-97ae-4d44-b087-f24657fb0370)
 
 </details>
+
+<details>
+<summary><b>6. Run Pipeline with Filters</b></summary>
+
+![run-pipeline-from-filters](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/1bf0e32c-8af7-44f5-8fa8-921320cedb95)
+
+</details> -->
 
 <!-- <details open>
 <summary><b>3. Run App from Team Files</b></summary>
