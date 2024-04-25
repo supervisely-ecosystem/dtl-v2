@@ -17,7 +17,7 @@ from src.utils import (
 from src.compute.Net import Net
 from src.compute.Layer import Layer as NetLayer
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
-from src.ui.dtl import actions_dict, actions_list
+from src.ui.dtl import actions_dict, actions_list, hidden_actions_dict
 from src.ui.dtl.Action import Action, SourceAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import (
@@ -299,6 +299,13 @@ def load_preview_for_data_layer(layer: Layer):
     if layer.action.name == "input_labeling_job":
         layer_settings = layer.get_settings()
         items_ids = layer_settings.get("entities_ids", None)
+    elif layer.action.name == "filtered_project":
+        layer_settings = layer.get_settings()
+        items_ids = g.FILTERED_ENTITIES
+        if len(items_ids) == 0:
+            items_ids = layer_settings.get("filtered_entities_ids", [])
+            if len(items_ids) == 0:
+                items_ids = None
     else:
         items_ids = None
 
@@ -584,7 +591,9 @@ def create_new_layer(
     action_name: str,
 ) -> Layer:
     try:
-        action = actions_dict[action_name]
+        action = actions_dict.get(action_name)
+        if action is None:
+            action = hidden_actions_dict[action_name]
     except KeyError:
         raise ActionNotFoundError(action_name)
     id = get_layer_id(action_name)

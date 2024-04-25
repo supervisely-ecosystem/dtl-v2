@@ -5,7 +5,7 @@ import json
 
 import numpy as np
 
-from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger, batched
 
 from src.compute.Layer import Layer
 from src.compute import layers  # to register layers
@@ -343,6 +343,9 @@ class Net:
     # Process classes begin
     ############################################################################################################
     def get_total_elements(self):
+        if len(g.FILTERED_ENTITIES) > 0:
+            return len(g.FILTERED_ENTITIES)
+
         total = 0
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         datasets = []
@@ -481,6 +484,15 @@ class Net:
                     for batch in g.api.image.get_list_generator(
                         dataset_id=dataset_id, batch_size=batch_size
                     ):
+                        # check if we need to filter items
+                        if len(g.FILTERED_ENTITIES) > 0:
+                            filtered_batch = [
+                                item_info
+                                for item_info in batch
+                                if item_info.id in g.FILTERED_ENTITIES
+                            ]
+                            batch = filtered_batch
+
                         items_batch = []
                         for img_info in batch:
                             img_data = np.zeros(
@@ -507,6 +519,7 @@ class Net:
                             data_el = (img_desc, ann)
                             items_batch.append(data_el)
                         yield items_batch
+
                 elif self.modality == "videos":
                     for batch in g.api.video.get_list_generator(
                         dataset_id=dataset_id, batch_size=batch_size
