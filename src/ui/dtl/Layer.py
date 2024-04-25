@@ -289,9 +289,6 @@ class Layer:
         self._res_img_desc = img_desc
         write_image(self._preview_img_path, self._res_img_desc.read_image())
         self._res_ann = ann
-        # self._preview_widget.set(
-        #     title=None, image_url=f"{self._preview_img_url}?{time.time()}", ann=self._res_ann
-        # )
         self._preview_widget.set(
             image_url=f"{self._preview_img_url}?q={time.time()}",
             ann=self._res_ann,

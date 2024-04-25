@@ -23,6 +23,7 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 ## Available Layers
 
+<<<<<<< HEAD
 | Layers                                                                                                                                                       | Description                                                 | Images | Videos |
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|--------|--------|
 | **Input**                                                                                                                                                    |                                                             |        |        |
@@ -92,6 +93,74 @@ This application is a versatile tool designed for data transformation tasks (lik
 | [Export Archive with Masks](/src/ui/dtl/actions/output/export_archive_with_masks/README.md#export-archive-with-masks)                                        | Export data to TeamFiles as an archive with masks.          | +      | -      |
 | [Copy Annotations](/src/ui/dtl/actions/output/copy_annotations/README.md#copy-annotations)                                                                   | Copy annotations from one project to another.               | +      | -      |
 | [Create Labeling Job](/src/ui/dtl/actions/output/create_labeling_job/README.md#create-labeling-job)                                                          | Create a labeling job from data.                            | +      | +      |
+=======
+| Layers                                                                                                                                                                                                                      | Description                                                 | Images | Videos |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|--------|--------|
+| **Input**                                                                                                                                                                                                                   |                                                             |        |        |
+| [Images Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/images_project/README.md#images-project)                                                                          | Select a project with images to process.                    | +      | -      |
+| [Videos Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/videos_project/README.md#videos-project)                                                                          | Select a project with videos to process.                    | -      | +      |
+| [Input Labeling Job](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/input/input_labeling_job/README.md#input-labeling-job)                                                              | Select a labeling job to process.                           | +      | -      |
+| **Pixel Level Transformations**                                                                                                                                                                                             |                                                             |        |        |
+| [Anonymize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/anonymize/README.md#anonymize)                                                                   | Anonymize objects on data.                                  | +      | -      |
+| [Blur](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/blur/README.md#blur)                                                                                  | Blur data.                                                  | +      | -      |
+| [Contrast Brightness](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/contrast_brightness/README.md#contrast-and-brightness)                                 | Change contrast and brightness of data.                     | +      | -      |
+| [Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/noise/README.md#noise)                                                                               | Add noise to data.                                          | +      | -      |
+| [Random Color](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/pixel_level_transformations/random_color/README.md#random-color)                                                          | Change colors of data.                                      | +      | -      |
+| **Spatial Level Transformations**                                                                                                                                                                                           |                                                             |        |        |
+| [Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/crop/README.md#crop)                                                                                     | Crop data.                                                  | +      | -      |
+| [Flip](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/flip/README.md#flip)                                                                                     | Flip data vertically or horizontally.                       | +      | -      |
+| [Instance Crop](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/instances_crop/README.md#instances-crop)                                                        | Crop instances in data.                                     | +      | -      |
+| [Multiply](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/multiply/README.md#multiply)                                                                         | Multiply objects.                                           | +      | -      |
+| [Resize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/resize/README.md#resize)                                                                               | Resize data.                                                | +      | -      |
+| [Rotate](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/rotate/README.md#rotate)                                                                               | Rotate data.                                                | +      | -      |
+| [Sliding Window](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/spatial_level_transforms/sliding_window/README.md#sliding-window)                                                       | Apply sliding window to data.                               | +      | -      |
+| **Annotation Transforms**                                                                                                                                                                                                   |                                                             |        |        |
+| [Approximate Vector](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/approx_vector/README.md#approx-vector)                                                       | Approximate vector objects.                                 | +      | -      |
+| [Background](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/background/README.md#background)                                                                     | Add background to data.                                     | +      | +      |
+| [Bounding Box](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/bbox/README.md#bounding-box)                                                                       | Convert object classes to bounding boxes.                   | +      | +      |
+| [Bounding Box to Polygon](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/bbox_to_polygon/README.md#bbox-to-polygon)                                              | Convert bounding boxes to polygons.                         | +      | +      |
+| [Bitwise Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/bitwise_masks/README.md#bitwise-masks)                                                            | Bitwise operations on masks.                                | +      | -      |
+| [Change Class Color](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/change_class_color/README.md#change-class-color)                                             | Change color of the object class.                           | +      | -      |
+| [Drop Lines by Length](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/drop_lines_by_length/README.md#drop-lines-by-length)                                       | Remove lines by length.                                     | +      | -      |
+| [Drop Noise](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/drop_noise/README.md#drop-noise)                                                                     | Remove noise from masks.                                    | +      | -      |
+| [Drop Object by Class](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/drop_object_by_class/README.md#drop-object-by-class)                                       | Remove objects by class.                                    | +      | -      |
+| [Duplicate Objects](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/duplicate_objects/README.md#duplicate-objects)                                                | Duplicate objects.                                          | +      | -      |
+| [Image Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/image_tag/README.md#image-tag)                                                                        | Add tag to data.                                            | +      | -      |
+| [Line to Mask](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/line_to_mask/README.md#line-to-mask)                                                               | Convert lines to masks.                                     | +      | -      |
+| [Mask to Lines](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/mask_to_lines/README.md#mask-to-lines)                                                            | Convert masks to lines.                                     | +      | -      |
+| [Mask to Polygon](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/mask_to_polygon/README.md#mask-to-polygon)                                                      | Convert masks to polygons.                                  | +      | -      |
+| [Merge Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/merge_masks/README.md#merge-masks)                                                                  | Merge few masks of the same object class into a single one. | +      | -      |
+| [Objects Filter](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/objects_filter/README.md#objects-filter)                                                         | Filter data by objects.                                     | +      | -      |
+| [Polygon to Mask](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/polygon_to_mask/README.md#polygon-to-mask)                                                      | Convert polygons to masks.                                  | +      | -      |
+| [Rasterize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/rasterize/README.md#rasterize)                                                                        | Rasterize objects.                                          | +      | -      |
+| [Rename Classes](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/rename_classes/README.md#rename-classes)                                                         | Rename object classes.                                      | +      | -      |
+| [Skeletonize](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/skeletonize/README.md#skeletonize)                                                                  | Skeletonize masks.                                          | +      | -      |
+| [Split Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/split_masks/README.md#split-masks)                                                                  | Split masks.                                                | +      | -      |
+| [Split Videos by Duration](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl//actions/annotation_transforms/split_videos_by_duration/README.md#split-video-by-duration)                            | Split videos by duration.                                   | -      | +      |
+| **Filters and Conditions**                                                                                                                                                                                                  |                                                             |        |        |
+| [Filter Image by Object](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_image_by_object/README.md#filter-images-by-object-classes)                        | Filter Image by Object.                                     | +      | -      |
+| [Filter Image by Tag](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_image_by_tag/README.md#filter-images-by-tags)                                        | Filter Image by Tag.                                        | +      | -      |
+| [Filter Images without Objects](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_images_without_objects/README.md#filter-images-without-object-classes)     | Filter Images without Objects.                              | +      | -      |
+| [Filter Videos by Duration](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_videos_by_duration/README.md#filter-videos-by-duration)                        | Filter Videos by Duration.                                  | -      | +      |
+| [Filter Videos by Objects](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_videos_by_objects/README.md#filter-videos-by-object-classes)                    | Filter Videos by Objects.                                   | -      | +      |
+| [Filter Videos by Tags](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_videos_by_tags/README.md#filter-videos-by-tags)                                    | Filter Videos by Tags.                                      | -      | +      |
+| [Filter Videos without Annotations](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_videos_without_annotation/README.md#filter-videos-without-annotations) | Filter Videos without Annotations.                          | -      | +      |
+| [Filter Videos without Objects](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/filter_videos_without_objects/README.md#filter-videos-without-object-classes)     | Filter Videos without Objects.                              | -      | +      |
+| [IF Action](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/filters_and_conditions/if_action/README.md#if-action)                                                                        | Select one of the available conditions and filter data.     | +      | -      |
+| **Neural Networks**                                                                                                                                                                                                         |                                                             |        |        |
+| [Apply NN Inference](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/neural_networks/apply_nn_inference/README.md#apply-nn-inference)                                                    | Apply neural network inference.                             | +      | -      |
+| [Deploy YOLOv8](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/neural_networks/deploy_yolov8/README.md#deploy-yolov8)                                                                   | Deploy pretrained or custom YOLOv8 model.                   | +      | -      |
+| **Other**                                                                                                                                                                                                                   |                                                             |        |        |
+| [Dummy](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/other/dummy/README.md#dummy)                                                                                                     | Dummy node. Do nothing. Can be used to merge layers.        | +      | -      |
+| [Dataset](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/other/dataset/README.md#dataset)                                                                                               | All data will be put into a single dataset.                 | +      | -      |
+| **Output**                                                                                                                                                                                                                  |                                                             |        |        |
+| [Create new Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/create_new_project/README.md#create-new-project)                                                             | Create a new project and save data there.                   | +      | +      |
+| [Add to Existing Project](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/add_to_existing_project/README.md#add-to-existing-project)                                              | Add data to an existing project or dataset.                 | +      | +      |
+| [Export Archive](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/export_archive/README.md#export-archive)                                                                         | Export data to TeamFiles as an archive.                     | +      | +      |
+| [Export Archive with Masks](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/export_archive_with_masks/README.md#export-archive-with-masks)                                        | Export data to TeamFiles as an archive with masks.          | +      | -      |
+| [Copy Annotations](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/copy_annotations/README.md#copy-annotations)                                                                   | Copy annotations from one project to another.               | +      | -      |
+| [Create Labeling Job](https://github.com/supervisely-ecosystem/data-nodes/blob/master/src/ui/dtl/actions/output/create_labeling_job/README.md#create-labeling-job)                                                          | Create a labeling job from data.                            | +      | +      |
+>>>>>>> master
 
 #### Key features:
 
@@ -125,21 +194,49 @@ This application is a versatile tool designed for data transformation tasks (lik
 
 ## How To Run
 
-You can run the application from the ecosystem, project or saved preset file.
+There are several ways to run the application, depending on your needs and preferences:
 
 <details open>
 <summary><b>1. Run App from Ecosystem</b></summary>
 
-![run-from-ecosystem-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/4dc28226-74d6-4603-a282-bdb94270d893)
+![run-from-ecosystem](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/f9d5ab6d-68e0-40d4-96a4-571eea41a383)
 
 </details>
 
-<details open>
-<summary><b>2. Run App from Project</b></summary>
+<details>
+<summary><b>2. Run App from the context menu of the Project</b></summary>
 
-![run-from-project-min](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/c92ecdc6-c038-4f86-880c-b974183dc6ab)
+![run-from-project](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/1df4ad60-4969-4c2a-b2bb-6cb9032fa13c)
 
 </details>
+
+<details>
+<summary><b>3. Run App from the context menu of the Dataset</b></summary>
+
+![run-from-dataset](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/ec9b955e-8abc-4908-821c-768eb7bcdd68)
+
+</details>
+
+<!-- <details>
+<summary><b>4. Run Pipeline from Project</b></summary>
+
+![run-pipeline-from-project](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/0bbf3f31-2a03-4f7c-b8a1-38eeaa314a99)
+
+</details>
+
+<details>
+<summary><b>5. Run Pipeline from Dataset</b></summary>
+
+![run-pipeline-from-dataset](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/0a2da1c9-97ae-4d44-b087-f24657fb0370)
+
+</details>
+
+<details>
+<summary><b>6. Run Pipeline with Filters</b></summary>
+
+![run-pipeline-from-filters](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/1bf0e32c-8af7-44f5-8fa8-921320cedb95)
+
+</details> -->
 
 <!-- <details open>
 <summary><b>3. Run App from Team Files</b></summary>

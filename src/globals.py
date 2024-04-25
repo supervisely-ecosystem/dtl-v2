@@ -1,9 +1,10 @@
 import os
+import ast
 
 from queue import Queue
 
 from dotenv import load_dotenv
-
+from distutils.util import strtobool
 import supervisely as sly
 from supervisely.app.widgets import (
     Dialog,
@@ -15,10 +16,11 @@ from supervisely.app.widgets import (
     NotificationBox,
 )
 
+if sly.is_development():
+    load_dotenv("local.env")
+    load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-load_dotenv("local.env")
-load_dotenv(os.path.expanduser("~/supervisely.env"))
-
+api = sly.Api()
 
 TEAM_ID = sly.env.team_id()
 WORKSPACE_ID = sly.env.workspace_id()
@@ -43,10 +45,6 @@ SUPPORTED_MODALITIES_MAP = {
     "videos": sly.ProjectType.VIDEOS,
 }
 
-
-api = sly.Api()
-
-
 ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
 
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
@@ -60,6 +58,11 @@ if PROJECT_ID is not None:
     MODALITY_TYPE = project_type
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
+
+if PROJECT_ID is not None:
+    FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])
+    if FILTERED_ENTITIES != []:
+        FILTERED_ENTITIES = ast.literal_eval(FILTERED_ENTITIES)
 
 if MODALITY_TYPE == "images":
     BATCH_SIZE = 50

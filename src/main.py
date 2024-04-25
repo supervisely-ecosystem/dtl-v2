@@ -8,6 +8,8 @@ from src.ui.tabs.presets import load_json
 
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
+from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredProjectAction
+
 from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
 from src.utils import LegacyProjectItem
 
@@ -61,7 +63,9 @@ update_loop = threading.Thread(
 
 
 def generate_preview_for_project(layer):
-    if g.DATASET_ID:
+    if len(g.FILTERED_ENTITIES) > 0:
+        items = [g.api.image.get_info_by_id(g.FILTERED_ENTITIES[0])]
+    elif g.DATASET_ID:
         items = g.api.image.get_list(g.DATASET_ID)
     else:
         dss = g.api.dataset.get_list(g.PROJECT_ID)
@@ -73,6 +77,7 @@ def generate_preview_for_project(layer):
     if len(items) > 0 and pr.type == "images":
         project_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
         item_info = items[0]
+        dataset_name = g.api.dataset.get_info_by_id(item_info.dataset_id).name
         image_path = f"{g.PREVIEW_DIR}/{layer.id}/preview_image.{item_info.ext}"
         g.api.image.download_path(item_info.id, image_path)
         ann_json = g.api.annotation.download_json(item_info.id)
@@ -80,7 +85,7 @@ def generate_preview_for_project(layer):
         item_desc = ImageDescriptor(
             LegacyProjectItem(
                 project_name=pr.name,
-                ds_name=ds.name,
+                ds_name=dataset_name,
                 item_name=".".join(item_info.name.split(".")[:-1]),
                 item_info=item_info,
                 ia_data={"item_ext": "." + item_info.ext},
@@ -95,7 +100,7 @@ def generate_preview_for_project(layer):
         layer.set_preview_loading(False)
 
 
-if g.PROJECT_ID:
+if g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     ds_name = "*"
     if g.DATASET_ID:
         ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
@@ -109,6 +114,15 @@ if g.PROJECT_ID:
         layer = create_new_layer(VideosProjectAction.name)
     else:
         raise NotImplementedError(f"Project type {pr.type} is not supported")
+    layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
+    node = layer.create_node()
+    nodes_flow.add_node(node)
+    generate_preview_for_project(layer)
+
+if g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
+    pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
+    src = [f"{pr.name}/*"]
+    layer = create_new_layer(FilteredProjectAction.name)
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)

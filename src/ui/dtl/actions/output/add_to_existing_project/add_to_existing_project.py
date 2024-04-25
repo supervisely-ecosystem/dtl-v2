@@ -121,7 +121,11 @@ class AddToExistingProjectAction(OutputAction):
 
         select_project_warning_notification_box = NotificationBox(
             box_type="warning",
-            description="The ProjectMeta of the source project does not match the ProjectMeta of the destination project. By ticking this checkbox, you confirm that you understand and approve the update of the destination project's ProjectMeta.",
+            description=(
+                "The ProjectMeta of the source project does not match the ProjectMeta of the destination project. "
+                "By ticking this checkbox, you confirm that you understand "
+                "and approve the update of the destination project's ProjectMeta."
+            ),
         )
         select_project_warning_checkbox = Checkbox("Confirm")
         select_project_warning_container = Container(
