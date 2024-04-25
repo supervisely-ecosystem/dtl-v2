@@ -12,9 +12,9 @@ from supervisely.app.widgets import (
 )
 
 
-class PixelateAction(OtherAugmentationsAction):
-    name = "pixelate"
-    title = "Pixelate"
+class ElasticTransformAction(OtherAugmentationsAction):
+    name = "elastictransform"
+    title = "Elastic Transform"
     docs_url = ""
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
