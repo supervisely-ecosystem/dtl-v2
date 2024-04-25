@@ -112,6 +112,7 @@ from .actions.output.create_labeling_job.create_labeling_job import CreateLabeli
 from .actions.input.filtered_project.filtered_project import FilteredProjectAction
 from .actions.other.move.move import MoveAction
 from .actions.other_augs.pixelate.pixelate import PixelateAction
+from .actions.other_augs.elastic_transform.elastic_transform import ElasticTransformAction
 
 import src.globals as g
 
@@ -151,7 +152,7 @@ image_actions_list = {
         RotateAction.name,
         SlidingWindowAction.name,
     ],
-    OTHER_AUGMENTATIONS: [PixelateAction.name],
+    OTHER_AUGMENTATIONS: [PixelateAction.name, ElasticTransformAction.name],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
         BackgroundAction.name,
@@ -215,6 +216,7 @@ image_actions_dict = {
     SlidingWindowAction.name: SlidingWindowAction,
     # Other Augmentations
     PixelateAction.name: PixelateAction,
+    ElasticTransformAction.name: ElasticTransformAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
