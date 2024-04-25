@@ -17,7 +17,7 @@ In this example, we transform the image with severity 5.
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/1a2f49c4-7f32-436f-a2fe-a55360dedec0" alt="Elastic Transform" width=91% /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/40677182-e110-4be4-b333-819e2b389806" alt="Elastic Transform" /> </td>
 </tr>
 </table>
 
