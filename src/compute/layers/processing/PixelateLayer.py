@@ -43,4 +43,4 @@ class PixelateLayer(Layer):
         yield data_els
 
     def has_batch_processing(self) -> bool:
-        return False
+        return True
