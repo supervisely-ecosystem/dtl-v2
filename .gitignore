@@ -6,4 +6,7 @@ local.env
 /sly_task_data
 # /static
 .DS_Store
+lib
+lib64
+bin
 stat_timer.json

@@ -8,6 +8,7 @@ from .Action import (
     OutputAction,
     FilterAndConditionAction,
     NeuralNetworkAction,
+    OtherAugmentationsAction,
 )
 from .actions.input.images_project.images_project import ImagesProjectAction
 from .actions.pixel_level_transformations.anonymize.anonymize import AnonymizeAction
@@ -110,6 +111,7 @@ from .actions.output.create_labeling_job.create_labeling_job import CreateLabeli
 # New
 from .actions.input.filtered_project.filtered_project import FilteredProjectAction
 from .actions.other.move.move import MoveAction
+from .actions.other_augs.pixelate.pixelate import PixelateAction
 
 import src.globals as g
 
@@ -122,7 +124,7 @@ OTHER = "Other"
 SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
-
+OTHER_AUGMENTATIONS = "Other Augmentations"
 # Video specific
 VIDEO_TRANSFORMS = "Video transforms"
 # ---
@@ -149,6 +151,7 @@ image_actions_list = {
         RotateAction.name,
         SlidingWindowAction.name,
     ],
+    OTHER_AUGMENTATIONS: [PixelateAction.name],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
         BackgroundAction.name,
@@ -210,6 +213,8 @@ image_actions_dict = {
     ResizeAction.name: ResizeAction,
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
+    # Other Augmentations
+    PixelateAction.name: PixelateAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
