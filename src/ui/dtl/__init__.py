@@ -216,6 +216,7 @@ image_actions_dict = {
     SlidingWindowAction.name: SlidingWindowAction,
     # Other Augmentations
     PixelateAction.name: PixelateAction,
+    ElasticTransformAction.name: ElasticTransformAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
