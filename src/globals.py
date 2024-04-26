@@ -59,6 +59,7 @@ if PROJECT_ID is not None:
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
+FILTERED_ENTITIES = []
 if PROJECT_ID is not None:
     FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])
     if FILTERED_ENTITIES != []:
