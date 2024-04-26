@@ -489,7 +489,6 @@ class Net:
                             dataset_id=dataset_id, batch_size=batch_size
                         ),
                     ):
-                        logger.debug("Creating Items Batch")
                         start_items_batch_time = time()
                         # check if we need to filter items
                         if len(g.FILTERED_ENTITIES) > 0:

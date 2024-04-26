@@ -1,8 +1,8 @@
 # coding: utf-8
-
+from time import time
 from typing import Tuple, Union, List
 
-from supervisely import Annotation, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, VideoAnnotation, KeyIdMap, logger
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -121,6 +121,11 @@ class CreateNewProjectLayer(Layer):
         if self.net.preview_mode:
             yield data_els
         else:
+            logger.debug("Process CreateNewProjectLayer")
+            start_time_whole = time()
+
+            logger.debug("CreateNewProjectLayer: PROCESS ITEMS BEFORE UPLOAD")
+            start_time = time()
             item_descs, anns = zip(*data_els)
             ds_item_map = {}
             for item_desc, ann in zip(item_descs, anns):
@@ -139,6 +144,11 @@ class CreateNewProjectLayer(Layer):
                 ]
                 if self.sly_project_info is not None:
                     dataset_info = self.get_or_create_dataset(ds_name)
+
+                    end_time = time()
+                    logger.debug(
+                        f"CreateNewProjectLayer: PROCESS ITEMS BEFORE UPLOAD time: '{end_time - start_time}' sec"
+                    )
                     if self.net.modality == "images":
                         if self.net.may_require_items():
                             item_infos = g.api.image.upload_nps(
@@ -147,6 +157,8 @@ class CreateNewProjectLayer(Layer):
                                 [item_desc.read_image() for item_desc, _ in ds_item_map[ds_name]],
                             )
                         else:
+                            logger.debug("CreateNewProjectLayer: upload_ids")
+                            upload_start_time = time()
                             item_infos = g.api.image.upload_ids(
                                 dataset_info.id,
                                 out_item_names,
@@ -155,10 +167,22 @@ class CreateNewProjectLayer(Layer):
                                     for item_desc, _ in ds_item_map[ds_name]
                                 ],
                             )
+                            upload_end_time = time()
+                            logger.debug(
+                                f"CreateNewProjectLayer: upload_ids time: '{upload_end_time - upload_start_time}' sec"
+                            )
+
+                        logger.debug("CreateNewProjectLayer: upload_anns")
+                        upload_anns_start_time = time()
                         g.api.annotation.upload_anns(
                             [item_info.id for item_info in item_infos],
                             [ann for _, ann in ds_item_map[ds_name]],
                         )
+                        upload_anns_end_time = time()
+                        logger.debug(
+                            f"CreateNewProjectLayer: upload_anns time: '{upload_anns_end_time - upload_anns_start_time}' sec"
+                        )
+
                     elif self.net.modality == "videos":
                         item_infos = g.api.video.upload_paths(
                             dataset_info.id,
@@ -177,6 +201,11 @@ class CreateNewProjectLayer(Layer):
                             g.api.video.annotation.upload_paths(
                                 [video_info.id], [ann_path], self.output_meta
                             )
+
+            end_time_whole = time()
+            logger.debug(
+                f"CreateNewProjectLayer process_batch time: '{end_time_whole - start_time_whole}' sec"
+            )
             yield tuple(zip(item_descs, anns))
 
     def has_batch_processing(self):
