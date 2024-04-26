@@ -1,9 +1,7 @@
-from time import sleep
 from typing import Optional
 from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
-from supervisely.api.task_api import TaskApi
 
 from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer

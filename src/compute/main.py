@@ -126,6 +126,11 @@ def main(
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project and it's not empty"
         )
+
+    # Dynamic batch size
+    if not net.modifies_data() and not net.may_require_items():
+        g.BATCH_SIZE = 1000
+
     elements_generator_batched = net.get_elements_generator_batched(batch_size=g.BATCH_SIZE)
     if not g.pipeline_running:
         return
