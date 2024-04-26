@@ -128,8 +128,8 @@ def main(
         )
 
     # Dynamic batch size
-    # if not net.modifies_data() and not net.may_require_items():
-    #     g.BATCH_SIZE = 1000
+    if not net.modifies_data() and not net.may_require_items():
+        g.BATCH_SIZE = 1000
 
     elements_generator_batched = net.get_elements_generator_batched(batch_size=g.BATCH_SIZE)
     if not g.pipeline_running:

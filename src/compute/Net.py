@@ -495,11 +495,6 @@ class Net:
 
                         items_batch = []
                         for img_info in batch:
-                            img_data = np.zeros(
-                                (img_info.height, img_info.width, 3), dtype=np.uint8
-                            )
-                            if require_items:
-                                img_data = g.api.image.download_np(img_info.id)
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(
                                     project_name=project_info.name,
@@ -512,7 +507,14 @@ class Net:
                                 ),
                                 False,
                             )
-                            img_desc.update_item(img_data)
+
+                            # img_data = np.zeros(
+                            #     (img_info.height, img_info.width, 3), dtype=np.uint8
+                            # )
+
+                            if require_items:
+                                img_data = g.api.image.download_np(img_info.id)
+                                img_desc.update_item(img_data)
                             ann = Annotation.from_json(
                                 g.api.annotation.download(img_info.id).annotation, project_meta
                             )
