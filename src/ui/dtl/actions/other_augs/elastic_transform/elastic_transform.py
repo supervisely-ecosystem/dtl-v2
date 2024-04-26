@@ -15,8 +15,8 @@ from supervisely.app.widgets import (
 class ElasticTransformAction(OtherAugmentationsAction):
     name = "elastic_transform"
     title = "Elastic Transform"
-    docs_url = ""
-    description = ""
+    docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
+    description = "Applies Elastic Transform augmentation to Images"
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
