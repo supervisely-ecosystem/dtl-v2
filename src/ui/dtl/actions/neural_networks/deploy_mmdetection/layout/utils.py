@@ -86,6 +86,8 @@ def save_model_settings(
     settings["task_type"] = model_params.get("task_type", None)
     settings["checkpoint_name"] = model_params.get("checkpoint_name", None)
     settings["checkpoint_url"] = model_params.get("checkpoint_url", None)
+    settings["config_url"] = model_params.get("config_url", None)
+    settings["arch_type"] = model_params.get("arch_type", None)
     settings["stop_model_session"] = stop_model_session
 
     return settings
@@ -155,13 +157,13 @@ def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
     app_params = {
         "agent_id": saved_settings["agent_id"],
         # "app_id": 0,
-        "module_id": 500,
+        "module_id": 625,
         "workspace_id": workspace_id,
         "description": f"AutoServe session for Serve MMDetection",
         "task_name": "AutoServe/serve",
         "params": {"autostart": False, **saved_settings},
-        "app_version": None,
-        "is_branch": False,
+        "app_version": "custom-gui-support",  # None
+        "is_branch": True,  # False
     }
     session_info = api.app.start(**app_params)
     return session_info
@@ -176,9 +178,11 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
             "deploy_params": {
                 "device": saved_settings["device"],
                 "model_source": saved_settings["model_source"],
+                "task_type": saved_settings["task_type"],
                 "checkpoint_name": saved_settings["checkpoint_name"],
                 "checkpoint_url": saved_settings["checkpoint_url"],
-                "task_type": saved_settings["task_type"],
+                "config_url": saved_settings["config_url"],
+                "arch_type": saved_settings.get("arch_type", None),
             },
         },
     )
