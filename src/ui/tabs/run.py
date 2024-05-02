@@ -34,6 +34,13 @@ show_run_dialog_btn = Button(
     button_size="small",
     style="border: 1px solid rgb(191, 203, 217); margin: 10px 0px 0px 25px; padding: 9px 13px; border-radius: 6px; font-size: 12px; text-transform: uppercase; font-weight: 500; background-color: #448dff; color: white; border-color: transparent; height: 32px;",
 )
+show_run_dialog_btn_running = Button(
+    "Running",
+    icon="el-icon-loading",
+    button_size="small",
+    style="border: 1px solid rgb(191, 203, 217); margin: 10px 0px 0px 25px; padding: 9px 13px; border-radius: 6px; font-size: 12px; text-transform: uppercase; font-weight: 500; background-color: #448dff; color: white; border-color: transparent; height: 32px;",
+)
+show_run_dialog_btn_running.hide()
 run_btn = Button("Run", icon="zmdi zmdi-play")
 stop_btn = Button("Stop", icon="zmdi zmdi-stop", button_type="danger")
 stop_btn.hide()
@@ -80,7 +87,7 @@ def _run():
 
     run_btn.hide()
     results.hide()
-    progress(message="Validating...", total=1)
+    progress(message="Validating...", total=1, position=0)
     progress.show()
 
     try:
@@ -231,6 +238,8 @@ def _run():
         g.warn_notification.hide()
         nodes_flow.enable()
         g.pipeline_running = False
+        show_run_dialog_btn_running.hide()
+        show_run_dialog_btn.show()
         g.pipeline_thread = None
         global_timer.dump()
 
@@ -239,6 +248,8 @@ def run_pipeline():
     while g.pipeline_running:
         _run()
         g.pipeline_running = False
+        show_run_dialog_btn_running.hide()
+        show_run_dialog_btn.show()
         g.pipeline_thread = None
 
 
@@ -248,6 +259,8 @@ def start_pipeline():
     g.pipeline_running = True
     g.pipeline_thread = threading.Thread(target=run_pipeline, daemon=True)
     g.pipeline_thread.start()
+    show_run_dialog_btn.hide()
+    show_run_dialog_btn_running.show()
 
 
 @run_btn.click
@@ -270,6 +283,8 @@ def stop_pipeline():
             )
             error_notification.show()
             circle_progress.hide()
+            show_run_dialog_btn_running.hide()
+            show_run_dialog_btn.show()
             # other settings are set in finally block of _run
     else:
         progress.hide()
@@ -281,4 +296,6 @@ def stop_pipeline():
         g.warn_notification.hide()
         nodes_flow.enable()
         g.pipeline_running = False
+        show_run_dialog_btn_running.hide()
+        show_run_dialog_btn.show()
         g.pipeline_thread = None

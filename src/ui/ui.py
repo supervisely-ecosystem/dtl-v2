@@ -11,9 +11,11 @@ from src.ui.tabs.run import (
     layout as run_layout,
     circle_progress,
     show_run_dialog_btn,
+    show_run_dialog_btn_running,
     start_pipeline,
 )
-from src.globals import error_dialog, pipeline_thread
+from src.globals import error_dialog
+import src.globals as g
 from src.exceptions import handle_exception
 
 
@@ -37,10 +39,13 @@ header = Container(
     [
         Flexbox(
             widgets=[
-                Flexbox([show_run_dialog_btn, circle_progress]),
+                Flexbox([show_run_dialog_btn, show_run_dialog_btn_running, circle_progress]),
                 save_button,
                 load_button,
-                # Container([Empty(style="padding: 4px;"), connect_node_checkbox]),
+                Container(
+                    widgets=[g.connect_node_checkbox],
+                    style="margin-left: 10px; margin-top: 10px; align-self: center;",
+                ),
             ],
             gap=7,
         )
@@ -56,10 +61,14 @@ layout = Container(
 @show_run_dialog_btn.click
 @handle_exception
 def show_run_dialog():
-    if pipeline_thread is not None:
-        run_dialog.show()
-    else:
-        start_pipeline()
+    if g.pipeline_running:
+        return
+    start_pipeline()
+
+
+@show_run_dialog_btn_running.click
+def show_run_dialog_running_click():
+    run_dialog.show()
 
 
 @circle_progress.click
