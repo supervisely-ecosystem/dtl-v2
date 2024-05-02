@@ -242,14 +242,18 @@ def run_pipeline():
         g.pipeline_thread = None
 
 
-@run_btn.click
-@handle_exception
 def start_pipeline():
     if g.pipeline_thread is not None:
         raise RuntimeError("Pipeline is already running")
     g.pipeline_running = True
     g.pipeline_thread = threading.Thread(target=run_pipeline, daemon=True)
     g.pipeline_thread.start()
+
+
+@run_btn.click
+@handle_exception
+def run_btn_clicked():
+    start_pipeline()
 
 
 @stop_btn.click

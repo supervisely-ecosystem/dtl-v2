@@ -7,8 +7,14 @@ from src.ui.tabs.presets import (
     save_dialog,
     load_dialog,
 )
-from src.ui.tabs.run import layout as run_layout, circle_progress, show_run_dialog_btn
-from src.globals import error_dialog
+from src.ui.tabs.run import (
+    layout as run_layout,
+    circle_progress,
+    show_run_dialog_btn,
+    start_pipeline,
+)
+from src.globals import error_dialog, pipeline_thread
+from src.exceptions import handle_exception
 
 
 run_dialog = Dialog(title="Run", content=run_layout)
@@ -48,7 +54,16 @@ layout = Container(
 
 
 @show_run_dialog_btn.click
+@handle_exception
 def show_run_dialog():
+    if pipeline_thread is not None:
+        run_dialog.show()
+    else:
+        start_pipeline()
+
+
+@circle_progress.click
+def progress_clicked():
     run_dialog.show()
 
 
