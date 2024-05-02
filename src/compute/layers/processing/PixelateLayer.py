@@ -5,6 +5,7 @@ from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from supervisely import Annotation
 import imgaug.augmenters as iaa
+import numpy as np
 
 
 class PixelateLayer(Layer):
@@ -35,9 +36,10 @@ class PixelateLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         aug = iaa.imgcorruptlike.Pixelate(severity=self.settings["severity"])
-        pixelated_img = aug.augment_image(img_desc.item_data)
-        img_desc.update_item(pixelated_img)
-        yield (img_desc, ann)
+        img = img_desc.read_image()
+        pixelated_img = aug.augment_image(img.astype(np.uint8))
+        new_img_desc = img_desc.clone_with_item(pixelated_img)
+        yield (new_img_desc, ann)
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         item_descs, anns = zip(*data_els)
