@@ -585,6 +585,21 @@ def get_layer_id(action_name: str):
 
 def register_layer(layer: Layer):
     g.layers[layer.id] = layer
+    g.nodes_history.append(layer.id)
+
+
+def maybe_connect_layer(layer: Layer):
+    if layer.get_src():
+        last_node_dst = None
+        for l_id in g.nodes_history:
+            if l_id in g.layers:
+                last_layer: Layer = g.layers[l_id]
+                l_dst = last_layer.get_dst()
+                if l_dst:
+                    last_node_dst = l_dst[0]
+                    break
+        if last_node_dst is not None:
+            layer.connect_to_source(last_node_dst)
 
 
 def create_new_layer(
@@ -599,11 +614,13 @@ def create_new_layer(
     id = get_layer_id(action_name)
     action: Action
     try:
-        layer = action.create_new_layer(id)
+        layer: Layer = action.create_new_layer(id)
     except CustomException as e:
         e.extra["action_name"] = action_name
+        raise e
     except Exception as e:
         raise e
+    maybe_connect_layer(layer)
     register_layer(layer)
     StateJson().send_changes()
     DataJson().send_changes()

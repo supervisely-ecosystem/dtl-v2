@@ -83,6 +83,7 @@ cache = {
 
 layers_count = 0
 layers = {}
+nodes_history = []
 
 
 update_queue = Queue()

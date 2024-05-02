@@ -370,3 +370,6 @@ class Layer:
             self._settings = self._get_settings(options_json=node_options)
         else:
             self._settings = {}
+
+    def connect_to_source(self, src: str, index: int = 0):
+        self._src[index] = src
