@@ -80,6 +80,20 @@ def save_model_settings(
         model_source = "Custom models"
         model_params = model_selector_sidebar_custom_model_table.get_selected_model_params()
 
+        config_url = model_params.get("config_url", None)
+        if config_url is not None:
+            file_info = g.api.file.exists(config_url)
+            if file_info is None:
+                raise ValueError(
+                    "Config file not found. "
+                    "Config file should be placed in the same directory as the model checkpoint."
+                )
+        else:
+            raise ValueError(
+                "Config file not found. "
+                "Config file should be placed in the same directory as the model checkpoint."
+            )
+
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
     settings["model_source"] = model_source
