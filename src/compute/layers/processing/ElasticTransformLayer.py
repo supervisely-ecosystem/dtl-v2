@@ -6,7 +6,8 @@ from src.compute.Layer import Layer
 from supervisely import Annotation, Bitmap, Rectangle, Polygon, Label
 from imgaug import augmenters as iaa
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
-from imgaug.augmentables.segmaps import SegmentationMapsOnImage
+from imgaug.augmentables.polys import PolygonsOnImage
+from imgaug.augmentables.polys import Polygon as iaaPolygon
 import numpy as np
 
 
@@ -15,49 +16,47 @@ def augment_boxes(aug: iaa.ElasticTransformation, labels: List[Label], img_size:
     ia_boxes = [BoundingBox(box.left, box.top, box.right, box.bottom) for box in boxes]
     imgaug_boxes = BoundingBoxesOnImage(ia_boxes, img_size)
     augmented_boxes = aug.augment_bounding_boxes(imgaug_boxes)
-    augmented_boxes = augmented_boxes.items()
+    # augmented_boxes = augmented_boxes.items()
     for label, box in zip(labels, augmented_boxes):
-        label.geometry = Rectangle(
-            box.x2_int,
-            box.y2_int,
-            box.x1_int,
-            box.y1_int,
-            label.geometry.sly_id,
-            label.geometry.class_id,
+        new_label = label.clone(
+            geometry=Rectangle(
+                box.x2_int,
+                box.y2_int,
+                box.x1_int,
+                box.y1_int,
+            )
         )
+        yield new_label
 
 
 def augment_masks(aug: iaa.ElasticTransformation, labels: List[Label]):
     masks = [label.geometry.data for label in labels]
     augmented_masks = aug.augment_images(masks)
     for label, mask in zip(labels, augmented_masks):
-        label.geometry.data = mask
+        new_label = label.clone(geometry=Bitmap(data=mask))
+        yield new_label
 
 
 def augment_polygons(
     aug: iaa.ElasticTransformation, labels: List[Label], img_size: Tuple[int, int]
 ):
+    numpy_to_tuples = lambda polygon_array: [tuple(map(float, point)) for point in polygon_array]
     ext_np = [label.geometry.exterior_np for label in labels]
+    ext_iaa = PolygonsOnImage([iaaPolygon(p) for p in ext_np], shape=img_size)
+    aug_ext = aug.augment_polygons(ext_iaa)
+
     int_np = [label.geometry.interior_np for label in labels]
+    # int_np = [points if len(points) > 0 else None for points in int_np]
+    aug_int = [None]
+    if len(int_np[0]) != 0:
+        int_iaa = PolygonsOnImage([iaaPolygon(p) for p in int_np], shape=img_size)
+        aug_int = aug.augment_polygons(int_iaa)
 
-    aug_ext_np = [
-        aug.augment_segmentation_maps(SegmentationMapsOnImage(arr, img_size)) for arr in ext_np
-    ]
-    aug_int_np = [
-        aug.augment_segmentation_maps(SegmentationMapsOnImage(arr, img_size)) for arr in int_np
-    ]
-    aug_points_list = []
-    for ext, int in zip(aug_ext_np, aug_int_np):
-        aug_ext_np = [segmap.get_arr() for segmap in ext]
-        aug_int_np = [segmap.get_arr() for segmap in int]
-
-        aug_ext = aug_ext_np.tolist()
-        aug_int = aug_int_np.tolist()
-        aug_points_list.append((aug_ext, aug_int))
-
-    for label, points in zip(labels, aug_points_list):
-        exterior, interior = points
-        label.geometry = Polygon(exterior, interior, label.geometry.sly_id, label.geometry.class_id)
+    for label, aug_ex, aug_int in zip(labels, aug_ext, aug_int):
+        aug_ex = aug_ex.exterior
+        aug_int = aug_int.exterior if aug_int is not None else []
+        new_label = label.clone(geometry=Polygon(numpy_to_tuples(aug_ex), aug_int))  # todo interior
+        yield new_label
 
 
 class ElasticTransformLayer(Layer):
@@ -86,26 +85,39 @@ class ElasticTransformLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img = img_desc.read_image()
-        # if img_desc.item_data is None:
 
         alpha = self.settings["alpha"]
         sigma = self.settings["sigma"]
         aug = iaa.ElasticTransformation(alpha, sigma)
-        img_size = img.shape[:2]
-        # print(img_size)
+        img_size = img.shape
 
         processed_img = aug.augment_image(img.astype(np.uint8))
         new_img_desc = img_desc.clone_with_item(processed_img)
 
         boxes_labels = [label for label in ann.labels if label.obj_class.geometry_type == Rectangle]
-        augment_boxes(aug, boxes_labels, img_size) if boxes_labels else None
-
         masks_labels = [label for label in ann.labels if label.obj_class.geometry_type == Bitmap]
-        augment_masks(aug, masks_labels) if masks_labels else None
-
         polygon_labels = [label for label in ann.labels if label.obj_class.geometry_type == Polygon]
-        augment_polygons(aug, polygon_labels, img_size) if polygon_labels else None
-        yield (new_img_desc, ann)
+        other_labels = [
+            label
+            for label in ann.labels
+            if (label.obj_class.geometry_type != Rectangle)
+            and (label.obj_class.geometry_type != Bitmap)
+            and (label.obj_class.geometry_type != Polygon)
+        ]
+
+        new_labels = []
+        for label in augment_polygons(aug, polygon_labels, img_size):
+            new_labels.append(label)
+        for label in augment_masks(aug, masks_labels):
+            new_labels.append(label)
+        for label in augment_boxes(aug, boxes_labels, img_size):
+            new_labels.append(label)
+        if len(other_labels) > 0:
+            new_labels.extend(other_labels)
+
+        new_ann = ann.clone(labels=new_labels)
+
+        yield (new_img_desc, new_ann)
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         item_descs, anns = zip(*data_els)
