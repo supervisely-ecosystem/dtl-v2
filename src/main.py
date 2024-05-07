@@ -94,6 +94,9 @@ def generate_preview_for_project(layer):
             ),
             False,
         )
+        img = item_desc.read_image()
+        item_desc.update_item(img)
+
         logger.info("Update project preview")
         layer.set_preview_loading(True)
         layer.update_preview(item_desc, ann, project_meta)
