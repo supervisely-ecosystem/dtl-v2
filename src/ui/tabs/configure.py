@@ -1,3 +1,4 @@
+import random
 import time
 from collections import defaultdict
 
@@ -18,6 +19,7 @@ from supervisely.app.widgets import (
     Card,
 )
 from supervisely.app import show_dialog
+from supervisely.sly_logger import logger
 from src.ui.dtl.Action import SourceAction
 
 from src.ui.dtl.Layer import Layer
@@ -111,7 +113,7 @@ add_specific_layer_buttons = {
 
 def add_specific_layer_func_factory(action_name: str):
     def add_specific_layer_func():
-        add_layer(action_name)
+        add_layer(action_name, autoconnect=g.connect_node_checkbox.is_checked())
 
     return add_specific_layer_func
 
@@ -181,33 +183,55 @@ def collapse_sidebar():
     sidebar.collapse()
 
 
+def maybe_add_edges(layer: Layer):
+    if not layer.action.create_inputs():
+        return
+
+    # Need this because remove_nodes is not always triggered
+    nodes_json = nodes_flow.get_nodes_json()
+    existing_layers = {node["id"] for node in nodes_json}
+    #
+    edges = nodes_flow.get_edges_json()
+
+    src_layer_id = None
+    for l_id in g.nodes_history[::-1]:
+        if l_id != layer.id and l_id in existing_layers:
+            last_layer: Layer = g.layers[l_id]
+            outputs = last_layer.action.create_outputs()
+            if outputs:
+                src_layer_id = l_id
+                interface_name = last_layer.get_destination_name(0)
+                break
+
+    if src_layer_id is None:
+        return
+
+    edges.append(
+        {
+            "id": random.randint(10000000000000, 99999999999999),
+            "output": {
+                "node": src_layer_id,
+                "interface": interface_name,
+            },
+            "input": {
+                "node": layer.id,
+                "interface": "source",
+            },
+        }
+    )
+    nodes_flow.set_edges(edges)
+    return
+
+
 @handle_exception
-def add_layer(action_name: str, position: dict = None):
+def add_layer(action_name: str, position: dict = None, autoconnect: bool = False):
     try:
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
 
-        # if g.connect_node_checkbox.is_checked() and not layer.id.startswith("data_"):
-        #     nodes_state = nodes_flow.get_nodes_state_json()
-        #     if len(nodes_state) > 0:
-        #         layer_id = list(nodes_state)[-1]
-        #         edges = nodes_flow.get_edges_json()
-        #         edges.append(
-        #             {
-        #                 "id": random.randint(10000000000000, 99999999999999),
-        #                 "output": {
-        #                     "node": layer_id,
-        #                     "interface": "destination",
-        #                 },
-        #                 "input": {
-        #                     "node": layer.id,
-        #                     "interface": "source",
-        #                 },
-        #             }
-        #         )
-        #         nodes_flow.set_edges(edges)
-
         nodes_flow.add_node(node)
+        if autoconnect:
+            maybe_add_edges(layer)
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
@@ -229,7 +253,7 @@ def context_menu_clicked_cb(item):
     if action_name == "__clear__":
         nodes_flow.clear()
         return
-    add_layer(action_name, position)
+    add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     g.context_menu_position = None
 
 
@@ -238,7 +262,7 @@ def item_dropped_cb(item):
     position = item["position"]
     g.context_menu_position = position
     action_name = item["item"]["key"]
-    add_layer(action_name, position)
+    add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     g.context_menu_position = None
 
 
@@ -251,13 +275,14 @@ def node_removed(layer_id):
     if layer_id.startswith("deploy"):
         utils.kill_deployed_app_by_layer_id(layer_id)
     g.layers.pop(layer_id)
+    logger.debug("node_removed", extra={"layer_id": layer_id, "g.layers": list(g.layers.keys())})
 
 
 @add_layer_from_dialog_btn.click
 def add_layer_from_dialog_btn_cb():
     position = g.context_menu_position
     action_name = select_action_name.get_value()
-    add_layer(action_name, position)
+    add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     add_layer_dialog.hide()
     g.context_menu_position = None
 

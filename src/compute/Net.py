@@ -519,7 +519,7 @@ class Net:
                             # )
 
                             if require_items:
-                                img_data = g.api.image.download_nps(img_info.id)
+                                img_data = g.api.image.download_np(img_info.id)
                                 img_desc.update_item(img_data)
 
                             # if require_ann:

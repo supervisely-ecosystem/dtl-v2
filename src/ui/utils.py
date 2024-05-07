@@ -585,6 +585,7 @@ def get_layer_id(action_name: str):
 
 def register_layer(layer: Layer):
     g.layers[layer.id] = layer
+    g.nodes_history.append(layer.id)
 
 
 def create_new_layer(
@@ -599,9 +600,10 @@ def create_new_layer(
     id = get_layer_id(action_name)
     action: Action
     try:
-        layer = action.create_new_layer(id)
+        layer: Layer = action.create_new_layer(id)
     except CustomException as e:
         e.extra["action_name"] = action_name
+        raise e
     except Exception as e:
         raise e
     register_layer(layer)

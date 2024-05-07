@@ -1,7 +1,7 @@
 import os
 import copy
 import time
-from typing import Optional, List
+from typing import Optional, List, Tuple
 import random
 
 from supervisely import Annotation, ProjectMeta
@@ -336,6 +336,12 @@ class Layer:
         outputs = self.action.create_outputs()
         return outputs[dst_index].name
 
+    @staticmethod
+    def parse_src(src: str) -> Tuple[str, str]:
+        src_id = src[1:].split("__")[0]
+        src_interface = src[1:].split("__")[1] if "__" in src[1:] else ""
+        return src_id, src_interface
+
     def _connection_name(self, name: str, interface: str):
         interface_str = "_".join(
             [
@@ -370,3 +376,9 @@ class Layer:
             self._settings = self._get_settings(options_json=node_options)
         else:
             self._settings = {}
+
+    def connect_to_source(self, src: str, index: int = None):
+        if index is None:
+            self._src.append(src)
+            return
+        self._src[index] = src

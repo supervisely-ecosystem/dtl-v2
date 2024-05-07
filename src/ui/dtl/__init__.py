@@ -112,6 +112,7 @@ from .actions.output.create_labeling_job.create_labeling_job import CreateLabeli
 # New
 from .actions.input.filtered_project.filtered_project import FilteredProjectAction
 from .actions.other.move.move import MoveAction
+from .actions.other.copy.copy import CopyAction
 from .actions.other_augs.pixelate.pixelate import PixelateAction
 from .actions.other_augs.elastic_transform.elastic_transform import ElasticTransformAction
 
@@ -189,6 +190,8 @@ image_actions_list = {
         ApplyNNInferenceAction.name,
     ],
     OTHER: [DatasetAction.name, DummyAction.name, MoveAction.name],
+    NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNInferenceAction.name],
+    OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
         CreateNewProjectAction.name,
         AddToExistingProjectAction.name,
@@ -256,6 +259,7 @@ image_actions_dict = {
     # Other layers
     DatasetAction.name: DatasetAction,
     DummyAction.name: DummyAction,
+    CopyAction.name: CopyAction,
     MoveAction.name: MoveAction,
     # Save layers
     CreateNewProjectAction.name: CreateNewProjectAction,
