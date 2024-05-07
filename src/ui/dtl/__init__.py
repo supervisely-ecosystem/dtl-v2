@@ -189,8 +189,6 @@ image_actions_list = {
         DeployMMDetectionAction.name,
         ApplyNNInferenceAction.name,
     ],
-    OTHER: [DatasetAction.name, DummyAction.name, MoveAction.name],
-    NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNInferenceAction.name],
     OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
         CreateNewProjectAction.name,
