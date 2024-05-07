@@ -4,4 +4,7 @@
     :width="32"
     :percentage=data.{{{widget.progress.widget_id}}}.percent
     :status="data.{{{widget.widget_id}}}.status"
+    {% if widget._click_handled %}
+    @click.native="post('/{{{widget.widget_id}}}/clicked_cb');"
+    {% endif %}
 ></el-progress>

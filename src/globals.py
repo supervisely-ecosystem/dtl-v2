@@ -14,6 +14,7 @@ from supervisely.app.widgets import (
     Button,
     Flexbox,
     NotificationBox,
+    Checkbox,
 )
 
 if sly.is_development():
@@ -83,6 +84,7 @@ cache = {
 
 layers_count = 0
 layers = {}
+nodes_history = []
 
 
 update_queue = Queue()
@@ -142,7 +144,7 @@ warn_notification.hide()
 # uncomment to work:
 # src/ui/ui.py line 28
 # src/ui/tabs/configure.py line 158-176
-# connect_node_checkbox = Checkbox("Auto-connect to node", checked=False)
+connect_node_checkbox = Checkbox("Auto-connect node", checked=False)
 
 
 @error_close_btn.click
