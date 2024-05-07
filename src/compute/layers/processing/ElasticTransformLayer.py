@@ -106,12 +106,15 @@ class ElasticTransformLayer(Layer):
         ]
 
         new_labels = []
-        for label in augment_polygons(aug, polygon_labels, img_size):
-            new_labels.append(label)
-        for label in augment_masks(aug, masks_labels):
-            new_labels.append(label)
-        for label in augment_boxes(aug, boxes_labels, img_size):
-            new_labels.append(label)
+        if polygon_labels:
+            for label in augment_polygons(aug, polygon_labels, img_size):  # todo check
+                new_labels.append(label)
+        if masks_labels:
+            for label in augment_masks(aug, masks_labels):
+                new_labels.append(label)
+        if boxes_labels:
+            for label in augment_boxes(aug, boxes_labels, img_size):
+                new_labels.append(label)
         if len(other_labels) > 0:
             new_labels.extend(other_labels)
 
