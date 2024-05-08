@@ -60,6 +60,8 @@ class MMDetectionLayer(Layer):
                     "checkpoint_name",
                     "task_type",
                     "checkpoint_url",
+                    "arch_type",
+                    "config_url",
                     "stop_model_session",
                 ],
                 "properties": {
@@ -70,6 +72,8 @@ class MMDetectionLayer(Layer):
                     "task_type": {"type": "string"},
                     "checkpoint_name": {"type": "string"},
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "arch_type": {"type": "string"},
+                    "config_url": {"type": "string"},
                     "stop_model_session": {"type": "boolean"},
                 },
             },
