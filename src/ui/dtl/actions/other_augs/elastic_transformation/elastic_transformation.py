@@ -3,13 +3,13 @@ from os.path import realpath, dirname
 
 from src.ui.dtl import OtherAugmentationsAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs, get_text_font_size
+from src.ui.dtl.utils import get_layer_docs, get_text_font_size, get_slider_style
 
 from supervisely import ProjectMeta, Polygon, AnyGeometry
 
 from src.ui.dtl.utils import classes_list_to_mapping
 
-from supervisely.app.widgets import Text, NodesFlow, InputNumber, Checkbox, NotificationBox
+from supervisely.app.widgets import Text, NodesFlow, InputNumber, Checkbox, NotificationBox, Slider
 
 
 class ElasticTransformationAction(OtherAugmentationsAction):
@@ -24,11 +24,36 @@ class ElasticTransformationAction(OtherAugmentationsAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         _current_meta = ProjectMeta()
         saved_classes_mapping_settings = "default"
+
+        DEFAULT_ALPHA = [0, 40]
+        DEFAULT_SIGMA = [4, 8]
         alpha_text = Text("Alpha", status="text", font_size=get_text_font_size())
-        alpha_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True, size="small")
+        alpha_input = Slider(
+            value=DEFAULT_ALPHA, step=1, min=0, max=200, range=True, style=get_slider_style()
+        )
+        alpha_preview_widget = Text(
+            f"min:{DEFAULT_ALPHA[0]} - max: {DEFAULT_ALPHA[1]}",
+            status="text",
+            font_size=get_text_font_size,
+        )
+
+        @alpha_input.value_changed
+        def alpha_slider_value_changed(value):
+            alpha_preview_widget.text = f"min: {value[0]} - max: {value[1]}"
 
         sigma_text = Text("Sigma", status="text", font_size=get_text_font_size())
-        sigma_input = InputNumber(value=1.000, step=0.1, controls=True, size="small")
+        sigma_input = Slider(
+            value=DEFAULT_SIGMA, step=1, min=0, max=50, range=True, style=get_slider_style()
+        )
+        sigma_preview_widget = Text(
+            f"min:{DEFAULT_SIGMA[0]} - max: {DEFAULT_SIGMA[1]}",
+            status="text",
+            font_size=get_text_font_size,
+        )
+
+        @sigma_input.value_changed
+        def sigma_slider_value_changed(value):
+            sigma_preview_widget.text = f"min: {value[0]} - max: {value[1]}"
 
         convert_notification = NotificationBox(
             title="Polygon labels will be converted to Bitmap",
@@ -44,11 +69,21 @@ class ElasticTransformationAction(OtherAugmentationsAction):
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_classes_mapping_settings
             classes_mapping = saved_classes_mapping_settings
+
+            alpha_min, alpha_max = alpha_input.get_value()
+            sigma_min, sigma_max = sigma_input.get_value()
+
             if saved_classes_mapping_settings == "default":
                 classes_mapping = _get_classes_mapping_value()
             return {
-                "alpha": alpha_input.get_value(),
-                "sigma": sigma_input.get_value(),
+                "alpha": {
+                    "min": alpha_min,
+                    "max": alpha_max,
+                },
+                "sigma": {
+                    "min": sigma_min,
+                    "max": sigma_max,
+                },
                 "classes_mapping": classes_mapping,
             }
 
