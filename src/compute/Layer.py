@@ -108,6 +108,7 @@ class Layer:
             # v = jsonschema.Draft202012Validator(self.params)
             # for error in v.iter_errors(self._config):
             #     extra.setdefault("errors", []).append(str(error))
+            logger.warn(e)
             raise GraphError("Layer not valid", error=e, extra=extra)
         try:
             self.validate_source_connections()
