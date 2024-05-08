@@ -82,7 +82,7 @@ def save_model_settings(
 
         config_url = model_params.get("config_url", None)
         if config_url is not None:
-            file_info = g.api.file.exists(config_url)
+            file_info = g.api.file.exists(g.TEAM_ID, config_url)
             if file_info is None:
                 raise ValueError(
                     "Config file not found. "
