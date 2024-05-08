@@ -36,7 +36,7 @@ def create_model_selector_widgets():
         g.TEAM_ID,
         custom_models,
         True,
-        ["object_detection", "instance segmentation", "pose estimation"],
+        ["object_detection", "instance segmentation"],
     )
 
     custom_models_task_types = model_selector_sidebar_custom_model_table.get_available_task_types()
@@ -46,7 +46,11 @@ def create_model_selector_widgets():
 
     # PUBLIC MODEL OPTIONS
     model_selector_sidebar_public_model_table = PretrainedModelsSelector(pretrained_models)
-    model_selector_sidebar_public_model_table.set_active_task_type("object detection")
+    pretrained_model_selector_task_types = (
+        model_selector_sidebar_public_model_table.get_available_task_types()
+    )
+    if "object detection" in pretrained_model_selector_task_types:
+        model_selector_sidebar_public_model_table.set_active_task_type("object detection")
     # ------------------------------
 
     # CUSTOM /PUBLIC TABS
