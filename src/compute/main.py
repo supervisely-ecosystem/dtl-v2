@@ -128,8 +128,14 @@ def main(
         )
 
     # Dynamic batch size
-    # if not net.modifies_data() and not net.may_require_items():
-    #     g.BATCH_SIZE = 1000
+    if not net.modifies_data() and not net.may_require_items():
+        g.BATCH_SIZE = 500
+        logger.info(f"No data modification is required. Batch size has been set to {g.BATCH_SIZE}")
+    else:
+        if g.MODALITY_TYPE == "images":
+            g.BATCH_SIZE = 50
+        else:
+            g.BATCH_SIZE = 1
 
     elements_generator_batched = net.get_elements_generator_batched(batch_size=g.BATCH_SIZE)
     if not g.pipeline_running:

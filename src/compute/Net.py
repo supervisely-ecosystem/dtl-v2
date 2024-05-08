@@ -2,7 +2,7 @@
 
 import os
 import json
-
+from time import time
 import numpy as np
 
 from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger, batched
@@ -481,9 +481,15 @@ class Net:
             for dataset_id in dataset_ids:
                 dataset_info = get_dataset_by_id(dataset_id)
                 if self.modality == "images":
-                    for batch in g.api.image.get_list_generator(
-                        dataset_id=dataset_id, batch_size=batch_size
+                    for batch, ann_batch in zip(
+                        g.api.image.get_list_generator(
+                            dataset_id=dataset_id, batch_size=batch_size
+                        ),
+                        g.api.annotation.get_list_generator(
+                            dataset_id=dataset_id, batch_size=batch_size
+                        ),
                     ):
+                        start_items_batch_time = time()
                         # check if we need to filter items
                         if len(g.FILTERED_ENTITIES) > 0:
                             filtered_batch = [
@@ -494,12 +500,7 @@ class Net:
                             batch = filtered_batch
 
                         items_batch = []
-                        for img_info in batch:
-                            img_data = np.zeros(
-                                (img_info.height, img_info.width, 3), dtype=np.uint8
-                            )
-                            if require_items:
-                                img_data = g.api.image.download_np(img_info.id)
+                        for img_info, ann_info in zip(batch, ann_batch):
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(
                                     project_name=project_info.name,
@@ -512,12 +513,23 @@ class Net:
                                 ),
                                 False,
                             )
-                            img_desc.update_item(img_data)
-                            ann = Annotation.from_json(
-                                g.api.annotation.download(img_info.id).annotation, project_meta
-                            )
+
+                            # img_data = np.zeros(
+                            #     (img_info.height, img_info.width, 3), dtype=np.uint8
+                            # )
+
+                            if require_items:
+                                img_data = g.api.image.download_np(img_info.id)
+                                img_desc.update_item(img_data)
+
+                            # if require_ann:
+                            ann = Annotation.from_json(ann_info.annotation, project_meta)
                             data_el = (img_desc, ann)
                             items_batch.append(data_el)
+                        end_items_batch_time = time()
+                        logger.debug(
+                            f"Items Batch created in: '{end_items_batch_time - start_items_batch_time}' seconds"
+                        )
                         yield items_batch
 
                 elif self.modality == "videos":
