@@ -3,7 +3,6 @@ from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
 
-from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_layer_docs,
@@ -23,9 +22,10 @@ from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import 
 )
 import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
 import src.globals as g
+from src.ui.dtl.Action import DeployNNAction
 
 
-class DeployYOLOV8Action(NeuralNetworkAction):
+class DeployYOLOV8Action(DeployNNAction):
     name = "deploy_yolo_v8"
     title = "Deploy YOLOv8"
     docs_url = ""

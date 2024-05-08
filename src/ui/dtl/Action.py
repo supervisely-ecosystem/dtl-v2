@@ -88,6 +88,16 @@ class NeuralNetworkAction(Action):
     icon = "zmdi zmdi-fire"
 
 
+class DeployNNAction(NeuralNetworkAction):
+    node_color = "#f7782f"
+    icon = "zmdi zmdi-fire"
+
+
+class ApplyNNAction(NeuralNetworkAction):
+    node_color = "#f7782f"
+    icon = "zmdi zmdi-fire"
+
+
 # Video specific
 class VideoAction(Action):
     node_color = "#bc805b"

@@ -4,7 +4,6 @@ from os.path import realpath, dirname
 
 from supervisely import ProjectMeta, logger
 from supervisely.app.widgets import NodesFlow
-from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_classes_list_value,
@@ -35,9 +34,10 @@ from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.node_layout im
 )
 
 from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.utils import *
+from src.ui.dtl.Action import ApplyNNAction
 
 
-class ApplyNNInferenceAction(NeuralNetworkAction):
+class ApplyNNInferenceAction(ApplyNNAction):
     name = "apply_nn_inference"
     legacy_name = "apply_nn"
     title = "Apply NN Inference"

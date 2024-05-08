@@ -20,7 +20,7 @@ from supervisely.app.widgets import (
 )
 from supervisely.app import show_dialog
 from supervisely.sly_logger import logger
-from src.ui.dtl.Action import SourceAction
+from src.ui.dtl.Action import ApplyNNAction, DeployNNAction, SourceAction
 
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import actions_dict, actions_list
@@ -184,7 +184,8 @@ def collapse_sidebar():
 
 
 def maybe_add_edges(layer: Layer):
-    if not layer.action.create_inputs():
+    layer_inputs = layer.action.create_inputs()
+    if not layer_inputs:
         return
 
     # Need this because remove_nodes is not always triggered
@@ -193,6 +194,13 @@ def maybe_add_edges(layer: Layer):
     #
     edges = nodes_flow.get_edges_json()
 
+    # layer input name.
+    # If layer has source input, it will be "source", otherwise it will be first one
+    layer_interface = layer_inputs[0].name
+    for i, input_ in enumerate(layer_inputs):
+        if input_.name == "source":
+            layer_interface = input_.name
+
     src_layer_id = None
     for l_id in g.nodes_history[::-1]:
         if l_id != layer.id and l_id in existing_layers:
@@ -200,7 +208,18 @@ def maybe_add_edges(layer: Layer):
             outputs = last_layer.action.create_outputs()
             if outputs:
                 src_layer_id = l_id
-                interface_name = last_layer.get_destination_name(0)
+                src_layer_interface = last_layer.get_destination_name(0)
+
+                # case with apply -> deploy
+                if issubclass(last_layer.action, DeployNNAction):
+                    # if last layer was deploy and current not apply, skip
+                    if not issubclass(layer.action, ApplyNNAction):
+                        continue
+                    # if last layer was deploy and current is apply, connect to deploy input
+                    for i, input_ in enumerate(layer_inputs):
+                        if input_.name == "deployed_model":
+                            layer_interface = input_.name
+                            break
                 break
 
     if src_layer_id is None:
@@ -211,11 +230,11 @@ def maybe_add_edges(layer: Layer):
             "id": random.randint(10000000000000, 99999999999999),
             "output": {
                 "node": src_layer_id,
-                "interface": interface_name,
+                "interface": src_layer_interface,
             },
             "input": {
                 "node": layer.id,
-                "interface": "source",
+                "interface": layer_interface,
             },
         }
     )
