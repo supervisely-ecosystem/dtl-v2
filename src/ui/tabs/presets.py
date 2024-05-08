@@ -99,8 +99,8 @@ def save_json_button_cb():
     nodes_state = nodes_flow.get_nodes_state_json()
 
     # Init layers data
-    layres_ids = ui_utils.init_layers(nodes_state)
-    all_layers_ids = layres_ids["all_layers_ids"]
+    layers_ids = ui_utils.init_layers(nodes_state)
+    all_layers_ids = layers_ids["all_layers_ids"]
 
     ui_utils.init_src(edges)
 
@@ -210,7 +210,7 @@ def apply_json(dtl_json):
 
         layer = ui_utils.create_new_layer(action_name)
         ids.append(layer.id)
-        if action_name in actions_list[SOURCE_ACTIONS]:
+        if action_name in actions_list[SOURCE_ACTIONS] or action_name == "filtered_project":
             data_layers_ids.append(layer.id)
 
     # update src and dst

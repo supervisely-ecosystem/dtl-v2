@@ -10,6 +10,8 @@ from src.ui.dtl.actions.input.images_project.images_project import ImagesProject
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
 from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredProjectAction
 
+from src.templates import templates, load_template
+
 from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
 from src.utils import LegacyProjectItem
 
@@ -103,7 +105,11 @@ def generate_preview_for_project(layer):
         layer.set_preview_loading(False)
 
 
-if g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
+if g.PIPELINE_ACTION is not None:
+    template = templates[g.MODALITY_TYPE].get(g.PIPELINE_ACTION, None)
+    if template is not None:
+        load_template(template)
+elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     ds_name = "*"
     if g.DATASET_ID:
         ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
@@ -122,7 +128,7 @@ if g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     nodes_flow.add_node(node)
     generate_preview_for_project(layer)
 
-if g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
+elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
     src = [f"{pr.name}/*"]
     layer = create_new_layer(FilteredProjectAction.name)
