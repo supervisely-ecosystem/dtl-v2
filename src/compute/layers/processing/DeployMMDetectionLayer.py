@@ -72,7 +72,7 @@ class MMDetectionLayer(Layer):
                     "task_type": {"type": "string"},
                     "checkpoint_name": {"type": "string"},
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
-                    "arch_type": {"type": "string"},
+                    "arch_type": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "config_url": {"type": "string"},
                     "stop_model_session": {"type": "boolean"},
                 },
