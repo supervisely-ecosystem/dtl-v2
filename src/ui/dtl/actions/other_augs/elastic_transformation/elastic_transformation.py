@@ -9,11 +9,7 @@ from supervisely import ProjectMeta, Polygon, AnyGeometry
 
 from src.ui.dtl.utils import classes_list_to_mapping
 
-from supervisely.app.widgets import (
-    Text,
-    NodesFlow,
-    InputNumber,
-)
+from supervisely.app.widgets import Text, NodesFlow, InputNumber, Checkbox, NotificationBox
 
 
 class ElasticTransformationAction(OtherAugmentationsAction):
@@ -22,6 +18,7 @@ class ElasticTransformationAction(OtherAugmentationsAction):
     docs_url = ""
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
+    width = 355
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
@@ -32,6 +29,17 @@ class ElasticTransformationAction(OtherAugmentationsAction):
 
         sigma_text = Text("Sigma", status="text", font_size=get_text_font_size())
         sigma_input = InputNumber(value=1.000, step=0.1, controls=True, size="small")
+
+        convert_notification = NotificationBox(
+            title="Polygon labels will be converted to Bitmap",
+            description=(
+                "This change ensures that label boundaries are accurately "
+                "represented for more precise augmentation results"
+            ),
+            box_type="info",
+        )
+        convert_checkbox = Checkbox(content="Convert Polygon labels to Bitmap", checked=True)
+        convert_checkbox.disable()
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_classes_mapping_settings
@@ -89,6 +97,14 @@ class ElasticTransformationAction(OtherAugmentationsAction):
                 NodesFlow.Node.Option(
                     name="sigma",
                     option_component=NodesFlow.WidgetOptionComponent(sigma_input),
+                ),
+                NodesFlow.Node.Option(
+                    name="notification",
+                    option_component=NodesFlow.WidgetOptionComponent(convert_notification),
+                ),
+                NodesFlow.Node.Option(
+                    name="checkbox",
+                    option_component=NodesFlow.WidgetOptionComponent(convert_checkbox),
                 ),
             ]
             return {
