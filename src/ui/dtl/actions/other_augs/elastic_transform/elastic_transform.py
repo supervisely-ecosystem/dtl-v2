@@ -5,6 +5,10 @@ from src.ui.dtl import OtherAugmentationsAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
+from supervisely import ProjectMeta, Polygon, AnyGeometry
+
+from src.ui.dtl.utils import get_classes_list_value, classes_list_to_mapping
+
 from supervisely.app.widgets import (
     Text,
     NodesFlow,
@@ -22,6 +26,8 @@ class ElasticTransformAction(OtherAugmentationsAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        _current_meta = ProjectMeta()
+        saved_classes_mapping_settings = "default"
         alpha_text = Text("Alpha", status="text", font_size=get_text_font_size())
         alpha_input = InputNumber(value=10.000, step=0.1, precision=3, controls=True, size="small")
 
@@ -29,11 +35,45 @@ class ElasticTransformAction(OtherAugmentationsAction):
         sigma_input = InputNumber(value=1.000, step=0.1, controls=True, size="small")
 
         def get_settings(options_json: dict) -> dict:
-            return {"alpha": alpha_input.get_value(), "sigma": sigma_input.get_value()}
+            nonlocal saved_classes_mapping_settings
+            classes_mapping = saved_classes_mapping_settings
+            if saved_classes_mapping_settings == "default":
+                classes_mapping = _get_classes_mapping_value()
+            return {
+                "alpha": alpha_input.get_value(),
+                "sigma": sigma_input.get_value(),
+                "classes_mapping": classes_mapping,
+            }
+
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
+            nonlocal _current_meta
+            if project_meta == _current_meta:
+                return
+            nonlocal saved_classes_mapping_settings
+            _current_meta = project_meta
+            old_obj_classes = project_meta.obj_classes
+            new_obj_classes = [
+                obj_class
+                for obj_class in project_meta.obj_classes
+                if obj_class.geometry_type in [Polygon, AnyGeometry]
+            ]
+            saved_classes_mapping_settings = {}
+            for new_obj_class in new_obj_classes:
+                saved_classes_mapping_settings[new_obj_class.name] = new_obj_class.name
 
         def _set_settings_from_json(settings: dict):
             alpha_input.value = settings.get("alpha", 10)
             sigma_input.value = settings.get("sigma", 1)
+
+        def _get_classes_mapping_value():
+            nonlocal _current_meta
+            classes = [obj_class.name for obj_class in _current_meta.obj_classes]
+            return classes_list_to_mapping(
+                classes, [oc.name for oc in _current_meta.obj_classes], other="skip"
+            )
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
@@ -67,4 +107,5 @@ class ElasticTransformAction(OtherAugmentationsAction):
             create_options=create_options,
             get_settings=get_settings,
             need_preview=True,
+            data_changed_cb=data_changed_cb,
         )
