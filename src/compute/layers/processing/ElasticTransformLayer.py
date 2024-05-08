@@ -31,6 +31,7 @@ class ElasticTransformLayer(Layer):
     }
 
     def __init__(self, config, net):
+        self._res_meta = None
         Layer.__init__(self, config, net=net)
 
     def modifies_data(self):
@@ -38,6 +39,11 @@ class ElasticTransformLayer(Layer):
 
     def requires_item(self):
         return True
+
+    def define_classes_mapping(self):
+        for old_class, new_class in self.settings["classes_mapping"].items():
+            self.cls_mapping[old_class] = {"title": new_class, "shape": Bitmap.geometry_name()}
+        self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         from supervisely.aug.imgaug_utils import apply as apply_augs
@@ -49,25 +55,17 @@ class ElasticTransformLayer(Layer):
         sigma = self.settings["sigma"]
         aug = iaa.Sequential([iaa.ElasticTransformation(alpha=alpha, sigma=sigma)])
 
-        res_meta, res_img, res_ann = apply_augs(aug, self.output_meta, img, ann)
+        def to_bitmap(label: Label):
+            new_title = self.settings["classes_mapping"].get(label.obj_class.name, None)
+            if new_title is None:
+                return [label]
+            new_obj_class = label.obj_class.clone(name=new_title, geometry_type=Bitmap)
+            return label.convert(new_obj_class)
+
+        ann = apply_to_labels(ann, to_bitmap)
+
+        _, res_img, res_ann = apply_augs(aug, self.output_meta, img, ann)
         new_img_desc = img_desc.clone_with_item(res_img)
-
-        self.output_meta = res_meta
-
-        # def to_bitmap(label: Label):
-        #     new_title = self.settings["classes_mapping"].get(label.obj_class.name, None)
-        #     if new_title is None:
-        #         return [label]
-        #     new_obj_class = label.obj_class.clone(name=new_title, geometry_type=Bitmap)
-
-        #     return label.convert(new_obj_class)
-
-        # res_ann = apply_to_labels(res_ann, to_bitmap)
-
-        # for old_class, new_class in self.settings["classes_mapping"].items():
-        #     self.cls_mapping[old_class] = {"title": new_class, "shape": Bitmap.geometry_name()}
-        # self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
-
         yield (new_img_desc, res_ann)
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):

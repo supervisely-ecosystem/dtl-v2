@@ -7,7 +7,7 @@ from src.ui.dtl.utils import get_layer_docs, get_text_font_size
 
 from supervisely import ProjectMeta, Polygon, AnyGeometry
 
-from src.ui.dtl.utils import get_classes_list_value, classes_list_to_mapping
+from src.ui.dtl.utils import classes_list_to_mapping
 
 from supervisely.app.widgets import (
     Text,
@@ -52,17 +52,16 @@ class ElasticTransformAction(OtherAugmentationsAction):
             nonlocal _current_meta
             if project_meta == _current_meta:
                 return
-            nonlocal saved_classes_mapping_settings
             _current_meta = project_meta
-            old_obj_classes = project_meta.obj_classes
-            new_obj_classes = [
+
+            oc_to_convert = [
                 obj_class
                 for obj_class in project_meta.obj_classes
                 if obj_class.geometry_type in [Polygon, AnyGeometry]
             ]
-            saved_classes_mapping_settings = {}
-            for new_obj_class in new_obj_classes:
-                saved_classes_mapping_settings[new_obj_class.name] = new_obj_class.name
+
+            nonlocal saved_classes_mapping_settings
+            saved_classes_mapping_settings = {oc.name: oc.name for oc in oc_to_convert}
 
         def _set_settings_from_json(settings: dict):
             alpha_input.value = settings.get("alpha", 10)
@@ -71,9 +70,7 @@ class ElasticTransformAction(OtherAugmentationsAction):
         def _get_classes_mapping_value():
             nonlocal _current_meta
             classes = [obj_class.name for obj_class in _current_meta.obj_classes]
-            return classes_list_to_mapping(
-                classes, [oc.name for oc in _current_meta.obj_classes], other="skip"
-            )
+            return classes_list_to_mapping(classes, classes, other="skip")
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
