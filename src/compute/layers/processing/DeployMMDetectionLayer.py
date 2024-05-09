@@ -106,7 +106,7 @@ class DeployMMDetectionLayer(Layer):
                     )
                 )
             check_model_is_deployed(settings["session_id"])
-            # return super().validate()
+            return super().validate()
 
     def postprocess(self):
         if self.settings["stop_model_session"]:
