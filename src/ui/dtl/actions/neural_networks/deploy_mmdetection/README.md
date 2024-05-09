@@ -1,7 +1,7 @@
 
 # Deploy MMDetection
 
-`Deploy MMDetection` layer can be used to deploy custom and pretrained MMDetection models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained `MMDetection` models in your Team Files. You can train your own model using `Train MMDetection` app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
+`Deploy MMDetection` using [Serve MMDetection 3.0](https://ecosystem.supervisely.com/apps/serve-mmdetection-v3) app to serve models and can be used to deploy custom and pretrained models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained MMDetection models in your Team Files. You can train your own model using [Train MMDetection 3.0](https://ecosystem.supervisely.com/apps/train-mmdetection-v3) app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
 ![image](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/791a50bf-51b5-4bdb-8bda-0f4ed2a3d06b)
 
