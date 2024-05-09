@@ -112,16 +112,6 @@ class DeployYOLOv8Layer(Layer):
             logger.info(f"Session ID: {session_id} has been stopped")
             self.postprocess_cb()
 
-    def modifies_data(self):
-        return False
-
-    def process(
-        self,
-        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
-    ):
-        item_desc, ann = data_el
-        yield item_desc, ann
-
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         yield data_els
 

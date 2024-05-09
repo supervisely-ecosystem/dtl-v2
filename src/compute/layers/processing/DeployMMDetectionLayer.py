@@ -45,7 +45,7 @@ def check_model_is_deployed(session_id: int):
         raise RuntimeError(error_message)
 
 
-class MMDetectionLayer(Layer):
+class DeployMMDetectionLayer(Layer):
     action = "deploy_mmdetection"
     layer_settings = {
         "required": ["settings"],
@@ -106,7 +106,7 @@ class MMDetectionLayer(Layer):
                     )
                 )
             check_model_is_deployed(settings["session_id"])
-            return super().validate()
+            # return super().validate()
 
     def postprocess(self):
         if self.settings["stop_model_session"]:
@@ -115,16 +115,6 @@ class MMDetectionLayer(Layer):
             g.running_sessions_ids.remove(session_id)
             logger.info(f"Session ID: {session_id} has been stopped")
             self.postprocess_cb()
-
-    def modifies_data(self):
-        return False
-
-    def process(
-        self,
-        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
-    ):
-        item_desc, ann = data_el
-        yield item_desc, ann
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         yield data_els
