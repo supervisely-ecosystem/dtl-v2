@@ -1,38 +1,25 @@
-# Elastic Transform
+# ImgAug.ImageCorruptlike Blur
 
-`Elastic Transform` layer applies elastic transformation augmentation to the images.
+This layer contains set of ImgAug's image augmentations related to blur. Annotations are not being augmented.
 
 ### Settings:
 
+- **Augmentation option** - Select desired blur augmentation. Can be set to `Defocus Blur`, `Motion Blur` and `Zoom Blur`
+
 - **Severity** - Set value to specify the transformation intensity. Goes from 1 to 5.
 
-### Example. Transform the image
+Below you can see examples and json views for each augmentation option.
 
-In this example, we transform the image with severity 5.
-
-<table>
-<tr>
-<td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Elastic Transform: Severity 5</strong></td>
-</tr>
-<tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/40677182-e110-4be4-b333-819e2b389806" alt="Elastic Transform" /> </td>
-</tr>
-</table>
-
-### Example. Pixelate the image
-
-In this example, we pixelate the image with severity 5.
+## Defocus Blur
 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Pixelated: Severity 5</strong></td>
+<td style="text-align:center; width:50%"><strong>Defocus Blur: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/1a2f49c4-7f32-436f-a2fe-a55360dedec0" alt="Pixelated" /> </td>
+<td> <img src="xxx" alt="Original image" /> </td>
+<td> <img src="xxx" alt="Defocus Blur" /> </td>
 </tr>
 </table>
 
@@ -40,14 +27,80 @@ In this example, we pixelate the image with severity 5.
   <summary>JSON view</summary>
 <pre>
 {
-    "action": "elastictransform",
+    "action": "iaa_imgcorruptlike_blur",
     "src": [
         "$images_project_1"
     ],
-    "dst": "$elastictransform_2",
+    "dst": "$iaa_imgcorruptlike_blur_5",
     "settings": {
+        "option": "defocus_blur",
         "severity": 5
     }
 }
 </pre>
 </details>
+
+## Motion Blur
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Motion Blur: Severity 5</strong></td>
+</tr>
+<tr>
+<td> <img src="xxx" alt="Original image" /> </td>
+<td> <img src="xxx" alt="Motion Blur" /> </td>
+</tr>
+</table>
+
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+    "action": "iaa_imgcorruptlike_blur",
+    "src": [
+        "$images_project_1"
+    ],
+    "dst": "$iaa_imgcorruptlike_blur_5",
+    "settings": {
+        "option": "motion_blur",
+        "severity": 5
+    }
+}
+</pre>
+</details>
+
+## Zoom Blur
+
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Zoom Blur: Severity 5</strong></td>
+</tr>
+<tr>
+<td> <img src="xxx" alt="Original image" /> </td>
+<td> <img src="xxx" alt="Zoom Blur" /> </td>
+</tr>
+</table>
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+    "action": "iaa_imgcorruptlike_blur",
+    "src": [
+        "$images_project_1"
+    ],
+    "dst": "$iaa_imgcorruptlike_blur_5",
+    "settings": {
+        "option": "zoom_blur",
+        "severity": 5
+    }
+}
+</pre>
+</details>
+
+# Acknowledgements
+
+This layer is based on the great work of `ImgAug` ([github](https://github.com/aleju/imgaug)). ![GitHub Org's stars](https://img.shields.io/github/stars/aleju/imgaug?style=social)

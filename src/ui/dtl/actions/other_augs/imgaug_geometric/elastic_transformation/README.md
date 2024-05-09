@@ -34,7 +34,25 @@ In this example, the image is transformed with alpha (0, 70), sigma (4, 6).
   <summary>JSON view</summary>
 <pre>
 {
-todo
+"action": "elastic_transformation",
+		"src": [
+			"$images_project_1"
+		],
+		"dst": "$elastic_transformation_2",
+		"settings": {
+			"alpha": {
+				"min": 0,
+				"max": 70
+			},
+			"sigma": {
+				"min": 4,
+				"max": 6
+			},
+			"classes_mapping": {
+				"neutral": "neutral",
+				"person_poly": "person_poly"
+			}
+		}
 }
 </pre>
 </details>
