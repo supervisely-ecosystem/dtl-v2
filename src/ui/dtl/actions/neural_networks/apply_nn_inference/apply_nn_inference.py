@@ -54,6 +54,15 @@ class ApplyNNInferenceAction(ApplyNNAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        return Layer(
+            action=cls,
+            id=layer_id,
+            init_widgets=cls.init_widgets,
+            custom_update_btn=create_preview_button_widget(),
+        )
+
+    @staticmethod
+    def init_widgets(layer: Layer):
         _session_id = None
         _model_from_deploy_node = False
         _current_meta = ProjectMeta()
@@ -133,7 +142,6 @@ class ApplyNNInferenceAction(ApplyNNAction):
         ) = create_tags_selector_widgets()
 
         connect_notification = create_connect_notification_widget()
-        update_preview_btn = create_preview_button_widget()
 
         ### CONNECT TO MODEL BUTTONS
         @connect_nn_model_selector.value_changed
@@ -163,7 +171,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
             model_separator.hide()
 
             connect_notification.loading = True
-            update_preview_btn.disable()
+            layer.custom_update_btn.disable()
 
             _session_id = connect_nn_model_info._session_id
             if _session_id is None:
@@ -240,7 +248,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 tags_list_preview,
                 inf_settings_edit_container,
             )
-            update_preview_btn.enable()
+            layer.custom_update_btn.enable()
             connect_nn_model_selector.disable()
             connect_nn_connect_btn.disable()
             connect_nn_disconnect_btn.enable()
@@ -248,14 +256,14 @@ class ApplyNNInferenceAction(ApplyNNAction):
             _model_from_apply_node = True
             g.updater("metas")
             if _need_preview_update:
-                g.updater(("nodes", layer_id))
+                g.updater(("nodes", layer.id))
 
         @connect_nn_disconnect_btn.click
         def disconnect_model():
             nonlocal _session_id
             _session_id = None
             _reset_model()
-            g.updater(("nodes", layer_id))
+            g.updater(("nodes", layer.id))
 
         ### -----------------------
 
@@ -307,7 +315,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 conflict_method_preview,
                 apply_method_preview,
                 connect_notification,
-                update_preview_btn,
+                layer.custom_update_btn,
                 model_separator,
                 classes_separator,
                 tags_separator,
@@ -570,7 +578,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 apply_method_preview,
             )
             # -----------------------
-            update_preview_btn.enable()
+            layer.custom_update_btn.enable()
 
         @classes_list_save_btn.click
         def classes_list_save_btn_cb():
@@ -681,13 +689,8 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 "settings": settings_options,
             }
 
-        return Layer(
-            action=cls,
-            id=layer_id,
-            create_options=create_options,
-            get_settings=get_settings,
-            data_changed_cb=data_changed_cb,
-            custom_update_btn=update_preview_btn,
-            postprocess_cb=postprocess_cb,
-            update_sources_cb=update_sources_cb,
-        )
+        layer._create_options = create_options
+        layer._get_settings = get_settings
+        layer._data_changed_cb = data_changed_cb
+        layer.postprocess_cb = postprocess_cb
+        layer.update_sources_cb = update_sources_cb
