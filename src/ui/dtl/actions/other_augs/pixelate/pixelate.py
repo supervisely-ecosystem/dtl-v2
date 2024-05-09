@@ -15,7 +15,9 @@ from supervisely.app.widgets import (
 class PixelateAction(OtherAugmentationsAction):
     name = "pixelate"
     title = "Pixelate"
-    docs_url = ""
+    docs_url = (
+        "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#pixelate"
+    )
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
