@@ -176,8 +176,8 @@ def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
         "description": f"AutoServe session for Serve MMDetection",
         "task_name": "AutoServe/serve",
         "params": {"autostart": False, **saved_settings},
-        "app_version": "custom-gui-support",  # None
-        "is_branch": True,  # False
+        "app_version": None,
+        "is_branch": False,
     }
     session_info = api.app.start(**app_params)
     return session_info
