@@ -9,13 +9,13 @@ from supervisely import ProjectMeta, Polygon, AnyGeometry
 
 from src.ui.dtl.utils import classes_list_to_mapping
 
-from supervisely.app.widgets import Text, NodesFlow, InputNumber, Checkbox, NotificationBox, Slider
+from supervisely.app.widgets import Text, NodesFlow, Checkbox, NotificationBox, Slider
 
 
 class ElasticTransformationAction(OtherAugmentationsAction):
     name = "elastic_transformation"
     title = "Elastic Transformation"
-    docs_url = ""
+    docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
     width = 355
@@ -105,9 +105,17 @@ class ElasticTransformationAction(OtherAugmentationsAction):
             nonlocal saved_classes_mapping_settings
             saved_classes_mapping_settings = {oc.name: oc.name for oc in oc_to_convert}
 
+        def _update_preview():
+            sigma_min, sigma_max = sigma_input.get_value()
+            sigma_preview_widget.set(text=f"min: {sigma_min} - max: {sigma_max}", status="text")
+            alpha_min, alpha_max = alpha_input.get_value()
+            alpha_preview_widget.set(text=f"min: {alpha_min} - max: {alpha_max}", status="text")
+
         def _set_settings_from_json(settings: dict):
             alpha_input.value = settings.get("alpha", 10)
             sigma_input.value = settings.get("sigma", 1)
+
+            _update_preview()
 
         def _get_classes_mapping_value():
             nonlocal _current_meta
@@ -122,12 +130,24 @@ class ElasticTransformationAction(OtherAugmentationsAction):
                     option_component=NodesFlow.WidgetOptionComponent(alpha_text),
                 ),
                 NodesFlow.Node.Option(
+                    name="alpha_preview",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=alpha_preview_widget,
+                    ),
+                ),
+                NodesFlow.Node.Option(
                     name="alpha",
                     option_component=NodesFlow.WidgetOptionComponent(alpha_input),
                 ),
                 NodesFlow.Node.Option(
                     name="sigma_text",
                     option_component=NodesFlow.WidgetOptionComponent(sigma_text),
+                ),
+                NodesFlow.Node.Option(
+                    name="sigma_preview",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=sigma_preview_widget,
+                    ),
                 ),
                 NodesFlow.Node.Option(
                     name="sigma",
