@@ -12,8 +12,6 @@ class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
     options = {
-        "gaussian_blur": "Gaussian Blur",
-        "glass_blur": "Glass Blur",
         "defocus_blur": "Defocus Blur",
         "motion_blur": "Motion Blur",
         "zoom_blur": "Zoom Blur",

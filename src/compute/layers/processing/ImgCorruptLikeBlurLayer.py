@@ -17,11 +17,7 @@ class ImgAugCorruptlikeBlurLayer(ImgCorruptLikeLayer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
 
-        if self.settings["option"] == "gaussian_blur":
-            aug = iaa.imgcorruptlike.GaussianBlur(severity=self.settings["severity"])
-        elif self.settings["option"] == "glass_blur":
-            aug = iaa.imgcorruptlike.GlassBlur(severity=self.settings["severity"])
-        elif self.settings["option"] == "defocus_blur":
+        if self.settings["option"] == "defocus_blur":
             aug = iaa.imgcorruptlike.DefocusBlur(severity=self.settings["severity"])
         elif self.settings["option"] == "motion_blur":
             aug = iaa.imgcorruptlike.MotionBlur(severity=self.settings["severity"])
