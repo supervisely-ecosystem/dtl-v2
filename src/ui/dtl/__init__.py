@@ -117,9 +117,14 @@ from .actions.other_augs.imgaug_geometric.elastic_transformation.elastic_transfo
     ElasticTransformationAction,
 )
 
+from .actions.other_augs.imgaug_corruptlike.noise.noise import ImgAugCorruptlikeNoiseAction
+from .actions.other_augs.imgaug_corruptlike.blur.blur import ImgAugCorruptlikeBlurAction
+from .actions.other_augs.imgaug_corruptlike.weather.weather import ImgAugCorruptlikeWeatherAction
+from .actions.other_augs.imgaug_corruptlike.color.color import ImgAugCorruptlikeColorAction
 from .actions.other_augs.imgaug_corruptlike.compression.compression import (
     ImgAugCorruptlikeCompressionAction,
 )
+
 
 import src.globals as g
 
@@ -160,6 +165,10 @@ image_actions_list = {
         SlidingWindowAction.name,
     ],
     OTHER_AUGMENTATIONS: [
+        ImgAugCorruptlikeNoiseAction.name,
+        ImgAugCorruptlikeBlurAction.name,
+        ImgAugCorruptlikeWeatherAction.name,
+        ImgAugCorruptlikeColorAction.name,
         ImgAugCorruptlikeCompressionAction.name,
         ElasticTransformationAction.name,
     ],
@@ -229,6 +238,10 @@ image_actions_dict = {
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
     # Other Augmentations
+    ImgAugCorruptlikeNoiseAction.name: ImgAugCorruptlikeNoiseAction,
+    ImgAugCorruptlikeBlurAction.name: ImgAugCorruptlikeBlurAction,
+    ImgAugCorruptlikeWeatherAction.name: ImgAugCorruptlikeWeatherAction,
+    ImgAugCorruptlikeColorAction.name: ImgAugCorruptlikeColorAction,
     ImgAugCorruptlikeCompressionAction.name: ImgAugCorruptlikeCompressionAction,
     ElasticTransformationAction.name: ElasticTransformationAction,
     # Annotation layers

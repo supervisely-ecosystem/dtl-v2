@@ -12,4 +12,8 @@ class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
-    options = {"pixelate": "Pixelate", "elastic_transform": "Elastic Transform"}
+    options = {
+        "jpeg_compression": "JPEG Compression",
+        "pixelate": "Pixelate",
+        "elastic_transform": "Elastic Transform",
+    }
