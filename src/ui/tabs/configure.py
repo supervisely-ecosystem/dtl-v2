@@ -1,6 +1,7 @@
 import random
 import time
 from collections import defaultdict
+from typing import List
 
 # import random
 from supervisely.app.widgets import (
@@ -276,7 +277,11 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             )
             position = nodes_json[node_idx].get("position", None)
             node = ui_utils.create_node(layer, position)
-            nodes_flow.replace_node(node_idx, node)
+            # nodes_flow.replace_node(node_idx, node)
+            nodes_flow.pop_node(node_idx)
+            nodes_flow.add_node(node)
+            if autoconnect:
+                maybe_add_edges(layer)
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
