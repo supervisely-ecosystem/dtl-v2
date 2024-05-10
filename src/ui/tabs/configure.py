@@ -209,7 +209,6 @@ def maybe_add_edges(layer: Layer):
     # Need this because remove_nodes is not always triggered
     nodes_json = nodes_flow.get_nodes_json()
     existing_layers = {node["id"] for node in nodes_json}
-    #
     edges = nodes_flow.get_edges_json()
 
     # layer input name.
