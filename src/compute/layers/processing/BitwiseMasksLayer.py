@@ -112,7 +112,7 @@ class BitwiseMasksLayer(Layer):
                     func = self.bitwise_ops(bitwise_type)
                     new_mask = func(full_target_mask, full_size_mask).astype(bool)
                     if np.any(new_mask):
-                        new_geometry = Bitmap(new_mask)
+                        new_geometry = Bitmap(new_mask, extra_validation=False)
                         new_labels.append(Label(geometry=new_geometry, obj_class=label.obj_class))
 
             ann = ann.clone(labels=new_labels)
