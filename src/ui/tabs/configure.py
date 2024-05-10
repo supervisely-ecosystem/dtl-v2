@@ -211,8 +211,6 @@ def maybe_add_edges(layer: Layer):
     existing_layers = {node["id"] for node in nodes_json}
     #
     edges = nodes_flow.get_edges_json()
-    logger.info(f"Edges before append: {edges}")
-    logger.info("----------------------")
 
     # layer input name.
     # If layer has source input, it will be "source", otherwise it will be first one
@@ -242,14 +240,6 @@ def maybe_add_edges(layer: Layer):
                             break
                 break
 
-    logger.info("----------------------")
-    logger.info(f"Src layer id: {src_layer_id}")
-    logger.info("----------------------")
-    logger.info(f"Existing layers: {existing_layers}")
-    logger.info("----------------------")
-    logger.info(f"Nodes history: {g.nodes_history}")
-    logger.info("----------------------")
-
     if src_layer_id is None:
         return
 
@@ -266,9 +256,6 @@ def maybe_add_edges(layer: Layer):
             },
         }
     )
-
-    logger.info(f"Edges after append: {edges}")
-    logger.info("----------------------")
 
     nodes_flow.set_edges(edges)
     return
