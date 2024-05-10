@@ -575,6 +575,8 @@ class Net:
         for layer in self.layers:
             if layer.action == "deploy_yolo_v8":
                 datalevel_metas[layer.dsts[0]] = ProjectMeta()
+            if layer.action == "deploy_mmdetection":
+                datalevel_metas[layer.dsts[0]] = ProjectMeta()
 
         for data_layer in cur_level_layers:
             try:

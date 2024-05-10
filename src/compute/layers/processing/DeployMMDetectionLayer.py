@@ -27,7 +27,7 @@ def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec:
 
 def check_model_is_deployed(session_id: int):
     error_message = (
-        "Selected model is not served in 'Deploy YOLOv8' node. "
+        "Selected model is not served in 'Deploy MMDetection' node. "
         "Make sure model is served by visiting app session page: "
         f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a> "
         "<br>Press the 'SERVE' button if the model is not served and try again. "
@@ -45,8 +45,8 @@ def check_model_is_deployed(session_id: int):
         raise RuntimeError(error_message)
 
 
-class DeployYOLOv8Layer(Layer):
-    action = "deploy_yolo_v8"
+class DeployMMDetectionLayer(Layer):
+    action = "deploy_mmdetection"
     layer_settings = {
         "required": ["settings"],
         "properties": {
@@ -60,6 +60,8 @@ class DeployYOLOv8Layer(Layer):
                     "checkpoint_name",
                     "task_type",
                     "checkpoint_url",
+                    "arch_type",
+                    "config_url",
                     "stop_model_session",
                 ],
                 "properties": {
@@ -70,6 +72,8 @@ class DeployYOLOv8Layer(Layer):
                     "task_type": {"type": "string"},
                     "checkpoint_name": {"type": "string"},
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "arch_type": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "config_url": {"type": "string"},
                     "stop_model_session": {"type": "boolean"},
                 },
             },
@@ -87,18 +91,18 @@ class DeployYOLOv8Layer(Layer):
             return
 
         if settings.get("agent_id", None) is None:
-            raise BadSettingsError("Select agent in 'Deploy YOLOv8' node'")
+            raise BadSettingsError("Select agent in 'Deploy MMDetection' node'")
         if settings.get("device", None) is None:
-            raise BadSettingsError("Select device in 'Deploy YOLOv8' node")
+            raise BadSettingsError("Select device in 'Deploy MMDetection' node")
         if settings.get("model_source", None) is None:
-            raise BadSettingsError("Select model in 'Deploy YOLOv8' node")
+            raise BadSettingsError("Select model in 'Deploy MMDetection' node")
         if not self.net.preview_mode:
             if settings.get("session_id", None) is None:
                 raise BadSettingsError(
                     (
-                        "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
+                        "Selected model session is not found. Make sure you have deployed model in 'Deploy MMDetection' node. "
                         "If you still have problems, try to check model logs for more info or contact support."
-                        "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
+                        "You can also close 'Deploy MMDetection' node to proceed further with the workflow."
                     )
                 )
             check_model_is_deployed(settings["session_id"])
