@@ -38,6 +38,15 @@ class DeployYOLOV8Action(DeployNNAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        return Layer(
+            action=cls,
+            id=layer_id,
+            need_preview=False,
+            init_widgets=cls.init_widgets,
+        )
+
+    @staticmethod
+    def init_widgets(layer: Layer):
         saved_settings = {}
         session: Session = None
 
@@ -295,12 +304,7 @@ class DeployYOLOV8Action(DeployNNAction):
                 "settings": settings_options,
             }
 
-        return Layer(
-            action=cls,
-            id=layer_id,
-            create_options=create_options,
-            get_settings=get_settings,
-            get_data=get_data,
-            need_preview=False,
-            postprocess_cb=postprocess_cb,
-        )
+        layer._create_options = create_options
+        layer._get_settings = get_settings
+        layer._get_data = get_data
+        layer.postprocess_cb = postprocess_cb

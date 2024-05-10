@@ -26,11 +26,30 @@ import src.globals as g
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 
 
+loading_widget = Text("Loading...")
+
+
+def create_placeholder_options(*args, **kwargs):
+    settings_options = [
+        NodesFlow.Node.Option(
+            name="Loading widget",
+            option_component=NodesFlow.WidgetOptionComponent(
+                widget=loading_widget,
+            ),
+        ),
+    ]
+    return {
+        "src": [],
+        "dst": [],
+        "settings": settings_options,
+    }
+
+
 class Layer:
     def __init__(
         self,
         action: Action,
-        create_options: callable,
+        create_options: Optional[callable] = None,
         get_src: Optional[callable] = None,
         get_settings: Optional[callable] = None,
         get_dst: Optional[callable] = None,
@@ -41,6 +60,7 @@ class Layer:
         get_data: Optional[callable] = None,
         postprocess_cb: Optional[callable] = None,
         update_sources_cb: Optional[callable] = None,
+        init_widgets: Optional[callable] = None,
     ):
         self.action = action
         self.id = id
@@ -48,6 +68,8 @@ class Layer:
             self.id = action.name + "_" + "".join(random.choice("0123456789") for _ in range(8))
 
         self._create_options = create_options
+        if self._create_options is None:
+            self._create_options = create_placeholder_options
         self._get_settings = get_settings
         self._get_src = get_src
         self._get_dst = get_dst
@@ -60,8 +82,10 @@ class Layer:
         self._dst = []
 
         self.output_meta = None
+        self.custom_update_btn = custom_update_btn
         self.postprocess_cb = postprocess_cb
         self.update_sources_cb = update_sources_cb
+        self._init_widgets = init_widgets
 
         md_description = self.action.md_description.replace(
             r"../../assets", r"https://raw.githubusercontent.com/supervisely/docs/master/assets"
@@ -97,8 +121,8 @@ class Layer:
         )
 
         if self._need_preview:
-            if custom_update_btn is not None:
-                self._update_preview_button = custom_update_btn
+            if self.custom_update_btn is not None:
+                self._update_preview_button = self.custom_update_btn
             else:
                 self._update_preview_button = Button(
                     text="Update",
@@ -179,6 +203,12 @@ class Layer:
             dst = [dst]
         self._dst = dst
         self._settings = json_data.get("settings", {})
+
+    def init_widgets(self):
+        if self._init_widgets is not None:
+            self._init_widgets(self)
+            return True
+        return False
 
     # NodesFlow.Node
     def create_node(self) -> NodesFlow.Node:

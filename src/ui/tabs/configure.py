@@ -248,9 +248,15 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
 
-        nodes_flow.add_node(node)
+        node_idx = nodes_flow.add_node(node)
+
         if autoconnect:
             maybe_add_edges(layer)
+        if layer.init_widgets():
+            position = nodes_flow.get_nodes_json()[node_idx]["position"]
+            nodes_flow.pop_node(node_idx)
+            node = ui_utils.create_node(layer, position)
+            nodes_flow.add_node(node)
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
