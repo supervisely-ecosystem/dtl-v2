@@ -248,7 +248,8 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
 
-        node_idx = nodes_flow.add_node(node)
+        nodes_flow.add_node(node)
+        node_idx = len(nodes_flow._nodes) - 1
 
         if autoconnect:
             maybe_add_edges(layer)
