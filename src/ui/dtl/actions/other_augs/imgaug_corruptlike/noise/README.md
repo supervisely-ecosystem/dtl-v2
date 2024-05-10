@@ -18,8 +18,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Gaussian Noise: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Gaussian Noise" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/d72fdf72-791d-4ac9-a98f-9fc38938371b" alt="Gaussian Noise" /> </td>
 </tr>
 </table>
 
@@ -47,8 +47,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Shot Noise: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Shot Noise" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/68425350-7632-4a89-8b4e-cfe660c4ea95" alt="Shot Noise" /> </td>
 </tr>
 </table>
 
@@ -77,8 +77,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Impulse Noise: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Impulse Noise" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/a197173b-7058-4a10-9892-d6de1af39405" alt="Impulse Noise" /> </td>
 </tr>
 </table>
 
@@ -106,8 +106,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Speckle Noise: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Speckle Noise" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/02f00ee7-0926-4814-9f7c-01ecf5dbac83" alt="Speckle Noise" /> </td>
 </tr>
 </table>
 
