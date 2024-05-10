@@ -18,8 +18,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Defocus Blur: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Defocus Blur" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/fb8b2263-fee6-4943-8ee7-f6a57e321033" alt="Defocus Blur" /> </td>
 </tr>
 </table>
 
@@ -47,8 +47,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Motion Blur: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Motion Blur" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/7f798a87-e225-40af-b2d7-f27c700d7584" alt="Motion Blur" /> </td>
 </tr>
 </table>
 
@@ -79,8 +79,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Zoom Blur: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Zoom Blur" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/018450ec-16b8-455f-b7ce-ceb18d74aec3" alt="Zoom Blur" /> </td>
 </tr>
 </table>
 

@@ -18,8 +18,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Fog: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Fog" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/b72facdd-8f97-46fe-a998-f0d75f60b185" alt="Fog" /> </td>
 </tr>
 </table>
 
@@ -47,8 +47,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Frost: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Frost" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/d146a2a7-20e7-43a0-aaf1-13685286c1c1" alt="Frost" /> </td>
 </tr>
 </table>
 
@@ -77,9 +77,9 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Snow: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Snow" /> </td>
-</tr>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/d377be8b-81be-403f-8756-a5ca29f42c64" alt="Snow" /> </td>
+</tr>   
 </table>
 
 <details>
@@ -106,8 +106,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Spatter: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original image" /> </td>
-<td> <img src="xxx" alt="Spatter" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/300f1ed6-d32f-4b02-87d8-002f549503ff" alt="Spatter" /> </td>
 </tr>
 </table>
 

@@ -18,8 +18,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>JPEG Compression: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/40677182-e110-4be4-b333-819e2b389806" alt="Elastic Transform" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/a92f6184-998a-4dd0-9a0c-867c82544bc4" alt="JPEG" /> </td>
 </tr>
 </table>
 
@@ -48,8 +48,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Pixelated: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/1a2f49c4-7f32-436f-a2fe-a55360dedec0" alt="Pixelated" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/6f889dd6-4c8d-43ae-80f2-29be5ebf0aad" alt="Pixelated" /> </td>
 </tr>
 </table>
 
@@ -80,8 +80,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Elastic Transform: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/c589730f-4dfd-4640-b6d3-265d704d9c92" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/40677182-e110-4be4-b333-819e2b389806" alt="Elastic Transform" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/9f31bc1d-6d75-47cc-8377-2a3076bfaeeb" alt="Elastic Transform" /> </td>
 </tr>
 </table>
 
