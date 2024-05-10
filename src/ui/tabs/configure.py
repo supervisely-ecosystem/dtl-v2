@@ -33,6 +33,8 @@ import src.globals as g
 from src.compute.Net import Net
 from src.ui.widgets import LayerCard
 
+from supervisely.app.content import StateJson
+
 
 # context menu "select" option dialog
 select_action_name = Select(
@@ -73,7 +75,22 @@ context_menu_items = [
     {"label": "Clear", "key": "__clear__", "divided": True},
 ]
 
-nodes_flow = NodesFlow(
+
+class CustomNodesFlow(NodesFlow):
+    def replace_node(self, node_idx, node: NodesFlow.Node):
+        self._nodes[node_idx] = node
+        StateJson()[self.widget_id]["flow"]["nodes"][node_idx] = node.to_json()
+        StateJson().send_changes()
+
+    def add_node(self, node: NodesFlow.Node):
+        self._nodes.append(node)
+        StateJson()[self.widget_id]["flow"]["nodes"].append(node.to_json())
+        len_nodes = len(StateJson()[self.widget_id]["flow"]["nodes"])
+        StateJson().send_changes()
+        return len_nodes - 1
+
+
+nodes_flow = CustomNodesFlow(
     height="calc(100vh - 58px)",
     context_menu=context_menu_items,
     color_theme="light",
@@ -248,16 +265,18 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
 
-        nodes_flow.add_node(node)
-        node_idx = len(nodes_flow._nodes) - 1
+        node_idx = nodes_flow.add_node(node)
 
         if autoconnect:
             maybe_add_edges(layer)
         if layer.init_widgets():
-            position = nodes_flow.get_nodes_json()[node_idx]["position"]
-            nodes_flow.pop_node(node_idx)
+            nodes_json = nodes_flow.get_nodes_json()
+            logger.debug(
+                "nodes_json", extra={"nodes_json len": len(nodes_json), "node_idx": node_idx}
+            )
+            position = nodes_json[node_idx].get("position", None)
             node = ui_utils.create_node(layer, position)
-            nodes_flow.add_node(node)
+            nodes_flow.replace_node(node_idx, node)
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
