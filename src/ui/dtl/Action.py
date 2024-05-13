@@ -25,7 +25,7 @@ class Action:
                 md_description = f.read()
             break
 
-    @staticmethod
+    @classmethod
     def read_md_file(cls, file_path):
         with open(file_path) as f:
             return f.read()
