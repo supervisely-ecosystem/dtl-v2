@@ -78,26 +78,27 @@ class SuperviselyProjectAction(OutputAction):
                 new_project_container.show()
 
         def _update_preview():
-            selected_project_id = dst_project_selector.get_selected_id()
-            if selected_project_id is not None:
-                project_info = g.api.project.get_info_by_id(selected_project_id)
-                dst_project_preview.set(project_info)
+            if is_existing_project.is_checked():
+                selected_project_id = dst_project_selector.get_selected_id()
+                if selected_project_id is not None:
+                    project_info = g.api.project.get_info_by_id(selected_project_id)
+                    dst_project_preview.set(project_info)
 
-                dataset_option = dst_dataset_options_selector.get_value()
-                if dataset_option == "new":
-                    dst_dataset_preview.set(
-                        f"Dataset: {dst_dataset_options_new_dataset_input.get_value()}", "text"
-                    )
-                elif dataset_option == "existing":
-                    dataset_name = g.api.dataset.get_info_by_id(
-                        dst_dataset_options_existing_dataset_selector.get_selected_id()
-                    ).name
-                    dst_dataset_preview.set(f"Dataset: {dataset_name}", "text")
-                else:
-                    dst_dataset_preview.set(
-                        "Dataset(s) will keep structure from input project", "text"
-                    )
-                dst_preview_container.show()
+                    dataset_option = dst_dataset_options_selector.get_value()
+                    if dataset_option == "new":
+                        dst_dataset_preview.set(
+                            f"Dataset: {dst_dataset_options_new_dataset_input.get_value()}", "text"
+                        )
+                    elif dataset_option == "existing":
+                        dataset_name = g.api.dataset.get_info_by_id(
+                            dst_dataset_options_existing_dataset_selector.get_selected_id()
+                        ).name
+                        dst_dataset_preview.set(f"Dataset: {dataset_name}", "text")
+                    else:
+                        dst_dataset_preview.set(
+                            "Dataset(s) will keep structure from input project", "text"
+                        )
+                    dst_preview_container.show()
 
         def get_settings(options_json: dict):
             nonlocal saved_settings
