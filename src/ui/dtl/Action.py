@@ -104,7 +104,7 @@ class VideoAction(Action):
     icon = "zmdi zmdi-videocam"
 
 
-class OtherAugmentationsAction(Action):
+class ImgAugAugmentationsAction(Action):
     node_color = "#8091ff"
     icon = "zmdi zmdi-brightness-auto"
 

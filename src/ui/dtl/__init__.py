@@ -8,7 +8,7 @@ from .Action import (
     OutputAction,
     FilterAndConditionAction,
     NeuralNetworkAction,
-    OtherAugmentationsAction,
+    ImgAugAugmentationsAction,
 )
 from .actions.input.images_project.images_project import ImagesProjectAction
 from .actions.pixel_level_transformations.anonymize.anonymize import AnonymizeAction
@@ -112,15 +112,15 @@ from .actions.output.create_labeling_job.create_labeling_job import CreateLabeli
 from .actions.input.filtered_project.filtered_project import FilteredProjectAction
 from .actions.other.move.move import MoveAction
 from .actions.other.copy.copy import CopyAction
-from .actions.other_augs.imgaug_geometric.elastic_transformation.elastic_transformation import (
+from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformation import (
     ElasticTransformationAction,
 )
 
-from .actions.other_augs.imgaug_corruptlike.noise.noise import ImgAugCorruptlikeNoiseAction
-from .actions.other_augs.imgaug_corruptlike.blur.blur import ImgAugCorruptlikeBlurAction
-from .actions.other_augs.imgaug_corruptlike.weather.weather import ImgAugCorruptlikeWeatherAction
-from .actions.other_augs.imgaug_corruptlike.color.color import ImgAugCorruptlikeColorAction
-from .actions.other_augs.imgaug_corruptlike.compression.compression import (
+from .actions.imgaug_augs.corruptlike.noise.noise import ImgAugCorruptlikeNoiseAction
+from .actions.imgaug_augs.corruptlike.blur.blur import ImgAugCorruptlikeBlurAction
+from .actions.imgaug_augs.corruptlike.weather.weather import ImgAugCorruptlikeWeatherAction
+from .actions.imgaug_augs.corruptlike.color.color import ImgAugCorruptlikeColorAction
+from .actions.imgaug_augs.corruptlike.compression.compression import (
     ImgAugCorruptlikeCompressionAction,
 )
 
@@ -136,7 +136,7 @@ OTHER = "Other"
 SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
-OTHER_AUGMENTATIONS = "Other Augmentations"
+IMGAUG_AUGMENTATIONS = "ImgAug Augmentations"
 # Video specific
 VIDEO_TRANSFORMS = "Video transforms"
 # ---
@@ -163,7 +163,7 @@ image_actions_list = {
         RotateAction.name,
         SlidingWindowAction.name,
     ],
-    OTHER_AUGMENTATIONS: [
+    IMGAUG_AUGMENTATIONS: [
         ImgAugCorruptlikeNoiseAction.name,
         ImgAugCorruptlikeBlurAction.name,
         ImgAugCorruptlikeWeatherAction.name,
@@ -235,7 +235,7 @@ image_actions_dict = {
     ResizeAction.name: ResizeAction,
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
-    # Other Augmentations
+    # ImgAug Augmentations
     ImgAugCorruptlikeNoiseAction.name: ImgAugCorruptlikeNoiseAction,
     ImgAugCorruptlikeBlurAction.name: ImgAugCorruptlikeBlurAction,
     ImgAugCorruptlikeWeatherAction.name: ImgAugCorruptlikeWeatherAction,
