@@ -116,11 +116,11 @@ from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformatio
     ElasticTransformationAction,
 )
 
-from .actions.imgaug_augs.corruptlike.noise.noise import ImgAugCorruptlikeNoiseAction
-from .actions.imgaug_augs.corruptlike.blur.blur import ImgAugCorruptlikeBlurAction
-from .actions.imgaug_augs.corruptlike.weather.weather import ImgAugCorruptlikeWeatherAction
-from .actions.imgaug_augs.corruptlike.color.color import ImgAugCorruptlikeColorAction
-from .actions.imgaug_augs.corruptlike.compression.compression import (
+from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
+    ImgAugCorruptlikeNoiseAction,
+    ImgAugCorruptlikeBlurAction,
+    ImgAugCorruptlikeWeatherAction,
+    ImgAugCorruptlikeColorAction,
     ImgAugCorruptlikeCompressionAction,
 )
 

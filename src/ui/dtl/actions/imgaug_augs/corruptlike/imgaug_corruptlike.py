@@ -8,6 +8,7 @@ from supervisely.app.widgets import (
 )
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import ImgAugAugmentationsAction
+from os.path import realpath, dirname
 
 
 class ImgAugCorruptLikeAction(ImgAugAugmentationsAction):
@@ -70,3 +71,66 @@ class ImgAugCorruptLikeAction(ImgAugAugmentationsAction):
             get_settings=get_settings,
             need_preview=True,
         )
+
+
+class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
+    name = "iaa_imgcorruptlike_blur"
+    title = "iaa.imgcorruptlike Blur"
+    description = ""
+    md_description = dirname(realpath(__file__)) + "/blur.md"
+    options = {
+        "defocus_blur": "Defocus Blur",
+        "motion_blur": "Motion Blur",
+        "zoom_blur": "Zoom Blur",
+    }
+
+
+class ImgAugCorruptlikeColorAction(ImgAugCorruptLikeAction):
+    name = "iaa_imgcorruptlike_color"
+    title = "iaa.imgcorruptlike Color"
+    description = ""
+    md_description = dirname(realpath(__file__)) + "/color.md"
+    options = {
+        "contrast": "Contrast",
+        "brightness": "Brightness",
+        "saturate": "Saturate",
+    }
+
+
+class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
+    name = "iaa_imgcorruptlike_compression"
+    title = "iaa.imgcorruptlike Compression"
+    docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
+    description = ""
+    md_description = dirname(realpath(__file__)) + "/compression.md"
+    options = {
+        "jpeg_compression": "JPEG Compression",
+        "pixelate": "Pixelate",
+        "elastic_transform": "Elastic Transform",
+    }
+
+
+class ImgAugCorruptlikeNoiseAction(ImgAugCorruptLikeAction):
+    name = "iaa_imgcorruptlike_noise"
+    title = "iaa.imgcorruptlike Noise"
+    description = ""
+    md_description = dirname(realpath(__file__)) + "/noise.md"
+    options = {
+        "gaussian_noise": "Gaussian Noise",
+        "shot_noise": "Shot Noise",
+        "impulse_noise": "Impulse Noise",
+        "speckle_noise": "Speckle Noise",
+    }
+
+
+class ImgAugCorruptlikeWeatherAction(ImgAugCorruptLikeAction):
+    name = "iaa_imgcorruptlike_weather"
+    title = "iaa.imgcorruptlike Weather"
+    description = ""
+    md_description = dirname(realpath(__file__)) + "/weather.md"
+    options = {
+        "fog": "Fog",
+        "frost": "Frost",
+        "snow": "Snow",
+        "spatter": "Spatter",
+    }
