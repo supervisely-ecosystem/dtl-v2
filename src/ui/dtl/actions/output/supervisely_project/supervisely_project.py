@@ -214,15 +214,13 @@ class SuperviselyProjectAction(OutputAction):
 
             _update_preview()
 
-            src_options = [
+            settings_options = [
                 NodesFlow.Node.Option(
                     name="Project Mode",
                     option_component=NodesFlow.WidgetOptionComponent(
                         widget=is_existing_project,
                     ),
                 ),
-            ]
-            settings_options = [
                 NodesFlow.Node.Option(
                     name="New Project",
                     option_component=NodesFlow.WidgetOptionComponent(
@@ -249,7 +247,7 @@ class SuperviselyProjectAction(OutputAction):
                 ),
             ]
             return {
-                "src": src_options,
+                "src": [],
                 "dst": [],
                 "settings": settings_options,
             }
