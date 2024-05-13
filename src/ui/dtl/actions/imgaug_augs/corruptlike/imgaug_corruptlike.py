@@ -8,7 +8,17 @@ from supervisely.app.widgets import (
 )
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import ImgAugAugmentationsAction
-from os.path import realpath, dirname
+from os.path import join, exists, realpath, dirname
+
+
+def get_layer_doc_by_name(doc_name: str) -> str:
+    layer_dir = dirname(realpath(__file__))
+    md_description = ""
+    p = join(layer_dir, doc_name)
+    if exists(p):
+        with open(p) as f:
+            md_description = f.read()
+    return md_description
 
 
 class ImgAugCorruptLikeAction(ImgAugAugmentationsAction):
@@ -77,10 +87,7 @@ class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_blur"
     title = "iaa.imgcorruptlike Blur"
     description = ""
-    desc_path = dirname(realpath(__file__)) + "/blur.md"
-    md_description = ""
-    with open(desc_path) as f:
-        md_description = f.read()
+    md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/blur.md")
     options = {
         "defocus_blur": "Defocus Blur",
         "motion_blur": "Motion Blur",
@@ -92,10 +99,7 @@ class ImgAugCorruptlikeColorAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_color"
     title = "iaa.imgcorruptlike Color"
     description = ""
-    desc_path = dirname(realpath(__file__)) + "/color.md"
-    md_description = ""
-    with open(desc_path) as f:
-        md_description = f.read()
+    md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/color.md")
     options = {
         "contrast": "Contrast",
         "brightness": "Brightness",
@@ -108,10 +112,9 @@ class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
     title = "iaa.imgcorruptlike Compression"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
-    desc_path = dirname(realpath(__file__)) + "/compression.md"
-    md_description = ""
-    with open(desc_path) as f:
-        md_description = f.read()
+    md_description = ImgAugCorruptLikeAction.read_md_file(
+        dirname(realpath(__file__)) + "/compression.md"
+    )
     options = {
         "jpeg_compression": "JPEG Compression",
         "pixelate": "Pixelate",
@@ -123,10 +126,7 @@ class ImgAugCorruptlikeNoiseAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_noise"
     title = "iaa.imgcorruptlike Noise"
     description = ""
-    desc_path = dirname(realpath(__file__)) + "/noise.md"
-    md_description = ""
-    with open(desc_path) as f:
-        md_description = f.read()
+    md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/noise.md")
     options = {
         "gaussian_noise": "Gaussian Noise",
         "shot_noise": "Shot Noise",
@@ -139,10 +139,9 @@ class ImgAugCorruptlikeWeatherAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_weather"
     title = "iaa.imgcorruptlike Weather"
     description = ""
-    desc_path = dirname(realpath(__file__)) + "/weather.md"
-    md_description = ""
-    with open(desc_path) as f:
-        md_description = f.read()
+    md_description = ImgAugCorruptLikeAction.read_md_file(
+        dirname(realpath(__file__)) + "/weather.md"
+    )
     options = {
         "fog": "Fog",
         "frost": "Frost",

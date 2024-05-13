@@ -25,6 +25,11 @@ class Action:
                 md_description = f.read()
             break
 
+    @staticmethod
+    def read_md_file(cls, file_path):
+        with open(file_path) as f:
+            return f.read()
+
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         raise NotImplementedError
