@@ -137,6 +137,7 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     nodes_flow.add_node(node)
     generate_preview_for_project(layer)
 
+g.PROJECT_ID = None
 update_loop.start()
 
 # if g.FILE:
