@@ -1,9 +1,16 @@
 
 # Supervisely Project
-`Add to Existing Project` stores results of data transformations to existing project in your workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence.
+
+`Supervisely Project` export results of data transformations to new or existing project in your current workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence. This layer is a combination of `Create New Project` and `Add to Existing Project` layers.
 
 ### Settings
 
+- **Export to existing Project** - Check the box if you want to save the results to an existing project. Leave the box unchecked if you want to create new project and save the results to it.
+  
+**New Project**
+- **Project name** - Input the name of the output project. If the project with the same name already exists, the new project name will be generated automatically by adding a suffix to the specified name.
+
+**Existing Project**
 - **Select Dataset Options**
   - **Existing Dataset** - select the dataset from the existing project to save results to
   - **New Dataset** - enter the name of a new dataset to create in the selected project
@@ -55,6 +62,24 @@ All files will be saved in the selected project in the same structure, with the 
 </table>
 
 ### JSON views
+
+<details>
+  <summary>Create new Project</summary>
+  <pre>
+    {
+        "action": "supervisely_project",
+        "src": ["$images_project_1"],
+        "dst": [],
+        "settings": {
+            "is_existing_project": False,
+            "dataset_option": "new",
+            "dataset_name": "",
+            "dataset_id": None,
+            "merge_different_meta": False,
+        },
+    }
+  </pre>
+</details>
 
 <details>
   <summary>Existing dataset</summary>
