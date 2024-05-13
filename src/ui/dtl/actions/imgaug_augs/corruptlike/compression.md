@@ -1,4 +1,4 @@
-# ImgAug.ImageCorruptlike Compression
+# ImgAug.ImgCorruptlike Compression
 
 This layer contains set of ImgAug's image augmentations related to compression. Annotations are not being augmented.
 

@@ -14,7 +14,7 @@ from supervisely.app.widgets import Text, NodesFlow, Checkbox, NotificationBox, 
 
 class ElasticTransformationAction(ImgAugAugmentationsAction):
     name = "elastic_transformation"
-    title = "Elastic Transformation"
+    title = "iaa.geometric Elastic Transformation"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))

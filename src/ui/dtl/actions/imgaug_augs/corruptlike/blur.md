@@ -1,4 +1,4 @@
-# ImgAug.ImageCorruptlike Blur
+# ImgAug.ImgCorruptlike Blur
 
 This layer contains set of ImgAug's image augmentations related to blur. Annotations are not being augmented.
 

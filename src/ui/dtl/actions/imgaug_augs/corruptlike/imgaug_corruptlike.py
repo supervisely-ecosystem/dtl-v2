@@ -77,7 +77,10 @@ class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_blur"
     title = "iaa.imgcorruptlike Blur"
     description = ""
-    md_description = dirname(realpath(__file__)) + "/blur.md"
+    desc_path = dirname(realpath(__file__)) + "/blur.md"
+    md_description = ""
+    with open(desc_path) as f:
+        md_description = f.read()
     options = {
         "defocus_blur": "Defocus Blur",
         "motion_blur": "Motion Blur",
@@ -89,7 +92,10 @@ class ImgAugCorruptlikeColorAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_color"
     title = "iaa.imgcorruptlike Color"
     description = ""
-    md_description = dirname(realpath(__file__)) + "/color.md"
+    desc_path = dirname(realpath(__file__)) + "/color.md"
+    md_description = ""
+    with open(desc_path) as f:
+        md_description = f.read()
     options = {
         "contrast": "Contrast",
         "brightness": "Brightness",
@@ -102,7 +108,10 @@ class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
     title = "iaa.imgcorruptlike Compression"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
-    md_description = dirname(realpath(__file__)) + "/compression.md"
+    desc_path = dirname(realpath(__file__)) + "/compression.md"
+    md_description = ""
+    with open(desc_path) as f:
+        md_description = f.read()
     options = {
         "jpeg_compression": "JPEG Compression",
         "pixelate": "Pixelate",
@@ -114,7 +123,10 @@ class ImgAugCorruptlikeNoiseAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_noise"
     title = "iaa.imgcorruptlike Noise"
     description = ""
-    md_description = dirname(realpath(__file__)) + "/noise.md"
+    desc_path = dirname(realpath(__file__)) + "/noise.md"
+    md_description = ""
+    with open(desc_path) as f:
+        md_description = f.read()
     options = {
         "gaussian_noise": "Gaussian Noise",
         "shot_noise": "Shot Noise",
@@ -127,7 +139,10 @@ class ImgAugCorruptlikeWeatherAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_weather"
     title = "iaa.imgcorruptlike Weather"
     description = ""
-    md_description = dirname(realpath(__file__)) + "/weather.md"
+    desc_path = dirname(realpath(__file__)) + "/weather.md"
+    md_description = ""
+    with open(desc_path) as f:
+        md_description = f.read()
     options = {
         "fog": "Fog",
         "frost": "Frost",

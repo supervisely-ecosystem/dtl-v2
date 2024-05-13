@@ -1,4 +1,4 @@
-# ImgAug.ImageCorruptlike Color
+# ImgAug.ImgCorruptlike Color
 
 This layer contains set of ImgAug's image augmentations related to color. Annotations are not being augmented.
 

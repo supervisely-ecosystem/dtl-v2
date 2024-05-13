@@ -1,4 +1,4 @@
-# Elastic Transformation
+# iaa.Geometric Elastic Transformation
 
 `Elastic Transformation` layer transforms images by moving pixels locally around using displacement fields.
 

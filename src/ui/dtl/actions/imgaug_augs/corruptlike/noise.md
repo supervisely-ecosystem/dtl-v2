@@ -1,4 +1,4 @@
-# ImgAug.ImageCorruptlike Noise
+# ImgAug.ImgCorruptlike Noise
 
 This layer contains set of ImgAug's image augmentations related to noise. Annotations are not being augmented.
 

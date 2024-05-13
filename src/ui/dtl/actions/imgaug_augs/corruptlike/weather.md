@@ -1,4 +1,4 @@
-# ImgAug.ImageCorruptlike Weather
+# ImgAug.ImgCorruptlike Weather
 
 This layer contains set of ImgAug's image augmentations related to weather. Annotations are not being augmented.
 
