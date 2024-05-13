@@ -115,6 +115,8 @@ from .actions.other.copy.copy import CopyAction
 from .actions.other_augs.pixelate.pixelate import PixelateAction
 from .actions.other_augs.elastic_transform.elastic_transform import ElasticTransformAction
 
+from .actions.output.supervisely_project.supervisely_project import SuperviselyProjectAction
+
 import src.globals as g
 
 SOURCE_ACTIONS = "Input"
@@ -186,6 +188,7 @@ image_actions_list = {
     NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNInferenceAction.name],
     OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
+        SuperviselyProjectAction.name,
         CreateNewProjectAction.name,
         AddToExistingProjectAction.name,
         ExportArchiveAction.name,
@@ -254,6 +257,7 @@ image_actions_dict = {
     CopyAction.name: CopyAction,
     MoveAction.name: MoveAction,
     # Save layers
+    SuperviselyProjectAction.name: SuperviselyProjectAction,
     CreateNewProjectAction.name: CreateNewProjectAction,
     AddToExistingProjectAction.name: AddToExistingProjectAction,
     ExportArchiveAction.name: ExportArchiveAction,
