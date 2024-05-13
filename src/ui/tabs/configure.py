@@ -460,7 +460,7 @@ def update_state():
 
         # Calculate output metas for all layers
         utils.delete_results_dir()
-        utils.create_results_dir
+        utils.create_results_dir()
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
 
@@ -516,6 +516,7 @@ def update_nodes_cb():
 
 
 def update_metas_cb():
+    update_nodes_cb()
     g.updater("metas")
 
 
