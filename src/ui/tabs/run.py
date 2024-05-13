@@ -245,8 +245,12 @@ def _run():
 
 
 def run_pipeline():
-    while g.pipeline_running:
+    g.pipeline_running = True
+    show_run_dialog_btn.hide()
+    show_run_dialog_btn_running.show()
+    try:
         _run()
+    finally:
         g.pipeline_running = False
         show_run_dialog_btn_running.hide()
         show_run_dialog_btn.show()
@@ -256,11 +260,8 @@ def run_pipeline():
 def start_pipeline():
     if g.pipeline_thread is not None:
         raise RuntimeError("Pipeline is already running")
-    g.pipeline_running = True
     g.pipeline_thread = threading.Thread(target=run_pipeline, daemon=True)
     g.pipeline_thread.start()
-    show_run_dialog_btn.hide()
-    show_run_dialog_btn_running.show()
 
 
 @run_btn.click

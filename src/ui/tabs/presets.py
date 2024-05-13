@@ -147,6 +147,8 @@ def load_json():
     filename = load_file_selector.get_value()
     if filename is None:
         load_notification_select.set_value("not selected")
+        load_preset_btn.loading = False
+        load_file_selector.enable()
         return
     # path =f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
     path = f"{g.PRESETS_PATH}/{filename}.json"
