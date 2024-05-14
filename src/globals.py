@@ -60,7 +60,7 @@ if PROJECT_ID is not None:
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
-PIPELINE_ACTION = os.getenv("modal.state.pipelineTemplate", None)
+PIPELINE_TEMPLATE = os.getenv("modal.state.pipelineTemplate", None)
 FILTERED_ENTITIES = []
 if PROJECT_ID is not None:
     FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])

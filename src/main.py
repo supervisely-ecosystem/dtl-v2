@@ -6,6 +6,7 @@ from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
 from src.ui.tabs.presets import load_json
 
+from src.ui.dtl.Layer import Layer
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
 from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredProjectAction
@@ -74,7 +75,7 @@ update_loop = threading.Thread(
 )
 
 
-def generate_preview_for_project(layer):
+def generate_preview_for_project(layer: Layer):
     if len(g.FILTERED_ENTITIES) > 0:
         items = [g.api.image.get_info_by_id(g.FILTERED_ENTITIES[0])]
     elif g.DATASET_ID:
@@ -115,10 +116,19 @@ def generate_preview_for_project(layer):
         layer.set_preview_loading(False)
 
 
-if g.PIPELINE_ACTION is not None:
-    template = templates[g.MODALITY_TYPE].get(g.PIPELINE_ACTION, None)
+if g.PIPELINE_TEMPLATE is not None:
+    template = templates[g.MODALITY_TYPE].get(g.PIPELINE_TEMPLATE, None)
     if template is not None:
         load_template(template)
+        layer = g.layers.get("filtered_project_1")
+        if layer is not None:
+            ds_name = "*"
+            if g.DATASET_ID:
+                ds: DatasetInfo = g.api.dataset.get_info_by_id(g.DATASET_ID)
+                ds_name = ds.name
+            pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
+            src = [f"{pr.name}/{ds_name}"]
+
 elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     ds_name = "*"
     if g.DATASET_ID:
@@ -136,7 +146,6 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)
-    generate_preview_for_project(layer)
 
 elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
@@ -145,13 +154,15 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)
-    generate_preview_for_project(layer)
 
-g.PROJECT_ID = None
-g.DATASET_ID = None
 update_loop.start()
 
 # if g.FILE:
 #     g.updater("load_json")
 
 app.call_before_shutdown(u.on_app_shutdown)
+if layer is not None:
+    generate_preview_for_project(layer)
+
+g.PROJECT_ID = None
+g.DATASET_ID = None

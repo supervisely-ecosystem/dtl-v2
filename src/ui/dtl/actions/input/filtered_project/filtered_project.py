@@ -23,6 +23,7 @@ class FilteredProjectAction(SourceAction):
     docs_url = ""
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
+    project_id = g.PROJECT_ID
 
     @classmethod
     def create_inputs(self):
@@ -31,10 +32,10 @@ class FilteredProjectAction(SourceAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         # Settings widgets
-        _current_info = g.api.project.get_info_by_id(g.PROJECT_ID)
-        _current_meta: ProjectMeta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
+        _current_info = g.api.project.get_info_by_id(cls.project_id)
+        _current_meta: ProjectMeta = ProjectMeta.from_json(g.api.project.get_meta(cls.project_id))
 
-        filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ENTITIES)
+        filtered_table_data = build_filtered_table(g.api, cls.project_id, g.FILTERED_ENTITIES)
         filtered_table = FastTable(data=filtered_table_data)
         filtered_data_btn = Button("Close", call_on_click="closeSidebar();")
 
@@ -76,7 +77,7 @@ class FilteredProjectAction(SourceAction):
 
         def get_settings(options_json: dict) -> dict:
             return {
-                "project_id": g.PROJECT_ID,
+                "project_id": cls.project_id,
                 "filtered_entities_ids": g.FILTERED_ENTITIES,
                 "classes_mapping": "default",
                 "tags_mapping": "default",
@@ -87,16 +88,18 @@ class FilteredProjectAction(SourceAction):
 
             project_id = settings.get("project_id", None)
             if project_id is not None:
-                g.PROJECT_ID = project_id
-                _current_info = g.api.project.get_info_by_id(g.PROJECT_ID)
-                _current_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
+                cls.project_id = project_id
+                _current_info = g.api.project.get_info_by_id(cls.project_id)
+                _current_meta = ProjectMeta.from_json(g.api.project.get_meta(cls.project_id))
 
             filtered_entities_ids = settings.get("filtered_entities_ids", [])
             if len(filtered_entities_ids) > 0:
                 g.FILTERED_ENTITIES = filtered_entities_ids
 
             if project_id is not None and len(filtered_entities_ids) > 0:
-                filtered_table_data = build_filtered_table(g.api, g.PROJECT_ID, g.FILTERED_ENTITIES)
+                filtered_table_data = build_filtered_table(
+                    g.api, cls.project_id, g.FILTERED_ENTITIES
+                )
                 filtered_table.read_pandas(filtered_table_data)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:

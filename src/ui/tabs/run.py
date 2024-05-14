@@ -20,6 +20,7 @@ from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
 from src.compute.layers.save.CreateLabelingJobLayer import CreateLabelingJobLayer
+from src.compute.layers.save.OutputProjectLayer import OutputProjectLayer
 from src.ui.tabs.configure import nodes_flow, nodes_flow_card
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -194,7 +195,13 @@ def _run():
             l
             for l in net.layers
             if isinstance(
-                l, (CreateNewProjectLayer, AddToExistingProjectLayer, CopyAnnotationsLayer)
+                l,
+                (
+                    CreateNewProjectLayer,
+                    AddToExistingProjectLayer,
+                    CopyAnnotationsLayer,
+                    OutputProjectLayer,
+                ),
             )
         ]
 
@@ -202,6 +209,7 @@ def _run():
             return
 
         labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
+
         results.set_content(
             ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
         )
@@ -209,6 +217,7 @@ def _run():
         results.reload()
         results.show()
         circle_progress.set_status("success")
+
     except CustomException as e:
         error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
