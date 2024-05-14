@@ -148,6 +148,7 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     generate_preview_for_project(layer)
 
 g.PROJECT_ID = None
+g.DATASET_ID = None
 update_loop.start()
 
 # if g.FILE:
