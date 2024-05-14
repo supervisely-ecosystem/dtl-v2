@@ -48,8 +48,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Pixelated: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/6f889dd6-4c8d-43ae-80f2-29be5ebf0aad" alt="Pixelated" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/9126c6e6-8dd0-4bd6-b968-78f7dbcefe7e" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/9ddcf069-8715-42f7-a0d1-3e8291e436d9" alt="Pixelated" /> </td>
 </tr>
 </table>
 
@@ -80,8 +80,8 @@ Below you can see examples and json views for each augmentation option.
 <td style="text-align:center; width:50%"><strong>Elastic Transform: Severity 5</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/894e0c45-44c9-4c67-9d9f-11cd5654fc90" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/9f31bc1d-6d75-47cc-8377-2a3076bfaeeb" alt="Elastic Transform" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/f85b7a80-f499-45a3-9d4c-7b9532facd97" alt="Original image" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/5ba8a608-05eb-4839-98bc-261f00d9788e" alt="Elastic Transform" /> </td>
 </tr>
 </table>
 
