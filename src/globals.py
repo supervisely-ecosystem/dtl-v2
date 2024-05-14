@@ -96,6 +96,7 @@ pipeline_thread = None
 
 def updater(update: str):
     global update_queue
+    sly.logger.debug("Put update to queue: %s", update)
     update_queue.put(update)
 
 
