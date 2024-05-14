@@ -487,6 +487,7 @@ def update_state():
 
 
 def update_nodes_cb():
+    logger.debug("update_nodes_cb")
     layer_sources = defaultdict(list)
 
     layers_to_update = []
@@ -513,6 +514,7 @@ def update_nodes_cb():
             layers_to_update.append(layer.id)
     for layer_id in layers_to_update:
         g.updater(("nodes", layer_id))
+    logger.debug("update_nodes_cb done")
 
 
 def update_metas_cb():
