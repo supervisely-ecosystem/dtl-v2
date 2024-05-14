@@ -67,7 +67,7 @@ class DropNoiseFromBitmapLayer(Layer):
 
             old_origin, old_mask = label.geometry.origin, label.geometry.data
             res_mask = remove_small_objects(old_mask, req_area)
-            new_geometry = Bitmap(res_mask, old_origin)
+            new_geometry = Bitmap(res_mask, old_origin, extra_validation=False)
             new_label = Label(geometry=new_geometry, obj_class=label.obj_class)
             return [new_label]
 

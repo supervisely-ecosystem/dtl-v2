@@ -99,6 +99,10 @@ class Layer:
         # for save layers
         self.existing_names = {}
 
+    @classmethod
+    def get_action(cls):
+        return cls.action
+
     def validate(self):
         try:
             jsonschema.validate(self._config, self.params)
@@ -658,7 +662,7 @@ class Layer:
     def register_layer(cls, type):
         if not hasattr(cls, "action"):
             raise RuntimeError('Layer "%s" has no attribute "action"' % cls.__name__)
-        action = cls.action
+        action = cls.get_action()
         if action in Layer.actions_mapping:
             raise RuntimeError('Duplicate action "%s"' % action)
 

@@ -64,7 +64,9 @@ class RasterizeLayer(Layer):
             new_obj_class = ObjClass(
                 name=self.cls_mapping[old_label.obj_class.name]["title"], geometry_type=Bitmap
             )
-            label = old_label.clone(geometry=Bitmap(mask), obj_class=new_obj_class)
+            label = old_label.clone(
+                geometry=Bitmap(mask, extra_validation=False), obj_class=new_obj_class
+            )
             new_labels.append(label)
 
         ann = ann.clone(labels=new_labels)

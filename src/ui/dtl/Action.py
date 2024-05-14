@@ -26,6 +26,11 @@ class Action:
             break
 
     @classmethod
+    def read_md_file(cls, file_path):
+        with open(file_path) as f:
+            return f.read()
+
+    @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         raise NotImplementedError
 
@@ -104,7 +109,7 @@ class VideoAction(Action):
     icon = "zmdi zmdi-videocam"
 
 
-class OtherAugmentationsAction(Action):
+class ImgAugAugmentationsAction(Action):
     node_color = "#8091ff"
     icon = "zmdi zmdi-brightness-auto"
 

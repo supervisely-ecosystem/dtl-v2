@@ -195,7 +195,10 @@ def apply_json(dtl_json):
                 original_action_name, action_name
             )
             for i, src in enumerate(dtl_json[idx]["src"]):
-                src_action_name = src[1:].rsplit("_", 1)[0]
+                if src.startswith("$"):
+                    src_action_name = src[1:].rsplit("_", 1)[0]
+                else:
+                    src_action_name = src  # use if SourceAction
                 if src_action_name in actions_dict_legacy:
                     dtl_json[idx]["src"][i] = dtl_json[idx]["src"][i].replace(
                         src_action_name, actions_dict_legacy[src_action_name]
