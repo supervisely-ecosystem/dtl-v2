@@ -354,7 +354,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
         layer_idx = all_layers_ids.index(layer_id)
     except:
         # hack, fix later
-        g.layers.pop(layer_id)
+        # g.layers.pop(layer_id)
         return
 
     net.preview_mode = True
