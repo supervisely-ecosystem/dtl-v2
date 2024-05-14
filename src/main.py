@@ -41,16 +41,26 @@ def _update_f():
         if len(updates) == 0:
             time.sleep(0.1)
             continue
+        updates = updates[::-1]
         try:
             if "load_json" in updates:
                 load_json()
                 continue
             if "metas" in updates:
                 update_state()
+            update_all = False
             for u in updates:
                 if isinstance(u, tuple):
-                    if u[0] == "nodes":
-                        update_nodes(u[1])
+                    if u[0] == "nodes" and u[1] is None:
+                        update_all = True
+                        update_nodes()
+            if not update_all:
+                updated = set()
+                for u in updates:
+                    if isinstance(u, tuple):
+                        if u[0] == "nodes" and u[1] not in updated:
+                            updated.add(u[1])
+                            update_nodes(u[1])
         finally:
             for _ in range(len(updates)):
                 g.update_queue.task_done()
@@ -137,6 +147,8 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     nodes_flow.add_node(node)
     generate_preview_for_project(layer)
 
+g.PROJECT_ID = None
+g.DATASET_ID = None
 update_loop.start()
 
 # if g.FILE:

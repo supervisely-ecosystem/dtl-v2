@@ -89,6 +89,7 @@ nodes_history = []
 
 
 update_queue = Queue()
+stop_updates = False
 
 pipeline_running = False
 pipeline_thread = None
@@ -96,6 +97,10 @@ pipeline_thread = None
 
 def updater(update: str):
     global update_queue
+    if stop_updates:
+        sly.logger.debug("Skip update: %s", update)
+        return
+    sly.logger.debug("Put update to queue: %s", update)
     update_queue.put(update)
 
 

@@ -11,7 +11,7 @@ from supervisely.app.widgets import (
     Checkbox,
 )
 from supervisely.io.json import load_json_file
-from supervisely.nn.checkpoints import yolov8
+from supervisely.nn.checkpoints import mmdetection3
 
 import src.globals as g
 from src.ui.dtl.utils import (
@@ -21,8 +21,8 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
-import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.models import (
+import src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.utils as utils
+from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.models import (
     models as pretrained_models,
 )
 
@@ -31,12 +31,12 @@ def create_model_selector_widgets():
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
-    custom_models = yolov8.get_list(g.api, g.TEAM_ID)
+    custom_models = mmdetection3.get_list(g.api, g.TEAM_ID)
     model_selector_sidebar_custom_model_table = CustomModelsSelector(
         g.TEAM_ID,
         custom_models,
         True,
-        ["object_detection", "instance segmentation", "pose estimation"],
+        ["object_detection", "instance segmentation"],
     )
 
     custom_models_task_types = model_selector_sidebar_custom_model_table.get_available_task_types()
@@ -56,7 +56,7 @@ def create_model_selector_widgets():
     # CUSTOM /PUBLIC TABS
     model_selector_sidebar_model_source_tabs = RadioTabs(
         titles=["Custom models", "Pretrained public models"],
-        descriptions=["Models trained by you", "Models trained by YOLOV8 team"],
+        descriptions=["Models trained by you", "Models trained by MMDetection team"],
         contents=[
             model_selector_sidebar_custom_model_table,
             model_selector_sidebar_public_model_table,

@@ -61,7 +61,9 @@ class LineToMaskLayer(Layer):
             bmp_to_draw = np.zeros(ann.img_size, np.uint8)
             label.geometry.draw(bmp_to_draw, color=1, thickness=thickness)
             new_obj_class = label.obj_class.clone(new_title, Bitmap)
-            new_label = label.clone(geometry=Bitmap(bmp_to_draw), obj_class=new_obj_class)
+            new_label = label.clone(
+                geometry=Bitmap(bmp_to_draw, extra_validation=False), obj_class=new_obj_class
+            )
             return [new_label]
 
         ann = apply_to_labels(ann, to_bitmap)

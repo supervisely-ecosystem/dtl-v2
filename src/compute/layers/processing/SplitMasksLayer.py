@@ -52,7 +52,9 @@ class SplitMasksLayer(Layer):
             res_labels = []
             for i in range(1, ret):
                 obj_mask = masks == i
-                res_labels.append(label.clone(geometry=Bitmap(obj_mask, old_origin)))
+                res_labels.append(
+                    label.clone(geometry=Bitmap(obj_mask, old_origin, extra_validation=False))
+                )
             return res_labels
 
         ann = apply_to_labels(ann, split_mask)

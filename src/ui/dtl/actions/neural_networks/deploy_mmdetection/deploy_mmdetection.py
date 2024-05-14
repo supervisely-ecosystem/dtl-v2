@@ -3,33 +3,33 @@ from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
 
+from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_layer_docs,
 )
 
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.model_selector import (
+from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.model_selector import (
     create_model_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.agent_selector import (
+from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.agent_selector import (
     create_agent_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.model_serve import (
+from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.model_serve import (
     create_model_serve_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import (
+from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.node_layout import (
     create_node_layout,
 )
-import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
+import src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.utils as utils
 import src.globals as g
-from src.ui.dtl.Action import DeployNNAction
 
 
-class DeployYOLOV8Action(DeployNNAction):
-    name = "deploy_yolo_v8"
-    title = "Deploy YOLOv8"
+class DeployMMDetectionAction(NeuralNetworkAction):
+    name = "deploy_mmdetection"
+    title = "Deploy MMDetection"
     docs_url = ""
-    description = "Deploy YOLOv8 models."
+    description = "Deploy MMDetection models."
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
@@ -258,7 +258,7 @@ class DeployYOLOV8Action(DeployNNAction):
             data = {}
             if session is not None:
                 data["session_id"] = session.task_id
-            data["deploy_layer_name"] = "Deploy YOLOv8"
+            data["deploy_layer_name"] = "Deploy MMDetection"
             data["deploy_layer_terminate"] = (
                 model_selector_stop_model_after_pipeline_checkbox.is_checked()
             )
