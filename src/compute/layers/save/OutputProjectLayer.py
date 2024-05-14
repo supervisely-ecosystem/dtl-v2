@@ -33,8 +33,8 @@ def _get_source_projects_ids_from_dtl():
     return source_projects_ids
 
 
-class SuperviselyProjectLayer(Layer):
-    action = "supervisely_project"
+class OutputProjectLayer(Layer):
+    action = "output_project"
 
     layer_settings = {
         "required": ["settings"],

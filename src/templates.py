@@ -33,7 +33,7 @@ move = [
         "settings": {"move_confirmation": False},
     },
     {
-        "action": "supervisely_project",
+        "action": "output_project",
         "src": ["$move_2"],
         "dst": [],
         "settings": {
@@ -65,7 +65,7 @@ copy = [
         "settings": {},
     },
     {
-        "action": "supervisely_project",
+        "action": "output_project",
         "src": ["$copy_2"],
         "dst": [],
         "settings": {

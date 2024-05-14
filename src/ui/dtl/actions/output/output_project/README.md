@@ -1,7 +1,7 @@
 
-# Supervisely Project
+# Output Project
 
-`Supervisely Project` export results of data transformations to new or existing project in your current workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence. This layer is a combination of `Create New Project` and `Add to Existing Project` layers.
+`Output Project` export results of data transformations to new or existing project in your current workspace. If the metadata of the project to which the saving is performed differs from the metadata of the project that has gone through the whole pipeline, then in this case you will be asked to confirm the merge of this data, the metadata of the project to which the saving is performed will take precedence. This layer is a combination of `Create New Project` and `Add to Existing Project` layers.
 
 ### Settings
 
@@ -67,7 +67,7 @@ All files will be saved in the selected project in the same structure, with the 
   <summary>Create new Project</summary>
   <pre>
     {
-        "action": "supervisely_project",
+        "action": "output_project",
         "src": ["$images_project_1"],
         "dst": [],
         "settings": {
@@ -85,7 +85,7 @@ All files will be saved in the selected project in the same structure, with the 
   <summary>Existing dataset</summary>
   <pre>
     {
-        "action": "add_to_existing_project",
+        "action": "output_project",
         "src": ["$images_project_1 "],
         "dst": "32786",
         "settings": {
@@ -101,7 +101,7 @@ All files will be saved in the selected project in the same structure, with the 
   <summary>New dataset</summary>
   <pre>
     {
-        "action": "add_to_existing_project",
+        "action": "output_project",
         "src": ["$images_project_1"],
         "dst": "dst_project_name",
         "settings": {
@@ -117,7 +117,7 @@ All files will be saved in the selected project in the same structure, with the 
   <summary>Keep source structure</summary>
   <pre>
     {
-        "action": "add_to_existing_project",
+        "action": "output_project",
         "src": ["$images_project_1"],
         "dst": "32787",
         "settings": {
