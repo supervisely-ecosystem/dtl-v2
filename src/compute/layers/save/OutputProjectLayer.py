@@ -97,10 +97,13 @@ class OutputProjectLayer(Layer):
             raise GraphError(
                 "Output meta is not set. Check that node is connected", extra={"layer": self.action}
             )
-        if len(self.dsts) == 0:
-            raise GraphError(
-                "Select destination project or dataset in the 'Add to Existing Project' layer"
-            )
+        if self.settings["is_existing_project"]:
+            if len(self.dsts) == 0:
+                raise GraphError(
+                    "Select destination project or dataset in the 'Output Project' layer"
+                )
+            else:
+                raise GraphError("Destination project name is empty in the 'Output Project' layer")
 
         dst = self.dsts[0]
 
