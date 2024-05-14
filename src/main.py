@@ -122,6 +122,8 @@ if g.PIPELINE_TEMPLATE is not None:
     if template is not None:
         load_template(template)
         layer = g.layers.get("filtered_project_1")
+        if layer is None:
+            layer = g.layers.get("images_project_1")
         if layer is not None:
             ds_name = "*"
             if g.DATASET_ID:
