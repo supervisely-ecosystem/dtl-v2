@@ -53,6 +53,7 @@ class CreateNewProjectLayer(Layer):
             raise GraphError(
                 "Enter name for the output project to the input field in the 'Create New Project' layer"
             )
+
         dst = self.dsts[0]
         self.out_project_name = dst
 

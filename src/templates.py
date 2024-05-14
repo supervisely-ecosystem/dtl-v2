@@ -32,6 +32,18 @@ move = [
         "dst": "$move_2",
         "settings": {"move_confirmation": False},
     },
+    {
+        "action": "output_project",
+        "src": ["$move_2"],
+        "dst": [],
+        "settings": {
+            "is_existing_project": False,
+            "dataset_option": "new",
+            "dataset_name": "",
+            "dataset_id": None,
+            "merge_different_meta": False,
+        },
+    },
 ]
 
 copy = [
@@ -51,6 +63,18 @@ copy = [
         "src": ["$filtered_project_1"],
         "dst": "$copy_2",
         "settings": {},
+    },
+    {
+        "action": "output_project",
+        "src": ["$copy_2"],
+        "dst": [],
+        "settings": {
+            "is_existing_project": False,
+            "dataset_option": "new",
+            "dataset_name": "",
+            "dataset_id": None,
+            "merge_different_meta": False,
+        },
     },
 ]
 

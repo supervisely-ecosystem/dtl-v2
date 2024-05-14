@@ -126,6 +126,8 @@ from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
 )
 
 
+from .actions.output.output_project.output_project import OutputProjectAction
+
 import src.globals as g
 
 SOURCE_ACTIONS = "Input"
@@ -208,6 +210,7 @@ image_actions_list = {
     ],
     OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
+        OutputProjectAction.name,
         CreateNewProjectAction.name,
         AddToExistingProjectAction.name,
         ExportArchiveAction.name,
@@ -281,6 +284,7 @@ image_actions_dict = {
     CopyAction.name: CopyAction,
     MoveAction.name: MoveAction,
     # Save layers
+    OutputProjectAction.name: OutputProjectAction,
     CreateNewProjectAction.name: CreateNewProjectAction,
     AddToExistingProjectAction.name: AddToExistingProjectAction,
     ExportArchiveAction.name: ExportArchiveAction,

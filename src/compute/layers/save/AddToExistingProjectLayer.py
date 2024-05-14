@@ -85,9 +85,6 @@ class AddToExistingProjectLayer(Layer):
             raise GraphError(
                 "Select destination project or dataset in the 'Add to Existing Project' layer"
             )
-            # raise GraphError(
-            # "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
-            # )
 
         dst = self.dsts[0]
         self.out_project_id = dst
