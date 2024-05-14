@@ -55,9 +55,11 @@ def _update_f():
                         update_all = True
                         update_nodes()
             if not update_all:
+                updated = set()
                 for u in updates:
                     if isinstance(u, tuple):
-                        if u[0] == "nodes":
+                        if u[0] == "nodes" and u[1] not in updated:
+                            updated.add(u[1])
                             update_nodes(u[1])
         finally:
             for _ in range(len(updates)):

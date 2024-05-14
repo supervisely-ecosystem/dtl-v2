@@ -171,167 +171,179 @@ def load_json():
 
 
 def apply_json(dtl_json):
-    # create layer objects
-    ids = []
-    data_layers_ids = []
-    for idx, layer_json in enumerate(dtl_json):
-        original_action_name = layer_json.get("action", None)
-        action_name = layer_json.get("action", None)
-        if original_action_name is None:
-            raise BadSettingsError(
-                'Missing "action" field in layer config', extra={"layer_config": layer_json}
-            )
-
-        legacy_action_name = actions_dict_legacy.get(original_action_name, None)
-        if legacy_action_name is not None:
-            action_name = legacy_action_name
-        else:
-            action_name = original_action_name
-
-        dtl_json[idx]["action"] = dtl_json[idx]["action"].replace(original_action_name, action_name)
-        for i, src in enumerate(dtl_json[idx]["src"]):
-            src_action_name = src[1:].rsplit("_", 1)[0]
-            if src_action_name in actions_dict_legacy:
-                dtl_json[idx]["src"][i] = dtl_json[idx]["src"][i].replace(
-                    src_action_name, actions_dict_legacy[src_action_name]
+    g.stop_updates = True
+    try:
+        # create layer objects
+        ids = []
+        data_layers_ids = []
+        for idx, layer_json in enumerate(dtl_json):
+            original_action_name = layer_json.get("action", None)
+            action_name = layer_json.get("action", None)
+            if original_action_name is None:
+                raise BadSettingsError(
+                    'Missing "action" field in layer config', extra={"layer_config": layer_json}
                 )
-        if isinstance(dtl_json[idx]["dst"], list):
-            for i, dst in enumerate(dtl_json[idx]["dst"]):
-                if dst in actions_dict_legacy:
-                    dtl_json[idx]["dst"][i] = dtl_json[idx]["dst"][i].replace(
-                        dst, actions_dict_legacy[dst]
+
+            legacy_action_name = actions_dict_legacy.get(original_action_name, None)
+            if legacy_action_name is not None:
+                action_name = legacy_action_name
+            else:
+                action_name = original_action_name
+
+            dtl_json[idx]["action"] = dtl_json[idx]["action"].replace(
+                original_action_name, action_name
+            )
+            for i, src in enumerate(dtl_json[idx]["src"]):
+                src_action_name = src[1:].rsplit("_", 1)[0]
+                if src_action_name in actions_dict_legacy:
+                    dtl_json[idx]["src"][i] = dtl_json[idx]["src"][i].replace(
+                        src_action_name, actions_dict_legacy[src_action_name]
                     )
-        else:
-            dtl_json[idx]["dst"] = dtl_json[idx]["dst"].replace(original_action_name, action_name)
+            if isinstance(dtl_json[idx]["dst"], list):
+                for i, dst in enumerate(dtl_json[idx]["dst"]):
+                    if dst in actions_dict_legacy:
+                        dtl_json[idx]["dst"][i] = dtl_json[idx]["dst"][i].replace(
+                            dst, actions_dict_legacy[dst]
+                        )
+            else:
+                dtl_json[idx]["dst"] = dtl_json[idx]["dst"].replace(
+                    original_action_name, action_name
+                )
 
-        settings = layer_json.get("settings", None)
-        if settings is None:
-            raise BadSettingsError(
-                'Missing "settings" field in layer config', extra={"layer_config": layer_json}
+            settings = layer_json.get("settings", None)
+            if settings is None:
+                raise BadSettingsError(
+                    'Missing "settings" field in layer config', extra={"layer_config": layer_json}
+                )
+
+            layer = ui_utils.create_new_layer(action_name)
+            ids.append(layer.id)
+            if action_name in actions_list[SOURCE_ACTIONS] or action_name == "filtered_project":
+                data_layers_ids.append(layer.id)
+
+        # update src and dst
+        for i, layer_id in enumerate(ids):
+            layer_json = dtl_json[i]
+            layer = g.layers[layer_id]
+            layer: Layer
+
+            src = layer_json.get("src", [])
+            if type(src) is str:
+                src = [src]
+            if g.PROJECT_ID and issubclass(layer.action, SourceAction):
+                ds = "*"
+                if g.DATASET_ID:
+                    ds = g.api.dataset.get_info_by_id(g.DATASET_ID).name
+                pr = g.api.project.get_info_by_id(g.PROJECT_ID).name
+                src = [f"{pr}/{ds}"]
+                layer_json["src"] = src
+
+            layer._src = src
+
+            dst = layer_json.get("dst", [])
+            if type(dst) is str:
+                dst = [dst]
+            layer._dst = dst
+
+        # update settings
+        for i, layer_id in enumerate(ids):
+            layer_json = dtl_json[i]
+            layer = g.layers[layer_id]
+            layer.from_json(layer_json)
+
+        # init metas for data layers
+        for i, layer_id in enumerate(data_layers_ids):
+            data_layer = g.layers[layer_id]
+            src = data_layer.get_src()
+            if len(src) == 0:
+                # Skip if no sources specified for data layer
+                show_dialog(
+                    title="Empty source",
+                    description=f"Project is not specified for {data_layer.action.title} layer. Please select the project manually in the layer card",
+                    status="info",
+                )
+                continue
+
+            # Add project meta
+            try:
+                project_name, dataset_name = src[0].split("/")
+            except:
+                show_dialog(
+                    title="Bad source",
+                    description=f'Wrong source path for {data_layer.action.title} layer. Should be "project_name/dataset_name" or "project_name/*". Please select the project manually in the layer card',
+                    status="error",
+                )
+                continue
+            try:
+                project_info = utils.get_project_by_name(project_name)
+                project_meta = utils.get_project_meta(project_info.id)
+            except Exception as e:
+                show_dialog(
+                    "Source not found",
+                    description=f'Cannot find project "{project_name}". Please select the project manually in the layer card',
+                    status="error",
+                )
+                continue
+            data_layer.update_project_meta(project_meta)
+
+        # init metas for all layers
+        net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
+        net.calc_metas()
+        for layer_id, net_layer in zip(ids, net.layers):
+            layer = g.layers[layer_id]
+            layer: Layer
+            layer.output_meta = net_layer.output_meta
+
+        for layer_id in ids:
+            if layer_id in data_layers_ids:
+                continue
+            layer = g.layers[layer_id]
+            layer_input_meta = utils.merge_input_metas(
+                [
+                    g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta
+                    for src in layer.get_src()
+                ]
             )
+            layer.update_project_meta(layer_input_meta)
 
-        layer = ui_utils.create_new_layer(action_name)
-        ids.append(layer.id)
-        if action_name in actions_list[SOURCE_ACTIONS] or action_name == "filtered_project":
-            data_layers_ids.append(layer.id)
+        # create nodes
+        for layer_id in ids:
+            layer = g.layers[layer_id]
+            node = layer.create_node()
+            nodes_flow.add_node(node)
 
-    # update src and dst
-    for i, layer_id in enumerate(ids):
-        layer_json = dtl_json[i]
-        layer = g.layers[layer_id]
-        layer: Layer
-
-        src = layer_json.get("src", [])
-        if type(src) is str:
-            src = [src]
-        if g.PROJECT_ID and issubclass(layer.action, SourceAction):
-            ds = "*"
-            if g.DATASET_ID:
-                ds = g.api.dataset.get_info_by_id(g.DATASET_ID).name
-            pr = g.api.project.get_info_by_id(g.PROJECT_ID).name
-            src = [f"{pr}/{ds}"]
-            layer_json["src"] = src
-
-        layer._src = src
-
-        dst = layer_json.get("dst", [])
-        if type(dst) is str:
-            dst = [dst]
-        layer._dst = dst
-
-    # update settings
-    for i, layer_id in enumerate(ids):
-        layer_json = dtl_json[i]
-        layer = g.layers[layer_id]
-        layer.from_json(layer_json)
-
-    # init metas for data layers
-    for i, layer_id in enumerate(data_layers_ids):
-        data_layer = g.layers[layer_id]
-        src = data_layer.get_src()
-        if len(src) == 0:
-            # Skip if no sources specified for data layer
-            show_dialog(
-                title="Empty source",
-                description=f"Project is not specified for {data_layer.action.title} layer. Please select the project manually in the layer card",
-                status="info",
-            )
-            continue
-
-        # Add project meta
-        try:
-            project_name, dataset_name = src[0].split("/")
-        except:
-            show_dialog(
-                title="Bad source",
-                description=f'Wrong source path for {data_layer.action.title} layer. Should be "project_name/dataset_name" or "project_name/*". Please select the project manually in the layer card',
-                status="error",
-            )
-            continue
-        try:
-            project_info = utils.get_project_by_name(project_name)
-            project_meta = utils.get_project_meta(project_info.id)
-        except Exception as e:
-            show_dialog(
-                "Source not found",
-                description=f'Cannot find project "{project_name}". Please select the project manually in the layer card',
-                status="error",
-            )
-            continue
-        data_layer.update_project_meta(project_meta)
-
-    # init metas for all layers
-    net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
-    net.calc_metas()
-    for layer_id, net_layer in zip(ids, net.layers):
-        layer = g.layers[layer_id]
-        layer: Layer
-        layer.output_meta = net_layer.output_meta
-
-    for layer_id in ids:
-        if layer_id in data_layers_ids:
-            continue
-        layer = g.layers[layer_id]
-        layer_input_meta = utils.merge_input_metas(
-            [g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta for src in layer.get_src()]
-        )
-        layer.update_project_meta(layer_input_meta)
-
-    # create nodes
-    for layer_id in ids:
-        layer = g.layers[layer_id]
-        node = layer.create_node()
-        nodes_flow.add_node(node)
-
-    # create node connections
-    nodes_flow_edges = []
-    for dst_layer_id in ids:
-        dst_layer = g.layers[dst_layer_id]
-        dst_layer: Layer
-        for src in dst_layer.get_src():
-            for src_layer_id in ids:
-                src_layer = g.layers[src_layer_id]
-                for dst_idx, dst in enumerate(src_layer.get_dst()):
-                    if dst == src:
-                        try:
-                            nodes_flow_edges.append(
-                                {
-                                    "id": random.randint(10000000000000, 99999999999999),
-                                    "output": {
-                                        "node": src_layer_id,
-                                        "interface": src_layer.get_destination_name(dst_idx),
-                                    },
-                                    "input": {
-                                        "node": dst_layer_id,
-                                        "interface": "source",
-                                    },
-                                }
-                            )
-                        except:
-                            pass
-    nodes_flow.set_edges(nodes_flow_edges)
-    g.updater(("nodes", None))
-    sleep(1)  # delay for previews to load
+        # create node connections
+        nodes_flow_edges = []
+        for dst_layer_id in ids:
+            dst_layer = g.layers[dst_layer_id]
+            dst_layer: Layer
+            for src in dst_layer.get_src():
+                for src_layer_id in ids:
+                    src_layer = g.layers[src_layer_id]
+                    for dst_idx, dst in enumerate(src_layer.get_dst()):
+                        if dst == src:
+                            try:
+                                nodes_flow_edges.append(
+                                    {
+                                        "id": random.randint(10000000000000, 99999999999999),
+                                        "output": {
+                                            "node": src_layer_id,
+                                            "interface": src_layer.get_destination_name(dst_idx),
+                                        },
+                                        "input": {
+                                            "node": dst_layer_id,
+                                            "interface": "source",
+                                        },
+                                    }
+                                )
+                            except:
+                                pass
+        nodes_flow.set_edges(nodes_flow_edges)
+        g.stop_updates = False
+        g.updater(("nodes", None))
+        sleep(2)  # delay for previews to load
+    finally:
+        g.stop_updates = False
 
 
 @load_preset_btn.click
