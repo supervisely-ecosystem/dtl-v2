@@ -116,6 +116,7 @@ def generate_preview_for_project(layer: Layer):
         layer.set_preview_loading(False)
 
 
+layer = None
 if g.PIPELINE_TEMPLATE is not None:
     template = templates[g.MODALITY_TYPE].get(g.PIPELINE_TEMPLATE, None)
     if template is not None:
