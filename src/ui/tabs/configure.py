@@ -1,6 +1,7 @@
 import random
 import time
 from collections import defaultdict
+from typing import List
 
 # import random
 from supervisely.app.widgets import (
@@ -32,6 +33,8 @@ from src.exceptions import handle_exception
 import src.globals as g
 from src.compute.Net import Net
 from src.ui.widgets import LayerCard
+
+from supervisely.app.content import StateJson
 
 
 # context menu "select" option dialog
@@ -73,7 +76,22 @@ context_menu_items = [
     {"label": "Clear", "key": "__clear__", "divided": True},
 ]
 
-nodes_flow = NodesFlow(
+
+class CustomNodesFlow(NodesFlow):
+    def replace_node(self, node_idx, node: NodesFlow.Node):
+        self._nodes[node_idx] = node
+        StateJson()[self.widget_id]["flow"]["nodes"][node_idx] = node.to_json()
+        StateJson().send_changes()
+
+    def add_node(self, node: NodesFlow.Node):
+        self._nodes.append(node)
+        StateJson()[self.widget_id]["flow"]["nodes"].append(node.to_json())
+        len_nodes = len(StateJson()[self.widget_id]["flow"]["nodes"])
+        StateJson().send_changes()
+        return len_nodes - 1
+
+
+nodes_flow = CustomNodesFlow(
     height="calc(100vh - 58px)",
     context_menu=context_menu_items,
     color_theme="light",
@@ -191,7 +209,6 @@ def maybe_add_edges(layer: Layer):
     # Need this because remove_nodes is not always triggered
     nodes_json = nodes_flow.get_nodes_json()
     existing_layers = {node["id"] for node in nodes_json}
-    #
     edges = nodes_flow.get_edges_json()
 
     # layer input name.
@@ -238,19 +255,36 @@ def maybe_add_edges(layer: Layer):
             },
         }
     )
+
     nodes_flow.set_edges(edges)
     return
 
 
 @handle_exception
 def add_layer(action_name: str, position: dict = None, autoconnect: bool = False):
+    g.stop_updates = True
     try:
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
 
-        nodes_flow.add_node(node)
+        node_idx = nodes_flow.add_node(node)
+
         if autoconnect:
             maybe_add_edges(layer)
+        if layer.init_widgets():
+            nodes_json = nodes_flow.get_nodes_json()
+            logger.debug(
+                "nodes_json", extra={"nodes_json len": len(nodes_json), "node_idx": node_idx}
+            )
+            position = nodes_json[node_idx].get("position", None)
+            node = ui_utils.create_node(layer, position)
+            # nodes_flow.replace_node(node_idx, node)
+            nodes_flow.pop_node(node_idx)
+            nodes_flow.add_node(node)
+            if autoconnect:
+                maybe_add_edges(layer)
+        g.stop_updates = False
+        g.updater(("nodes", layer.id))
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
@@ -259,6 +293,9 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             title="Error adding layer", description=f"Unexpected Error: {str(e)}", status="error"
         )
         raise
+    finally:
+        g.stop_updates = False
+        g.updater("metas")
 
 
 @nodes_flow.context_menu_clicked
@@ -429,7 +466,7 @@ def update_state():
 
         # Calculate output metas for all layers
         utils.delete_results_dir()
-        utils.create_results_dir
+        utils.create_results_dir()
         dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
         net = Net(dtl_json, g.RESULTS_DIR, g.MODALITY_TYPE)
 
@@ -485,6 +522,7 @@ def update_nodes_cb():
 
 
 def update_metas_cb():
+    update_nodes_cb()
     g.updater("metas")
 
 
