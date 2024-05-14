@@ -153,6 +153,7 @@ def load_json():
     # path =f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
     path = f"{g.PRESETS_PATH}/{filename}.json"
     nodes_flow.clear()
+    g.layers.clear()
     try:
         utils.create_data_dir()
         g.api.file.download(g.TEAM_ID, path, g.DATA_DIR + "/preset.json")
