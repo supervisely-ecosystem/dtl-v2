@@ -342,7 +342,7 @@ def apply_json(dtl_json):
         nodes_flow.set_edges(nodes_flow_edges)
         g.stop_updates = False
         g.updater(("nodes", None))
-        sleep(2)  # delay for previews to load
+        # sleep(1)  # delay for previews to load
     finally:
         g.stop_updates = False
 
