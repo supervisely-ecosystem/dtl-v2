@@ -255,6 +255,7 @@ def _run():
 
 def run_pipeline(run_dialog=None):
     g.pipeline_running = True
+    run_dialog.show()
     show_run_dialog_btn.hide()
     show_run_dialog_btn_running.show()
     try:
@@ -264,8 +265,6 @@ def run_pipeline(run_dialog=None):
         show_run_dialog_btn_running.hide()
         show_run_dialog_btn.show()
         g.pipeline_thread = None
-        if run_dialog is not None:
-            run_dialog.show()
 
 
 def start_pipeline(run_dialog=None):
