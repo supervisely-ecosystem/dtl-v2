@@ -262,6 +262,7 @@ def maybe_add_edges(layer: Layer):
 
 @handle_exception
 def add_layer(action_name: str, position: dict = None, autoconnect: bool = False):
+    g.stop_updates = True
     try:
         layer = ui_utils.create_new_layer(action_name)
         node = ui_utils.create_node(layer, position)
@@ -282,6 +283,8 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             nodes_flow.add_node(node)
             if autoconnect:
                 maybe_add_edges(layer)
+        g.stop_updates = False
+        g.updater(("nodes", layer.id))
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise
@@ -290,6 +293,9 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             title="Error adding layer", description=f"Unexpected Error: {str(e)}", status="error"
         )
         raise
+    finally:
+        g.stop_updates = False
+        g.updater("metas")
 
 
 @nodes_flow.context_menu_clicked
