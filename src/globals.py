@@ -62,10 +62,25 @@ PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
 PIPELINE_TEMPLATE = os.getenv("modal.state.pipelineTemplate", None)
 FILTERED_ENTITIES = []
+ENTITIES_FILTERS = []
 if PROJECT_ID is not None:
+    ENTITIES_FILTERS = os.getenv("modal.state.entitiesFilter", [])
+    if ENTITIES_FILTERS != []:
+        ENTITIES_FILTERS = ast.literal_eval(ENTITIES_FILTERS)
     FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])
     if FILTERED_ENTITIES != []:
         FILTERED_ENTITIES = ast.literal_eval(FILTERED_ENTITIES)
+    if FILTERED_ENTITIES == [] and ENTITIES_FILTERS != []:
+        if DATASET_ID is not None:
+            datasets = [api.dataset.get_info_by_id(DATASET_ID)]
+        else:
+            datasets = api.dataset.get_list(PROJECT_ID)
+        FILTERED_ENTITIES = []
+        for dataset in datasets:
+            FILTERED_ENTITIES.extend(api.image.get_filtered_list(dataset.id, ENTITIES_FILTERS))
+        if FILTERED_ENTITIES != []:
+            FILTERED_ENTITIES = [entity.id for entity in FILTERED_ENTITIES]
+
 
 if MODALITY_TYPE == "images":
     BATCH_SIZE = 50

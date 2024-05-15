@@ -13,18 +13,17 @@ from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredP
 
 from src.templates import templates, load_template
 
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
 from src.utils import LegacyProjectItem
 
 import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
 from src.ui.widgets import ApplyCss
-from supervisely.app.widgets import ImageAnnotationPreview, FastTable
+from supervisely.app.widgets import ImageAnnotationPreview
 
 # init widget scripts
 ImageAnnotationPreview()
-FastTable()
 
 u.clean_static_dir(g.STATIC_DIR)
 app = Application(
