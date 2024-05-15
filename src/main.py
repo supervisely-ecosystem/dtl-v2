@@ -20,10 +20,11 @@ import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
 from src.ui.widgets import ApplyCss
-from supervisely.app.widgets import ImageAnnotationPreview
+from supervisely.app.widgets import ImageAnnotationPreview, FastTable
 
 # init widget scripts
 ImageAnnotationPreview()
+FastTable()
 
 u.clean_static_dir(g.STATIC_DIR)
 app = Application(
