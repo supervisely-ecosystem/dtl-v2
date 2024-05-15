@@ -102,11 +102,11 @@ class OutputProjectLayer(Layer):
                 raise GraphError(
                     "Select destination project or dataset in the 'Output Project' layer"
                 )
-            else:
+        else:
+            if len(self.dsts) == 0:
                 raise GraphError("Destination project name is empty in the 'Output Project' layer")
 
         dst = self.dsts[0]
-
         is_existing_project = self.settings["is_existing_project"]
         if is_existing_project:
             self.out_project_id = dst
