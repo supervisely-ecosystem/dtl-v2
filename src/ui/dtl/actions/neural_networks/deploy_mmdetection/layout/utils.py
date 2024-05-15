@@ -168,6 +168,11 @@ def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
 
 
 def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
+    app_info = api.app.get_info_by_slug("serve-mmdetection-v3")
+    module_id = app_info.get("id", None)
+    if module_id is None:
+        raise ValueError("Your instance does not have the required app 'Serve MMDetection 3.0'")
+
     app_params = {
         "agent_id": saved_settings["agent_id"],
         # "app_id": 0,
