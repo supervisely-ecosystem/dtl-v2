@@ -12,7 +12,7 @@
 > ✅ Don't worry, your original project will remain safe in your workspace. Any changes you make using all the layers will not affect source project, unless you use `Move` layer that will move filtered entities to another project and remove them from the source project.
 
 <details>
-  <summary>Specific datasets and classes</summary>
+  <summary>JSON view</summary>
 <pre>
     {
         "action": "filtered_project",
