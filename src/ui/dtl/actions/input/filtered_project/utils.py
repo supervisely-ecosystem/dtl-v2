@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import List
-from supervisely import Api, ImageInfo
+from supervisely import Api, ImageInfo, ProjectInfo
 
 
 def build_filtered_table(
@@ -37,3 +37,32 @@ def build_filtered_table(
 
     dataframe = pd.DataFrame(data=data, columns=columns)
     return dataframe
+
+
+def generate_project_description(
+    api: Api,
+    project_id: int,
+    project_info: ProjectInfo,
+    dataset_id: int = None,
+    filtered_entities: list = [],
+    entities_filters: list = [],
+) -> str:
+    filtered_project_description = (
+        f"{len(filtered_entities)} {project_info.type} selected via filters"
+    )
+    if len(filtered_entities) == 0 and len(entities_filters) > 0:
+        if dataset_id is not None:
+            datasets = [api.dataset.get_info_by_id(dataset_id)]
+        else:
+            datasets = api.dataset.get_list(project_id)
+
+        filtered_images = []
+        for dataset in datasets:
+            filtered_images.extend(api.image.get_filtered_list(dataset.id, entities_filters))
+
+        filtered_project_description = (
+            f"{len(filtered_images)} {project_info.type} selected via filters"
+        )
+    elif len(filtered_entities) == 0 and len(entities_filters) == 0:
+        filtered_project_description = f"No filtered {project_info.type} in project"
+    return filtered_project_description
