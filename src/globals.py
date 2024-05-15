@@ -60,7 +60,7 @@ if PROJECT_ID is not None:
 
 PRESETS_PATH = os.path.join("/" + TEAM_FILES_PATH + "/presets", MODALITY_TYPE)
 
-PIPELINE_ACTION = os.getenv("modal.state.pipelineAction", None)
+PIPELINE_TEMPLATE = os.getenv("modal.state.pipelineTemplate", None)
 FILTERED_ENTITIES = []
 if PROJECT_ID is not None:
     FILTERED_ENTITIES = os.getenv("modal.state.selectedEntities", [])
@@ -89,6 +89,7 @@ nodes_history = []
 
 
 update_queue = Queue()
+stop_updates = False
 
 pipeline_running = False
 pipeline_thread = None
@@ -96,6 +97,10 @@ pipeline_thread = None
 
 def updater(update: str):
     global update_queue
+    if stop_updates:
+        sly.logger.debug("Skip update: %s", update)
+        return
+    sly.logger.debug("Put update to queue: %s", update)
     update_queue.put(update)
 
 

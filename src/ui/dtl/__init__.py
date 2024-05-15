@@ -8,7 +8,7 @@ from .Action import (
     OutputAction,
     FilterAndConditionAction,
     NeuralNetworkAction,
-    OtherAugmentationsAction,
+    ImgAugAugmentationsAction,
 )
 from .actions.input.images_project.images_project import ImagesProjectAction
 from .actions.pixel_level_transformations.anonymize.anonymize import AnonymizeAction
@@ -78,6 +78,7 @@ from .actions.output.copy_annotations.copy_annotations import (
 
 # Neural networks
 from .actions.neural_networks.deploy_yolov8.deploy_yolov8 import DeployYOLOV8Action
+from .actions.neural_networks.deploy_mmdetection.deploy_mmdetection import DeployMMDetectionAction
 from .actions.neural_networks.apply_nn_inference.apply_nn_inference import ApplyNNInferenceAction
 
 # Video
@@ -112,8 +113,20 @@ from .actions.output.create_labeling_job.create_labeling_job import CreateLabeli
 from .actions.input.filtered_project.filtered_project import FilteredProjectAction
 from .actions.other.move.move import MoveAction
 from .actions.other.copy.copy import CopyAction
-from .actions.other_augs.pixelate.pixelate import PixelateAction
-from .actions.other_augs.elastic_transform.elastic_transform import ElasticTransformAction
+from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformation import (
+    ElasticTransformationAction,
+)
+
+from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
+    ImgAugCorruptlikeNoiseAction,
+    ImgAugCorruptlikeBlurAction,
+    ImgAugCorruptlikeWeatherAction,
+    ImgAugCorruptlikeColorAction,
+    ImgAugCorruptlikeCompressionAction,
+)
+
+
+from .actions.output.output_project.output_project import OutputProjectAction
 
 import src.globals as g
 
@@ -126,7 +139,7 @@ OTHER = "Other"
 SAVE_ACTIONS = "Output"
 FILTERS_AND_CONDITIONS = "Filters and conditions"
 NEURAL_NETWORKS = "Neural networks"
-OTHER_AUGMENTATIONS = "Other Augmentations"
+IMGAUG_AUGMENTATIONS = "ImgAug Augmentations"
 # Video specific
 VIDEO_TRANSFORMS = "Video transforms"
 # ---
@@ -153,7 +166,14 @@ image_actions_list = {
         RotateAction.name,
         SlidingWindowAction.name,
     ],
-    OTHER_AUGMENTATIONS: [PixelateAction.name, ElasticTransformAction.name],
+    IMGAUG_AUGMENTATIONS: [
+        ImgAugCorruptlikeNoiseAction.name,
+        ImgAugCorruptlikeBlurAction.name,
+        ImgAugCorruptlikeWeatherAction.name,
+        ImgAugCorruptlikeColorAction.name,
+        ImgAugCorruptlikeCompressionAction.name,
+        ElasticTransformationAction.name,
+    ],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
         BackgroundAction.name,
@@ -183,9 +203,14 @@ image_actions_list = {
         FilterImageWithoutObjects.name,
         IfAction.name,
     ],
-    NEURAL_NETWORKS: [DeployYOLOV8Action.name, ApplyNNInferenceAction.name],
+    NEURAL_NETWORKS: [
+        DeployYOLOV8Action.name,
+        DeployMMDetectionAction.name,
+        ApplyNNInferenceAction.name,
+    ],
     OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
+        OutputProjectAction.name,
         CreateNewProjectAction.name,
         AddToExistingProjectAction.name,
         ExportArchiveAction.name,
@@ -215,9 +240,13 @@ image_actions_dict = {
     ResizeAction.name: ResizeAction,
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
-    # Other Augmentations
-    PixelateAction.name: PixelateAction,
-    ElasticTransformAction.name: ElasticTransformAction,
+    # ImgAug Augmentations
+    ImgAugCorruptlikeNoiseAction.name: ImgAugCorruptlikeNoiseAction,
+    ImgAugCorruptlikeBlurAction.name: ImgAugCorruptlikeBlurAction,
+    ImgAugCorruptlikeWeatherAction.name: ImgAugCorruptlikeWeatherAction,
+    ImgAugCorruptlikeColorAction.name: ImgAugCorruptlikeColorAction,
+    ImgAugCorruptlikeCompressionAction.name: ImgAugCorruptlikeCompressionAction,
+    ElasticTransformationAction.name: ElasticTransformationAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
@@ -247,6 +276,7 @@ image_actions_dict = {
     IfAction.name: IfAction,
     # Neural Networks
     DeployYOLOV8Action.name: DeployYOLOV8Action,
+    DeployMMDetectionAction.name: DeployMMDetectionAction,
     ApplyNNInferenceAction.name: ApplyNNInferenceAction,
     # Other layers
     DatasetAction.name: DatasetAction,
@@ -254,6 +284,7 @@ image_actions_dict = {
     CopyAction.name: CopyAction,
     MoveAction.name: MoveAction,
     # Save layers
+    OutputProjectAction.name: OutputProjectAction,
     CreateNewProjectAction.name: CreateNewProjectAction,
     AddToExistingProjectAction.name: AddToExistingProjectAction,
     ExportArchiveAction.name: ExportArchiveAction,

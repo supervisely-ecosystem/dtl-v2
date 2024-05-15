@@ -63,7 +63,7 @@ layout = Container(
 def show_run_dialog():
     if g.pipeline_running:
         return
-    start_pipeline()
+    start_pipeline(run_dialog)
 
 
 @show_run_dialog_btn_running.click

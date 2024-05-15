@@ -14,11 +14,41 @@ if g.PROJECT_ID is not None:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
     src = [f"{pr.name}/{ds_name}"]
 
+
+if len(g.FILTERED_ENTITIES) > 0:
+    src_action = "filtered_project"
+    src_action_template = (
+        {
+            "action": f"{src_action}",
+            "src": src,
+            "dst": f"${src_action}_1",
+            "settings": {
+                "project_id": g.PROJECT_ID,
+                "filtered_entities_ids": g.FILTERED_ENTITIES,
+                "classes_mapping": "default",
+                "tags_mapping": "default",
+            },
+        },
+    )
+else:
+    src_action = "images_project"
+    src_action_template = (
+        {
+            "action": f"{src_action}",
+            "src": src,
+            "dst": f"${src_action}_1",
+            "settings": {
+                "classes_mapping": "default",
+                "tags_mapping": "default",
+            },
+        },
+    )
+
 move = [
     {
-        "action": "filtered_project",
+        "action": f"{src_action}",
         "src": src,
-        "dst": "$filtered_project_1",
+        "dst": f"${src_action}_1",
         "settings": {
             "project_id": g.PROJECT_ID,
             "filtered_entities_ids": g.FILTERED_ENTITIES,
@@ -28,17 +58,29 @@ move = [
     },
     {
         "action": "move",
-        "src": ["$filtered_project_1"],
+        "src": [f"${src_action}_1"],
         "dst": "$move_2",
         "settings": {"move_confirmation": False},
+    },
+    {
+        "action": "output_project",
+        "src": ["$move_2"],
+        "dst": [],
+        "settings": {
+            "is_existing_project": False,
+            "dataset_option": "new",
+            "dataset_name": "",
+            "dataset_id": None,
+            "merge_different_meta": False,
+        },
     },
 ]
 
 copy = [
     {
-        "action": "filtered_project",
+        "action": f"{src_action}",
         "src": src,
-        "dst": "$filtered_project_1",
+        "dst": f"${src_action}_1",
         "settings": {
             "project_id": g.PROJECT_ID,
             "filtered_entities_ids": g.FILTERED_ENTITIES,
@@ -48,9 +90,21 @@ copy = [
     },
     {
         "action": "copy",
-        "src": ["$filtered_project_1"],
+        "src": [f"${src_action}_1"],
         "dst": "$copy_2",
         "settings": {},
+    },
+    {
+        "action": "output_project",
+        "src": ["$copy_2"],
+        "dst": [],
+        "settings": {
+            "is_existing_project": False,
+            "dataset_option": "new",
+            "dataset_name": "",
+            "dataset_id": None,
+            "merge_different_meta": False,
+        },
     },
 ]
 

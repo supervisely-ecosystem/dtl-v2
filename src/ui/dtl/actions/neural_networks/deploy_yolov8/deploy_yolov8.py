@@ -3,7 +3,6 @@ from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
 
-from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_layer_docs,
@@ -23,9 +22,10 @@ from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import 
 )
 import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
 import src.globals as g
+from src.ui.dtl.Action import DeployNNAction
 
 
-class DeployYOLOV8Action(NeuralNetworkAction):
+class DeployYOLOV8Action(DeployNNAction):
     name = "deploy_yolo_v8"
     title = "Deploy YOLOv8"
     docs_url = ""
@@ -38,6 +38,15 @@ class DeployYOLOV8Action(NeuralNetworkAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        return Layer(
+            action=cls,
+            id=layer_id,
+            need_preview=False,
+            init_widgets=cls.init_widgets,
+        )
+
+    @staticmethod
+    def init_widgets(layer: Layer):
         saved_settings = {}
         session: Session = None
 
@@ -295,12 +304,7 @@ class DeployYOLOV8Action(NeuralNetworkAction):
                 "settings": settings_options,
             }
 
-        return Layer(
-            action=cls,
-            id=layer_id,
-            create_options=create_options,
-            get_settings=get_settings,
-            get_data=get_data,
-            need_preview=False,
-            postprocess_cb=postprocess_cb,
-        )
+        layer._create_options = create_options
+        layer._get_settings = get_settings
+        layer._get_data = get_data
+        layer.postprocess_cb = postprocess_cb

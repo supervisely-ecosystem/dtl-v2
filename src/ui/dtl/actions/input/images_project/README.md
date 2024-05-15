@@ -50,6 +50,11 @@ This data will be used in the next layers of the transformation process.
       "dog": "__ignore__",
       "plants": "__ignore__",
       "tree": "__ignore__"
+    },
+    "tags_mapping": {
+      "fruit": "__ignore__",
+      "berry": "raccoon",
+      "animal": "__ignore__"
     }
   }
 }

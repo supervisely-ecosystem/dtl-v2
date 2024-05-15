@@ -20,6 +20,7 @@ from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
 from src.compute.layers.save.CreateLabelingJobLayer import CreateLabelingJobLayer
+from src.compute.layers.save.OutputProjectLayer import OutputProjectLayer
 from src.ui.tabs.configure import nodes_flow, nodes_flow_card
 import src.utils as utils
 import src.ui.utils as ui_utils
@@ -194,7 +195,13 @@ def _run():
             l
             for l in net.layers
             if isinstance(
-                l, (CreateNewProjectLayer, AddToExistingProjectLayer, CopyAnnotationsLayer)
+                l,
+                (
+                    CreateNewProjectLayer,
+                    AddToExistingProjectLayer,
+                    CopyAnnotationsLayer,
+                    OutputProjectLayer,
+                ),
             )
         ]
 
@@ -202,6 +209,7 @@ def _run():
             return
 
         labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
+
         results.set_content(
             ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
         )
@@ -209,6 +217,7 @@ def _run():
         results.reload()
         results.show()
         circle_progress.set_status("success")
+
     except CustomException as e:
         error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
@@ -244,23 +253,25 @@ def _run():
         global_timer.dump()
 
 
-def run_pipeline():
-    while g.pipeline_running:
+def run_pipeline(run_dialog=None):
+    g.pipeline_running = True
+    run_dialog.show()
+    show_run_dialog_btn.hide()
+    show_run_dialog_btn_running.show()
+    try:
         _run()
+    finally:
         g.pipeline_running = False
         show_run_dialog_btn_running.hide()
         show_run_dialog_btn.show()
         g.pipeline_thread = None
 
 
-def start_pipeline():
+def start_pipeline(run_dialog=None):
     if g.pipeline_thread is not None:
         raise RuntimeError("Pipeline is already running")
-    g.pipeline_running = True
-    g.pipeline_thread = threading.Thread(target=run_pipeline, daemon=True)
+    g.pipeline_thread = threading.Thread(target=run_pipeline, args=(run_dialog,), daemon=True)
     g.pipeline_thread.start()
-    show_run_dialog_btn.hide()
-    show_run_dialog_btn_running.show()
 
 
 @run_btn.click

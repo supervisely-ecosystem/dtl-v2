@@ -1,5 +1,4 @@
 # coding: utf-8
-
 from typing import Tuple, Union, List
 
 from supervisely import Annotation, VideoAnnotation, KeyIdMap
@@ -54,6 +53,7 @@ class CreateNewProjectLayer(Layer):
             raise GraphError(
                 "Enter name for the output project to the input field in the 'Create New Project' layer"
             )
+
         dst = self.dsts[0]
         self.out_project_name = dst
 
@@ -159,6 +159,7 @@ class CreateNewProjectLayer(Layer):
                             [item_info.id for item_info in item_infos],
                             [ann for _, ann in ds_item_map[ds_name]],
                         )
+
                     elif self.net.modality == "videos":
                         item_infos = g.api.video.upload_paths(
                             dataset_info.id,

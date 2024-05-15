@@ -69,7 +69,7 @@ class SkeletonizeLayer(Layer):
             origin, mask = label.geometry.origin, label.geometry.data
             mask_u8 = mask.astype(np.uint8)
             res_mask = method(mask_u8).astype(bool)
-            new_geometry = Bitmap(res_mask, origin)
+            new_geometry = Bitmap(res_mask, origin, extra_validation=False)
             new_label = label.clone(geometry=new_geometry)
             return [new_label]
 

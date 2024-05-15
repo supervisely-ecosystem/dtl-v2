@@ -256,9 +256,9 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         return chain
     src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
-        if src_layer.startswith("deploy_"):
-            continue
         if src_layer is None:
+            continue
+        if src_layer.startswith("deploy_"):
             continue
         if src_layer in chain:
             continue
@@ -354,7 +354,7 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
         layer_idx = all_layers_ids.index(layer_id)
     except:
         # hack, fix later
-        g.layers.pop(layer_id)
+        # g.layers.pop(layer_id)
         return
 
     net.preview_mode = True
@@ -517,12 +517,12 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
                 continue
             layer = g.layers[all_layers_ids[layer_indx]]
             layer: Layer
-            if len(data_el) == 1:
+            if len(data_el[0]) == 1:
                 img_desc, ann = data_el[0]
-            elif len(data_el) == 3:
-                img_desc, ann, _ = data_el
+            elif len(data_el[0]) == 3:
+                img_desc, ann, _ = data_el[0]
             else:
-                img_desc, ann = data_el
+                img_desc, ann = data_el[0]
             layer.update_preview(img_desc, ann)
             layer.set_preview_loading(False)
             updated.add(layer_indx)

@@ -481,23 +481,27 @@ class Net:
             for dataset_id in dataset_ids:
                 dataset_info = get_dataset_by_id(dataset_id)
                 if self.modality == "images":
+                    images_list = g.api.image.get_list(dataset_id=dataset_id)
+                    # check if we need to filter items
+                    if len(g.FILTERED_ENTITIES) > 0:
+                        images_list = [
+                            item_info
+                            for item_info in images_list
+                            if item_info.id in g.FILTERED_ENTITIES
+                        ]
+                        images_ids = [item_info.id for item_info in images_list]
+
+                        filters = [{"field": "imageId", "operator": "in", "value": images_ids}]
+                        annotations = g.api.annotation.get_list(
+                            dataset_id=dataset_id, filters=filters
+                        )
+                    else:
+                        annotations = g.api.annotation.get_list(dataset_id=dataset_id)
+
                     for batch, ann_batch in zip(
-                        g.api.image.get_list_generator(
-                            dataset_id=dataset_id, batch_size=batch_size
-                        ),
-                        g.api.annotation.get_list_generator(
-                            dataset_id=dataset_id, batch_size=batch_size
-                        ),
+                        batched(images_list, batch_size), batched(annotations, batch_size)
                     ):
                         start_items_batch_time = time()
-                        # check if we need to filter items
-                        if len(g.FILTERED_ENTITIES) > 0:
-                            filtered_batch = [
-                                item_info
-                                for item_info in batch
-                                if item_info.id in g.FILTERED_ENTITIES
-                            ]
-                            batch = filtered_batch
 
                         items_batch = []
                         for img_info, ann_info in zip(batch, ann_batch):
@@ -574,6 +578,8 @@ class Net:
 
         for layer in self.layers:
             if layer.action == "deploy_yolo_v8":
+                datalevel_metas[layer.dsts[0]] = ProjectMeta()
+            if layer.action == "deploy_mmdetection":
                 datalevel_metas[layer.dsts[0]] = ProjectMeta()
 
         for data_layer in cur_level_layers:

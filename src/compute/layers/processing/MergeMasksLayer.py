@@ -33,7 +33,7 @@ class MergeMasksLayer(Layer):
         for label in bitmaps:
             label.draw(base_mask, color=True)
 
-        return Bitmap(base_mask)
+        return Bitmap(base_mask, extra_validation=False)
 
     def modifies_data(self):
         return True
