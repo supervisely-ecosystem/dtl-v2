@@ -1,12 +1,13 @@
 import pandas as pd
 from typing import List
 from supervisely import Api, ImageInfo
-import src.globals as g
 
 
-def build_filtered_table(api: Api, project_id: int, filtered_items_ids: List[int]) -> pd.DataFrame:
-    if g.DATASET_ID:
-        datasets = [api.dataset.get_info_by_id(g.DATASET_ID)]
+def build_filtered_table(
+    api: Api, project_id: int, filtered_items_ids: List[int], dataset_id: int = None
+) -> pd.DataFrame:
+    if dataset_id:
+        datasets = [api.dataset.get_info_by_id(dataset_id)]
     else:
         datasets = api.dataset.get_list(project_id)
 

@@ -24,6 +24,8 @@ class FilteredProjectAction(SourceAction):
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
     project_id = g.PROJECT_ID
+    dataset_id = g.DATASET_ID
+    filtered_entities = g.FILTERED_ENTITIES
 
     @classmethod
     def create_inputs(self):
@@ -35,7 +37,10 @@ class FilteredProjectAction(SourceAction):
         _current_info = g.api.project.get_info_by_id(cls.project_id)
         _current_meta: ProjectMeta = ProjectMeta.from_json(g.api.project.get_meta(cls.project_id))
 
-        filtered_table_data = build_filtered_table(g.api, cls.project_id, g.FILTERED_ENTITIES)
+        filtered_table_data = build_filtered_table(
+            g.api, cls.project_id, cls.filtered_entities, cls.dataset_id
+        )
+        print(filtered_table_data)
         filtered_table = FastTable(data=filtered_table_data)
         filtered_data_btn = Button("Close", call_on_click="closeSidebar();")
 
@@ -44,7 +49,7 @@ class FilteredProjectAction(SourceAction):
         filtered_project_text = Text("Selected Project", font_size=get_text_font_size())
         filtered_project_preview = ProjectThumbnail(
             info=_current_info,
-            description=f"{len(g.FILTERED_ENTITIES)} {_current_info.type} selected via filters",
+            description=f"{len(cls.filtered_entities)} {_current_info.type} selected via filters",
         )
         show_filtered_data_btn = Button(
             text="SHOW",
@@ -78,7 +83,7 @@ class FilteredProjectAction(SourceAction):
         def get_settings(options_json: dict) -> dict:
             return {
                 "project_id": cls.project_id,
-                "filtered_entities_ids": g.FILTERED_ENTITIES,
+                "filtered_entities_ids": cls.filtered_entities,
                 "classes_mapping": "default",
                 "tags_mapping": "default",
             }
@@ -94,11 +99,11 @@ class FilteredProjectAction(SourceAction):
 
             filtered_entities_ids = settings.get("filtered_entities_ids", [])
             if len(filtered_entities_ids) > 0:
-                g.FILTERED_ENTITIES = filtered_entities_ids
+                cls.filtered_entities = filtered_entities_ids
 
             if project_id is not None and len(filtered_entities_ids) > 0:
                 filtered_table_data = build_filtered_table(
-                    g.api, cls.project_id, g.FILTERED_ENTITIES
+                    g.api, cls.project_id, cls.filtered_entities
                 )
                 filtered_table.read_pandas(filtered_table_data)
 
