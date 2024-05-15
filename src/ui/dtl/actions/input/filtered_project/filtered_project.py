@@ -40,7 +40,6 @@ class FilteredProjectAction(SourceAction):
         filtered_table_data = build_filtered_table(
             g.api, cls.project_id, cls.filtered_entities, cls.dataset_id
         )
-        print(filtered_table_data)
         filtered_table = FastTable(data=filtered_table_data)
         filtered_data_btn = Button("Close", call_on_click="closeSidebar();")
 
