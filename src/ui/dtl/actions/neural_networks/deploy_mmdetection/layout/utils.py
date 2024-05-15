@@ -168,10 +168,11 @@ def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
 
 
 def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
+    module_id = api.app.get_ecosystem_module_id("supervisely-ecosystem/serve-mmdetection-v3")
     app_params = {
         "agent_id": saved_settings["agent_id"],
         # "app_id": 0,
-        "module_id": 625,
+        "module_id": module_id,
         "workspace_id": workspace_id,
         "description": f"AutoServe session for Serve MMDetection",
         "task_name": "AutoServe/serve",
