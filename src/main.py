@@ -13,7 +13,7 @@ from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredP
 
 from src.templates import templates, load_template
 
-from src.compute.dtl_utils.item_descriptor import ItemDescriptor, ImageDescriptor
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.utils import LegacyProjectItem
 
 import src.globals as g
