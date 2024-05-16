@@ -8,6 +8,7 @@ from src.compute.classes_utils import ClassConstants
 from imgaug import augmenters as iaa
 from src.compute.dtl_utils import apply_to_labels
 from src.exceptions import BadSettingsError
+from supervisely.aug.imgaug_utils import apply as apply_augs
 
 
 class PerspectiveTransformLayer(Layer):
@@ -74,7 +75,6 @@ class PerspectiveTransformLayer(Layer):
         self.cls_mapping[ClassConstants.OTHER] = ClassConstants.DEFAULT
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
-        from supervisely.aug.imgaug_utils import apply as apply_augs
 
         img_desc, ann = data_el
         img = img_desc.read_image()
@@ -88,7 +88,7 @@ class PerspectiveTransformLayer(Layer):
 
         aug = iaa.Sequential(
             [iaa.PerspectiveTransform(scale=scale, cval=cval, keep_size=keep, fit_output=fit)]
-        )  # todo checkbox
+        )
 
         def to_bitmap(label: Label):
             new_title = self.settings["classes_mapping"].get(label.obj_class.name, None)
@@ -107,10 +107,3 @@ class PerspectiveTransformLayer(Layer):
         res_ann = res_ann.add_labels(labels_to_add)
         new_img_desc = img_desc.clone_with_item(res_img)
         yield (new_img_desc, res_ann)
-
-    def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
-        item_descs, anns = zip(*data_els)
-        yield tuple(zip(item_descs, anns))
-
-    def has_batch_processing(self) -> bool:
-        return False

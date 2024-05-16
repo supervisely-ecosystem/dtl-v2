@@ -11,7 +11,16 @@ from src.ui.dtl.utils import (
 )
 
 from supervisely import ProjectMeta, Polygon, AnyGeometry
-from supervisely.app.widgets import Text, NodesFlow, Checkbox, NotificationBox, Slider, InputNumber
+from supervisely.app.widgets import (
+    Text,
+    NodesFlow,
+    Checkbox,
+    NotificationBox,
+    Slider,
+    InputNumber,
+    Field,
+    Container,
+)
 
 
 class PerspectiveTransformaAction(ImgAugAugmentationsAction):
@@ -30,7 +39,6 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
         DEFAULT_SCALE = [0.01, 0.15]
         DEFAULT_CVAL = 0
 
-        scale_text = Text("Scale", status="text", font_size=get_text_font_size())
         scale_input = Slider(
             value=DEFAULT_SCALE, step=0.01, min=0.01, max=0.5, range=True, style=get_slider_style()
         )
@@ -39,12 +47,22 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
             status="text",
             font_size=get_text_font_size,
         )
+        scale_field = Field(
+            title="Scale",
+            description="",
+            content=Container(widgets=[scale_preview_widget, scale_input]),
+        )  # todo desc
 
         keep_size_checkbox = Checkbox(content="Keep image size")
+        keep_box_field = Field(
+            title="Keep original image size", description="Ipsum Lorem", content=keep_size_checkbox
+        )  # todo desc
         fit_checkbox = Checkbox("Fit to Output")
 
-        cval_text = Text("cval", status="text", font_size=get_text_font_size())
         cval_input = InputNumber(value=DEFAULT_CVAL, min=0, max=255, step=1, controls=True)
+        cval_field = Field(
+            title="cval", description="", content=Container(widgets=[cval_input])
+        )  # todo desc
 
         convert_notification = NotificationBox(
             title="Polygon labels will be converted to Bitmap",
@@ -135,17 +153,7 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
             settings_options = [
                 NodesFlow.Node.Option(
                     name="scale_text",
-                    option_component=NodesFlow.WidgetOptionComponent(scale_text),
-                ),
-                NodesFlow.Node.Option(
-                    name="scale_preview",
-                    option_component=NodesFlow.WidgetOptionComponent(
-                        widget=scale_preview_widget,
-                    ),
-                ),
-                NodesFlow.Node.Option(
-                    name="scale",
-                    option_component=NodesFlow.WidgetOptionComponent(scale_input),
+                    option_component=NodesFlow.WidgetOptionComponent(scale_field),
                 ),
                 NodesFlow.Node.Option(
                     name="keep_size_checkbox",
