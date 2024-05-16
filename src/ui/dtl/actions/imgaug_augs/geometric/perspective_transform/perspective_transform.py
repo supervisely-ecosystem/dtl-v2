@@ -152,24 +152,20 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
             _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="scale_text",
+                    name="scale_field",
                     option_component=NodesFlow.WidgetOptionComponent(scale_field),
                 ),
                 NodesFlow.Node.Option(
-                    name="keep_size_checkbox",
-                    option_component=NodesFlow.WidgetOptionComponent(keep_size_checkbox),
+                    name="keep_field",
+                    option_component=NodesFlow.WidgetOptionComponent(keep_box_field),
                 ),
                 NodesFlow.Node.Option(
                     name="fit_checkbox",
                     option_component=NodesFlow.WidgetOptionComponent(fit_checkbox),
                 ),
                 NodesFlow.Node.Option(
-                    name="cval_text",
-                    option_component=NodesFlow.WidgetOptionComponent(cval_text),
-                ),
-                NodesFlow.Node.Option(
-                    name="cval",
-                    option_component=NodesFlow.WidgetOptionComponent(cval_input),
+                    name="cval_field",
+                    option_component=NodesFlow.WidgetOptionComponent(cval_field),
                 ),
                 NodesFlow.Node.Option(
                     name="notification",
