@@ -10,3 +10,6 @@ RUN apt-get update && apt-get install -y
 
 COPY dev_requirements.txt dev_requirements.txt
 RUN pip3 install -r dev_requirements.txt
+
+
+RUN python src/main.py; exit 0
