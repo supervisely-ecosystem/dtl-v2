@@ -104,6 +104,7 @@ class OutputProjectAction(OutputAction):
             nonlocal saved_settings
             return {
                 **saved_settings,
+                "is_existing_project": is_existing_project.is_checked(),
                 "merge_different_meta": select_project_warning_checkbox.is_checked(),
             }
 
@@ -147,7 +148,6 @@ class OutputProjectAction(OutputAction):
 
             if not is_existing_project.is_checked():
                 settings = {
-                    "is_existing_project": False,
                     "project_name": new_project_name_input.get_value(),
                     "dataset_option": None,
                     "dataset_name": None,
@@ -155,7 +155,7 @@ class OutputProjectAction(OutputAction):
                     "merge_different_meta": False,
                 }
             else:
-                settings = {"is_existing_project": True, "project_name": None}
+                settings = {"project_name": None}
 
             project_id = dst_project_selector.get_selected_id()
             dataset_options = dst_dataset_options_selector.get_value()
