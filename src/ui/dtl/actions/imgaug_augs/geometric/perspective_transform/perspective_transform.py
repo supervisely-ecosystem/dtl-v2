@@ -49,20 +49,29 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
         )
         scale_field = Field(
             title="Scale",
-            description="",
+            description="Standard deviation of the normal distributions.",
             content=Container(widgets=[scale_preview_widget, scale_input]),
-        )  # todo desc
+        )
 
         keep_size_checkbox = Checkbox(content="Keep image size")
         keep_box_field = Field(
-            title="Keep original image size", description="Ipsum Lorem", content=keep_size_checkbox
-        )  # todo desc
-        fit_checkbox = Checkbox("Fit to Output")
+            title="Keep original image size",
+            description="Resize images back to their original size after transformation",
+            content=keep_size_checkbox,
+        )
+        fit_checkbox = Checkbox("Fit Output")
+        fit_checkbox_field = Field(
+            title="Fit Output",
+            description="Adjust image plane size and position",
+            content=Container(widgets=[fit_checkbox]),
+        )
 
         cval_input = InputNumber(value=DEFAULT_CVAL, min=0, max=255, step=1, controls=True)
         cval_field = Field(
-            title="cval", description="", content=Container(widgets=[cval_input])
-        )  # todo desc
+            title="cval",
+            description="Value to fill up pixels that didn’t exist in the input image",
+            content=Container(widgets=[cval_input]),
+        )
 
         convert_notification = NotificationBox(
             title="Polygon labels will be converted to Bitmap",
@@ -160,8 +169,8 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
                     option_component=NodesFlow.WidgetOptionComponent(keep_box_field),
                 ),
                 NodesFlow.Node.Option(
-                    name="fit_checkbox",
-                    option_component=NodesFlow.WidgetOptionComponent(fit_checkbox),
+                    name="checkbox_field",
+                    option_component=NodesFlow.WidgetOptionComponent(fit_checkbox_field),
                 ),
                 NodesFlow.Node.Option(
                     name="cval_field",
@@ -172,7 +181,7 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
                     option_component=NodesFlow.WidgetOptionComponent(convert_notification),
                 ),
                 NodesFlow.Node.Option(
-                    name="checkbox",
+                    name="checkbox_convert",
                     option_component=NodesFlow.WidgetOptionComponent(convert_checkbox),
                 ),
             ]
