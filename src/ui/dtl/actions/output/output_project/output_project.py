@@ -206,18 +206,19 @@ class OutputProjectAction(OutputAction):
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
 
-            if isinstance(dst, list):
-                if len(dst) != 0:
-                    project_id = int(dst[0])
+            if is_existing_project.is_checked():
+                if isinstance(dst, list):
+                    if len(dst) != 0:
+                        project_id = int(dst[0])
+                    else:
+                        project_id = None
                 else:
-                    project_id = None
-            else:
-                project_id = int(dst)
+                    project_id = int(dst)
 
-            dst_project_selector.set_project_id(project_id)
-            dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
+                dst_project_selector.set_project_id(project_id)
+                dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
 
-            _update_preview()
+                _update_preview()
 
             settings_options = [
                 NodesFlow.Node.Option(

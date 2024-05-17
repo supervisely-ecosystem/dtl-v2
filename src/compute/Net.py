@@ -188,6 +188,8 @@ class Net:
         if branch == -1:
             dsts = self.layers[indx].dsts
         else:
+            if isinstance(branch, tuple):
+                branch = branch[-1]
             dsts = [self.layers[indx].dsts[branch]]
         dsts = list(set(dsts) - {Layer.null})
 
