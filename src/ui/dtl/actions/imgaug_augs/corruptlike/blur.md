@@ -2,6 +2,8 @@
 
 This layer contains set of ImgAug's image augmentations related to blur. Annotations are not being augmented.
 
+[Learn more about ImgAug's Corruptlike augmenters in their documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_imgcorruptlike.html)
+
 ### Settings:
 
 - **Augmentation option** - Select desired blur augmentation. Can be set to `Defocus Blur`, `Motion Blur` and `Zoom Blur`

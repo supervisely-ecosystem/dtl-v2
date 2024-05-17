@@ -2,6 +2,7 @@
 
 This layer contains set of ImgAug's image augmentations related to noise. Annotations are not being augmented.
 
+[Learn more about ImgAug's Corruptlike augmenters in their documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_imgcorruptlike.html)
 ### Settings:
 
 - **Augmentation option** - Select desired noise augmentation. Can be set to `Gaussian Noise`, `Shot Noise`, `Impulse Noise` and `Speckle Noise`
