@@ -77,8 +77,8 @@ from .actions.output.copy_annotations.copy_annotations import (
 )
 
 # Neural networks
-from .actions.neural_networks.deploy_yolov8.deploy_yolov8 import DeployYOLOV8Action
-from .actions.neural_networks.deploy_mmdetection.deploy_mmdetection import DeployMMDetectionAction
+from .actions.neural_networks.deploy.yolov8.yolov8 import DeployYOLOV8Action
+from .actions.neural_networks.deploy.mmdetection.mmdetection import DeployMMDetectionAction
 from .actions.neural_networks.apply_nn_inference.apply_nn_inference import ApplyNNInferenceAction
 
 # Video

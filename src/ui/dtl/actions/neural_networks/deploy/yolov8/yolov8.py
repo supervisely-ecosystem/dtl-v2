@@ -8,24 +8,25 @@ from src.ui.dtl.utils import (
     get_layer_docs,
 )
 
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.model_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.model_selector import (
     create_model_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.agent_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.agent_selector import (
     create_agent_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.model_serve import (
+from src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.model_serve import (
     create_model_serve_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.node_layout import (
+from src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.node_layout import (
     create_node_layout,
 )
-import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
+import src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.utils as utils
 import src.globals as g
 from src.ui.dtl.Action import DeployNNAction
+from src.ui.dtl.actions.neural_networks.deploy.base.deploy import DeployBaseAction
 
 
-class DeployYOLOV8Action(DeployNNAction):
+class DeployYOLOV8Action(DeployBaseAction):
     name = "deploy_yolo_v8"
     title = "Deploy YOLOv8"
     docs_url = ""

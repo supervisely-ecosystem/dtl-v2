@@ -9,19 +9,19 @@ from src.ui.dtl.utils import (
     get_layer_docs,
 )
 
-from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.model_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.model_selector import (
     create_model_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.agent_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.agent_selector import (
     create_agent_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.model_serve import (
+from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.model_serve import (
     create_model_serve_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.node_layout import (
+from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.node_layout import (
     create_node_layout,
 )
-import src.ui.dtl.actions.neural_networks.deploy_mmdetection.layout.utils as utils
+import src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.utils as utils
 import src.globals as g
 
 

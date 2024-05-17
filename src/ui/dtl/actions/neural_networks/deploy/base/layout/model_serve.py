@@ -1,7 +1,6 @@
 from supervisely.app.widgets import Text, Button, NotificationBox
 
 from src.ui.dtl.utils import (
-    get_set_settings_button_style,
     get_set_settings_container,
     get_text_font_size,
 )

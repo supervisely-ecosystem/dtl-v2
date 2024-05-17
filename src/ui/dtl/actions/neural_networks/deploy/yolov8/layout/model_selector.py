@@ -1,8 +1,5 @@
-import os
-from typing import Literal
 from supervisely.app.widgets import (
     Text,
-    RadioTable,
     Button,
     Container,
     RadioTabs,
@@ -10,7 +7,6 @@ from supervisely.app.widgets import (
     PretrainedModelsSelector,
     Checkbox,
 )
-from supervisely.io.json import load_json_file
 from supervisely.nn.checkpoints import yolov8
 
 import src.globals as g
@@ -21,8 +17,7 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
-import src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.utils as utils
-from src.ui.dtl.actions.neural_networks.deploy_yolov8.layout.models import (
+from src.ui.dtl.actions.neural_networks.deploy.yolov8.layout.models import (
     models as pretrained_models,
 )
 

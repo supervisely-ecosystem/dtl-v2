@@ -2,11 +2,9 @@ from typing import List
 from supervisely.api.api import Api
 from supervisely.app.widgets import (
     AgentSelector,
-    Input,
     Button,
     Text,
     Select,
-    RadioTable,
     RadioTabs,
     RadioGroup,
     CustomModelsSelector,
@@ -16,7 +14,6 @@ from supervisely.app.widgets import (
 
 from supervisely.api.agent_api import AgentInfo
 from supervisely.api.app_api import SessionInfo
-from supervisely.io.fs import get_file_name_with_ext
 import src.globals as g
 
 

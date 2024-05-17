@@ -2,11 +2,9 @@ from typing import List
 from supervisely.api.api import Api
 from supervisely.app.widgets import (
     AgentSelector,
-    Input,
     Button,
     Text,
     Select,
-    RadioTable,
     RadioTabs,
     RadioGroup,
     CustomModelsSelector,
@@ -16,7 +14,6 @@ from supervisely.app.widgets import (
 
 from supervisely.api.agent_api import AgentInfo
 from supervisely.api.app_api import SessionInfo
-from supervisely.io.fs import get_file_name_with_ext
 import src.globals as g
 
 
@@ -80,28 +77,12 @@ def save_model_settings(
         model_source = "Custom models"
         model_params = model_selector_sidebar_custom_model_table.get_selected_model_params()
 
-        config_url = model_params.get("config_url", None)
-        if config_url is not None:
-            file_info = g.api.file.exists(g.TEAM_ID, config_url)
-            if file_info is None:
-                raise ValueError(
-                    "Config file not found. "
-                    "Config file should be placed in the same directory as the model checkpoint."
-                )
-        else:
-            raise ValueError(
-                "Config file not found. "
-                "Config file should be placed in the same directory as the model checkpoint."
-            )
-
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
     settings["model_source"] = model_source
     settings["task_type"] = model_params.get("task_type", None)
     settings["checkpoint_name"] = model_params.get("checkpoint_name", None)
     settings["checkpoint_url"] = model_params.get("checkpoint_url", None)
-    settings["config_url"] = model_params.get("config_url", None)
-    settings["arch_type"] = model_params.get("arch_type", None)
     settings["stop_model_session"] = stop_model_session
 
     return settings
@@ -167,14 +148,21 @@ def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
     return agent_selector_sidebar_device_selector_items
 
 
-def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
-    module_id = api.app.get_ecosystem_module_id("supervisely-ecosystem/serve-mmdetection-v3")
+def start_app(
+    api: Api,
+    framework: str,
+    framework_name: str,
+    slug: str,
+    workspace_id: int,
+    saved_settings: dict,
+) -> SessionInfo:
+    module_id = api.app.get_ecosystem_module_id(slug)
     app_params = {
         "agent_id": saved_settings["agent_id"],
         # "app_id": 0,
         "module_id": module_id,
         "workspace_id": workspace_id,
-        "description": f"AutoServe session for Serve MMDetection",
+        "description": f"AutoServe session for Serve {framework_name}",
         "task_name": "AutoServe/serve",
         "params": {"autostart": False, **saved_settings},
         "app_version": None,
@@ -193,11 +181,9 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
             "deploy_params": {
                 "device": saved_settings["device"],
                 "model_source": saved_settings["model_source"],
-                "task_type": saved_settings["task_type"],
                 "checkpoint_name": saved_settings["checkpoint_name"],
                 "checkpoint_url": saved_settings["checkpoint_url"],
-                "config_url": saved_settings["config_url"],
-                "arch_type": saved_settings.get("arch_type", None),
+                "task_type": saved_settings["task_type"],
             },
         },
     )
