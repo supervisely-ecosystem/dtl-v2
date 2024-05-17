@@ -46,7 +46,7 @@ SUPPORTED_MODALITIES_MAP = {
     "videos": sly.ProjectType.VIDEOS,
 }
 
-ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
+# ava_ag = api.agent.get_list_available(team_id=TEAM_ID)
 
 MODALITY_TYPE = os.getenv("modal.state.modalityType", "images")
 if PROJECT_ID is not None:

@@ -1,6 +1,13 @@
 import threading
 import time
+
+t = time.time()
 from supervisely import Application, ProjectInfo, DatasetInfo, Annotation, ProjectMeta, logger
+from supervisely.app.widgets import ImageAnnotationPreview, FastTable
+from supervisely.sly_logger import logger
+
+logger.info(f"Supervisely Import time: {time.time() - t:.3f}s")
+t = time.time()
 
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
@@ -20,7 +27,11 @@ import src.globals as g
 import src.utils as u
 from src.ui.utils import create_new_layer
 from src.ui.widgets import ApplyCss
-from supervisely.app.widgets import ImageAnnotationPreview, FastTable
+
+logger.info("App imports time: {:.3f}s".format(time.time() - t))
+
+
+t = time.time()
 
 # init widget scripts
 ImageAnnotationPreview()
@@ -33,6 +44,10 @@ app = Application(
     session_info_extra_content=header,
     session_info_solid=True,
 )
+
+logger.info(f"Application init time: {time.time() - t:.3f}s")
+
+t = time.time()
 
 
 def _update_f():
@@ -170,3 +185,5 @@ if layer is not None:
 
 g.PROJECT_ID = None
 g.DATASET_ID = None
+
+logger.info(f"App start time: {time.time() - t:.3f}s")
