@@ -1,8 +1,10 @@
-# iaa.Geometric Perspective Transform
+# iaa.geometric.PerspectiveTransform
 
-`Perspective Transform` layer applies random four point perspective transformations to images.
+`PerspectiveTransform` layer applies random four point perspective transformations to images.
 
 Each of the four points is placed on the image using a random distance from its respective corner. The distance is sampled from a normal distribution. As a result, most transformations don’t change the image very much, while some “focus” on polygons far inside the image.
+
+[Read more about Perspective Transform in the ImgAug's documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.PerspectiveTransform)
 
 ### Annotation augmentation
 

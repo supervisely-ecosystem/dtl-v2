@@ -11,12 +11,20 @@ from src.ui.dtl.utils import (
 )
 
 from supervisely import ProjectMeta, Polygon, AnyGeometry
-from supervisely.app.widgets import Text, NodesFlow, Checkbox, NotificationBox, Slider
+from supervisely.app.widgets import (
+    Text,
+    NodesFlow,
+    Checkbox,
+    NotificationBox,
+    Slider,
+    Field,
+    Container,
+)
 
 
 class ElasticTransformationAction(ImgAugAugmentationsAction):
     name = "elastic_transformation"
-    title = "iaa.geometric Elastic Transformation"
+    title = "iaa.geometric.ElasticTransformation"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
@@ -29,7 +37,6 @@ class ElasticTransformationAction(ImgAugAugmentationsAction):
 
         DEFAULT_ALPHA = [0, 40]
         DEFAULT_SIGMA = [4, 8]
-        alpha_text = Text("Alpha", status="text", font_size=get_text_font_size())
         alpha_input = Slider(
             value=DEFAULT_ALPHA, step=1, min=0, max=200, range=True, style=get_slider_style()
         )
@@ -38,12 +45,16 @@ class ElasticTransformationAction(ImgAugAugmentationsAction):
             status="text",
             font_size=get_text_font_size,
         )
+        alpha_field = Field(
+            title="Alpha",
+            description="Strength of the distortion field",
+            content=Container(widgets=[alpha_preview_widget, alpha_input]),
+        )
 
         @alpha_input.value_changed
         def alpha_slider_value_changed(value):
             alpha_preview_widget.text = f"min: {value[0]} - max: {value[1]}"
 
-        sigma_text = Text("Sigma", status="text", font_size=get_text_font_size())
         sigma_input = Slider(
             value=DEFAULT_SIGMA, step=1, min=0, max=50, range=True, style=get_slider_style()
         )
@@ -51,6 +62,12 @@ class ElasticTransformationAction(ImgAugAugmentationsAction):
             f"min:{DEFAULT_SIGMA[0]} - max: {DEFAULT_SIGMA[1]}",
             status="text",
             font_size=get_text_font_size,
+        )
+
+        sigma_field = Field(
+            title="Sigma",
+            description="Smoothness of the displacement",
+            content=Container(widgets=[sigma_preview_widget, sigma_input]),
         )
 
         @sigma_input.value_changed
@@ -128,32 +145,12 @@ class ElasticTransformationAction(ImgAugAugmentationsAction):
             _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="alpha_text",
-                    option_component=NodesFlow.WidgetOptionComponent(alpha_text),
+                    name="alpha_field",
+                    option_component=NodesFlow.WidgetOptionComponent(alpha_field),
                 ),
                 NodesFlow.Node.Option(
-                    name="alpha_preview",
-                    option_component=NodesFlow.WidgetOptionComponent(
-                        widget=alpha_preview_widget,
-                    ),
-                ),
-                NodesFlow.Node.Option(
-                    name="alpha",
-                    option_component=NodesFlow.WidgetOptionComponent(alpha_input),
-                ),
-                NodesFlow.Node.Option(
-                    name="sigma_text",
-                    option_component=NodesFlow.WidgetOptionComponent(sigma_text),
-                ),
-                NodesFlow.Node.Option(
-                    name="sigma_preview",
-                    option_component=NodesFlow.WidgetOptionComponent(
-                        widget=sigma_preview_widget,
-                    ),
-                ),
-                NodesFlow.Node.Option(
-                    name="sigma",
-                    option_component=NodesFlow.WidgetOptionComponent(sigma_input),
+                    name="sigma_field",
+                    option_component=NodesFlow.WidgetOptionComponent(sigma_field),
                 ),
                 NodesFlow.Node.Option(
                     name="notification",

@@ -1,6 +1,8 @@
-# iaa.Geometric Elastic Transformation
+# iaa.geometric.ElasticTransformation
 
-`Elastic Transformation` layer transforms images by moving pixels locally around using displacement fields.
+`ElasticTransformation` layer transforms images by moving pixels locally around using displacement fields.
+
+[Read more about ElasticTransformation in ImgAug's documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ElasticTransformation)
 
 ### Annotation augmentation
 

@@ -25,7 +25,7 @@ from supervisely.app.widgets import (
 
 class PerspectiveTransformaAction(ImgAugAugmentationsAction):
     name = "perspective_transform"
-    title = "iaa.geometric Perspective Transform"
+    title = "iaa.geometric.PerspectiveTransform"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/geometric.html#perspectivetransform"
     description = ""
     md_description = get_layer_docs(dirname(realpath(__file__)))
