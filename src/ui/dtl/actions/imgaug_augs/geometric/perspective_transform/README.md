@@ -1,6 +1,8 @@
 # iaa.Geometric Perspective Transform
 
-`Perspective Transform` layer transforms images by applying ImgAug's Perspective Transform augmentation.
+`Perspective Transform` layer applies random four point perspective transformations to images.
+
+Each of the four points is placed on the image using a random distance from its respective corner. The distance is sampled from a normal distribution. As a result, most transformations don’t change the image very much, while some “focus” on polygons far inside the image.
 
 ### Annotation augmentation
 
@@ -9,15 +11,15 @@ At the current moment, layer only augments `Masks`, `Bounding Boxes` and `Polygo
 
 ### Settings:
 
-- **Scale** Set minimum and maximum values to specify the strength of the displacement.
-- **Keep image size** checkbox
-- **Fit to output** check to see the full image with the black bars
-- **cval** todo
+- **Scale** - Set minimum and maximum values to specify the strength of the perspective transformation.
+- **Keep image size** - Whether to resize image’s back to their original size after applying the perspective transform. If set to False, the resulting images may end up having different shapes.
+- **Fit to output** - If True, the image plane size and position will be adjusted to still capture the whole image after perspective transformation. (Followed by image resizing if keep_size is set to True.) Otherwise, parts of the transformed image may be outside of the image plane. This setting should not be set to True when using large scale values as it could lead to very large images.
+- **cval** - The constant value used to fill up pixels in the result image that didn’t exist in the input image
 
 
 ### Example. Transform the image
 
-In this example, the image is transformed with scale (0.04, 0.15), Fit to Output unchecked, Keep Image size checked, and cval 0.
+In this example, the image is transformed with scale (0.04, 0.15), Fit Output unchecked and Keep Image size checked.
 
 <table>
 <tr>
