@@ -114,6 +114,10 @@ class OutputProjectAction(OutputAction):
             else:
                 is_existing_project.uncheck()
 
+            project_name = settings.get("project_name", None)
+            if project_name is not None:
+                new_project_name_input.set_value(project_name)
+
             dataset_option = settings.get("dataset_option", "new")
             dst_dataset_options_selector.set_value(dataset_option)
             if dataset_option == "new":
@@ -144,13 +148,14 @@ class OutputProjectAction(OutputAction):
             if not is_existing_project.is_checked():
                 settings = {
                     "is_existing_project": False,
+                    "project_name": new_project_name_input.get_value(),
                     "dataset_option": None,
                     "dataset_name": None,
                     "dataset_id": None,
                     "merge_different_meta": False,
                 }
             else:
-                settings = {"is_existing_project": True}
+                settings = {"is_existing_project": True, "project_name": None}
 
             project_id = dst_project_selector.get_selected_id()
             dataset_options = dst_dataset_options_selector.get_value()

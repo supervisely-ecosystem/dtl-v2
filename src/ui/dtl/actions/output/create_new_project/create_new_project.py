@@ -33,8 +33,13 @@ class CreateNewProjectAction(OutputAction):
 
             return dst
 
+        def get_settings(options_json: dict):
+            return {"project_name": sly_project_name_input.get_value()}
+
         def _set_settings_from_json(settings: dict):
-            return
+            project_name = settings.get("project_name", None)
+            if project_name is not None:
+                sly_project_name_input.set_value(project_name)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
@@ -58,6 +63,7 @@ class CreateNewProjectAction(OutputAction):
             action=cls,
             id=layer_id,
             create_options=create_options,
+            get_settings=get_settings,
             get_dst=get_dst,
             need_preview=False,
         )

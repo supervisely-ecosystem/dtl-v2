@@ -41,13 +41,14 @@ class OutputProjectLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["is_existing_project", "dataset_option"],
+                "required": ["is_existing_project", "dataset_option", "project_name"],
                 "properties": {
                     "is_existing_project": {"type": "boolean"},
                     "dataset_option": {
                         "type": "string",
                         "enum": ["new", "existing", "keep"],
                     },
+                    "project_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "dataset_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "dataset_id": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
                     "merge_different_meta": {"type": "boolean"},

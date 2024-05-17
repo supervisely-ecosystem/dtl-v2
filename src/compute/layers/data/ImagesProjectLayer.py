@@ -47,7 +47,10 @@ class ImagesProjectLayer(Layer):
         if self.project_name is None:
             self.in_project_meta = ProjectMeta()
         else:
-            self.in_project_meta = get_project_meta(get_project_by_name(self.project_name).id)
+            try:
+                self.in_project_meta = get_project_meta(get_project_by_name(self.project_name).id)
+            except:
+                self.in_project_meta = ProjectMeta()
 
     @classmethod
     def _split_data_src(cls, src):

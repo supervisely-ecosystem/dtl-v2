@@ -457,6 +457,7 @@ class ImagesProjectAction(SourceAction):
         def _set_src_from_json(srcs: List[str]):
             nonlocal saved_src
             project_info = None
+            project_not_found = False
             if len(srcs) == 0:
                 # set empty src to widget
                 StateJson()[select_datasets._project_selector.widget_id]["projectId"] = None
@@ -476,26 +477,38 @@ class ImagesProjectAction(SourceAction):
                         first_project_name = project_name
                     elif first_project_name != project_name:
                         raise RuntimeError("All datasets should be from the same project")
-                    project_info = utils.get_project_by_name(name=project_name)
+
+                    try:
+                        project_info = utils.get_project_by_name(name=project_name)
+                    except:
+                        project_not_found = True
+                        break
                     if dataset_name == "*":
                         datasets.extend(utils.get_all_datasets(project_info.id))
                     else:
                         datasets.append(utils.get_dataset_by_name(dataset_name, project_info.id))
 
-                # set datasets to widget
-                StateJson()[select_datasets._project_selector.widget_id][
-                    "projectId"
-                ] = project_info.id
-                StateJson()[select_datasets.widget_id]["datasets"] = [ds.id for ds in datasets]
-                if len(datasets) == project_info.datasets_count:
-                    select_datasets._all_datasets_checkbox.check()
+                if project_not_found is False:
+                    # set datasets to widget
+                    StateJson()[select_datasets._project_selector.widget_id][
+                        "projectId"
+                    ] = project_info.id
+                    StateJson()[select_datasets.widget_id]["datasets"] = [ds.id for ds in datasets]
+                    if len(datasets) == project_info.datasets_count:
+                        select_datasets._all_datasets_checkbox.check()
+                    else:
+                        select_datasets._all_datasets_checkbox.uncheck()
+                    StateJson().send_changes()
+
+                    # get project meta
+                    project_meta = utils.get_project_meta(project_info.id)
                 else:
-                    select_datasets._all_datasets_checkbox.uncheck()
-                StateJson().send_changes()
-
-                # get project meta
-                project_meta = utils.get_project_meta(project_info.id)
-
+                    # set empty src to widget
+                    StateJson()[select_datasets._project_selector.widget_id]["projectId"] = None
+                    StateJson()[select_datasets.widget_id]["datasets"] = []
+                    StateJson().send_changes()
+                    project_meta = ProjectMeta()
+                    
             # save src
             _save_src()
             # set src preview
