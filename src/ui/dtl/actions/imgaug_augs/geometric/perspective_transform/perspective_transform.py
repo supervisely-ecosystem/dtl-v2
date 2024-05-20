@@ -15,6 +15,7 @@ from supervisely.app.widgets import (
     Text,
     NodesFlow,
     Checkbox,
+    CheckboxField,
     NotificationBox,
     Slider,
     InputNumber,
@@ -53,19 +54,14 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
             content=Container(widgets=[scale_preview_widget, scale_input]),
         )
 
-        keep_size_checkbox = Checkbox(content="Keep image size")
-        keep_box_field = Field(
+        keep_size_checkbox = CheckboxField(
             title="Keep original image size",
             description="Resize images back to their original size after transformation",
-            content=keep_size_checkbox,
         )
-        fit_checkbox = Checkbox("Fit Output")
-        fit_checkbox_field = Field(
+        fit_checkbox = CheckboxField(
             title="Fit Output",
             description="Adjust image plane size and position",
-            content=Container(widgets=[fit_checkbox]),
         )
-
         cval_input = InputNumber(value=DEFAULT_CVAL, min=0, max=255, step=1, controls=True)
         cval_field = Field(
             title="cval",
@@ -165,12 +161,12 @@ class PerspectiveTransformaAction(ImgAugAugmentationsAction):
                     option_component=NodesFlow.WidgetOptionComponent(scale_field),
                 ),
                 NodesFlow.Node.Option(
-                    name="keep_field",
-                    option_component=NodesFlow.WidgetOptionComponent(keep_box_field),
+                    name="keep_size_checkbox",
+                    option_component=NodesFlow.WidgetOptionComponent(keep_size_checkbox),
                 ),
                 NodesFlow.Node.Option(
-                    name="checkbox_field",
-                    option_component=NodesFlow.WidgetOptionComponent(fit_checkbox_field),
+                    name="fit_checkbox",
+                    option_component=NodesFlow.WidgetOptionComponent(fit_checkbox),
                 ),
                 NodesFlow.Node.Option(
                     name="cval_field",
