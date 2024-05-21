@@ -406,6 +406,7 @@ templates = {
         "move": move,
         "copy": copy,
         "basic-detection-augmentations": basic_detection_augmentations,
+        "basic-segmentation-augmentation": basic_segmentation_augmentations,  # key to be renamed soon
         "basic-segmentation-augmentations": basic_segmentation_augmentations,
     },
     "videos": {},
