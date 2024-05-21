@@ -116,6 +116,9 @@ from .actions.other.copy.copy import CopyAction
 from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformation import (
     ElasticTransformationAction,
 )
+from .actions.imgaug_augs.geometric.perspective_transform.perspective_transform import (
+    PerspectiveTransformaAction,
+)
 
 from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
     ImgAugCorruptlikeNoiseAction,
@@ -173,6 +176,7 @@ image_actions_list = {
         ImgAugCorruptlikeColorAction.name,
         ImgAugCorruptlikeCompressionAction.name,
         ElasticTransformationAction.name,
+        PerspectiveTransformaAction.name,
     ],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
@@ -247,6 +251,7 @@ image_actions_dict = {
     ImgAugCorruptlikeColorAction.name: ImgAugCorruptlikeColorAction,
     ImgAugCorruptlikeCompressionAction.name: ImgAugCorruptlikeCompressionAction,
     ElasticTransformationAction.name: ElasticTransformationAction,
+    PerspectiveTransformaAction.name: PerspectiveTransformaAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
