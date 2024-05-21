@@ -185,7 +185,7 @@ left_sidebar_widgets = [
 sidebar = Sidebar(
     left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;", gap=15),
     right_content=nodes_flow_card,
-    width_percent=22.05,
+    width_percent=25,
     standalone=True,
     height="calc(100vh - 57px)",
     clear_main_panel_paddings=True,
