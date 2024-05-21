@@ -28,11 +28,12 @@ move = [
         "src": ["$move_2"],
         "dst": [],
         "settings": {
-            "is_existing_project": False,
+            "project_name": f"{project_name} (move)",
             "dataset_option": "new",
             "dataset_name": "",
             "dataset_id": None,
             "merge_different_meta": False,
+            "is_existing_project": False,
         },
     },
 ]
@@ -60,11 +61,12 @@ copy = [
         "src": ["$copy_2"],
         "dst": [],
         "settings": {
-            "is_existing_project": False,
+            "project_name": f"{project_name} (copy)",
             "dataset_option": "new",
             "dataset_name": "",
             "dataset_id": None,
             "merge_different_meta": False,
+            "is_existing_project": False,
         },
     },
 ]
