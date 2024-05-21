@@ -72,6 +72,7 @@ All files will be saved in the selected project in the same structure, with the 
         "dst": [],
         "settings": {
             "is_existing_project": False,
+            "project_name": None,
             "dataset_option": "new",
             "dataset_name": "",
             "dataset_id": None,

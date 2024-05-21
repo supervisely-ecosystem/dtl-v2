@@ -188,6 +188,8 @@ class Net:
         if branch == -1:
             dsts = self.layers[indx].dsts
         else:
+            if isinstance(branch, tuple):
+                branch = branch[-1]
             dsts = [self.layers[indx].dsts[branch]]
         dsts = list(set(dsts) - {Layer.null})
 
@@ -283,27 +285,43 @@ class Net:
             if layer_output is None:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
-            # FIX check every data_el in batch?
-            if len(layer_output[0]) == 3:  # filter layers with 2 outputs
-                new_data_batch = [output[:2] for output in layer_output]
-                branch = layer_output[-1]
-            elif len(layer_output[0]) == 2:  # layers with 1 output
-                new_data_batch = layer_output
-                branch = 0
-            elif len(layer_output[0]) == 1:  # output layers
+            # output layers
+            if len(layer_output[0]) == 1:
                 yield layer_output
                 continue
-            else:
-                raise RuntimeError(
-                    "Wrong number of items in layer output ({}). Got {} items.".format(
-                        layer, len(layer_output)
-                    )
-                )
 
-            for x in self.push(
-                indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
-            ):
-                yield x
+            from collections import defaultdict
+
+            branches = defaultdict(list)
+            for layer in layer_output:
+                if len(layer) == 3:
+                    branches[layer[2]].append(layer[:2])
+                elif len(layer) == 2:
+                    branches[0].append(layer)
+
+            # @TODO: ADD SUPPORT FOR BRANCHES
+            # FIX check every data_el in batch?
+            # if len(layer_output[0]) == 3:  # filter layers with 2 outputs
+            #     new_data_batch = [output[:2] for output in layer_output]
+            #     branch = layer_output[-1]
+            # elif len(layer_output[0]) == 2:  # layers with 1 output
+            #     new_data_batch = layer_output
+            #     branch = 0
+            # elif len(layer_output[0]) == 1:  # output layers
+            #     yield layer_output
+            #     continue
+            # else:
+            #     raise RuntimeError(
+            #         "Wrong number of items in layer output ({}). Got {} items.".format(
+            #             layer, len(layer_output)
+            #         )
+            #     )
+
+            for branch, new_data_batch in branches.items():
+                for x in self.push(
+                    indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
+                ):
+                    yield x
 
     def process_iterate(self, indx, data_batch, layers_idx_whitelist=None):
         layer = self.layers[indx]
