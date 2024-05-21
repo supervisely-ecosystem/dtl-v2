@@ -70,7 +70,7 @@ copy = [
 ]
 
 
-basic_detection_augmentation = [
+basic_detection_augmentations = [
     {
         **src_action_template,
         "scene_location": {"order_idx": 0, "position": {"x": 100, "y": 140}},
@@ -227,7 +227,7 @@ basic_detection_augmentation = [
     },
 ]
 
-basic_segmentation_augmentation = [
+basic_segmentation_augmentations = [
     {
         **src_action_template,
         "scene_location": {"order_idx": 0, "position": {"x": 100, "y": 140}},
@@ -405,8 +405,8 @@ templates = {
     "images": {
         "move": move,
         "copy": copy,
-        "basic-detection-augmentation": basic_detection_augmentation,
-        "basic-segmentation-augmentation": basic_segmentation_augmentation,
+        "basic-detection-augmentations": basic_detection_augmentations,
+        "basic-segmentation-augmentations": basic_segmentation_augmentations,
     },
     "videos": {},
 }
