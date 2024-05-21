@@ -112,23 +112,23 @@ class OutputProjectAction(OutputAction):
             project_mode = settings.get("is_existing_project", False)
             if project_mode:
                 is_existing_project.check()
+                dataset_option = settings.get("dataset_option", "new")
+                dst_dataset_options_selector.set_value(dataset_option)
+                if dataset_option == "new":
+                    dataset_name = settings.get("dataset_name", "")
+                    dst_dataset_options_new_dataset_input.set_value(dataset_name)
+                elif dataset_option == "existing":
+                    dataset_id = settings.get("dataset_id", None)
+                    dst_dataset_options_existing_dataset_selector.set_dataset_id(dataset_id)
+                else:
+                    pass
             else:
                 is_existing_project.uncheck()
-
-            project_name = settings.get("project_name", None)
-            if project_name is not None:
-                new_project_name_input.set_value(project_name)
-
-            dataset_option = settings.get("dataset_option", "new")
-            dst_dataset_options_selector.set_value(dataset_option)
-            if dataset_option == "new":
-                dataset_name = settings.get("dataset_name", "")
-                dst_dataset_options_new_dataset_input.set_value(dataset_name)
-            elif dataset_option == "existing":
-                dataset_id = settings.get("dataset_id", None)
-                dst_dataset_options_existing_dataset_selector.set_dataset_id(dataset_id)
-            else:
-                pass
+                project_name = settings.get("project_name", None)
+                if project_name is not None:
+                    new_project_name_input.set_value(project_name)
+                else:
+                    new_project_name_input.set_value("")
             _save_settings()
 
         def project_selected_cb(**kwargs):
@@ -154,31 +154,30 @@ class OutputProjectAction(OutputAction):
                     "dataset_id": None,
                     "merge_different_meta": False,
                 }
+                saved_settings = settings
             else:
                 settings = {"project_name": None}
+                project_id = dst_project_selector.get_selected_id()
+                dataset_options = dst_dataset_options_selector.get_value()
+                if dataset_options == "new":
+                    settings["dataset_option"] = "new"
+                    settings["dataset_name"] = dst_dataset_options_new_dataset_input.get_value()
+                elif dataset_options == "existing":
+                    settings["dataset_option"] = "existing"
+                    settings["dataset_id"] = (
+                        dst_dataset_options_existing_dataset_selector.get_selected_id()
+                    )
+                else:
+                    settings["dataset_option"] = "keep"
 
-            project_id = dst_project_selector.get_selected_id()
-            dataset_options = dst_dataset_options_selector.get_value()
-            if dataset_options == "new":
-                settings["dataset_option"] = "new"
-                settings["dataset_name"] = dst_dataset_options_new_dataset_input.get_value()
-            elif dataset_options == "existing":
-                settings["dataset_option"] = "existing"
-                settings["dataset_id"] = (
-                    dst_dataset_options_existing_dataset_selector.get_selected_id()
-                )
-            else:
-                settings["dataset_option"] = "keep"
-
-            if project_id:
-                _saved_meta = g.api.project.get_meta(project_id)
-                _saved_meta = ProjectMeta.from_json(_saved_meta)
-                g.updater("metas")
-            else:
-                _saved_meta = None
-
-            saved_settings = settings
-            _update_preview()
+                if project_id:
+                    _saved_meta = g.api.project.get_meta(project_id)
+                    _saved_meta = ProjectMeta.from_json(_saved_meta)
+                    g.updater("metas")
+                else:
+                    _saved_meta = None
+                saved_settings = settings
+                _update_preview()
 
         def get_dst(options_json: dict) -> dict:
             if is_existing_project.is_checked():
@@ -214,10 +213,8 @@ class OutputProjectAction(OutputAction):
                         project_id = None
                 else:
                     project_id = int(dst)
-
                 dst_project_selector.set_project_id(project_id)
                 dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
-
                 _update_preview()
 
             settings_options = [

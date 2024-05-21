@@ -64,7 +64,7 @@ def backup_destination_project(project_info: ProjectInfo) -> SessionInfo:
         module_id=module_id,
         workspace_id=g.WORKSPACE_ID,
         params=module_params,
-        task_name="[Data Nodes] Add labels to existing project backup",
+        task_name="[ML Pipelines] Add labels to existing project backup",
     )
     return session
 
