@@ -85,7 +85,7 @@ class ImgAugCorruptLikeAction(ImgAugAugmentationsAction):
 
 class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_blur"
-    title = "iaa.imgcorruptlike Blur"
+    title = "iaa.imgcorruptlike.Blur"
     description = ""
     md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/blur.md")
     options = {
@@ -97,7 +97,7 @@ class ImgAugCorruptlikeBlurAction(ImgAugCorruptLikeAction):
 
 class ImgAugCorruptlikeColorAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_color"
-    title = "iaa.imgcorruptlike Color"
+    title = "iaa.imgcorruptlike.Color"
     description = ""
     md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/color.md")
     options = {
@@ -109,7 +109,7 @@ class ImgAugCorruptlikeColorAction(ImgAugCorruptLikeAction):
 
 class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_compression"
-    title = "iaa.imgcorruptlike Compression"
+    title = "iaa.imgcorruptlike.Compression"
     docs_url = "https://imgaug.readthedocs.io/en/latest/source/overview/imgcorruptlike.html#elastictransform"
     description = ""
     md_description = ImgAugCorruptLikeAction.read_md_file(
@@ -124,7 +124,7 @@ class ImgAugCorruptlikeCompressionAction(ImgAugCorruptLikeAction):
 
 class ImgAugCorruptlikeNoiseAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_noise"
-    title = "iaa.imgcorruptlike Noise"
+    title = "iaa.imgcorruptlike.Noise"
     description = ""
     md_description = ImgAugCorruptLikeAction.read_md_file(dirname(realpath(__file__)) + "/noise.md")
     options = {
@@ -137,7 +137,7 @@ class ImgAugCorruptlikeNoiseAction(ImgAugCorruptLikeAction):
 
 class ImgAugCorruptlikeWeatherAction(ImgAugCorruptLikeAction):
     name = "iaa_imgcorruptlike_weather"
-    title = "iaa.imgcorruptlike Weather"
+    title = "iaa.imgcorruptlike.Weather"
     description = ""
     md_description = ImgAugCorruptLikeAction.read_md_file(
         dirname(realpath(__file__)) + "/weather.md"
