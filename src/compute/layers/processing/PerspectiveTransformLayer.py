@@ -11,35 +11,39 @@ from src.exceptions import BadSettingsError
 from supervisely.aug.imgaug_utils import apply as apply_augs
 
 
-class ElasticTransformationLayer(Layer):
-    action = "elastic_transformation"
+class PerspectiveTransformLayer(Layer):
+    action = "perspective_transform"
 
     layer_settings = {
         "required": ["settings"],
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["alpha", "sigma", "classes_mapping"],
+                "required": ["scale", "classes_mapping", "size_box"],
                 "properties": {
-                    "alpha": {
+                    "scale": {
                         "type": "object",
                         "required": ["min", "max"],
                         "properties": {
-                            "min": {"type": "number", "minimum": 0, "maximum": 200},
-                            "max": {"type": "number", "minimum": 1, "maximum": 200},
-                        },
-                    },
-                    "sigma": {
-                        "type": "object",
-                        "required": ["min", "max"],
-                        "properties": {
-                            "min": {"type": "number", "minimum": 0, "maximum": 50},
-                            "max": {"type": "number", "minimum": 1, "maximum": 50},
+                            "min": {"type": "number", "minimum": 0.01, "maximum": 0.5},
+                            "max": {"type": "number", "minimum": 0.01, "maximum": 0.5},
                         },
                     },
                     "classes_mapping": {
                         "type": "object",
                         "patternProperties": {".*": {"type": "string"}},
+                    },
+                    "size_box": {
+                        "type": "object",
+                        "required": ["keep", "fit"],
+                        "properties": {"keep": {"type": "boolean"}, "fit": {"type": "boolean"}},
+                    },
+                    "cval": {
+                        "type": "object",
+                        "required": ["value"],
+                        "properties": {
+                            "value": {"type": "number", "minimum": 0, "maximum": 255},
+                        },
                     },
                 },
             }
@@ -57,8 +61,7 @@ class ElasticTransformationLayer(Layer):
             if dictionary["min"] > dictionary["max"]:
                 raise BadSettingsError('"min" should be <= than "max" for "{}"'.format(text))
 
-        check_min_max(self.settings["alpha"], "alpha")
-        check_min_max(self.settings["sigma"], "sigma")
+        check_min_max(self.settings["scale"], "scale")
 
     def modifies_data(self):
         return False
@@ -76,13 +79,16 @@ class ElasticTransformationLayer(Layer):
         img_desc, ann = data_el
         img = img_desc.read_image()
 
-        alpha_value = self.settings["alpha"]
-        sigma_value = self.settings["sigma"]
+        scale_value = self.settings["scale"]
+        keep = self.settings["size_box"]["keep"]
+        fit = self.settings["size_box"]["fit"]
+        cval = self.settings["cval"]["value"]
 
-        alpha = (alpha_value["min"], alpha_value["max"])
-        sigma = (sigma_value["min"], sigma_value["max"])
+        scale = (scale_value["min"], scale_value["max"])
 
-        aug = iaa.Sequential([iaa.ElasticTransformation(alpha=alpha, sigma=sigma)])
+        aug = iaa.Sequential(
+            [iaa.PerspectiveTransform(scale=scale, cval=cval, keep_size=keep, fit_output=fit)]
+        )
 
         def to_bitmap(label: Label):
             new_title = self.settings["classes_mapping"].get(label.obj_class.name, None)
