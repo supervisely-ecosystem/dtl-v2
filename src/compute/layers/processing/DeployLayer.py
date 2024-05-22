@@ -121,6 +121,11 @@ class DeployLayer(Layer):
         return True
 
 
+class DeployYOLOv5Layer(DeployLayer):
+    action = "deploy_yolo_v5"
+    title = "Deploy YOLOv5"
+
+
 class DeployYOLOv8Layer(DeployLayer):
     action = "deploy_yolo_v8"
     title = "Deploy YOLOv8"

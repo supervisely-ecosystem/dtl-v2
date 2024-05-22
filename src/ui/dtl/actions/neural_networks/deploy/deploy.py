@@ -24,8 +24,12 @@ import src.ui.dtl.actions.neural_networks.deploy.layout.utils as utils
 import src.globals as g
 from src.ui.dtl.Action import DeployNNAction
 
+from supervisely.nn.checkpoints import yolov5_v2 as custom_yolov5
 from supervisely.nn.checkpoints import yolov8 as custom_yolov8
 from supervisely.nn.checkpoints import mmdetection3 as custom_mmdetection3
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    yolov5 as pretrained_yolov5,
+)
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     yolov8 as pretrained_yolov8,
 )
@@ -321,6 +325,21 @@ class DeployBaseAction(DeployNNAction):
         layer._get_settings = get_settings
         layer._get_data = get_data
         layer.postprocess_cb = postprocess_cb
+
+
+class DeployYOLOV5Action(DeployBaseAction):
+    name = "deploy_yolo_v5"
+    title = "Deploy YOLOv5"
+    docs_url = ""
+    description = "Deploy YOLOv5 models."
+    md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov5.md")
+
+    # Framework settings
+    framework = "yolov5"
+    framework_name = "YOLOv5"
+    slug = "supervisely-ecosystem/yolov5_2.0/serve"
+    custom_models = custom_yolov5.get_list(g.api, g.TEAM_ID)
+    pretrained_models = pretrained_yolov5
 
 
 class DeployYOLOV8Action(DeployBaseAction):
