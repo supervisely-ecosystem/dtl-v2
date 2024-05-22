@@ -79,11 +79,20 @@ def save_model_settings(
 
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
+    # common
     settings["model_source"] = model_source
     settings["task_type"] = model_params.get("task_type", None)
     settings["checkpoint_name"] = model_params.get("checkpoint_name", None)
     settings["checkpoint_url"] = model_params.get("checkpoint_url", None)
     settings["stop_model_session"] = stop_model_session
+
+    # specific
+    config_url = model_params.get("config_url", None)
+    if config_url is not None:
+        settings["config_url"] = config_url
+    arch_type = model_params.get("arch_type", None)
+    if arch_type is not None:
+        settings["arch_type"] = arch_type
 
     return settings
 
@@ -148,14 +157,20 @@ def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
     return agent_selector_sidebar_device_selector_items
 
 
-def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
-    module_id = api.app.get_ecosystem_module_id("supervisely-ecosystem/yolov8/serve")
+def start_app(
+    api: Api,
+    workspace_id: int,
+    saved_settings: dict,
+    framework_name: str,
+    slug: str,
+) -> SessionInfo:
+    module_id = api.app.get_ecosystem_module_id(slug)
     app_params = {
         "agent_id": saved_settings["agent_id"],
         # "app_id": 0,
         "module_id": module_id,
         "workspace_id": workspace_id,
-        "description": f"AutoServe session for Serve YOLOv8",
+        "description": f"AutoServe session for Serve {framework_name}",
         "task_name": "AutoServe/serve",
         "params": {"autostart": False, **saved_settings},
         "app_version": None,
@@ -166,20 +181,22 @@ def start_app(api: Api, workspace_id: int, saved_settings: dict) -> SessionInfo:
 
 
 def deploy_model(api: Api, session_id: int, saved_settings: dict):
-    api.task.send_request(
-        session_id,
-        "deploy_from_api",
-        data={
-            # "model_dir": "data-nodes/models",
-            "deploy_params": {
-                "device": saved_settings["device"],
-                "model_source": saved_settings["model_source"],
-                "checkpoint_name": saved_settings["checkpoint_name"],
-                "checkpoint_url": saved_settings["checkpoint_url"],
-                "task_type": saved_settings["task_type"],
-            },
-        },
-    )
+    deploy_params = {}
+    # common
+    deploy_params["device"] = saved_settings["device"]
+    deploy_params["model_source"] = saved_settings["model_source"]
+    deploy_params["checkpoint_name"] = saved_settings["checkpoint_name"]
+    deploy_params["checkpoint_url"] = saved_settings["checkpoint_url"]
+    deploy_params["task_type"] = saved_settings["task_type"]
+    # specific
+    config_url = saved_settings.get("config_url", None)
+    if config_url is not None:
+        deploy_params["config_url"] = config_url
+    arch_type = saved_settings.get("arch_type", None)
+    if arch_type is not None:
+        deploy_params["arch_type"] = arch_type
+
+    api.task.send_request(session_id, "deploy_from_api", data={"deploy_params": {**deploy_params}})
 
 
 # Check model

@@ -2,7 +2,7 @@ from supervisely.app.widgets import Text, Select, Button, Container, Field, Agen
 import src.globals as g
 
 from src.ui.dtl.utils import get_text_font_size
-import src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.utils as utils
+import src.ui.dtl.actions.neural_networks.deploy.layout.utils as utils
 from src.ui.dtl.utils import (
     create_save_btn,
     get_set_settings_button_style,

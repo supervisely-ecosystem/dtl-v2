@@ -3,34 +3,43 @@ from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
 
-from src.ui.dtl import NeuralNetworkAction
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     get_layer_docs,
 )
 
-from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.model_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.layout.model_selector import (
     create_model_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.agent_selector import (
+from src.ui.dtl.actions.neural_networks.deploy.layout.agent_selector import (
     create_agent_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.model_serve import (
+from src.ui.dtl.actions.neural_networks.deploy.layout.model_serve import (
     create_model_serve_widgets,
 )
-from src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.node_layout import (
+from src.ui.dtl.actions.neural_networks.deploy.layout.node_layout import (
     create_node_layout,
 )
-import src.ui.dtl.actions.neural_networks.deploy.mmdetection.layout.utils as utils
+import src.ui.dtl.actions.neural_networks.deploy.layout.utils as utils
 import src.globals as g
+from src.ui.dtl.Action import DeployNNAction
+
+from supervisely.nn.checkpoints import yolov8 as custom_yolov8
+from supervisely.nn.checkpoints import mmdetection3 as custom_mmdetection3
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    yolov8 as pretrained_yolov8,
+)
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    mmdetection3 as pretrained_mmdetection3,
+)
 
 
-class DeployMMDetectionAction(NeuralNetworkAction):
-    name = "deploy_mmdetection"
-    title = "Deploy MMDetection"
+class DeployBaseAction(DeployNNAction):
+    name = "deploy_base"
+    title = "Deploy Base"
     docs_url = ""
-    description = "Deploy MMDetection models."
-    md_description = get_layer_docs(dirname(realpath(__file__)))
+    description = "Base layer for deployment of neural networks"
+    model_params = {}
 
     @classmethod
     def create_inputs(self):
@@ -45,8 +54,8 @@ class DeployMMDetectionAction(NeuralNetworkAction):
             init_widgets=cls.init_widgets,
         )
 
-    @staticmethod
-    def init_widgets(layer: Layer):
+    @classmethod
+    def init_widgets(cls, layer: Layer):
         saved_settings = {}
         session: Session = None
 
@@ -127,7 +136,9 @@ class DeployMMDetectionAction(NeuralNetworkAction):
             model_selector_layout_edit_btn,
             model_selector_layout_container,
             model_selector_stop_model_after_pipeline_checkbox,
-        ) = create_model_selector_widgets()
+        ) = create_model_selector_widgets(
+            cls.framework_name, cls.pretrained_models, cls.custom_models
+        )
 
         # MODEL SELECTOR CBs
         @model_selector_sidebar_save_btn.click
@@ -197,7 +208,9 @@ class DeployMMDetectionAction(NeuralNetworkAction):
                 model_selector_stop_model_after_pipeline_checkbox.enable()
                 return
 
-            session = utils.start_app(g.api, g.WORKSPACE_ID, saved_settings)
+            session = utils.start_app(
+                g.api, g.WORKSPACE_ID, saved_settings, cls.framework_name, cls.slug
+            )
             utils.set_model_serve_preview("Waiting for the app to start...", model_serve_preview)
             g.api.app.wait_until_ready_for_api_calls(session.task_id, 10, 10)
             try:
@@ -258,7 +271,7 @@ class DeployMMDetectionAction(NeuralNetworkAction):
             data = {}
             if session is not None:
                 data["session_id"] = session.task_id
-            data["deploy_layer_name"] = "Deploy MMDetection"
+            data["deploy_layer_name"] = layer.action.title
             data["deploy_layer_terminate"] = (
                 model_selector_stop_model_after_pipeline_checkbox.is_checked()
             )
@@ -308,3 +321,33 @@ class DeployMMDetectionAction(NeuralNetworkAction):
         layer._get_settings = get_settings
         layer._get_data = get_data
         layer.postprocess_cb = postprocess_cb
+
+
+class DeployYOLOV8Action(DeployBaseAction):
+    name = "deploy_yolo_v8"
+    title = "Deploy YOLOv8"
+    docs_url = ""
+    description = "Deploy YOLOv8 models."
+    md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
+
+    # Framework settings
+    framework = "yolov8"
+    framework_name = "YOLOv8"
+    slug = "supervisely-ecosystem/yolov8/serve"
+    custom_models = custom_yolov8.get_list(g.api, g.TEAM_ID)
+    pretrained_models = pretrained_yolov8
+
+
+class DeployMMDetectionAction(DeployBaseAction):
+    name = "deploy_mmdetection"
+    title = "Deploy MMDetection"
+    docs_url = ""
+    description = "Deploy MMDetection models."
+    md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/mmdetection.md")
+
+    # Framework settings
+    framework = "mmdetection3"
+    framework_name = "MMDetection"
+    slug = "supervisely-ecosystem/serve-mmdetection-v3"
+    custom_models = custom_mmdetection3.get_list(g.api, g.TEAM_ID)
+    pretrained_models = pretrained_mmdetection3

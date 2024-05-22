@@ -8,17 +8,7 @@ from supervisely.app.widgets import (
 )
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl import ImgAugAugmentationsAction
-from os.path import join, exists, realpath, dirname
-
-
-def get_layer_doc_by_name(doc_name: str) -> str:
-    layer_dir = dirname(realpath(__file__))
-    md_description = ""
-    p = join(layer_dir, doc_name)
-    if exists(p):
-        with open(p) as f:
-            md_description = f.read()
-    return md_description
+from os.path import realpath, dirname
 
 
 class ImgAugCorruptLikeAction(ImgAugAugmentationsAction):

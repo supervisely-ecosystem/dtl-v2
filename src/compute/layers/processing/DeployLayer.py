@@ -25,9 +25,9 @@ def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec:
             logger.warning("Model is not served yet. Waiting for model to be served")
 
 
-def check_model_is_deployed(session_id: int):
+def check_model_is_deployed(session_id: int, action_name):
     error_message = (
-        "Selected model is not served in 'Deploy YOLOv8' node. "
+        f"Selected model is not served in '{action_name}' node. "
         "Make sure model is served by visiting app session page: "
         f"<a href='{g.api.server_address}{g.api.app.get_url(session_id)}' target='_blank'>open app</a> "
         "<br>Press the 'SERVE' button if the model is not served and try again. "
@@ -45,8 +45,10 @@ def check_model_is_deployed(session_id: int):
         raise RuntimeError(error_message)
 
 
-class DeployYOLOv8Layer(Layer):
-    action = "deploy_yolo_v8"
+class DeployLayer(Layer):
+    action = "deploy"
+    title = "Deploy"
+
     layer_settings = {
         "required": ["settings"],
         "properties": {
@@ -87,21 +89,21 @@ class DeployYOLOv8Layer(Layer):
             return
 
         if settings.get("agent_id", None) is None:
-            raise BadSettingsError("Select agent in 'Deploy YOLOv8' node'")
+            raise BadSettingsError(f"Select agent in '{self.title}' node'")
         if settings.get("device", None) is None:
-            raise BadSettingsError("Select device in 'Deploy YOLOv8' node")
+            raise BadSettingsError(f"Select device in '{self.title}' node")
         if settings.get("model_source", None) is None:
-            raise BadSettingsError("Select model in 'Deploy YOLOv8' node")
+            raise BadSettingsError(f"Select model in '{self.title}' node")
         if not self.net.preview_mode:
             if settings.get("session_id", None) is None:
                 raise BadSettingsError(
                     (
-                        "Selected model session is not found. Make sure you have deployed model in 'Deploy YOLOv8' node. "
+                        f"Selected model session is not found. Make sure you have deployed model in '{self.title}' node. "
                         "If you still have problems, try to check model logs for more info or contact support."
-                        "You can also close 'Deploy YOLOv8' node to proceed further with the workflow."
+                        f"You can also close '{self.title}' node to proceed further with the workflow."
                     )
                 )
-            check_model_is_deployed(settings["session_id"])
+            check_model_is_deployed(settings["session_id"], self.title)
             return super().validate()
 
     def postprocess(self):
@@ -117,3 +119,46 @@ class DeployYOLOv8Layer(Layer):
 
     def has_batch_processing(self) -> bool:
         return True
+
+
+class DeployYOLOv8Layer(DeployLayer):
+    action = "deploy_yolo_v8"
+    title = "Deploy YOLOv8"
+
+
+class DeployMMDetectionLayer(DeployLayer):
+    action = "deploy_mmdetection"
+    title = "Deploy MMDetection"
+
+    layer_settings = {
+        "required": ["settings"],
+        "properties": {
+            "settings": {
+                "type": "object",
+                "required": [
+                    "session_id",
+                    "agent_id",
+                    "device",
+                    "model_source",
+                    "checkpoint_name",
+                    "task_type",
+                    "checkpoint_url",
+                    "arch_type",
+                    "config_url",
+                    "stop_model_session",
+                ],
+                "properties": {
+                    "session_id": {"type": "integer"},
+                    "agent_id": {"type": "integer"},
+                    "device": {"type": "string"},
+                    "model_source": {"type": "string"},
+                    "task_type": {"type": "string"},
+                    "checkpoint_name": {"type": "string"},
+                    "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "arch_type": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "config_url": {"type": "string"},
+                    "stop_model_session": {"type": "boolean"},
+                },
+            },
+        },
+    }
