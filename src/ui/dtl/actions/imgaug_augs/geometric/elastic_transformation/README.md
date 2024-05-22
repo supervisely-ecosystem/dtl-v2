@@ -1,6 +1,8 @@
-# iaa.Geometric Elastic Transformation
+# iaa.geometric.ElasticTransformation
 
-`Elastic Transformation` layer transforms images by moving pixels locally around using displacement fields.
+`ElasticTransformation` layer transforms images by moving pixels locally around using displacement fields.
+
+[Read more about ElasticTransformation in ImgAug's documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ElasticTransformation)
 
 ### Annotation augmentation
 
@@ -26,7 +28,7 @@ In this example, the image is transformed with alpha (0, 70), sigma (4, 6).
 </tr>
 <tr>
 <td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/a44c195b-1e81-4bab-9435-0271bd3c6741" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/ee0c3838-3392-4d21-8dd4-8e373e746510" alt="Elastic Transform" /> </td>
+<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/ee0c3838-3392-4d21-8dd4-8e373e746510" alt="Elastic Transformation" /> </td>
 </tr>
 </table>
 

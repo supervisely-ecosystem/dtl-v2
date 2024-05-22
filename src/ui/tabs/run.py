@@ -6,6 +6,7 @@ from src.compute.utils.stat_timer import global_timer
 from supervisely.app.widgets import (
     Button,
     Container,
+    Dialog,
     Progress,
     Text,
     ReloadableArea,
@@ -253,9 +254,10 @@ def _run():
         global_timer.dump()
 
 
-def run_pipeline(run_dialog=None):
+def run_pipeline(run_dialog: Dialog = None):
     g.pipeline_running = True
-    run_dialog.show()
+    if run_dialog is not None:
+        run_dialog.show()
     show_run_dialog_btn.hide()
     show_run_dialog_btn_running.show()
     try:
@@ -267,7 +269,7 @@ def run_pipeline(run_dialog=None):
         g.pipeline_thread = None
 
 
-def start_pipeline(run_dialog=None):
+def start_pipeline(run_dialog: Dialog = None):
     if g.pipeline_thread is not None:
         raise RuntimeError("Pipeline is already running")
     g.pipeline_thread = threading.Thread(target=run_pipeline, args=(run_dialog,), daemon=True)

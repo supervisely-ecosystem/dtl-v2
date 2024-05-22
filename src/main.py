@@ -11,7 +11,8 @@ from src.ui.dtl.actions.input.images_project.images_project import ImagesProject
 from src.ui.dtl.actions.input.videos_project.videos_project import VideosProjectAction
 from src.ui.dtl.actions.input.filtered_project.filtered_project import FilteredProjectAction
 
-from src.templates import templates, load_template
+from src.preconfigured.templates import templates
+from src.preconfigured.utils import load_template
 
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.utils import LegacyProjectItem

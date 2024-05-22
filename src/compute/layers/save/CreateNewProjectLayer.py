@@ -27,7 +27,18 @@ class CreateNewProjectLayer(Layer):
     action = "create_new_project"
     legacy_action = "supervisely"
 
-    layer_settings = {"required": ["settings"], "properties": {"settings": {}}}
+    layer_settings = {
+        "required": ["settings"],
+        "properties": {
+            "settings": {
+                "type": "object",
+                "required": ["project_name"],
+                "properties": {
+                    "project_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                },
+            },
+        },
+    }
 
     def __init__(self, config, output_folder, net):
         Layer.__init__(self, config, net=net)

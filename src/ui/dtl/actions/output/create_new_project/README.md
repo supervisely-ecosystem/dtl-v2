@@ -14,7 +14,7 @@
   "action": "supervisely",
   "src": ["$images_project_1"],
   "dst": "result project",
-  "settings": {}
+  "settings": {"project_name": ""}
 }
 ```
 

@@ -41,9 +41,10 @@ class OutputProjectLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["is_existing_project", "dataset_option"],
+                "required": ["is_existing_project", "dataset_option", "project_name"],
                 "properties": {
                     "is_existing_project": {"type": "boolean"},
+                    "project_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "dataset_option": {
                         "type": "string",
                         "enum": ["new", "existing", "keep"],

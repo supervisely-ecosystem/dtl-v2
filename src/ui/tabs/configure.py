@@ -170,7 +170,7 @@ left_sidebar_groups_widgets = {
 }
 
 modality_type_text = Text(
-    f"The list of Data Nodes (operations) below is for <b>{g.MODALITY_TYPE}</b> modality. "
+    f"The list of ML Pipelines (operations) below is for <b>{g.MODALITY_TYPE}</b> modality. "
     "Run the app with different option to change the data type.",
     status="text",
     font_size=12,
@@ -185,7 +185,7 @@ left_sidebar_widgets = [
 sidebar = Sidebar(
     left_content=Container(widgets=left_sidebar_widgets, style="padding-top: 10px;", gap=15),
     right_content=nodes_flow_card,
-    width_percent=22.05,
+    width_percent=26.1,
     standalone=True,
     height="calc(100vh - 57px)",
     clear_main_panel_paddings=True,
@@ -284,7 +284,7 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             if autoconnect:
                 maybe_add_edges(layer)
         g.stop_updates = False
-        g.updater(("nodes", layer.id))
+        # g.updater(("nodes", layer.id))
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
         raise

@@ -2,6 +2,8 @@
 
 This layer contains set of ImgAug's image augmentations related to color. Annotations are not being augmented.
 
+[Learn more about ImgAug's Corruptlike augmenters in their documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_imgcorruptlike.html)
+
 ### Settings:
 
 - **Augmentation option** - Select desired color augmentation. Can be set to `Contrast`, `Brightness`, and `Saturate`
