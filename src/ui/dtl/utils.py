@@ -1,5 +1,6 @@
 from typing import List, Literal, Union
-from os.path import join, exists
+from os.path import join, exists, realpath, dirname
+
 
 from supervisely import ObjClass, ObjClassCollection, TagMeta, TagMetaCollection
 from supervisely.app.widgets import (
@@ -665,6 +666,16 @@ def get_layer_docs(layer_dir: str) -> str:
             with open(p) as f:
                 md_description = f.read()
             break
+    return md_description
+
+
+def get_layer_doc_by_name(doc_name: str) -> str:
+    layer_dir = dirname(realpath(__file__))
+    md_description = ""
+    p = join(layer_dir, doc_name)
+    if exists(p):
+        with open(p) as f:
+            md_description = f.read()
     return md_description
 
 

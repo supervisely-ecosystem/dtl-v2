@@ -77,8 +77,11 @@ from .actions.output.copy_annotations.copy_annotations import (
 )
 
 # Neural networks
-from .actions.neural_networks.deploy_yolov8.deploy_yolov8 import DeployYOLOV8Action
-from .actions.neural_networks.deploy_mmdetection.deploy_mmdetection import DeployMMDetectionAction
+from .actions.neural_networks.deploy.deploy import (
+    DeployYOLOV5Action,
+    DeployYOLOV8Action,
+    DeployMMDetectionAction,
+)
 from .actions.neural_networks.apply_nn_inference.apply_nn_inference import ApplyNNInferenceAction
 
 # Video
@@ -208,6 +211,7 @@ image_actions_list = {
         IfAction.name,
     ],
     NEURAL_NETWORKS: [
+        DeployYOLOV5Action.name,
         DeployYOLOV8Action.name,
         DeployMMDetectionAction.name,
         ApplyNNInferenceAction.name,
@@ -280,6 +284,7 @@ image_actions_dict = {
     FilterImageWithoutObjects.name: FilterImageWithoutObjects,
     IfAction.name: IfAction,
     # Neural Networks
+    DeployYOLOV5Action.name: DeployYOLOV5Action,
     DeployYOLOV8Action.name: DeployYOLOV8Action,
     DeployMMDetectionAction.name: DeployMMDetectionAction,
     ApplyNNInferenceAction.name: ApplyNNInferenceAction,
