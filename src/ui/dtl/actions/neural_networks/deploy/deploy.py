@@ -4,9 +4,6 @@ from supervisely import logger
 from supervisely.nn.inference.session import Session
 
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import (
-    get_layer_docs,
-)
 
 from src.ui.dtl.actions.neural_networks.deploy.layout.model_selector import (
     create_model_selector_widgets,
@@ -27,6 +24,7 @@ from src.ui.dtl.Action import DeployNNAction
 from supervisely.nn.checkpoints import yolov5_v2 as custom_yolov5
 from supervisely.nn.checkpoints import yolov8 as custom_yolov8
 from supervisely.nn.checkpoints import mmdetection3 as custom_mmdetection3
+from supervisely.nn.checkpoints import mmsegmentation as custom_mmsegmentation
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     yolov5 as pretrained_yolov5,
 )
@@ -35,6 +33,9 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
 )
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     mmdetection3 as pretrained_mmdetection3,
+)
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    mmsegmentation as pretrained_mmsegmentation,
 )
 
 
@@ -370,3 +371,20 @@ class DeployMMDetectionAction(DeployBaseAction):
     slug = "supervisely-ecosystem/serve-mmdetection-v3"
     custom_models = custom_mmdetection3.get_list(g.api, g.TEAM_ID)
     pretrained_models = pretrained_mmdetection3
+
+
+class DeployMMSegmentationAction(DeployBaseAction):
+    name = "deploy_mmsegmentation"
+    title = "Deploy MMSegmentation"
+    docs_url = ""
+    description = "Deploy MMSegmentation models."
+    md_description = DeployBaseAction.read_md_file(
+        dirname(realpath(__file__)) + "/mmsegmentation.md"
+    )
+
+    # Framework settings
+    framework = "mmsegmentation"
+    framework_name = "MMSegmentation"
+    slug = "supervisely-ecosystem/mmsegmentation/serve"
+    custom_models = custom_mmsegmentation.get_list(g.api, g.TEAM_ID)
+    pretrained_models = pretrained_mmsegmentation

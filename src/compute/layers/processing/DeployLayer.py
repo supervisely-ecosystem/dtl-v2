@@ -167,3 +167,8 @@ class DeployMMDetectionLayer(DeployLayer):
             },
         },
     }
+
+
+class DeployMMSegmentationLayer(DeployMMDetectionLayer):
+    action = "deploy_segmentation"
+    title = "Deploy MMSegmentation"
