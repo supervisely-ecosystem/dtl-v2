@@ -42,7 +42,6 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
 class DeployBaseAction(DeployNNAction):
     name = "deploy_base"
     title = "Deploy Base"
-    docs_url = ""
     description = "Base layer for deployment of neural networks"
     model_params = {}
 
@@ -142,7 +141,7 @@ class DeployBaseAction(DeployNNAction):
             model_selector_layout_container,
             model_selector_stop_model_after_pipeline_checkbox,
         ) = create_model_selector_widgets(
-            cls.framework_name, cls.pretrained_models, cls.custom_models
+            cls.framework_name, cls.pretrained_models, cls.custom_models, cls.custom_task_types
         )
 
         # MODEL SELECTOR CBs
@@ -331,7 +330,6 @@ class DeployBaseAction(DeployNNAction):
 class DeployYOLOV5Action(DeployBaseAction):
     name = "deploy_yolo_v5"
     title = "Deploy YOLOv5"
-    docs_url = ""
     description = "Deploy YOLOv5 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov5.md")
 
@@ -340,13 +338,13 @@ class DeployYOLOV5Action(DeployBaseAction):
     framework_name = "YOLOv5"
     slug = "supervisely-ecosystem/yolov5_2.0/serve"
     custom_models = custom_yolov5.get_list(g.api, g.TEAM_ID)
+    custom_task_types = ["object detection"]
     pretrained_models = pretrained_yolov5
 
 
 class DeployYOLOV8Action(DeployBaseAction):
     name = "deploy_yolo_v8"
     title = "Deploy YOLOv8"
-    docs_url = ""
     description = "Deploy YOLOv8 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
 
@@ -355,13 +353,13 @@ class DeployYOLOV8Action(DeployBaseAction):
     framework_name = "YOLOv8"
     slug = "supervisely-ecosystem/yolov8/serve"
     custom_models = custom_yolov8.get_list(g.api, g.TEAM_ID)
+    custom_task_types = ["object detection", "instance segmentation", "pose estimation"]
     pretrained_models = pretrained_yolov8
 
 
 class DeployMMDetectionAction(DeployBaseAction):
     name = "deploy_mmdetection"
     title = "Deploy MMDetection"
-    docs_url = ""
     description = "Deploy MMDetection models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/mmdetection.md")
 
@@ -370,13 +368,13 @@ class DeployMMDetectionAction(DeployBaseAction):
     framework_name = "MMDetection"
     slug = "supervisely-ecosystem/serve-mmdetection-v3"
     custom_models = custom_mmdetection3.get_list(g.api, g.TEAM_ID)
+    custom_task_types = ["object detection", "instance segmentation"]
     pretrained_models = pretrained_mmdetection3
 
 
 class DeployMMSegmentationAction(DeployBaseAction):
     name = "deploy_mmsegmentation"
     title = "Deploy MMSegmentation"
-    docs_url = ""
     description = "Deploy MMSegmentation models."
     md_description = DeployBaseAction.read_md_file(
         dirname(realpath(__file__)) + "/mmsegmentation.md"
@@ -387,4 +385,5 @@ class DeployMMSegmentationAction(DeployBaseAction):
     framework_name = "MMSegmentation"
     slug = "supervisely-ecosystem/mmsegmentation/serve"
     custom_models = custom_mmsegmentation.get_list(g.api, g.TEAM_ID)
+    custom_task_types = ["semantic segmentation"]
     pretrained_models = pretrained_mmsegmentation
