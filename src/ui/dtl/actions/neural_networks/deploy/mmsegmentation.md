@@ -22,7 +22,6 @@
     - `Device` - select CPU or GPU (faster) device if available
 - **Select model** - select custom or pretrained model
     - `Model type` - custom or pretrained
-    - `Task type` - select task type from "object detection", "instance segmentation" or "pose estimation"
     - `Checkpoint` - select checkpoint
 - **Auto stop model session** - automatically stop model session when pipeline is finished
 
@@ -32,9 +31,9 @@
   <summary>JSON view</summary>
 <pre>
   {
-    "action": "deploy_mmdetection",
+    "action": "deploy_segmentation",
     "src": [],
-    "dst": "$deploy_mmdetection_2",
+    "dst": "$deploy_segmentation",
     "settings": {
       "agent_id": 359,
       "device": "cuda:0",
