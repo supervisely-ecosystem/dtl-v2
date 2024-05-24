@@ -20,16 +20,18 @@ from src.ui.dtl.utils import (
 
 
 def create_model_selector_widgets(
-    framework_name: str, pretrained_models: list, custom_models: list
+    framework_name: str, pretrained_models: list, custom_models: list, custom_task_types: list = []
 ):
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
+    need_custom_task_types = len(custom_task_types) > 0
+
     model_selector_sidebar_custom_model_table = CustomModelsSelector(
         g.TEAM_ID,
         custom_models,
-        True,
-        ["object_detection", "instance segmentation", "pose estimation"],
+        need_custom_task_types,
+        custom_task_types,
     )
 
     custom_models_task_types = model_selector_sidebar_custom_model_table.get_available_task_types()

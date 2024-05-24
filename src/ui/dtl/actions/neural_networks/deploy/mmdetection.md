@@ -24,7 +24,7 @@
     - `Device` - select CPU or GPU (faster) device if available
 - **Select model** - select custom or pretrained model
     - `Model type` - custom or pretrained
-    - `Task type` - select task type from "object detection", "instance segmentation" or "pose estimation"
+    - `Task type` - select task type from "object detection" or "instance segmentation"
     - `Checkpoint` - select checkpoint
 - **Auto stop model session** - automatically stop model session when pipeline is finished
 
