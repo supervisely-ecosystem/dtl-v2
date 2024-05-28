@@ -101,9 +101,9 @@ def save_json_button_cb():
     nodes_json = nodes_flow.get_nodes_json()
 
     # save node order position
-    nodes_meta = []
+    scene_location = []
     for idx, node_json in enumerate(nodes_json):
-        nodes_meta.append({"order_idx": idx, "position": node_json["position"]})
+        scene_location.append({"order_idx": idx, "position": node_json["position"]})
 
     # Init layers data
     layers_ids = ui_utils.init_layers(nodes_state)
@@ -114,7 +114,7 @@ def save_json_button_cb():
     dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
     # @TODO: make more safe position save by checking id and names
     for idx, layer_json in enumerate(dtl_json):
-        layer_json["scene_location"] = nodes_meta[idx]
+        layer_json["scene_location"] = scene_location[idx]
 
     preset_name = preset_name_input.get_value()
     if preset_name == "":
@@ -323,6 +323,7 @@ def apply_json(dtl_json):
         # create nodes
         for idx, layer_id in enumerate(ids):
             layer = g.layers[layer_id]
+            layer_json = layer.to_json()
             node = layer.create_node()
 
             # set position

@@ -156,11 +156,21 @@ def init_nodes_state(
 
         def get_dest_layers_idxs(the_layer_idx):
             the_layer = net.layers[the_layer_idx]
-            return [
-                idx
-                for idx, dest_layer in enumerate(net.layers)
-                if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0
-            ]
+            indexes = []
+            for idx, dest_layer in enumerate(net.layers):
+                if isinstance(the_layer.dsts, list) and isinstance(dest_layer.srcs, list):
+                    if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0:
+                        indexes.append(idx)
+                else:
+                    if len(the_layer.dsts & dest_layer.srcs) > 0:
+                        indexes.append(idx)
+            return indexes
+
+            # return [
+            # idx
+            # for idx, dest_layer in enumerate(net.layers)
+            # if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0
+            # ]
 
         def layer_input_metas_are_calculated(the_layer_idx):
             the_layer = net.layers[the_layer_idx]
