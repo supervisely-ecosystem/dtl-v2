@@ -40,6 +40,9 @@ class AnonymizeLayer(Layer):
     def modifies_data(self):
         return True
 
+    def requires_item(self):
+        return True
+
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         img = img_desc.read_image()
