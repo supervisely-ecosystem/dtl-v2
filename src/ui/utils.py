@@ -49,7 +49,15 @@ def find_children(parent: Layer, all_layers_ids: list):
     parent_dst = parent.get_dst()
     for layer_id in all_layers_ids:
         layer = g.layers.get(layer_id)
-        for l_src in layer.get_src():
+
+        layer_sources = []
+        if isinstance(layer.get_src(), dict):
+            for k in layer.get_src():
+                layer_sources.extend(layer.get_src()[k])
+        else:
+            layer_sources.extend(layer.get_src())
+
+        for l_src in layer_sources:
             if l_src in parent_dst:
                 children.append(layer_id)
     return children
@@ -298,7 +306,15 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
         return chain
     if issubclass(layer.action, SourceAction):
         return chain
-    src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
+
+    layer_sources = layer.get_src()
+    if isinstance(layer_sources, dict):
+        src_layes = []
+        for k in layer_sources:
+            src_layers = [find_layer_id_by_dst(src) for src in layer_sources[k]]
+            src_layes.extend(src_layers)
+    else:
+        src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
         if src_layer is None:
             continue

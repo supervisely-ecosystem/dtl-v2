@@ -515,7 +515,12 @@ def update_nodes_cb():
             continue
 
         src_names = layer_sources[layer_id]
-        if set(src_names) != set(layer._src):
+
+        layer_src = []
+        for k in layer._src:
+            layer_src.extend(layer._src[k])
+
+        if set(src_names) != set(layer_src):
             layers_to_update.append(layer.id)
     for layer_id in layers_to_update:
         g.updater(("nodes", layer_id))

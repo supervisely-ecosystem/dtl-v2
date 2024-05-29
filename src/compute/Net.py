@@ -196,7 +196,14 @@ class Net:
         result = []
         for dst in dsts:
             for i, layer_ in enumerate(self.layers):
-                if dst in layer_.srcs:
+                layer_sources = []
+                for src in layer_.srcs:
+                    if isinstance(src, dict):
+                        for k in src:
+                            layer_sources.extend(src[k])
+                    else:
+                        layer_sources.append(src)
+                if dst in layer_sources:
                     if layers_idx_whitelist is None or i in layers_idx_whitelist:
                         result.append(i)
         return result
