@@ -461,16 +461,15 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
         data_el, layer_idx=layer_idx, layers_idx_whitelist=layers_idx_whitelist
     )
 
-    if len(processing_generator) == 0:
-        net.preview_mode = False
-        return
-
     updated = set()
     is_starting_layer = True
     prev_img_desc = None
     prev_ann = None
     try:
-        for data_el, layer_indx in processing_generator:
+        for element in processing_generator:
+            if len(element) == 0:
+                continue
+            data_el, layer_indx = element
             if layer_indx in updated:
                 continue
             layer = g.layers[all_layers_ids[layer_indx]]

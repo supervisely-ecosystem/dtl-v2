@@ -259,12 +259,12 @@ class Net:
                             "Can not find data layer for the image: {}".format(data_batch[0][0])
                         )
 
-        for start_layer_indx in start_layer_indxs:
-            output_generator = self.process_iterate(
-                start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
-            )
-            for output in output_generator:
-                yield output
+                for start_layer_indx in start_layer_indxs:
+                    output_generator = self.process_iterate(
+                        start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
+                    )
+                    for output in output_generator:
+                        yield output
 
     def push(self, indx, data_batch, branch, layers_idx_whitelist=None):
         next_layer_indxs = self.get_next_layer_indxs(
