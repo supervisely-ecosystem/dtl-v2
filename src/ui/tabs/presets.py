@@ -312,12 +312,21 @@ def apply_json(dtl_json):
             if layer_id in data_layers_ids:
                 continue
             layer = g.layers[layer_id]
-            layer_input_meta = utils.merge_input_metas(
-                [
-                    g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta
-                    for src in layer.get_src()
-                ]
-            )
+
+            output_metas_to_merge = []
+
+            layer_sources = layer.get_src()
+            if isinstance(layer_sources, dict):
+                for k in layer_sources:
+                    for src in layer_sources[k]:
+                        src_layer = g.layers[ui_utils.find_layer_id_by_dst(src)]
+                        output_metas_to_merge.append(src_layer.output_meta)
+            else:
+                for src in layer_sources:
+                    src_layer = g.layers[ui_utils.find_layer_id_by_dst(src)]
+                    output_metas_to_merge.append(src_layer.output_meta)
+
+            layer_input_meta = utils.merge_input_metas(output_metas_to_merge)
             layer.update_project_meta(layer_input_meta)
 
         # create nodes
@@ -341,27 +350,58 @@ def apply_json(dtl_json):
         for dst_layer_id in ids:
             dst_layer = g.layers[dst_layer_id]
             dst_layer: Layer
-            for src in dst_layer.get_src():
-                for src_layer_id in ids:
-                    src_layer = g.layers[src_layer_id]
-                    for dst_idx, dst in enumerate(src_layer.get_dst()):
-                        if dst == src:
-                            try:
-                                nodes_flow_edges.append(
-                                    {
-                                        "id": random.randint(10000000000000, 99999999999999),
-                                        "output": {
-                                            "node": src_layer_id,
-                                            "interface": src_layer.get_destination_name(dst_idx),
-                                        },
-                                        "input": {
-                                            "node": dst_layer_id,
-                                            "interface": "source",
-                                        },
-                                    }
-                                )
-                            except:
-                                pass
+            dst_layer_sources = dst_layer.get_src()
+            if isinstance(dst_layer_sources, dict):
+                for k in dst_layer_sources:
+                    for src in dst_layer_sources[k]:
+                        for src_layer_id in ids:
+                            src_layer = g.layers[src_layer_id]
+                            for dst_idx, dst in enumerate(src_layer.get_dst()):
+                                if dst == src:
+                                    try:
+                                        nodes_flow_edges.append(
+                                            {
+                                                "id": random.randint(
+                                                    10000000000000, 99999999999999
+                                                ),
+                                                "output": {
+                                                    "node": src_layer_id,
+                                                    "interface": src_layer.get_destination_name(
+                                                        dst_idx
+                                                    ),
+                                                },
+                                                "input": {
+                                                    "node": dst_layer_id,
+                                                    "interface": k,
+                                                },
+                                            }
+                                        )
+                                    except:
+                                        pass
+            else:
+                for src in dst_layer_sources:
+                    for src_layer_id in ids:
+                        src_layer = g.layers[src_layer_id]
+                        for dst_idx, dst in enumerate(src_layer.get_dst()):
+                            if dst == src:
+                                try:
+                                    nodes_flow_edges.append(
+                                        {
+                                            "id": random.randint(10000000000000, 99999999999999),
+                                            "output": {
+                                                "node": src_layer_id,
+                                                "interface": src_layer.get_destination_name(
+                                                    dst_idx
+                                                ),
+                                            },
+                                            "input": {
+                                                "node": dst_layer_id,
+                                                "interface": "source",
+                                            },
+                                        }
+                                    )
+                                except:
+                                    pass
         nodes_flow.set_edges(nodes_flow_edges)
         g.stop_updates = False
         g.updater(("nodes", None))

@@ -155,14 +155,26 @@ def init_nodes_state(
                 metas_dict[src] = input_meta
 
         def get_dest_layers_idxs(the_layer_idx):
+            def extract_values(lst: list):
+                values = []
+                if len(lst) > 0:
+                    for item in lst:
+                        if isinstance(item, dict):
+                            for d in lst:
+                                for k in d:
+                                    for v in d[k]:
+                                        values.append(v)
+                        else:
+                            values.append(item)
+                return set(values)
+
             the_layer = net.layers[the_layer_idx]
             indexes = []
             for idx, dest_layer in enumerate(net.layers):
                 if isinstance(the_layer.dsts, list) and isinstance(dest_layer.srcs, list):
-                    if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0:
-                        indexes.append(idx)
-                else:
-                    if len(the_layer.dsts & dest_layer.srcs) > 0:
+                    the_layer_dsts_set = extract_values(the_layer.dsts)
+                    dest_layer_srcs_set = extract_values(dest_layer.srcs)
+                    if the_layer_dsts_set & dest_layer_srcs_set:
                         indexes.append(idx)
             return indexes
 
@@ -174,7 +186,20 @@ def init_nodes_state(
 
         def layer_input_metas_are_calculated(the_layer_idx):
             the_layer = net.layers[the_layer_idx]
-            return all((x in metas_dict for x in the_layer.srcs))
+            for x in the_layer.srcs:
+                if isinstance(x, list) or isinstance(x, str):
+                    if x not in metas_dict:
+                        return False
+                elif isinstance(x, dict):
+                    for k, v in x.items():
+                        for i in v:
+                            if i not in metas_dict:
+                                return False
+                else:
+                    if x not in metas_dict:
+                        return False
+            return True
+            # return all((x in metas_dict for x in the_layer.srcs))
 
         datas_dict = {}
         processed_layers = set()
@@ -185,7 +210,16 @@ def init_nodes_state(
                 cur_layer = net.layers[cur_layer_idx]
                 processed_layers.add(cur_layer_idx)
                 # TODO no need for dict here?
-                cur_layer_input_metas = {src: metas_dict[src] for src in cur_layer.srcs}
+                # cur_layer_input_metas = {src: metas_dict[src] for src in cur_layer.srcs}
+
+                cur_layer_input_metas = {}
+                for src in cur_layer.srcs:
+                    if isinstance(src, list) or isinstance(src, str):
+                        cur_layer_input_metas[src] = metas_dict[src]
+                    elif isinstance(src, dict):
+                        for k in src:
+                            for v in src[k]:
+                                cur_layer_input_metas[v] = metas_dict[v]
 
                 # update ui layer meta and data
                 merged_meta = utils.merge_input_metas(cur_layer_input_metas.values())
@@ -426,6 +460,11 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
     processing_generator = net.start_iterate(
         data_el, layer_idx=layer_idx, layers_idx_whitelist=layers_idx_whitelist
     )
+
+    if len(processing_generator) == 0:
+        net.preview_mode = False
+        return
+
     updated = set()
     is_starting_layer = True
     prev_img_desc = None

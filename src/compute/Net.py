@@ -231,26 +231,33 @@ class Net:
                     yield output
 
     def start_iterate(self, data_batch, layer_idx: int = None, layers_idx_whitelist: list = None):
-        img_pr_name = data_batch[0][0].get_pr_name()
-        img_ds_name = data_batch[0][0].get_ds_name()
-
-        if layer_idx is not None:
-            start_layer_indxs = [layer_idx]
+        if len(data_batch) == 0:
+            logger.debug("Empty data batch.")
+            yield []
         else:
-            start_layer_indxs = set()
-            for idx, layer in enumerate(self.layers):
-                if layers_idx_whitelist is not None and idx not in layers_idx_whitelist:
-                    continue
-                if layer.type != "data":
-                    continue
-                if layer.project_name == img_pr_name and (
-                    "*" in layer.dataset_names or img_ds_name in layer.dataset_names
-                ):
-                    start_layer_indxs.add(idx)
-            if len(start_layer_indxs) == 0:
-                raise RuntimeError(
-                    "Can not find data layer for the image: {}".format(data_batch[0][0])
-                )
+            if data_batch[0][0] is None:
+                logger.debug("Empty data batch.")
+                yield []
+            else:
+                img_pr_name = data_batch[0][0].get_pr_name()
+                img_ds_name = data_batch[0][0].get_ds_name()
+                if layer_idx is not None:
+                    start_layer_indxs = [layer_idx]
+                else:
+                    start_layer_indxs = set()
+                    for idx, layer in enumerate(self.layers):
+                        if layers_idx_whitelist is not None and idx not in layers_idx_whitelist:
+                            continue
+                        if layer.type != "data":
+                            continue
+                        if layer.project_name == img_pr_name and (
+                            "*" in layer.dataset_names or img_ds_name in layer.dataset_names
+                        ):
+                            start_layer_indxs.add(idx)
+                    if len(start_layer_indxs) == 0:
+                        raise RuntimeError(
+                            "Can not find data layer for the image: {}".format(data_batch[0][0])
+                        )
 
         for start_layer_indx in start_layer_indxs:
             output_generator = self.process_iterate(
@@ -614,21 +621,8 @@ class Net:
             for src in data_layer.srcs:
                 datalevel_metas[src] = input_meta
 
-        # def get_dest_layers(the_layer):
-        #     dest_layers = []
-        #     for dest_layer in self.layers:
-        #         if isinstance(the_layer.dsts, list) and isinstance(dest_layer.srcs, list):
-        #             # if len(set(the_layer.dsts) & dest_layer.srcs) > 0:  # set(dest_layer.srcs)
-        #             if len(the_layer.dsts) > 0 and len(dest_layer.srcs) > 0:
-        #                 dest_layers.append(dest_layer)
-        #         else:
-        #             # if len(the_layer.dsts & dest_layer.srcs) > 0:
-        #             if len(the_layer.dsts) > 0 and len(dest_layer.srcs) > 0:
-        #                 dest_layers.append(dest_layer)
-        #     return dest_layers
-
         def get_dest_layers(the_layer):
-            def extract_values(lst):
+            def extract_values(lst: list):
                 values = []
                 if len(lst) > 0:
                     for item in lst:
