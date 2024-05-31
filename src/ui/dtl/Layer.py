@@ -267,9 +267,14 @@ class Layer:
     def update_sources(self, connections: List[tuple]):
         new_sources = []
         src_names = []
+
+        from collections import defaultdict
+
+        new_sourcesv2 = defaultdict(list)
         for from_node_id, from_node_interface, to_node_interface in connections:
             src_name = self._connection_name(from_node_id, from_node_interface)
             src_names.append((src_name, to_node_interface))
+            new_sourcesv2[to_node_interface].append(src_name)
 
         need_append = [True] * len(src_names)
         if self.update_sources_cb is not None:
@@ -281,7 +286,7 @@ class Layer:
                 new_sources.append(src_name)
 
         if len(new_sources) > 0:
-            self._src = new_sources
+            self._src = new_sourcesv2
 
     def clear_preview(self):
         self._img_desc = None

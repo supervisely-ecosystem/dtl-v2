@@ -323,14 +323,16 @@ def item_dropped_cb(item):
 
 
 @nodes_flow.node_removed
-def node_removed(layer_id):
+def node_removed(layer_id: str):
     if layer_id.startswith("filtered_project"):
         g.FILTERED_ENTITIES = []
-        # filtered_project was never in g.layers?
         return
     if layer_id.startswith("deploy"):
         utils.kill_deployed_app_by_layer_id(layer_id)
-    g.layers.pop(layer_id)
+
+    g.layers.pop(layer_id, None)
+    if layer_id.startswith("images_project"):
+        utils.clean_current_srcs()
     logger.debug("node_removed", extra={"layer_id": layer_id, "g.layers": list(g.layers.keys())})
 
 
@@ -515,7 +517,12 @@ def update_nodes_cb():
             continue
 
         src_names = layer_sources[layer_id]
-        if set(src_names) != set(layer._src):
+
+        layer_src = []
+        for k in layer._src:
+            layer_src.extend(layer._src[k])
+
+        if set(src_names) != set(layer_src):
             layers_to_update.append(layer.id)
     for layer_id in layers_to_update:
         g.updater(("nodes", layer_id))

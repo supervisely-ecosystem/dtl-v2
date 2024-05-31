@@ -5,6 +5,7 @@ from time import sleep
 from supervisely.app.widgets import (
     Button,
     Container,
+    CheckboxField,
     Input,
     Field,
     Select,
@@ -15,7 +16,7 @@ from supervisely.app.widgets import (
     Text,
 )
 from supervisely.app import show_dialog
-
+from supervisely import logger
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.Action import SourceAction
@@ -29,6 +30,11 @@ from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
 preset_name_input = Input(value="preset", placeholder="Enter preset name")
+save_as_template_checkbox = CheckboxField(
+    title="Save as template",
+    description=f"Presets saved as templates will use the current '{g.MODALITY_TYPE.capitalize()} Project' layers with the selected project and dataset(s)",
+    checked=False,
+)
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
 save_preset_file_thumbnail = FileThumbnail()
 save_preset_file_thumbnail.hide()
@@ -49,6 +55,7 @@ save_container = Container(
             description=f'Preset will be saved to folder "{g.PRESETS_PATH}" in your Team files with .json extension',
             content=preset_name_input,
         ),
+        save_as_template_checkbox,
         save_preset_btn,
         save_notification_oneof,
         save_preset_file_thumbnail,
@@ -95,15 +102,17 @@ load_dialog = Dialog(title="Load Preset", content=load_layout)
 
 @save_preset_btn.click
 def save_json_button_cb():
+    is_save_as_template = save_as_template_checkbox.is_checked()
+
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
     nodes_json = nodes_flow.get_nodes_json()
 
     # save node order position
-    nodes_meta = []
+    scene_location = []
     for idx, node_json in enumerate(nodes_json):
-        nodes_meta.append({"order_idx": idx, "position": node_json["position"]})
+        scene_location.append({"order_idx": idx, "position": node_json["position"]})
 
     # Init layers data
     layers_ids = ui_utils.init_layers(nodes_state)
@@ -112,9 +121,14 @@ def save_json_button_cb():
     ui_utils.init_src(edges)
 
     dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+    if is_save_as_template:
+        for idx, layer_json in enumerate(dtl_json):
+            if layer_json["action"] == f"{g.MODALITY_TYPE}_project":
+                dtl_json[idx]["is_template"] = True
+
     # @TODO: make more safe position save by checking id and names
     for idx, layer_json in enumerate(dtl_json):
-        layer_json["scene_location"] = nodes_meta[idx]
+        layer_json["scene_location"] = scene_location[idx]
 
     preset_name = preset_name_input.get_value()
     if preset_name == "":
@@ -122,7 +136,10 @@ def save_json_button_cb():
         return
 
     # dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
-    dst_path = f"{g.PRESETS_PATH}/{preset_name}.json"
+    if is_save_as_template:
+        dst_path = f"{g.PRESETS_PATH}/{preset_name} (template).json"
+    else:
+        dst_path = f"{g.PRESETS_PATH}/{preset_name}.json"
     if g.api.file.exists(g.TEAM_ID, dst_path):
         dst_path = g.api.file.get_free_name(g.TEAM_ID, dst_path)
     src_path = g.DATA_DIR + "/preset.json"
@@ -187,7 +204,9 @@ def apply_json(dtl_json):
         # create layer objects
         ids = []
         data_layers_ids = []
+        template_id = 0
         for idx, layer_json in enumerate(dtl_json):
+            is_template = False
             original_action_name = layer_json.get("action", None)
             action_name = layer_json.get("action", None)
             if original_action_name is None:
@@ -201,6 +220,9 @@ def apply_json(dtl_json):
             else:
                 action_name = original_action_name
 
+            if action_name == f"{g.MODALITY_TYPE}_project":
+                is_template = layer_json.get("is_template", False)
+
             dtl_json[idx]["action"] = dtl_json[idx]["action"].replace(
                 original_action_name, action_name
             )
@@ -208,7 +230,19 @@ def apply_json(dtl_json):
                 if src.startswith("$"):
                     src_action_name = src[1:].rsplit("_", 1)[0]
                 else:
-                    src_action_name = src  # use if SourceAction
+                    if is_template:
+                        if len(g.current_srcs) > 0:
+                            for idx, k in enumerate(g.current_srcs):
+                                if idx == template_id:
+                                    dtl_json[idx]["src"] = g.current_srcs[k][0]
+                                    src_action_name = g.current_srcs[k][0]
+                                    template_id += 1
+                                    break
+                        else:
+                            logger.warn("Couldn't find current project source")
+                            src_action_name = src
+                    else:
+                        src_action_name = src  # use if SourceAction
                 if src_action_name in actions_dict_legacy:
                     dtl_json[idx]["src"][i] = dtl_json[idx]["src"][i].replace(
                         src_action_name, actions_dict_legacy[src_action_name]
@@ -312,17 +346,27 @@ def apply_json(dtl_json):
             if layer_id in data_layers_ids:
                 continue
             layer = g.layers[layer_id]
-            layer_input_meta = utils.merge_input_metas(
-                [
-                    g.layers[ui_utils.find_layer_id_by_dst(src)].output_meta
-                    for src in layer.get_src()
-                ]
-            )
+
+            output_metas_to_merge = []
+
+            layer_sources = layer.get_src()
+            if isinstance(layer_sources, dict):
+                for k in layer_sources:
+                    for src in layer_sources[k]:
+                        src_layer = g.layers[ui_utils.find_layer_id_by_dst(src)]
+                        output_metas_to_merge.append(src_layer.output_meta)
+            else:
+                for src in layer_sources:
+                    src_layer = g.layers[ui_utils.find_layer_id_by_dst(src)]
+                    output_metas_to_merge.append(src_layer.output_meta)
+
+            layer_input_meta = utils.merge_input_metas(output_metas_to_merge)
             layer.update_project_meta(layer_input_meta)
 
         # create nodes
         for idx, layer_id in enumerate(ids):
             layer = g.layers[layer_id]
+            layer_json = layer.to_json()
             node = layer.create_node()
 
             # set position
@@ -340,27 +384,58 @@ def apply_json(dtl_json):
         for dst_layer_id in ids:
             dst_layer = g.layers[dst_layer_id]
             dst_layer: Layer
-            for src in dst_layer.get_src():
-                for src_layer_id in ids:
-                    src_layer = g.layers[src_layer_id]
-                    for dst_idx, dst in enumerate(src_layer.get_dst()):
-                        if dst == src:
-                            try:
-                                nodes_flow_edges.append(
-                                    {
-                                        "id": random.randint(10000000000000, 99999999999999),
-                                        "output": {
-                                            "node": src_layer_id,
-                                            "interface": src_layer.get_destination_name(dst_idx),
-                                        },
-                                        "input": {
-                                            "node": dst_layer_id,
-                                            "interface": "source",
-                                        },
-                                    }
-                                )
-                            except:
-                                pass
+            dst_layer_sources = dst_layer.get_src()
+            if isinstance(dst_layer_sources, dict):
+                for k in dst_layer_sources:
+                    for src in dst_layer_sources[k]:
+                        for src_layer_id in ids:
+                            src_layer = g.layers[src_layer_id]
+                            for dst_idx, dst in enumerate(src_layer.get_dst()):
+                                if dst == src:
+                                    try:
+                                        nodes_flow_edges.append(
+                                            {
+                                                "id": random.randint(
+                                                    10000000000000, 99999999999999
+                                                ),
+                                                "output": {
+                                                    "node": src_layer_id,
+                                                    "interface": src_layer.get_destination_name(
+                                                        dst_idx
+                                                    ),
+                                                },
+                                                "input": {
+                                                    "node": dst_layer_id,
+                                                    "interface": k,
+                                                },
+                                            }
+                                        )
+                                    except:
+                                        pass
+            else:
+                for src in dst_layer_sources:
+                    for src_layer_id in ids:
+                        src_layer = g.layers[src_layer_id]
+                        for dst_idx, dst in enumerate(src_layer.get_dst()):
+                            if dst == src:
+                                try:
+                                    nodes_flow_edges.append(
+                                        {
+                                            "id": random.randint(10000000000000, 99999999999999),
+                                            "output": {
+                                                "node": src_layer_id,
+                                                "interface": src_layer.get_destination_name(
+                                                    dst_idx
+                                                ),
+                                            },
+                                            "input": {
+                                                "node": dst_layer_id,
+                                                "interface": "source",
+                                            },
+                                        }
+                                    )
+                                except:
+                                    pass
         nodes_flow.set_edges(nodes_flow_edges)
         g.stop_updates = False
         g.updater(("nodes", None))

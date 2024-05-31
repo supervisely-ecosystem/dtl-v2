@@ -284,6 +284,9 @@ class ImagesProjectAction(SourceAction):
 
             nonlocal _current_info, saved_src
             _current_info, saved_src = read_src_from_widget()
+            if len(saved_src) > 0:
+                g.current_srcs[layer_id] = saved_src
+            utils.clean_current_srcs()
 
         def _get_classes_mapping_value():
             nonlocal _current_meta
@@ -508,7 +511,7 @@ class ImagesProjectAction(SourceAction):
                     StateJson()[select_datasets.widget_id]["datasets"] = []
                     StateJson().send_changes()
                     project_meta = ProjectMeta()
-                    
+
             # save src
             _save_src()
             # set src preview

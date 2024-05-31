@@ -30,8 +30,13 @@ def maybe_wrap_in_list(v):
 def check_connection_name(connection_name):
     if len(connection_name) == 0:
         raise GraphError("Connection name should be non empty.")
-    if connection_name[0] != "$" and connection_name != Layer.null:
-        raise GraphError(f'Connection name should be "{Layer.null}" or start with "$".')
+    if isinstance(connection_name, dict):
+        for k in connection_name:
+            if connection_name[k][0][0] != "$":
+                raise GraphError(f'Connection name should be "{Layer.null}" or start with "$".')
+    else:
+        if connection_name[0] != "$" and connection_name != Layer.null:
+            raise GraphError(f'Connection name should be "{Layer.null}" or start with "$".')
 
 
 class Layer:
@@ -40,7 +45,12 @@ class Layer:
 
     base_params = {
         "definitions": {
-            "connections": {"type": "array", "items": {"type": "string"}, "minItems": 0},
+            "connections": {
+                "oneOf": [
+                    {"type": "object"},
+                    {"type": "array", "items": {"type": "string"}, "minItems": 0},
+                ]
+            },
             "color": {
                 "type": "array",
                 "items": {"type": "integer", "minimum": 0, "maximum": 255},

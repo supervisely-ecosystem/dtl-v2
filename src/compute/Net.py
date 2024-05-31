@@ -196,7 +196,14 @@ class Net:
         result = []
         for dst in dsts:
             for i, layer_ in enumerate(self.layers):
-                if dst in layer_.srcs:
+                layer_sources = []
+                for src in layer_.srcs:
+                    if isinstance(src, dict):
+                        for k in src:
+                            layer_sources.extend(src[k])
+                    else:
+                        layer_sources.append(src)
+                if dst in layer_sources:
                     if layers_idx_whitelist is None or i in layers_idx_whitelist:
                         result.append(i)
         return result
@@ -231,33 +238,40 @@ class Net:
                     yield output
 
     def start_iterate(self, data_batch, layer_idx: int = None, layers_idx_whitelist: list = None):
-        img_pr_name = data_batch[0][0].get_pr_name()
-        img_ds_name = data_batch[0][0].get_ds_name()
-
-        if layer_idx is not None:
-            start_layer_indxs = [layer_idx]
+        if len(data_batch) == 0:
+            logger.debug("Empty data batch.")
+            yield []
         else:
-            start_layer_indxs = set()
-            for idx, layer in enumerate(self.layers):
-                if layers_idx_whitelist is not None and idx not in layers_idx_whitelist:
-                    continue
-                if layer.type != "data":
-                    continue
-                if layer.project_name == img_pr_name and (
-                    "*" in layer.dataset_names or img_ds_name in layer.dataset_names
-                ):
-                    start_layer_indxs.add(idx)
-            if len(start_layer_indxs) == 0:
-                raise RuntimeError(
-                    "Can not find data layer for the image: {}".format(data_batch[0][0])
-                )
+            if data_batch[0][0] is None:
+                logger.debug("Empty data batch.")
+                yield []
+            else:
+                img_pr_name = data_batch[0][0].get_pr_name()
+                img_ds_name = data_batch[0][0].get_ds_name()
+                if layer_idx is not None:
+                    start_layer_indxs = [layer_idx]
+                else:
+                    start_layer_indxs = set()
+                    for idx, layer in enumerate(self.layers):
+                        if layers_idx_whitelist is not None and idx not in layers_idx_whitelist:
+                            continue
+                        if layer.type != "data":
+                            continue
+                        if layer.project_name == img_pr_name and (
+                            "*" in layer.dataset_names or img_ds_name in layer.dataset_names
+                        ):
+                            start_layer_indxs.add(idx)
+                    if len(start_layer_indxs) == 0:
+                        raise RuntimeError(
+                            "Can not find data layer for the image: {}".format(data_batch[0][0])
+                        )
 
-        for start_layer_indx in start_layer_indxs:
-            output_generator = self.process_iterate(
-                start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
-            )
-            for output in output_generator:
-                yield output
+                for start_layer_indx in start_layer_indxs:
+                    output_generator = self.process_iterate(
+                        start_layer_indx, data_batch, layers_idx_whitelist=layers_idx_whitelist
+                    )
+                    for output in output_generator:
+                        yield output
 
     def push(self, indx, data_batch, branch, layers_idx_whitelist=None):
         next_layer_indxs = self.get_next_layer_indxs(
@@ -615,14 +629,49 @@ class Net:
                 datalevel_metas[src] = input_meta
 
         def get_dest_layers(the_layer):
-            return [
-                dest_layer
-                for dest_layer in self.layers
-                if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0
-            ]
+            def extract_values(lst: list):
+                values = []
+                if len(lst) > 0:
+                    for item in lst:
+                        if isinstance(item, dict):
+                            for d in lst:
+                                for k in d:
+                                    for v in d[k]:
+                                        values.append(v)
+                        else:
+                            values.append(item)
+                return set(values)
+
+            dest_layers = []
+            for dest_layer in self.layers:
+                if isinstance(the_layer.dsts, list) and isinstance(dest_layer.srcs, list):
+                    the_layer_dsts_set = extract_values(the_layer.dsts)
+                    dest_layer_srcs_set = extract_values(dest_layer.srcs)
+                    if the_layer_dsts_set & dest_layer_srcs_set:
+                        dest_layers.append(dest_layer)
+            return dest_layers
+
+            # return [
+            # dest_layer
+            # for dest_layer in self.layers
+            # if len(set(the_layer.dsts) & set(dest_layer.srcs)) > 0
+            # ]
 
         def layer_input_metas_are_calculated(the_layer):
-            return all((x in datalevel_metas for x in the_layer.srcs))
+            for x in the_layer.srcs:
+                if isinstance(x, list) or isinstance(x, str):
+                    if x not in datalevel_metas:
+                        return False
+                elif isinstance(x, dict):
+                    for k, v in x.items():
+                        for i in v:
+                            if i not in datalevel_metas:
+                                return False
+                else:
+                    if x not in datalevel_metas:
+                        return False
+            return True
+            # return all((x in datalevel_metas for x in the_layer.srcs))
 
         processed_layers = set()
         while len(cur_level_layers) != 0:
@@ -631,7 +680,16 @@ class Net:
             for cur_layer in cur_level_layers:
                 processed_layers.add(cur_layer)
                 # TODO no need for dict here?
-                cur_layer_input_metas = {src: datalevel_metas[src] for src in cur_layer.srcs}
+                # cur_layer_input_metas = {src: datalevel_metas[src] for src in cur_layer.srcs}
+                cur_layer_input_metas = {}
+                for src in cur_layer.srcs:
+                    if isinstance(src, list) or isinstance(src, str):
+                        cur_layer_input_metas[src] = datalevel_metas[src]
+                    elif isinstance(src, dict):
+                        for k in src:
+                            for v in src[k]:
+                                cur_layer_input_metas[v] = datalevel_metas[v]
+
                 try:
                     cur_layer_res_meta = cur_layer.make_output_meta(cur_layer_input_metas)
                 except CreateMetaError as e:

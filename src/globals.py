@@ -87,6 +87,8 @@ if MODALITY_TYPE == "images":
 else:
     BATCH_SIZE = 1
 
+current_srcs: dict = {}
+
 cache = {
     "workspace_info": {},
     "project_id": {},
