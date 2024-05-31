@@ -5,6 +5,7 @@ from time import sleep
 from supervisely.app.widgets import (
     Button,
     Container,
+    CheckboxField,
     Input,
     Field,
     Select,
@@ -15,7 +16,7 @@ from supervisely.app.widgets import (
     Text,
 )
 from supervisely.app import show_dialog
-
+from supervisely import logger
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.Action import SourceAction
@@ -29,6 +30,11 @@ from src.exceptions import handle_exception
 from src.exceptions import CustomException, BadSettingsError
 
 preset_name_input = Input(value="preset", placeholder="Enter preset name")
+save_as_template_checkbox = CheckboxField(
+    title="Save as template",
+    description=f"Presets saved as templates will use the current '{g.MODALITY_TYPE.capitalize()} Project' layers with the selected project and dataset(s)",
+    checked=False,
+)
 save_preset_btn = Button("Save", icon="zmdi zmdi-floppy")
 save_preset_file_thumbnail = FileThumbnail()
 save_preset_file_thumbnail.hide()
@@ -49,6 +55,7 @@ save_container = Container(
             description=f'Preset will be saved to folder "{g.PRESETS_PATH}" in your Team files with .json extension',
             content=preset_name_input,
         ),
+        save_as_template_checkbox,
         save_preset_btn,
         save_notification_oneof,
         save_preset_file_thumbnail,
@@ -95,6 +102,8 @@ load_dialog = Dialog(title="Load Preset", content=load_layout)
 
 @save_preset_btn.click
 def save_json_button_cb():
+    is_save_as_template = save_as_template_checkbox.is_checked()
+
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
@@ -112,6 +121,11 @@ def save_json_button_cb():
     ui_utils.init_src(edges)
 
     dtl_json = [g.layers[layer_id].to_json() for layer_id in all_layers_ids]
+    if is_save_as_template:
+        for idx, layer_json in enumerate(dtl_json):
+            if layer_json["action"] == f"{g.MODALITY_TYPE}_project":
+                dtl_json[idx]["is_template"] = True
+
     # @TODO: make more safe position save by checking id and names
     for idx, layer_json in enumerate(dtl_json):
         layer_json["scene_location"] = scene_location[idx]
@@ -122,7 +136,10 @@ def save_json_button_cb():
         return
 
     # dst_path = f"/{g.TEAM_FILES_PATH}/presets/{preset_name}.json"
-    dst_path = f"{g.PRESETS_PATH}/{preset_name}.json"
+    if is_save_as_template:
+        dst_path = f"{g.PRESETS_PATH}/{preset_name} (template).json"
+    else:
+        dst_path = f"{g.PRESETS_PATH}/{preset_name}.json"
     if g.api.file.exists(g.TEAM_ID, dst_path):
         dst_path = g.api.file.get_free_name(g.TEAM_ID, dst_path)
     src_path = g.DATA_DIR + "/preset.json"
@@ -187,7 +204,9 @@ def apply_json(dtl_json):
         # create layer objects
         ids = []
         data_layers_ids = []
+        template_id = 0
         for idx, layer_json in enumerate(dtl_json):
+            is_template = False
             original_action_name = layer_json.get("action", None)
             action_name = layer_json.get("action", None)
             if original_action_name is None:
@@ -201,6 +220,9 @@ def apply_json(dtl_json):
             else:
                 action_name = original_action_name
 
+            if action_name == f"{g.MODALITY_TYPE}_project":
+                is_template = layer_json.get("is_template", False)
+
             dtl_json[idx]["action"] = dtl_json[idx]["action"].replace(
                 original_action_name, action_name
             )
@@ -208,7 +230,19 @@ def apply_json(dtl_json):
                 if src.startswith("$"):
                     src_action_name = src[1:].rsplit("_", 1)[0]
                 else:
-                    src_action_name = src  # use if SourceAction
+                    if is_template:
+                        if len(g.current_srcs) > 0:
+                            for idx, k in enumerate(g.current_srcs):
+                                if idx == template_id:
+                                    dtl_json[idx]["src"] = g.current_srcs[k][0]
+                                    src_action_name = g.current_srcs[k][0]
+                                    template_id += 1
+                                    break
+                        else:
+                            logger.warn("Couldn't find current project source")
+                            src_action_name = src
+                    else:
+                        src_action_name = src  # use if SourceAction
                 if src_action_name in actions_dict_legacy:
                     dtl_json[idx]["src"][i] = dtl_json[idx]["src"][i].replace(
                         src_action_name, actions_dict_legacy[src_action_name]

@@ -322,5 +322,11 @@ def kill_deployed_app_by_layer_id(id: str):
         return
 
 
+def clean_current_srcs():
+    for layer_id in list(g.current_srcs.keys()):
+        if layer_id not in g.layers.keys():
+            g.current_srcs.pop(layer_id, None)
+
+
 def on_app_shutdown():
     kill_serving_app()
