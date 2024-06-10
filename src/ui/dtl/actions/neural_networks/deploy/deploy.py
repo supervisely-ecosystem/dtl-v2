@@ -20,11 +20,8 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.node_layout import (
 import src.ui.dtl.actions.neural_networks.deploy.layout.utils as utils
 import src.globals as g
 from src.ui.dtl.Action import DeployNNAction
+from supervisely.nn.artifacts import YOLOv5v2, YOLOv8, MMDetection3, MMSegmentation
 
-from supervisely.nn.checkpoints import yolov5_v2 as custom_yolov5
-from supervisely.nn.checkpoints import yolov8 as custom_yolov8
-from supervisely.nn.checkpoints import mmdetection3 as custom_mmdetection3
-from supervisely.nn.checkpoints import mmsegmentation as custom_mmsegmentation
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     yolov5 as pretrained_yolov5,
 )
@@ -122,6 +119,7 @@ class DeployBaseAction(DeployNNAction):
         # -----------------------------
 
         # MODEL SELECTOR
+        custom_models = cls.artifacts.get_list()
         (
             # sidebar
             # custom options
@@ -141,7 +139,7 @@ class DeployBaseAction(DeployNNAction):
             model_selector_layout_container,
             model_selector_stop_model_after_pipeline_checkbox,
         ) = create_model_selector_widgets(
-            cls.framework_name, cls.pretrained_models, cls.custom_models, cls.custom_task_types
+            cls.framework_name, cls.pretrained_models, custom_models, cls.custom_task_types
         )
 
         # MODEL SELECTOR CBs
@@ -337,7 +335,7 @@ class DeployYOLOV5Action(DeployBaseAction):
     framework = "yolov5"
     framework_name = "YOLOv5"
     slug = "supervisely-ecosystem/yolov5_2.0/serve"
-    custom_models = custom_yolov5.get_list(g.api, g.TEAM_ID)
+    artifacts = YOLOv5v2(g.TEAM_ID)
     custom_task_types = ["object detection"]
     pretrained_models = pretrained_yolov5
 
@@ -352,7 +350,7 @@ class DeployYOLOV8Action(DeployBaseAction):
     framework = "yolov8"
     framework_name = "YOLOv8"
     slug = "supervisely-ecosystem/yolov8/serve"
-    custom_models = custom_yolov8.get_list(g.api, g.TEAM_ID)
+    artifacts = YOLOv8(g.TEAM_ID)
     custom_task_types = ["object detection", "instance segmentation", "pose estimation"]
     pretrained_models = pretrained_yolov8
 
@@ -367,7 +365,7 @@ class DeployMMDetectionAction(DeployBaseAction):
     framework = "mmdetection3"
     framework_name = "MMDetection"
     slug = "supervisely-ecosystem/serve-mmdetection-v3"
-    custom_models = custom_mmdetection3.get_list(g.api, g.TEAM_ID)
+    artifacts = MMDetection3(g.TEAM_ID)
     custom_task_types = ["object detection", "instance segmentation"]
     pretrained_models = pretrained_mmdetection3
 
@@ -384,6 +382,6 @@ class DeployMMSegmentationAction(DeployBaseAction):
     framework = "mmsegmentation"
     framework_name = "MMSegmentation"
     slug = "supervisely-ecosystem/mmsegmentation/serve"
-    custom_models = custom_mmsegmentation.get_list(g.api, g.TEAM_ID)
+    artifacts = MMSegmentation(g.TEAM_ID)
     custom_task_types = ["semantic segmentation"]
     pretrained_models = pretrained_mmsegmentation

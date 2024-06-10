@@ -238,8 +238,15 @@ def init_nodes_state(
                 ui_layer: Layer
                 merged_data = {}
                 # gather data from all sources
-                for src in ui_layer.get_src():
-                    merged_data.update(datas_dict.get(find_layer_id_by_dst(src), {}))
+                sources = ui_layer.get_src()
+                if isinstance(sources, dict):
+                    for srcs in sources.values():
+                        for src in srcs:
+                            merged_data.update(datas_dict.get(find_layer_id_by_dst(src), {}))
+                else:
+                    for src in sources:
+                        merged_data.update(datas_dict.get(find_layer_id_by_dst(src), {}))
+
                 # update data in node
                 ui_layer.update_data({**merged_data, "project_meta": merged_meta})
                 # get update data to use in next nodes
@@ -309,10 +316,10 @@ def get_layer_parents_chain(layer_id: str, chain: list = None):
 
     layer_sources = layer.get_src()
     if isinstance(layer_sources, dict):
-        src_layes = []
+        src_layers = []
         for k in layer_sources:
-            src_layers = [find_layer_id_by_dst(src) for src in layer_sources[k]]
-            src_layes.extend(src_layers)
+            found_layers = [find_layer_id_by_dst(src) for src in layer_sources[k]]
+            src_layers.extend(found_layers)
     else:
         src_layers = [find_layer_id_by_dst(src) for src in layer.get_src()]
     for src_layer in src_layers:
