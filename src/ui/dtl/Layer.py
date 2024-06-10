@@ -1,5 +1,6 @@
 import os
 import copy
+from collections import defaultdict
 import time
 from typing import Optional, List, Tuple
 import random
@@ -265,28 +266,22 @@ class Layer:
         self._update_settings(node_options)
 
     def update_sources(self, connections: List[tuple]):
-        new_sources = []
         src_names = []
-
-        from collections import defaultdict
-
-        new_sourcesv2 = defaultdict(list)
+        new_sources = defaultdict(list)
         for from_node_id, from_node_interface, to_node_interface in connections:
             src_name = self._connection_name(from_node_id, from_node_interface)
             src_names.append((src_name, to_node_interface))
-            new_sourcesv2[to_node_interface].append(src_name)
 
         need_append = [True] * len(src_names)
         if self.update_sources_cb is not None:
             need_append = self.update_sources_cb(src_names)
 
-        # fix var naming
-        for (src_name, _), to_append in zip(src_names, need_append):
+        for (src_name, to_node_interface), to_append in zip(src_names, need_append):
             if to_append:
-                new_sources.append(src_name)
+                new_sources[to_node_interface].append(src_name)
 
         if len(new_sources) > 0:
-            self._src = new_sourcesv2
+            self._src = new_sources
 
     def clear_preview(self):
         self._img_desc = None
