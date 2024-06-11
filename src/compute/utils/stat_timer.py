@@ -36,7 +36,7 @@ class StatTimer:
             self._q_dct[object_id] = []
         self._q_dct[object_id].append({**layer_info, "val_sec": val_sec})
         logger.debug(
-            f"Action '{layer_info['action_name']}' processing time: {val_sec} sec for {layer_info['items_count']} items"
+            f"Action '{layer_info['action_name']}' processing time: {val_sec:.6f} sec for {layer_info['items_count']} items"
         )
 
         # if len(curr_list) >= self.logging_interval:

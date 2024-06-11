@@ -39,16 +39,19 @@ class TagsListPreview(Widget):
         }
 
     def get_json_state(self) -> Dict:
-        return {
-            "tags": [
-                {
-                    "name": f"<b>{tag_meta.name}</b>",
-                    "valueType": VALUE_TYPE_NAME[tag_meta.value_type],
-                    "color": rgb2hex(tag_meta.color),
-                }
-                for tag_meta in self._tag_metas
-            ]
-        }
+        if self._tag_metas is None or len(self._tag_metas) == 0:
+            return {"tags": []}
+        else:
+            return {
+                "tags": [
+                    {
+                        "name": f"<b>{tag_meta.name}</b>",
+                        "valueType": VALUE_TYPE_NAME[tag_meta.value_type],
+                        "color": rgb2hex(tag_meta.color),
+                    }
+                    for tag_meta in self._tag_metas
+                ]
+            }
 
     def set(self, tag_metas: Union[List[TagMeta], TagMetaCollection]):
         self._tag_metas = tag_metas

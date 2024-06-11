@@ -668,9 +668,10 @@ def create_new_layer(
     try:
         action = actions_dict.get(action_name)
         if action is None:
-            action = hidden_actions_dict[action_name]
+            action = hidden_actions_dict.get(action_name, None)
     except KeyError:
         raise ActionNotFoundError(action_name)
+    
     id = get_layer_id(action_name)
     action: Action
     try:
