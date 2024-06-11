@@ -441,7 +441,8 @@ def update_nodes(layer_id: str = None):
         )
         raise e
     finally:
-        for layer in g.layers.values():
+        current_layers = g.layers.copy()
+        for layer in current_layers.values():
             layer.set_preview_loading(False)
 
 

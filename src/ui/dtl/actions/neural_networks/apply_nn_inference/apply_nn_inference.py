@@ -2,7 +2,7 @@ import copy
 from typing import Optional
 from os.path import realpath, dirname
 
-from supervisely import ProjectMeta, logger
+from supervisely import ProjectMeta
 from supervisely.app.widgets import NodesFlow
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
