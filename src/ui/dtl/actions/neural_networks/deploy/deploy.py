@@ -342,8 +342,8 @@ class DeployYOLOV5Action(DeployBaseAction):
 
 class DeployYOLOV8Action(DeployBaseAction):
     name = "deploy_yolo_v8"
-    title = "Deploy YOLOv8"
-    description = "Deploy YOLOv8 models."
+    title = "Deploy YOLO (v8, v9)"
+    description = "Deploy YOLO (v8, v9) models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
 
     # Framework settings
