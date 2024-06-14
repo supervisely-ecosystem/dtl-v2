@@ -1,6 +1,6 @@
-# Deploy YOLOv8
+# Deploy YOLO (v8, v9)
 
-`Deploy YOLOv8` using [Serve YOLOv8](https://ecosystem.supervisely.com/apps/yolov8/serve) app to serve models and can be used to deploy custom and pretrained models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained YOLOv8 models in your Team Files. You can train your own model using [Train YOLOv8](https://ecosystem.supervisely.com/apps/yolov8/train) app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
+`Deploy YOLO (v8, v9)` using [Serve YOLO (v8, v9)](https://ecosystem.supervisely.com/apps/yolov8/serve) app to serve models and can be used to deploy custom and pretrained models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained YOLO (v8, v9) models in your Team Files. You can train your own model using [Train YOLO (v8, v9)](https://ecosystem.supervisely.com/apps/yolov8/train) app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
 ![image](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/791a50bf-51b5-4bdb-8bda-0f4ed2a3d06b)
 
@@ -8,7 +8,7 @@
 
 ### How to use:
 
-1. Add `Deploy YOLOv8` layer
+1. Add `Deploy YOLO (v8, v9)` layer
 2. Open agent settings and select agent and device
 3. Open models selector and select one of the available models
 4. Press `SERVE`
