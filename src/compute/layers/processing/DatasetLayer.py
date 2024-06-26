@@ -38,6 +38,9 @@ class DatasetLayer(Layer):
         Layer.__init__(self, config, net=net)
 
     def validate(self):
+        if self.net.preview_mode:
+            return
+
         super().validate()
         if len(self.settings.get("name", "")) > 2048:
             raise BadSettingsError("Dataset name is too long, huh?")

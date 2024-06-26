@@ -284,6 +284,7 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             if autoconnect:
                 maybe_add_edges(layer)
         g.stop_updates = False
+        logger.info(f"Layer with ID: '{layer.id}' have been added")
         # g.updater(("nodes", layer.id))
     except CustomException as e:
         ui_utils.show_error("Error adding layer", e)
@@ -334,6 +335,7 @@ def node_removed(layer_id: str):
     if layer_id.startswith("images_project"):
         utils.clean_current_srcs()
     logger.debug("node_removed", extra={"layer_id": layer_id, "g.layers": list(g.layers.keys())})
+    logger.info(f"Layer with ID: '{layer_id}' have been removed")
 
 
 @add_layer_from_dialog_btn.click
@@ -521,7 +523,10 @@ def update_nodes_cb():
 
         layer_src = []
         for k in layer._src:
-            layer_src.extend(layer._src[k])
+            try:
+                layer_src.extend(layer._src[k])
+            except:
+                logger.info(f"Error in layer with ID: '{layer_id}'. layer._src: {layer._src}")
 
         if set(src_names) != set(layer_src):
             layers_to_update.append(layer.id)
