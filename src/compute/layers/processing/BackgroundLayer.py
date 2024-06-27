@@ -24,7 +24,8 @@ def add_bg_to_image(ann: Annotation, bg_class: ObjClass, bg_geometry: Rectangle)
         geometry=bg_geometry,
         obj_class=bg_class,
     )
-    ann = ann.add_label(bg_label)
+    existing_labels = [bg_label] + ann.labels
+    ann = ann.clone(labels=existing_labels)
     return ann
 
 
