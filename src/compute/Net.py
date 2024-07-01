@@ -296,7 +296,7 @@ class Net:
     def process(self, indx, data_batch, layers_idx_whitelist=None):
         layer: Layer = self.layers[indx]
         for layer_output in layer.process_timed(data_batch):
-            if layer_output is None:
+            if layer_output is None or len(layer_output) == 0:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
             # output layers
