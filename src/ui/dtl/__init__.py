@@ -123,7 +123,7 @@ from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformatio
 from .actions.imgaug_augs.geometric.perspective_transform.perspective_transform import (
     PerspectiveTransformaAction,
 )
-
+from .actions.imgaug_augs.studio.imgaug_studio import ImgAugStudioAction
 from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
     ImgAugCorruptlikeNoiseAction,
     ImgAugCorruptlikeBlurAction,
@@ -258,6 +258,7 @@ image_actions_dict = {
     ImgAugCorruptlikeCompressionAction.name: ImgAugCorruptlikeCompressionAction,
     ElasticTransformationAction.name: ElasticTransformationAction,
     PerspectiveTransformaAction.name: PerspectiveTransformaAction,
+    ImgAugStudioAction.name: ImgAugStudioAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
