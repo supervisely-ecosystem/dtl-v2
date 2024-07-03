@@ -313,24 +313,6 @@ class Net:
                 elif len(layer) == 2:
                     branches[0].append(layer)
 
-            # @TODO: ADD SUPPORT FOR BRANCHES
-            # FIX check every data_el in batch?
-            # if len(layer_output[0]) == 3:  # filter layers with 2 outputs
-            #     new_data_batch = [output[:2] for output in layer_output]
-            #     branch = layer_output[-1]
-            # elif len(layer_output[0]) == 2:  # layers with 1 output
-            #     new_data_batch = layer_output
-            #     branch = 0
-            # elif len(layer_output[0]) == 1:  # output layers
-            #     yield layer_output
-            #     continue
-            # else:
-            #     raise RuntimeError(
-            #         "Wrong number of items in layer output ({}). Got {} items.".format(
-            #             layer, len(layer_output)
-            #         )
-            #     )
-
             for branch, new_data_batch in branches.items():
                 for x in self.push(
                     indx, new_data_batch, branch, layers_idx_whitelist=layers_idx_whitelist
@@ -347,7 +329,7 @@ class Net:
         except:
             raise
         for layer_output in layer.process_timed(data_batch):
-            if layer_output is None:
+            if layer_output is None or len(layer_output) == 0:
                 raise RuntimeError("Layer_output ({}) is None.".format(layer))
 
             if len(layer_output[0]) == 3:  # filter layers with 2 outputs
