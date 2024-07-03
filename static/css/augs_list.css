@@ -1,0 +1,24 @@
+#augs-research .sly-copy-to-clipboard-widget {
+    background: #eeffcc;
+}
+
+#augs-research .sly-copy-to-clipboard-widget .content .ace-chrome {
+    background-color: #eeffcc;
+}
+
+#augs-research .auto-field {
+    background: hsl(202deg 40% 97%);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+#augs-research .action-icon-btn {
+    padding: 0;
+    height: 22px;
+    width: 22px;
+    line-height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    text-align: center;
+}
