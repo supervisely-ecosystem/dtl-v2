@@ -6,6 +6,7 @@ from typing import Tuple
 import imgaug.augmenters as iaa
 from supervisely import Annotation
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+
 import json
 
 
@@ -18,10 +19,7 @@ class ImgAugStudioLayer(Layer):
             "settings": {
                 "type": "object",
                 "required": ["pipeline"],
-                # "properties": {
-                #     "option": {"type": "string"},
-                #     "severity": {"type": "integer", "minimum": 1, "maximum": 5},
-                # },
+                "properties": {},
             }
         },
     }

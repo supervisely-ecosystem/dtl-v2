@@ -12,7 +12,6 @@ from src.ui.dtl.utils import (
 
 from src.ui.dtl.Layer import Layer
 
-from src.ui.dtl.actions.imgaug_augs.studio.layout.node_layout import create_node_layout
 import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as utils
 import src.globals as g
 from src.ui.widgets.augs_list import AugsList
@@ -31,10 +30,12 @@ from supervisely.app.widgets import (
 )
 import src.globals as g
 import supervisely as sly
+from src.ui.dtl import ImgAugAugmentationsAction
+
 import os
 
 
-class ImgAugStudioAction(Layer):
+class ImgAugStudioAction(ImgAugAugmentationsAction):
     name = "imgaug_studio_action"
     title = "ImgAug Studio"
     description = ""
@@ -56,7 +57,7 @@ class ImgAugStudioAction(Layer):
 
     @classmethod
     def init_widgets(cls, layer: Layer):
-        saved_settings = {}
+        saved_settings = {"pipeline": {}}
         session: Session = None
 
         def _get_params_json(json_data, aug_func):
@@ -81,7 +82,8 @@ class ImgAugStudioAction(Layer):
                 if widget is None:
                     raise ValueError("widget not found")
 
-                filtered_param = {k: v for k, v in param.items() if k != "pname"}
+                ignore = ["pname", "type"]
+                filtered_param = {k: v for k, v in param.items() if k not in ignore}
                 widget_obj = widget(**filtered_param)
                 field = Field(widget_obj, param_name)
                 fields.append(field)
@@ -136,7 +138,7 @@ class ImgAugStudioAction(Layer):
         aug_func_field = Field(aug_func_selector, "Transformation", "Choose augmentation function")
 
         DEFAULT_SOMETIMES_VALUE = 0.5
-        aug_sometimes_check = Checkbox(Text("probability"))
+        aug_sometimes_check = Checkbox(content="probability")
         aug_sometimes_input = InputNumber(DEFAULT_SOMETIMES_VALUE, 0, 1, 0.01)
         aug_sometimes_input.disable()
         aug_sometimes_container = Container(
@@ -170,6 +172,21 @@ class ImgAugStudioAction(Layer):
             aug_add_container, "Add aug to pipeline", "Explore, configure and preview"
         )
         aug_add_field.hide()
+
+        settings_options = [
+            NodesFlow.Node.Option(
+                name="Edit pipeline",
+                option_component=NodesFlow.WidgetOptionComponent(pipeline_layout_container),
+            ),
+            NodesFlow.Node.Option(
+                name="Sidebar",
+                option_component=NodesFlow.WidgetOptionComponent(
+                    widget=pipeline_layout_container,
+                    sidebar_component=NodesFlow.WidgetOptionComponent(pipeline_sidebar_field),
+                    sidebar_width=420,
+                ),
+            ),
+        ]
 
         @pipeline_layout_edit_button.click
         def pipeline_layout_edit_button_cb():
@@ -223,7 +240,6 @@ class ImgAugStudioAction(Layer):
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)
-            settings_options = create_node_layout(pipeline_layout_container, pipeline_sidebar_field)
             return {
                 "src": [],
                 "dst": [],

@@ -181,6 +181,7 @@ image_actions_list = {
         ImgAugCorruptlikeCompressionAction.name,
         ElasticTransformationAction.name,
         PerspectiveTransformaAction.name,
+        ImgAugStudioAction.name,
     ],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
