@@ -10,7 +10,7 @@ import json
 
 
 class ImgAugStudioLayer(Layer):
-    action = "iaa_imgcorruptlike_blur"
+    action = "iaa_imgaug_studio"
 
     layer_settings = {
         "required": ["settings"],

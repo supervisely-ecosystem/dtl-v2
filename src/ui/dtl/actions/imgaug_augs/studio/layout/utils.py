@@ -18,9 +18,13 @@ import src.globals as g
 import supervisely as sly
 import os
 from collections import OrderedDict
-from cache import get_random_image
+from src.ui.dtl.actions.imgaug_augs.studio.layout.cache import get_random_image
 
-augs_configs = sly.json.load_json_file(os.path.join(os.getcwd(), "augs.json"))
+json_path = os.path.join(
+    os.getcwd(), "src", "ui", "dtl", "actions", "imgaug_augs", "studio", "layout", "augs.json"
+)
+
+augs_configs = sly.json.load_json_file(json_path)
 meta = g.api.project.get_meta(g.PROJECT_ID)
 
 pipeline = []

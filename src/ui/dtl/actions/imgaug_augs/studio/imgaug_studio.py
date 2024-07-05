@@ -3,6 +3,13 @@ from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
 
+from src.ui.dtl.utils import (
+    get_layer_docs,
+    get_text_font_size,
+    get_slider_style,
+    classes_list_to_mapping,
+)
+
 from src.ui.dtl.Layer import Layer
 
 from src.ui.dtl.actions.imgaug_augs.studio.layout.node_layout import create_node_layout
@@ -31,6 +38,7 @@ class ImgAugStudioAction(Layer):
     name = "imgaug_studio_action"
     title = "ImgAug Studio"
     description = ""
+    md_description = get_layer_docs(dirname(realpath(__file__)))
     model_params = {}
 
     @classmethod
