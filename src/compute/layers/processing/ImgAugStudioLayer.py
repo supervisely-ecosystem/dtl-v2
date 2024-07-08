@@ -11,7 +11,7 @@ import json
 
 
 class ImgAugStudioLayer(Layer):
-    action = "iaa_imgaug_studio"
+    action = "imgaug_studio"
 
     layer_settings = {
         "required": ["settings"],
@@ -19,7 +19,7 @@ class ImgAugStudioLayer(Layer):
             "settings": {
                 "type": "object",
                 "required": ["pipeline"],
-                "properties": {},
+                "properties": [],
             }
         },
     }
