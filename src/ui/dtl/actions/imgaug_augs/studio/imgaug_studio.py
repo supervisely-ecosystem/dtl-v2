@@ -28,7 +28,10 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        saved_settings = {"pipeline": {}}
+        saved_settings = {
+            "pipeline": [],
+            "shuffle": False,
+        }
 
         layout_text, layout_edit_button, layout_container = create_layout_widgets()
 
@@ -54,19 +57,20 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             sidebar_params_field,
             # Sidebar add Aug
             sidebar_add_to_pipeline_button,
+            sidebar_cancel_add_to_pipeline_button,
             sidebar_add_container,
             # Sidebar layout widgets
             sidebar_layout_pipeline,
             sidebar_layout_add_aug_button,
             sidebar_layout_aug_add_field,
+            sidebar_layout_save_btn,
+            sidebar_layout_buttons_container,
             pipeline_sidebar_container,
         ) = create_sidebar_widgets()
         sidebar_layout_aug_add_field.hide()
 
         @sidebar_add_to_pipeline_button.click
         def sidebar_add_to_pipeline_button_cb():
-            nonlocal saved_settings
-
             category = sidebar_category_selector.get_value()
             method = sidebar_method_selector.get_value()
             params = aug_utils.get_params_from_widgets(sidebar_params_widgets)
@@ -75,14 +79,29 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             else:
                 sometimes = None
             sidebar_layout_pipeline.append_aug(category, method, params, sometimes)
-            saved_settings["pipeline"] = sidebar_layout_pipeline.get_pipeline()
             sidebar_layout_aug_add_field.hide()
             sidebar_layout_add_aug_button.enable()
+            sidebar_layout_save_btn.enable()
+
+        @sidebar_cancel_add_to_pipeline_button.click
+        def sidebar_cancel_add_to_pipeline_button_cb():
+            sidebar_layout_aug_add_field.hide()
+            sidebar_layout_add_aug_button.enable()
+            sidebar_layout_save_btn.enable()
+
+        @sidebar_layout_save_btn.click
+        def sidebar_layout_save_btn_cb():
+            nonlocal saved_settings
+            saved_settings = {
+                "pipeline": sidebar_layout_pipeline.get_pipeline(),
+                "shuffle": sidebar_layout_pipeline.is_shuffled(),
+            }
 
         @sidebar_layout_add_aug_button.click
         def sidebar_add_aug_button_cb():
             sidebar_layout_aug_add_field.show()
             sidebar_layout_add_aug_button.disable()
+            sidebar_layout_save_btn.disable()
 
         @sidebar_sometimes_check.value_changed
         def sidebar_sometimes_check_cb(is_checked):
@@ -112,10 +131,6 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
-            saved_settings = {
-                "pipeline": sidebar_layout_pipeline.get_pipeline(),
-                "shuffle": sidebar_layout_pipeline.is_shuffled(),
-            }
             return saved_settings
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
@@ -146,9 +161,11 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         )
 
 
-# @TODO: create one widget of each param type, hide, show, change values based on the selected method (? use reloadable for now)
 # @TODO: after adding aug to pipeline, next click on add button won't reset selectors to default values
 # @TODO: some selector widgets don't have appropriate settings for selecting value
 # ^^(e.g default slider values in geometric scaleX are float (0.5, 1.5), but slider step is 1
 # ^^ => can't select float value in slider for scaleX)
 # @TODO: check min and max values for created slider widgets
+# @TODO: value previews for slider (like in app) - slider - (-4.50, 3.30)
+
+# @TODO: [LOW PRIORITY] create one widget of each param type, hide, show, change values based on the selected method (? use reloadable for now)
