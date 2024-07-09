@@ -26,9 +26,7 @@ class AugsList(Widget):
             self.python = self._generate_py()
 
         def _generate_py(self):
-            py = (
-                f"iaa.{self.method}({''.join([f'{k}={v}, ' for k, v in self.params.items()])[:-2]})"
-            )
+            py = f"iaa.{self.method}({', '.join([f'{k}={repr(v)}' if isinstance(v, str) else f'{k}={v}' for k, v in self.params.items()])})"
             if self.sometimes is not None:
                 py = f"iaa.Sometimes({self.sometimes}, {py})"
             return py
@@ -126,6 +124,9 @@ class AugsList(Widget):
         }
 
     def get_pipeline(self):
+        return [aug.to_json() for aug in self._pipeline]
+
+    def get_pipeline_raw(self):
         return self._pipeline
 
     def set_pipeline(self, pipeline):
@@ -140,3 +141,6 @@ class AugsList(Widget):
         self._pipeline_json = [aug.get_py() for aug in self._pipeline]
         DataJson()[self.widget_id]["pipeline"] = self._pipeline_json
         DataJson().send_changes()
+
+    def is_shuffled(self) -> bool:
+        return StateJson()[self.widget_id]["shuffle"]

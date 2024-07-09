@@ -10,18 +10,13 @@ from supervisely.app.widgets import (
     Select,
 )
 
-from supervisely.app.content import StateJson, DataJson
-
-
 from src.ui.dtl import ImgAugAugmentationsAction
-from src.ui.widgets.augs_list import AugsList
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
     create_sidebar_widgets,
-    augs_json,
-    _get_params_widget,
 )
 
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_layout import create_layout_widgets
+import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as aug_utils
 
 
 class ImgAugStudioAction(ImgAugAugmentationsAction):
@@ -55,6 +50,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             # Sidebar Aug params widgets
             sidebar_params_widgets,
             sidebar_params_container,
+            sidebar_params_reloadable,
             sidebar_params_field,
             # Sidebar add Aug
             sidebar_add_to_pipeline_button,
@@ -69,15 +65,17 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
         @sidebar_add_to_pipeline_button.click
         def sidebar_add_to_pipeline_button_cb():
+            nonlocal saved_settings
+
             category = sidebar_category_selector.get_value()
             method = sidebar_method_selector.get_value()
-            params = [field for field in sidebar_params_widgets]  # todo
+            params = aug_utils.get_params_from_widgets(sidebar_params_widgets)
             if sidebar_sometimes_check.is_checked():
                 sometimes = sidebar_sometimes_input.get_value()
             else:
                 sometimes = None
-            sidebar_params_widgets.append(AugsList.AugItem(category, method, params, sometimes))
-            saved_settings["pipeline"] = sidebar_params_widgets.get_pipeline()
+            sidebar_layout_pipeline.append_aug(category, method, params, sometimes)
+            saved_settings["pipeline"] = sidebar_layout_pipeline.get_pipeline()
             sidebar_layout_aug_add_field.hide()
             sidebar_layout_add_aug_button.enable()
 
@@ -95,23 +93,29 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
         @sidebar_category_selector.value_changed
         def sidebar_category_selector_cb(current_category):
-            current_category_methods = augs_json.get(current_category)
+            current_category_methods = aug_utils.augs_json.get(current_category)
             sidebar_method_selector.set(
                 [Select.Item(new_func) for new_func in current_category_methods]
             )
 
         @sidebar_method_selector.value_changed
         def sidebar_method_selector_cb(current_method):
+            nonlocal sidebar_params_widgets, sidebar_params_container, sidebar_params_reloadable
+            sidebar_params_container.loading = True
             current_category = sidebar_category_selector.get_value()
-            current_param_widgets = _get_params_widget(current_category, current_method)
+            sidebar_params_widgets = aug_utils.get_params_widget(current_category, current_method)
 
-            sidebar_params_container._widgets = current_param_widgets
-            sidebar_params_field._content = sidebar_params_container
-            StateJson().update()
-            DataJson().update()
+            sidebar_params_container._widgets = sidebar_params_widgets
+            sidebar_params_reloadable.set_content(sidebar_params_container)
+            sidebar_params_reloadable.reload()
+            sidebar_params_container.loading = False
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
+            saved_settings = {
+                "pipeline": sidebar_layout_pipeline.get_pipeline(),
+                "shuffle": sidebar_layout_pipeline.is_shuffled(),
+            }
             return saved_settings
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
@@ -123,7 +127,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
                         sidebar_component=NodesFlow.WidgetOptionComponent(
                             pipeline_sidebar_container
                         ),
-                        sidebar_width=420,
+                        sidebar_width=680,
                     ),
                 )
             ]
@@ -142,4 +146,8 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         )
 
 
-# @TODO: create one widget of each param type, hide, show, change values based on the selected method
+# @TODO: create one widget of each param type, hide, show, change values based on the selected method (? use reloadable for now)
+# @TODO: after adding aug to pipeline, next click on add button won't reset selectors to default values
+# @TODO: some selector widgets don't have appropriate settings for selecting value
+# ^^(e.g default slider values in geometric scaleX are float (0.5, 1.5), but slider step is 1
+# ^^ => can't select float value in slider for scaleX)
