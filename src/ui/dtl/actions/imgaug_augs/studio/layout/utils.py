@@ -105,7 +105,7 @@ def get_params_widget(category, func):
 
     html_to_widget = {
         "el-input-number": InputNumber,
-        "el-input-number-range": Input,
+        "el-input-number-range": Slider,
         "el-select": Select,
         "el-slider-range": Slider,
         "el-checkbox": Checkbox,
@@ -131,9 +131,10 @@ def get_params_widget(category, func):
                 elif k == "options":
                     filtered_param["items"] = _get_select_items_params(param["options"])
                     del filtered_param["value"]
-            if param_type == "el-input-number-range" or param_type == "el-slider-range":
-                filtered_param["range"] = True
-
+                else:
+                    filtered_param[k] = v
+        if widget == Slider:
+            filtered_param["range"] = True
         widget_obj = widget(**filtered_param)
         field = Field(widget_obj, param_name)
         fields.append(field)
