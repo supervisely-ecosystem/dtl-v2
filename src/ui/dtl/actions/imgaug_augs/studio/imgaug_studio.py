@@ -33,7 +33,16 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             "shuffle": False,
         }
 
-        layout_text, layout_edit_button, layout_container = create_layout_widgets()
+        (
+            # Layout
+            layout_text,
+            layout_edit_button,
+            layout_container,
+            # Preview
+            layout_pipeline_preview,
+            layout_shuffle_preview,
+            layout_preview_container,
+        ) = create_layout_widgets()
 
         (
             # Sidebar Aug category widgets
@@ -92,9 +101,14 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         @sidebar_layout_save_btn.click
         def sidebar_layout_save_btn_cb():
             nonlocal saved_settings
+            pipeline = sidebar_layout_pipeline.get_pipeline()
+            shuffle = sidebar_layout_pipeline.is_shuffled()
+
+            layout_pipeline_preview.set(pipeline)
+            layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
             saved_settings = {
-                "pipeline": sidebar_layout_pipeline.get_pipeline(),
-                "shuffle": sidebar_layout_pipeline.is_shuffled(),
+                "pipeline": pipeline,
+                "shuffle": shuffle,
             }
 
         @sidebar_layout_add_aug_button.click
@@ -144,7 +158,13 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
                         ),
                         sidebar_width=680,
                     ),
-                )
+                ),
+                NodesFlow.Node.Option(
+                    name="Layout Preview",
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        widget=layout_preview_container
+                    ),
+                ),
             ]
             return {
                 "src": [],

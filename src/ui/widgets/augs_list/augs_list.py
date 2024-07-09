@@ -1,9 +1,5 @@
-import os
-from collections import OrderedDict
 from typing import List
 from supervisely.app.widgets import Widget
-import supervisely as sly
-from supervisely.io.json import load_json_file
 from supervisely.app import StateJson, DataJson
 
 
@@ -43,7 +39,6 @@ class AugsList(Widget):
 
     def __init__(self, pipeline: List[AugItem] = [], shuffle: bool = False, widget_id: str = None):
         self._pipeline = pipeline
-        # self._augs_config = load_json_file(os.path.join(os.path.dirname(__file__), "augs.json"))
         self._shuffle = shuffle
         self._py_options = {
             "mode": "ace/mode/python",

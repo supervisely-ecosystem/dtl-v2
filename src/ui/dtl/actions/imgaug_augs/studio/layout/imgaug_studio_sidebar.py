@@ -1,4 +1,3 @@
-from src.ui.widgets.augs_list import AugsList
 from supervisely.app.widgets import (
     Container,
     Button,
@@ -8,6 +7,7 @@ from supervisely.app.widgets import (
     InputNumber,
     ReloadableArea,
 )
+from src.ui.widgets.augs_list import AugsList
 from src.ui.dtl.utils import create_save_btn
 import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as aug_utils
 
