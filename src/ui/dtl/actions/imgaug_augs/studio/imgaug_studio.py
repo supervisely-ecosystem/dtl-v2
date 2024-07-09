@@ -187,5 +187,6 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 # ^^ => can't select float value in slider for scaleX)
 # @TODO: check min and max values for created slider widgets
 # @TODO: value previews for slider (like in app) - slider - (-4.50, 3.30)
+# @TODO: add batch processing to compute
 
 # @TODO: [LOW PRIORITY] create one widget of each param type, hide, show, change values based on the selected method (? use reloadable for now)
