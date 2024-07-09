@@ -7,34 +7,21 @@ from src.ui.dtl.utils import get_layer_docs
 
 from supervisely.app.widgets import (
     NodesFlow,
-    Container,
-    Button,
-    Text,
-    Field,
     Select,
-    Checkbox,
-    Slider,
-    Input,
-    InputNumber,
-)
-from supervisely.app import StateJson, DataJson
-from src.ui.dtl import ImgAugAugmentationsAction
-from src.ui.widgets.augs_list import AugsList
-import os
-import json
-from src.ui.dtl.utils import (
-    get_text_font_size,
-    create_save_btn,
-    get_set_settings_button_style,
-    get_set_settings_container,
-    get_text_font_size,
 )
 
+from supervisely.app.content import StateJson, DataJson
+
+
+from src.ui.dtl import ImgAugAugmentationsAction
+from src.ui.widgets.augs_list import AugsList
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
     create_sidebar_widgets,
     augs_json,
     _get_params_widget,
 )
+
+from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_layout import create_layout_widgets
 
 
 class ImgAugStudioAction(ImgAugAugmentationsAction):
@@ -48,95 +35,80 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
     def create_new_layer(cls, layer_id: Optional[str] = None):
         saved_settings = {"pipeline": {}}
 
-        # layout edit button
-        pipeline_layout_text = Text(
-            "Edit Augmentation Pipeline", status="text", font_size=get_text_font_size()
-        )
-        pipeline_layout_edit_button = Button(
-            text="EDIT",
-            icon="zmdi zmdi-edit",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
-        pipeline_layout_container = Container(
-            widgets=[pipeline_layout_text, pipeline_layout_edit_button],
-            direction="horizontal",
-            style="place-items: center",
-        )
+        layout_text, layout_edit_button, layout_container = create_layout_widgets()
 
         (
-            pipeline_widget,
-            add_aug_button,
+            # Sidebar Aug category widgets
+            sidebar_category_items,
+            sidebar_category_selector,
+            sidebar_category_field,
+            # Sidebar Aug method widgets
+            sidebar_method_list,
+            sidebar_method_items,
+            sidebar_method_selector,
+            sidebar_method_field,
+            # Sidebar Aug probability widgets
+            sidebar_sometimes_check,
+            sidebar_sometimes_input,
+            sidebar_sometimes_container,
+            sidebar_sometimes_field,
+            # Sidebar Aug params widgets
+            sidebar_params_widgets,
+            sidebar_params_container,
+            sidebar_params_field,
+            # Sidebar add Aug
+            sidebar_add_to_pipeline_button,
+            sidebar_add_container,
+            # Sidebar layout widgets
+            sidebar_layout_pipeline,
+            sidebar_layout_add_aug_button,
+            sidebar_layout_aug_add_field,
             pipeline_sidebar_container,
-            pipeline_sidebar_field,
-            aug_category_selector,
-            aug_category_field,
-            aug_func_items,
-            aug_func_selector,
-            aug_func_field,
-            aug_sometimes_check,
-            aug_sometimes_input,
-            aug_sometimes_container,
-            aug_sometimes_field,
-            fields_container,
-            aug_params_field,
-            aug_add_to_pipeline_button,
-            aug_add_container,
-            aug_add_field,
-            params_fields,
         ) = create_sidebar_widgets()
-        aug_add_field.hide()
+        sidebar_layout_aug_add_field.hide()
 
-        # @TODO: two fields in the sidebar, add aug field in layout instead of sidebar
-
-        @pipeline_layout_edit_button.click
-        def pipeline_layout_edit_button_cb():
-            pipeline_layout_edit_button.disable()
-            pipeline_sidebar_field.show()
-
-        @aug_add_to_pipeline_button.click
-        def aug_add_to_pipeline_button_cb():
-            nonlocal params_fields
-            category = aug_category_selector.get_value()
-            method = aug_func_selector.get_value()
-            params = [field for field in params_fields]  # todo
-            if aug_sometimes_check.is_checked():
-                sometimes = aug_sometimes_input.get_value()
+        @sidebar_add_to_pipeline_button.click
+        def sidebar_add_to_pipeline_button_cb():
+            category = sidebar_category_selector.get_value()
+            method = sidebar_method_selector.get_value()
+            params = [field for field in sidebar_params_widgets]  # todo
+            if sidebar_sometimes_check.is_checked():
+                sometimes = sidebar_sometimes_input.get_value()
             else:
                 sometimes = None
-            pipeline_widget.append(AugsList.AugItem(category, method, params, sometimes))
-            saved_settings["pipeline"] = pipeline_widget.get_pipeline()
-            aug_add_field.hide()
-            add_aug_button.enable()
-            pipeline_layout_edit_button.enable()
+            sidebar_params_widgets.append(AugsList.AugItem(category, method, params, sometimes))
+            saved_settings["pipeline"] = sidebar_params_widgets.get_pipeline()
+            sidebar_layout_aug_add_field.hide()
+            sidebar_layout_add_aug_button.enable()
 
-        @add_aug_button.click
-        def add_aug_button_cb():
-            aug_add_field.show()
-            add_aug_button.disable()
+        @sidebar_layout_add_aug_button.click
+        def sidebar_add_aug_button_cb():
+            sidebar_layout_aug_add_field.show()
+            sidebar_layout_add_aug_button.disable()
 
-        @aug_sometimes_check.value_changed
-        def aug_sometimes_check_cb(value):
-            if value is True:
-                aug_sometimes_input.enable()
-            elif value is False:
-                aug_sometimes_input.disable()
+        @sidebar_sometimes_check.value_changed
+        def sidebar_sometimes_check_cb(is_checked):
+            if is_checked:
+                sidebar_sometimes_input.enable()
+            else:
+                sidebar_sometimes_input.disable()
 
-        @aug_category_selector.value_changed
-        def aug_category_selector_cb(value):
-            new_funcs = augs_json.get(value)
-            aug_func_selector.set([Select.Item(new_func) for new_func in new_funcs.keys()])
-
-        @aug_func_selector.value_changed
-        def aug_func_selector_cb(value):
-            nonlocal fields_container
-
-            fields_container = Container(
-                _get_params_widget(aug_category_selector.get_value(), value)
+        @sidebar_category_selector.value_changed
+        def sidebar_category_selector_cb(current_category):
+            current_category_methods = augs_json.get(current_category)
+            sidebar_method_selector.set(
+                [Select.Item(new_func) for new_func in current_category_methods]
             )
-            aug_params_field._content = fields_container
+
+        @sidebar_method_selector.value_changed
+        def sidebar_method_selector_cb(current_method):
+            current_category = sidebar_category_selector.get_value()
+            current_param_widgets = _get_params_widget(current_category, current_method)
+
+            sidebar_params_container._widgets = current_param_widgets
+            sidebar_params_field._content = sidebar_params_container
+            StateJson().update()
+            DataJson().update()
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
@@ -145,23 +117,15 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         def create_options(src: list, dst: list, settings: dict) -> dict:
             settings_options = [
                 NodesFlow.Node.Option(
-                    name="Sidebar",
+                    name="Layout",
                     option_component=NodesFlow.WidgetOptionComponent(
-                        widget=pipeline_layout_container,
+                        widget=layout_container,
                         sidebar_component=NodesFlow.WidgetOptionComponent(
-                            Container([pipeline_sidebar_field, aug_add_field])
+                            pipeline_sidebar_container
                         ),
                         sidebar_width=420,
                     ),
-                ),
-                # NodesFlow.Node.Option(
-                #     name="Pipeline",
-                #     option_component=NodesFlow.WidgetOptionComponent(
-                #         aug_add_field,
-                #         sidebar_component=NodesFlow.WidgetOptionComponent(aug_add_field),
-                #         sidebar_width=420,
-                #     ),
-                # ),
+                )
             ]
             return {
                 "src": [],
@@ -176,3 +140,6 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             get_settings=get_settings,
             need_preview=False,
         )
+
+
+# @TODO: create one widget of each param type, hide, show, change values based on the selected method
