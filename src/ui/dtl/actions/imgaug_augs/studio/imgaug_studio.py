@@ -142,7 +142,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
-            need_preview=False,
+            need_preview=True,
         )
 
 
@@ -151,3 +151,4 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 # @TODO: some selector widgets don't have appropriate settings for selecting value
 # ^^(e.g default slider values in geometric scaleX are float (0.5, 1.5), but slider step is 1
 # ^^ => can't select float value in slider for scaleX)
+# @TODO: check min and max values for created slider widgets

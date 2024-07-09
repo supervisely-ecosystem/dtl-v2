@@ -6,6 +6,7 @@ from typing import Tuple
 import imgaug.augmenters as iaa
 from supervisely import Annotation
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+import supervisely as sly
 
 import json
 
@@ -18,8 +19,21 @@ class ImgAugStudioLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["pipeline"],
-                "properties": [],
+                "required": ["pipeline", "shuffle"],
+                "properties": {
+                    "pipeline": {
+                        "type": "array",
+                        "properties": {
+                            "category": {"type": "string"},
+                            "method": {"type": "string"},
+                            "params": {"type": "object"},
+                            "sometimes": {"type": "number"},
+                            "python": {"type": "string"},
+                        },
+                        "required": ["category", "method", "params", "sometimes", "python"],
+                    },
+                    "shuffle": {"type": "boolean"},
+                },
             }
         },
     }
@@ -32,18 +46,14 @@ class ImgAugStudioLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
-
-        pipeline_json = self.settings["pipeline"]
-        pipeline = json.loads(pipeline_json)
-
-        if self.settings["option"] == "defocus_blur":
-            aug = iaa.imgcorruptlike.DefocusBlur(severity=self.settings["severity"])
-        elif self.settings["option"] == "motion_blur":
-            aug = iaa.imgcorruptlike.MotionBlur(severity=self.settings["severity"])
-        elif self.settings["option"] == "zoom_blur":
-            aug = iaa.imgcorruptlike.ZoomBlur(severity=self.settings["severity"])
-
-        img = img_desc.read_image()
-        pixelated_img = aug.augment_image(img.astype(np.uint8))
-        new_img_desc = img_desc.clone_with_item(pixelated_img)
-        yield (new_img_desc, ann)
+        pipeline = self.settings["pipeline"]
+        if len(pipeline) == 0:
+            yield (img_desc, ann)
+        else:
+            img = img_desc.item_data
+            meta = self.output_meta
+            augs = sly.imgaug_utils.build_pipeline(pipeline)
+            _, res_img, res_ann = sly.imgaug_utils.apply(augs, meta, img, ann)
+            new_img_desc = img_desc.clone_with_item(res_img)
+            new_ann = res_ann
+            yield (new_img_desc, new_ann)
