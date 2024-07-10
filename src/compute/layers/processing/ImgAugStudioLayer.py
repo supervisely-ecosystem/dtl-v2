@@ -47,12 +47,13 @@ class ImgAugStudioLayer(Layer):
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
         pipeline = self.settings["pipeline"]
+        shuffle = self.settings["shuffle"]
         if len(pipeline) == 0:
             yield (img_desc, ann)
         else:
             img = img_desc.item_data
             meta = self.output_meta
-            augs = sly.imgaug_utils.build_pipeline(pipeline)
+            augs = sly.imgaug_utils.build_pipeline(pipeline, shuffle)
             _, res_img, res_ann = sly.imgaug_utils.apply(augs, meta, img, ann)
             new_img_desc = img_desc.clone_with_item(res_img)
             new_ann = res_ann
