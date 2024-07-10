@@ -183,11 +183,6 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         )
 
 
-# @TODO: after adding aug to pipeline, next click on add button won't reset selectors to default values - done
-# @TODO: some selector widgets don't have appropriate settings for selecting value - done
-# ^^(e.g default slider values in geometric scaleX are float (0.5, 1.5), but slider step is 1
-# ^^ => can't select float value in slider for scaleX)
-# @TODO: check min and max values for created slider widgets - done
 # @TODO: value previews for slider (like in app) - slider - (-4.50, 3.30)
 # @TODO: add batch processing to compute
 
