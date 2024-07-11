@@ -1,16 +1,15 @@
 <link rel="stylesheet" href="./static/css/augs_list.css" />
 
 <div id="augs-research">
-	<sly-card
-		class="mr15"
-		title="Add aug to pipeline"
-		subtitle="Explore, configure and preview"
-		style="min-width: 350px; max-width: 350px; align-self: flex-start"
-	>
-		<sly-field
-			title="Augmenter Category"
-			description="Choose augmentation category"
+	<sly-field title="Add aug to pipeline" description=""
+		><div
+			slot="description"
+			style="border-bottom: 3px solid #dae2e8; padding-bottom: 5px"
 		>
+			Explore, configure and preview
+		</div>
+		<sly-field title="Augmenter Category"
+			><div slot="description">Choose augmentation category</div>
 			<el-select
 				:value="state.{{{widget.widget_id}}}.category"
 				@input="
@@ -29,10 +28,8 @@
 			</el-select>
 		</sly-field>
 
-		<sly-field
-			title="Transformation"
-			description="Choose augmentation function"
-		>
+		<sly-field title="Transformation"
+			><div slot="description">Choose augmentation function</div>
 			<el-select
 				:value="state.{{{widget.widget_id}}}.name"
 				@input="
@@ -51,10 +48,8 @@
 		</sly-field>
 
 		<div>
-			<sly-field
-				title="Apply sometimes"
-				description="apply aug with given probability"
-			>
+			<sly-field title="Apply sometimes"
+				><div slot="description">Apply aug with given probability</div>
 				<el-checkbox v-model="state.{{{widget.widget_id}}}.sometimes"
 					>probability</el-checkbox
 				>
@@ -70,7 +65,8 @@
 				></el-input-number>
 			</sly-field>
 
-			<sly-field title="Params" description="Configure current augmentation">
+			<sly-field title="Params">
+				<div slot="description">Configure current augmentation</div>
 				<div
 					v-for="(item, idx) in data.{{{widget.widget_id}}}.config[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name].params"
 					:key="item.pname"
@@ -172,5 +168,5 @@
 				</div>
 			</sly-field>
 		</div>
-	</sly-card>
+	</sly-field>
 </div>

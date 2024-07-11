@@ -85,7 +85,7 @@ class AugsListParamsSelector(Widget):
         if sometimes:
             return StateJson()[self.widget_id]["probability"]
         else:
-            return False
+            return None
 
     def get_params(self):
         category = self.get_category()
