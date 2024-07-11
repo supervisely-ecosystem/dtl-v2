@@ -65,6 +65,11 @@ def get_params_widget(category, func):
     return fields
 
 
+def get_pipeline_from_fileinfo(file_info):
+    pipeline = []
+    return pipeline
+
+
 def get_params_from_widgets(widgets: List[Widget]) -> Dict:
     params = {}
     for field_widget in widgets:

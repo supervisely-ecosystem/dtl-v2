@@ -17,6 +17,8 @@ from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
 
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_layout import create_layout_widgets
 import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as aug_utils
+from supervisely.api.file_api import FileApi
+import src.globals as g
 
 
 class ImgAugStudioAction(ImgAugAugmentationsAction):
@@ -45,6 +47,16 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         ) = create_layout_widgets()
 
         (
+            # Sidebar Initialization widgets
+            sidebar_init_selector,
+            # sidebar_init_new_button,
+            # sidebar_init_selector_container,
+            sidebar_init_input,
+            sidebar_init_input_button,
+            sidebar_init_input_container,
+            sidebar_init_input_filethumb,
+            sidebar_init_container,
+            sidebar_init_field,
             # Sidebar create Aug
             sidebar_params_widget,
             sidebar_add_to_pipeline_button,
@@ -96,6 +108,42 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             sidebar_add_container.show()
             sidebar_layout_add_aug_button.disable()
             sidebar_layout_save_btn.disable()
+
+        @sidebar_init_selector.value_changed
+        def sidebar_init_selecor_cb(value):
+            if value == 0:
+                sidebar_init_input_container.hide()
+                sidebar_layout_pipeline.show()
+                sidebar_layout_buttons_container.show()
+            elif value == 1:
+                sidebar_init_input_container.show()
+                sidebar_layout_pipeline.hide()
+                sidebar_layout_buttons_container.hide()
+
+        @sidebar_init_input.value_changed
+        def sidebar_init_input_cb(value):
+            file_info = None
+            if len(value) > 0 and value != "":
+                sidebar_init_input_filethumb.show()
+                file_info = FileApi(g.api).get_info_by_path(g.TEAM_ID, value)
+            else:
+                sidebar_init_input_filethumb.hide()
+
+            sidebar_init_input_filethumb.set(file_info)
+            if file_info is not None:
+                sidebar_init_input_button.enable()
+            else:
+                sidebar_init_input_button.disable()
+
+        @sidebar_init_input_button.click
+        def sidebar_init_input_button_cb():
+            sidebar_init_input.disable()
+            sidebar_init_input_button.disable()
+            file_info = sidebar_init_input_filethumb.get_json_data()
+            pipeline = aug_utils.get_pipeline_from_fileinfo(file_info)
+            sidebar_layout_pipeline.set_pipeline(pipeline)
+            sidebar_layout_pipeline.show()
+            sidebar_layout_buttons_container.show()
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
