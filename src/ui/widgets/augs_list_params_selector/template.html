@@ -1,0 +1,176 @@
+<link rel="stylesheet" href="./static/css/augs_list.css" />
+
+<div id="augs-research">
+	<sly-card
+		class="mr15"
+		title="Add aug to pipeline"
+		subtitle="Explore, configure and preview"
+		style="min-width: 350px; max-width: 350px; align-self: flex-start"
+	>
+		<sly-field
+			title="Augmenter Category"
+			description="Choose augmentation category"
+		>
+			<el-select
+				:value="state.{{{widget.widget_id}}}.category"
+				@input="
+                    (val) => {
+                        state.{{{widget.widget_id}}}.category = val;
+                        state.{{{widget.widget_id}}}.name = data.{{{widget.widget_id}}}.augs[state.{{{widget.widget_id}}}.category][0];
+                    }
+                    "
+			>
+				<el-option
+					v-for="(item, category_name) in data.{{{widget.widget_id}}}.config"
+					:key="category_name"
+					:label="category_name"
+					:value="category_name"
+				></el-option>
+			</el-select>
+		</sly-field>
+
+		<sly-field
+			title="Transformation"
+			description="Choose augmentation function"
+		>
+			<el-select
+				:value="state.{{{widget.widget_id}}}.name"
+				@input="
+                    (val) => {
+                        state.{{{widget.widget_id}}}.name = val;
+                    }
+                    "
+			>
+				<el-option
+					v-for="(item, method_name) in data.{{{widget.widget_id}}}.config[state.{{{widget.widget_id}}}.category]"
+					:key="method_name"
+					:label="method_name"
+					:value="method_name"
+				></el-option>
+			</el-select>
+		</sly-field>
+
+		<div>
+			<sly-field
+				title="Apply sometimes"
+				description="apply aug with given probability"
+			>
+				<el-checkbox v-model="state.{{{widget.widget_id}}}.sometimes"
+					>probability</el-checkbox
+				>
+				<el-input-number
+					v-model="state.{{{widget.widget_id}}}.probability"
+					class="ml5"
+					:disabled="!state.{{{widget.widget_id}}}.sometimes"
+					:min="0"
+					:max="1"
+					:step="0.01"
+					size="small"
+					:debounce="1000"
+				></el-input-number>
+			</sly-field>
+
+			<sly-field title="Params" description="Configure current augmentation">
+				<div
+					v-for="(item, idx) in data.{{{widget.widget_id}}}.config[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name].params"
+					:key="item.pname"
+				>
+					<sly-field :title="item.pname" class="auto-field">
+						<div v-if="item.type === 'el-slider-range'" class="fflex">
+							<el-slider
+								class="ml5 mr5"
+								size="small"
+								style="flex: 1"
+								v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname]"
+								range
+								:min="item.min"
+								:max="item.max"
+								:step="item.step || 1"
+							>
+							</el-slider>
+							<span
+								v-if="item.valueType !== 'int'"
+								style="width: 70px; text-align: right"
+							>
+								({{state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][0].toFixed(2)}},
+								{{state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][1].toFixed(2)}})
+							</span>
+							<span
+								v-if="item.valueType === 'int'"
+								style="width: 70px; text-align: right"
+							>
+								({{state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][0]}},
+								{{state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][1]}})
+							</span>
+						</div>
+						<div v-if="item.type === 'el-input-number-range'" class="fflex">
+							<div class="fflex">
+								<el-input-number
+									size="small"
+									:min="item.min"
+									:max="item.max"
+									:step="item.step || 1"
+									:debounce="1000"
+									v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][0]"
+								>
+								</el-input-number>
+								<span class="ml5 mr5">-</span>
+								<el-input-number
+									size="small"
+									:min="item.min"
+									:max="item.max"
+									:step="item.step || 1"
+									:debounce="1000"
+									v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][1]"
+								>
+								</el-input-number>
+							</div>
+						</div>
+						<div v-if="item.type === 'el-input-range'" class="fflex">
+							<div class="fflex">
+								<el-input
+									size="small"
+									v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][0]"
+								>
+								</el-input>
+								<span class="ml5 mr5">-</span>
+								<el-input
+									size="small"
+									v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname][1]"
+								>
+								</el-input>
+							</div>
+						</div>
+						<el-checkbox
+							v-if="item.type === 'el-checkbox'"
+							v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname]"
+							>Enable
+						</el-checkbox>
+						<el-input-number
+							v-if="item.type === 'el-input-number'"
+							size="small"
+							:min="item.min"
+							:max="item.max"
+							:step="item.step || 1"
+							:debounce="1000"
+							v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname]"
+						>
+						</el-input-number>
+						<el-select
+							v-if="item.type === 'el-select'"
+							size="small"
+							v-model="state.{{{widget.widget_id}}}.augVModels[state.{{{widget.widget_id}}}.category][state.{{{widget.widget_id}}}.name][item.pname]"
+						>
+							<el-option
+								v-for="val in item.options"
+								:key="val"
+								:label="val"
+								:value="val"
+							></el-option>
+						</el-select>
+					</sly-field>
+				</div>
+			</sly-field>
+		</div>
+	</sly-card>
+</div>

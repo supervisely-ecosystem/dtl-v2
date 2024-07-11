@@ -136,14 +136,12 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         @sidebar_method_selector.value_changed
         def sidebar_method_selector_cb(current_method):
             nonlocal sidebar_params_widgets, sidebar_params_container, sidebar_params_reloadable
-            sidebar_params_container.loading = True
             current_category = sidebar_category_selector.get_value()
             sidebar_params_widgets = aug_utils.get_params_widget(current_category, current_method)
 
             sidebar_params_container._widgets = sidebar_params_widgets
             sidebar_params_reloadable.set_content(sidebar_params_container)
             sidebar_params_reloadable.reload()
-            sidebar_params_container.loading = False
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
