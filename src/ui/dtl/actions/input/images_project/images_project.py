@@ -95,8 +95,6 @@ class ImagesProjectAction(SourceAction):
             widgets=[select_datasets, empty_dataset_notification, src_save_btn]
         )
 
-        saved_src = []
-
         # fix team and workspace for SelectDataset widget
         StateJson()[select_datasets._project_selector._ws_selector._team_selector.widget_id][
             "teamId"
@@ -107,6 +105,7 @@ class ImagesProjectAction(SourceAction):
         select_datasets._project_selector._ws_selector.disable()
         StateJson().send_changes()
 
+        saved_src = []
         # Settings widgets
         _current_info = None
         _current_meta = ProjectMeta()
