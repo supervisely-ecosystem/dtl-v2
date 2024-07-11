@@ -1,8 +1,145 @@
-# iaa.geometric.ElasticTransformation
+# ImgAugStudio
 
-`ElasticTransformation` layer transforms images by moving pixels locally around using displacement fields.
+`ImgAugStudio` layer is a wrapper around great [ImgAug Library](https://github.com/aleju/imgaug). It helps you build augmentation pipelines with ease.
 
-[Read more about ElasticTransformation in ImgAug's documentation](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ElasticTransformation)
+Only labels of types `Polygon`, `Rectangle` and `Bitmap` in supervisely format can be converted automatically to imgaug format (and vice versa).
+
+<details>
+  <summary><b>List of supported augmentations</b></summary>
+
+```python
+{
+    "arithmetic": [
+        arithmetic.Add,
+        arithmetic.AddElementwise,
+        arithmetic.AdditiveGaussianNoise,
+        arithmetic.AdditiveLaplaceNoise,
+        arithmetic.AdditivePoissonNoise,
+        arithmetic.Multiply,
+        arithmetic.MultiplyElementwise,
+        arithmetic.Cutout,
+        arithmetic.Dropout,
+        arithmetic.CoarseDropout,
+        arithmetic.Dropout2d,
+        arithmetic.ImpulseNoise,
+        arithmetic.SaltAndPepper,
+        arithmetic.CoarseSaltAndPepper,
+        arithmetic.Salt,
+        arithmetic.CoarseSalt,
+        arithmetic.Pepper,
+        arithmetic.CoarsePepper,
+        arithmetic.Invert,
+        arithmetic.Solarize,
+        arithmetic.ContrastNormalization,
+        arithmetic.JpegCompression,
+    ],
+    "blur": [
+        blur.GaussianBlur,
+        blur.AverageBlur,
+        blur.MedianBlur,
+        blur.BilateralBlur,
+        blur.MotionBlur,
+        blur.MeanShiftBlur,
+    ],
+    "color": [
+        color.MultiplyAndAddToBrightness,
+        color.MultiplyBrightness,
+        color.AddToBrightness,
+        color.MultiplyHueAndSaturation,
+        color.MultiplyHue,
+        color.MultiplySaturation,
+        color.RemoveSaturation,
+        color.AddToHueAndSaturation,
+        color.AddToHue,
+        color.AddToSaturation,
+        color.Grayscale,
+        color.ChangeColorTemperature,
+        color.KMeansColorQuantization,
+        color.UniformColorQuantization,
+        color.Posterize,
+    ],
+    "contrast": [
+        contrast.GammaContrast,
+        contrast.SigmoidContrast,
+        contrast.LogContrast,
+        contrast.LinearContrast,
+        contrast.AllChannelsHistogramEqualization,
+        contrast.HistogramEqualization,
+        contrast.AllChannelsCLAHE,
+        contrast.CLAHE,
+    ],
+    "convolutional": [
+        convolutional.Sharpen,
+        convolutional.Emboss,
+        convolutional.EdgeDetect,
+        convolutional.DirectedEdgeDetect,
+    ],
+    "flip": [
+        flip.Fliplr,
+        flip.Flipud,
+    ],
+    "geometric": [
+        geometric.ScaleX,
+        geometric.ScaleY,
+        geometric.TranslateX,
+        geometric.TranslateY,
+        geometric.Rotate,
+        geometric.ShearX,
+        geometric.ShearY,
+        geometric.PiecewiseAffine,
+        geometric.PerspectiveTransform,
+        geometric.ElasticTransformation,
+        geometric.Rot90,
+    ],
+    "imgcorruptlike": [
+        imgcorruptlike.GaussianNoise,
+        imgcorruptlike.ShotNoise,
+        imgcorruptlike.ImpulseNoise,
+        imgcorruptlike.SpeckleNoise,
+        imgcorruptlike.GaussianBlur,
+        imgcorruptlike.GlassBlur,
+        imgcorruptlike.DefocusBlur,
+        imgcorruptlike.MotionBlur,
+        imgcorruptlike.ZoomBlur,
+        imgcorruptlike.Fog,
+        imgcorruptlike.Frost,
+        imgcorruptlike.Snow,
+        imgcorruptlike.Spatter,
+        imgcorruptlike.Contrast,
+        imgcorruptlike.Brightness,
+        imgcorruptlike.Saturate,
+        imgcorruptlike.JpegCompression,
+        imgcorruptlike.Pixelate,
+    ],
+    "pillike": [
+        pillike.Solarize,
+        pillike.Equalize,
+        pillike.Autocontrast,
+        pillike.EnhanceColor,
+        pillike.EnhanceContrast,
+        pillike.EnhanceBrightness,
+        pillike.EnhanceSharpness,
+        pillike.FilterBlur,
+        pillike.FilterSmooth,
+        pillike.FilterSmoothMore,
+        pillike.FilterEdgeEnhance,
+        pillike.FilterEdgeEnhanceMore,
+        pillike.FilterFindEdges,
+        pillike.FilterContour,
+        pillike.FilterEmboss,
+        pillike.FilterSharpen,
+        pillike.FilterDetail,
+    ],
+    "segmentation": [
+        segmentation.Superpixels,
+        segmentation.UniformVoronoi,
+        segmentation.RegularGridVoronoi,
+        segmentation.RelativeRegularGridVoronoi,
+    ],
+}
+```
+
+</details>
 
 ### Annotation augmentation
 
@@ -11,11 +148,9 @@ At the current moment, layer only augments `Masks`, `Bounding Boxes` and `Polygo
 
 ### Settings:
 
-- **Alpha** Set minimum and maximum values to specify the strength of the displacement.
-- **Sigma** Set minimum and maximum values to specify the smoothness of the displacement.
-
-A proportion of 10:1 between alpha and sigma (e.g. alpha=30, sigma=3 or alpha=70, sigma=7) seems work really well to achieve water-like effect.
-
+- **Category** - Augmentation category. Select one of the aug categories: `arithmetic`, `blur`, `color`, `contrast`, `convolutional`, `flip`, `geometric`, `imgcorruptlike`, `pillike`, `segmentation`.
+- **Method** - Augmentation method. Select one of the methods from the selected category.
+- **Parameters** - Augmentation parameters. Each method has its own set of parameters. You can find the full list of parameters in the [ImgAug documentation](https://imgaug.readthedocs.io/en/latest/source/overview_of_augmenters.html).
 
 ### Example. Transform the image
 
@@ -62,4 +197,3 @@ In this example, the image is transformed with alpha (0, 70), sigma (4, 6).
 # Acknowledgements
 
 This layer is based on the great work of `ImgAug` ([github](https://github.com/aleju/imgaug)). ![GitHub Org's stars](https://img.shields.io/github/stars/aleju/imgaug?style=social)
-

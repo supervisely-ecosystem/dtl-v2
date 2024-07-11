@@ -174,6 +174,7 @@ image_actions_list = {
         SlidingWindowAction.name,
     ],
     IMGAUG_AUGMENTATIONS: [
+        ImgAugStudioAction.name,
         ImgAugCorruptlikeNoiseAction.name,
         ImgAugCorruptlikeBlurAction.name,
         ImgAugCorruptlikeWeatherAction.name,
@@ -181,7 +182,6 @@ image_actions_list = {
         ImgAugCorruptlikeCompressionAction.name,
         ElasticTransformationAction.name,
         PerspectiveTransformaAction.name,
-        ImgAugStudioAction.name,
     ],
     ANNOTATION_TRANSFORMS: [
         ApproxVectorAction.name,
@@ -252,6 +252,7 @@ image_actions_dict = {
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
     # ImgAug Augmentations
+    ImgAugStudioAction.name: ImgAugStudioAction,
     ImgAugCorruptlikeNoiseAction.name: ImgAugCorruptlikeNoiseAction,
     ImgAugCorruptlikeBlurAction.name: ImgAugCorruptlikeBlurAction,
     ImgAugCorruptlikeWeatherAction.name: ImgAugCorruptlikeWeatherAction,
@@ -259,7 +260,6 @@ image_actions_dict = {
     ImgAugCorruptlikeCompressionAction.name: ImgAugCorruptlikeCompressionAction,
     ElasticTransformationAction.name: ElasticTransformationAction,
     PerspectiveTransformaAction.name: PerspectiveTransformaAction,
-    ImgAugStudioAction.name: ImgAugStudioAction,
     # Annotation layers
     ApproxVectorAction.name: ApproxVectorAction,
     BackgroundAction.name: BackgroundAction,
