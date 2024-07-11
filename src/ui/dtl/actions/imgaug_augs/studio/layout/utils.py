@@ -1,5 +1,4 @@
 import os
-import json
 from typing import List, Dict
 from supervisely.app.widgets import (
     Select,
@@ -10,10 +9,11 @@ from supervisely.app.widgets import (
     Widget,
     Field,
 )
+from supervisely.io.json import load_json_file
 
 
 json_path = os.path.join(os.getcwd(), "src/ui/dtl/actions/imgaug_augs/studio/layout/augs.json")
-augs_json = json.load(json_path)
+augs_json = load_json_file(json_path)
 
 
 def get_params_widget(category, func):
