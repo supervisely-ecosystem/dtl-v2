@@ -42,6 +42,14 @@ from supervisely.app.widgets import (
     Field,
 )
 
+from ui.dtl.actions.input.images_project.layout.src_input_data import (
+    create_input_data_selector_widgets,
+)
+from src.ui.dtl.actions.input.images_project.layout.src_classes import (
+    create_classes_selector_widgets,
+)
+from src.ui.dtl.actions.input.images_project.layout.src_tags import create_tags_selector_widgets
+
 
 # ImagesProject
 class ImagesProjectAction(SourceAction):
@@ -58,161 +66,43 @@ class ImagesProjectAction(SourceAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        # Src widgets
-        select_datasets = SelectDataset(
-            multiselect=True,
-            select_all_datasets=True,
-            allowed_project_types=[ProjectType.IMAGES],
-            compact=False,
-        )
-        select_datasets_text = Text("Select Project", status="text", font_size=get_text_font_size())
-        select_datasets_btn = Button(
-            text="SELECT",
-            icon="zmdi zmdi-folder",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
-        empty_dataset_notification = NotificationBox(
-            title="No datasets selected", description="Select at lease one dataset"
-        )
-        empty_dataset_notification.hide()
-        select_datasets_container = get_set_settings_container(
-            select_datasets_text, select_datasets_btn
-        )
-        src_save_btn = Button(
-            "Save", icon="zmdi zmdi-floppy", emit_on_click="save", call_on_click="closeSidebar();"
-        )
-        src_preview_widget_text = Text("", status="text", font_size=get_text_font_size())
-        src_preview_widget_text.hide()
-        src_preview_widget_thumbnail = ProjectThumbnail(remove_margins=True)
-        src_preview_widget_thumbnail.hide()
-        src_preview_widget = Container(
-            widgets=[src_preview_widget_thumbnail, src_preview_widget_text]
-        )
-        src_widgets_container = Container(
-            widgets=[select_datasets, empty_dataset_notification, src_save_btn]
-        )
-
-        # fix team and workspace for SelectDataset widget
-        StateJson()[select_datasets._project_selector._ws_selector._team_selector.widget_id][
-            "teamId"
-        ] = g.TEAM_ID
-        StateJson()[select_datasets._project_selector._ws_selector.widget_id][
-            "workspaceId"
-        ] = g.WORKSPACE_ID
-        select_datasets._project_selector._ws_selector.disable()
-        StateJson().send_changes()
-
+        # Layer Settings
         saved_src = []
-        # Settings widgets
         _current_info = None
         _current_meta = ProjectMeta()
 
-        # add to sidebar when no project selected
-        # empty_src_notification = NotificationBox(
-        #     title="No classes",
-        #     description="Choose datasets and ensure that source project have classes.",
-        # )
+        default_classes_mapping_settings = "default"
+        saved_classes_mapping_settings = "default"
 
-        # CLASSES
-        classes_mapping_widget = ClassesTable()
-        classes_mapping_save_btn = create_save_btn()
-        classes_mapping_set_default_btn = Button(
-            "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
-        )
-        classes_mapping_preview = ClassesListPreview()
+        default_tags_mapping_settings = "default"
+        saved_tags_mapping_settings = "default"
+        # ----------------------------
 
-        classes_mapping_field = Field(
-            content=classes_mapping_widget,
-            title="Classes",
-            description=(
-                "Select classes that will be used in data transformation processes. "
-                "If class is not selected, it will be ignored."
-            ),
-        )
-        classes_mapping_widgets_container = Container(
-            widgets=[
-                classes_mapping_field,
-                Container(
-                    widgets=[
-                        classes_mapping_save_btn,
-                        classes_mapping_set_default_btn,
-                    ],
-                    direction="horizontal",
-                    gap=0,
-                    fractions=[1, 0],
-                    # gap=355,
-                ),
-            ]
-        )
-        classes_mapping_edit_text = Text("Classes", status="text", font_size=get_text_font_size())
-        classes_mapping_edit_btn = Button(
-            text="EDIT",
-            icon="zmdi zmdi-edit",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
+        # Project/Dataset Selector
+        (
+            # Sidebar
+            src_input_data_sidebar_dataset_selector,
+            src_input_data_sidebar_save_btn,
+            src_input_data_sidebar_empty_ds_notification,
+            src_input_data_sidebar_widgets_container,
+            # Preview
+            src_input_data_sidebar_preview_widget_text,
+            src_input_data_sidebar_preview_widget_pr_thumbnail,
+            src_input_data_sidebar_preview_widget_ds_thumbnail,
+            src_input_data_sidebar_preview_widget,
+            # Layout
+            src_input_data_sidebar_layout_text,
+            src_input_data_sidebar_layout_select_btn,
+            src_input_data_sidebar_layout_container,
+        ) = create_input_data_selector_widgets()
+        # ----------------------------
 
-        if g.PROJECT_ID is None:
-            classes_mapping_edit_btn.disable()
-
-        classes_mapping_edit_contaniner = get_set_settings_container(
-            classes_mapping_edit_text, classes_mapping_edit_btn
-        )
+        # Classes Selector
+        () = create_classes_selector_widgets()
         # -----
 
         # TAGS
-        tags_mapping_widget = TagsTable()
-        tags_mapping_save_btn = create_save_btn()
-        tags_mapping_set_default_btn = Button(
-            "Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh"
-        )
-        tags_mapping_preview = TagsListPreview()
-
-        tags_mapping_field = Field(
-            content=tags_mapping_widget,
-            title="Tags",
-            description=(
-                "Select tags that will be used in data transformation processes. "
-                "If tag is not selected, it will be ignored."
-            ),
-        )
-        tags_mapping_widgets_container = Container(
-            widgets=[
-                tags_mapping_field,
-                Container(
-                    widgets=[
-                        tags_mapping_save_btn,
-                        tags_mapping_set_default_btn,
-                    ],
-                    direction="horizontal",
-                    gap=0,
-                    fractions=[1, 0],
-                    # gap=355,
-                ),
-            ]
-        )
-        tags_mapping_edit_text = Text("Tags", status="text", font_size=get_text_font_size())
-        tags_mapping_edit_btn = Button(
-            text="EDIT",
-            icon="zmdi zmdi-edit",
-            button_type="text",
-            button_size="small",
-            emit_on_click="openSidebar",
-            style=get_set_settings_button_style(),
-        )
-
-        if g.PROJECT_ID is None:
-            tags_mapping_edit_btn.disable()
-
-        tags_mapping_edit_contaniner = get_set_settings_container(
-            tags_mapping_edit_text, tags_mapping_edit_btn
-        )
-
+        () = create_tags_selector_widgets()
         # -----
 
         update_preview_btn = Button(
@@ -223,12 +113,6 @@ class ImagesProjectAction(SourceAction):
             style=get_set_settings_button_style(),
         )
         update_preview_btn.disable()
-
-        default_classes_mapping_settings = "default"
-        saved_classes_mapping_settings = "default"
-
-        default_tags_mapping_settings = "default"
-        saved_tags_mapping_settings = "default"
 
         def _set_src_preview():
             src_preview_text = ""
@@ -245,16 +129,16 @@ class ImagesProjectAction(SourceAction):
                         src_preview_text = f'<ul style="margin: 1px; padding: 0px 0px 0px 18px">{src_preview_text}<ul>'
             if _current_info is not None:
                 if not src_preview_text == "":
-                    src_preview_widget_text.show()
-                src_preview_widget_thumbnail.show()
-                src_preview_widget_thumbnail.set(_current_info)
-                src_preview_widget_text.text = src_preview_text
+                    src_input_data_sidebar_preview_widget_text.show()
+                src_input_data_sidebar_preview_widget_pr_thumbnail.show()
+                src_input_data_sidebar_preview_widget_pr_thumbnail.set(_current_info)
+                src_input_data_sidebar_preview_widget_text.text = src_preview_text
 
         def _save_src():
             def read_src_from_widget():
                 # get_list and compare ids
-                selected_dataset_ids = select_datasets.get_selected_ids()
-                project_id = select_datasets.get_selected_project_id()
+                selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
+                project_id = src_input_data_sidebar_dataset_selector.get_selected_project_id()
                 datasets = []
                 if project_id is not None:
                     datasets = g.api.dataset.get_list(project_id)
@@ -462,9 +346,11 @@ class ImagesProjectAction(SourceAction):
             project_not_found = False
             if len(srcs) == 0:
                 # set empty src to widget
-                StateJson()[select_datasets._project_selector.widget_id]["projectId"] = None
-                StateJson()[select_datasets.widget_id]["datasets"] = []
-                # select_datasets._all_datasets_checkbox.uncheck()
+                StateJson()[src_input_data_sidebar_dataset_selector._project_selector.widget_id][
+                    "projectId"
+                ] = None
+                StateJson()[src_input_data_sidebar_dataset_selector.widget_id]["datasets"] = []
+                # src_input_data_sidebar_dataset_selector._all_datasets_checkbox.uncheck()
                 StateJson().send_changes()
 
                 # set empty project meta
@@ -492,22 +378,26 @@ class ImagesProjectAction(SourceAction):
 
                 if project_not_found is False:
                     # set datasets to widget
-                    StateJson()[select_datasets._project_selector.widget_id][
-                        "projectId"
-                    ] = project_info.id
-                    StateJson()[select_datasets.widget_id]["datasets"] = [ds.id for ds in datasets]
+                    StateJson()[
+                        src_input_data_sidebar_dataset_selector._project_selector.widget_id
+                    ]["projectId"] = project_info.id
+                    StateJson()[src_input_data_sidebar_dataset_selector.widget_id]["datasets"] = [
+                        ds.id for ds in datasets
+                    ]
                     if len(datasets) == project_info.datasets_count:
-                        select_datasets._all_datasets_checkbox.check()
+                        src_input_data_sidebar_dataset_selector._all_datasets_checkbox.check()
                     else:
-                        select_datasets._all_datasets_checkbox.uncheck()
+                        src_input_data_sidebar_dataset_selector._all_datasets_checkbox.uncheck()
                     StateJson().send_changes()
 
                     # get project meta
                     project_meta = utils.get_project_meta(project_info.id)
                 else:
                     # set empty src to widget
-                    StateJson()[select_datasets._project_selector.widget_id]["projectId"] = None
-                    StateJson()[select_datasets.widget_id]["datasets"] = []
+                    StateJson()[
+                        src_input_data_sidebar_dataset_selector._project_selector.widget_id
+                    ]["projectId"] = None
+                    StateJson()[src_input_data_sidebar_dataset_selector.widget_id]["datasets"] = []
                     StateJson().send_changes()
                     project_meta = ProjectMeta()
 
@@ -549,9 +439,9 @@ class ImagesProjectAction(SourceAction):
             _set_tags_mapping_preview()
             tags_mapping_widget.loading = False
 
-        @src_save_btn.click
-        def src_save_btn_cb():
-            selected_dataset_ids = select_datasets.get_selected_ids()
+        @src_input_data_sidebar_save_btn.click
+        def src_input_data_sidebar_save_btn_cb():
+            selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
             if (
                 selected_dataset_ids is None
                 or len(selected_dataset_ids) == 0
@@ -610,21 +500,21 @@ class ImagesProjectAction(SourceAction):
             _set_tags_mapping_preview()
             g.updater("metas")
 
-        @select_datasets.value_changed
+        @src_input_data_sidebar_dataset_selector.value_changed
         def select_dataset_changed_handler(args):
-            selected = select_datasets.get_selected_ids()
+            selected = src_input_data_sidebar_dataset_selector.get_selected_ids()
             if selected is None or len(selected) == 0:
-                src_save_btn.disable()
-                empty_dataset_notification.show()
+                src_input_data_sidebar_save_btn.disable()
+                src_input_data_sidebar_empty_ds_notification.show()
             else:
-                src_save_btn.enable()
-                empty_dataset_notification.hide()
+                src_input_data_sidebar_save_btn.enable()
+                src_input_data_sidebar_empty_ds_notification.hide()
 
         def postprocess_cb():
             nonlocal _current_info
-            project_id = select_datasets.get_selected_project_id()
+            project_id = src_input_data_sidebar_dataset_selector.get_selected_project_id()
             project_info = g.api.project.get_info_by_id(project_id)
-            src_preview_widget_thumbnail.set(project_info)
+            src_input_data_sidebar_preview_widget_pr_thumbnail.set(project_info)
             _current_info = project_info
 
         def create_options(src: List[str], dst: List[str], settings: dict) -> dict:
@@ -635,14 +525,18 @@ class ImagesProjectAction(SourceAction):
                 NodesFlow.Node.Option(
                     name="Select Project",
                     option_component=NodesFlow.WidgetOptionComponent(
-                        widget=select_datasets_container,
-                        sidebar_component=NodesFlow.WidgetOptionComponent(src_widgets_container),
+                        widget=src_input_data_sidebar_layout_container,
+                        sidebar_component=NodesFlow.WidgetOptionComponent(
+                            src_input_data_sidebar_widgets_container
+                        ),
                         sidebar_width=300,
                     ),
                 ),
                 NodesFlow.Node.Option(
                     name="Source Preview",
-                    option_component=NodesFlow.WidgetOptionComponent(src_preview_widget),
+                    option_component=NodesFlow.WidgetOptionComponent(
+                        src_input_data_sidebar_preview_widget
+                    ),
                 ),
             ]
             settings_options = [
