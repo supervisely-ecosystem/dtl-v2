@@ -152,18 +152,20 @@ At the current moment, layer only augments `Masks`, `Bounding Boxes` and `Polygo
 - **Method** - Augmentation method. Select one of the methods from the selected category.
 - **Parameters** - Augmentation parameters. Each method has its own set of parameters. You can find the full list of parameters in the [ImgAug documentation](https://imgaug.readthedocs.io/en/latest/source/overview_of_augmenters.html).
 
-### Example. Transform the image
+## Example. Transform the image
 
-In this example, the image is transformed with alpha (0, 70), sigma (4, 6).
+The ImgAug Studio allows for unlimited combinations of different augmentations, in the examples below you can see the combination of two augmentations per 3 categories
+
+### Iaa.Arithmetic: Add + ImpulseNoise
 
 <table>
 <tr>
 <td style="text-align:center; width:50%"><strong>Original image</strong></td>
-<td style="text-align:center; width:50%"><strong>Elastic Transformation</strong></td>
+<td style="text-align:center; width:50%"><strong>Augmented</strong></td>
 </tr>
 <tr>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/a44c195b-1e81-4bab-9435-0271bd3c6741" alt="Original image" /> </td>
-<td> <img src="https://github.com/supervisely-ecosystem/data-nodes/assets/115161827/ee0c3838-3392-4d21-8dd4-8e373e746510" alt="Elastic Transformation" /> </td>
+<td> <img src="https://github.com/user-attachments/assets/b107d22f-2f0e-4558-b73f-3de08c4740cc" alt="Original image" /> </td>
+<td> <img src="https://github.com/user-attachments/assets/ec01a485-ea16-4cfb-87df-17b1a6466134" alt="Augmented" /> </td>
 </tr>
 </table>
 
@@ -171,25 +173,125 @@ In this example, the image is transformed with alpha (0, 70), sigma (4, 6).
   <summary>JSON view</summary>
 <pre>
 {
-"action": "elastic_transformation",
-		"src": [
-			"$images_project_1"
-		],
-		"dst": "$elastic_transformation_2",
-		"settings": {
-			"alpha": {
-				"min": 0,
-				"max": 70
-			},
-			"sigma": {
-				"min": 4,
-				"max": 6
-			},
-			"classes_mapping": {
-				"neutral": "neutral",
-				"person_poly": "person_poly"
-			}
-		}
+    "category": "arithmetic",
+    "name": "Add",
+    "params": {
+        "value": [
+            111,
+            138
+        ],
+        "per_channel": false
+    },
+    "sometimes": null,
+    "python": "iaa.Add(value=[111, 138], per_channel=False)",
+    "icon": "zmdi zmdi-plus-1"
+},
+{
+    "category": "arithmetic",
+    "name": "ImpulseNoise",
+    "params": {
+        "p": [
+            0,
+            0.03
+        ]
+    },
+    "sometimes": null,
+    "python": "iaa.ImpulseNoise(p=[0, 0.03])",
+    "icon": "zmdi zmdi-plus-1"
+}
+</pre>
+</details>
+
+### Iaa.Geometric: TranslateX + ShearY
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Augmented</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/user-attachments/assets/02c12a33-a3ab-4463-8c81-c2191734b860" alt="Original image" /> </td>
+<td> <img src="https://github.com/user-attachments/assets/2836502f-4349-4287-a386-d4e85eee4fcc" alt="Augmented" /> </td>
+</tr>
+</table>
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+    "category": "geometric",
+    "name": "ScaleX",
+    "params": {
+        "scale": [
+            0.5,
+            1.5
+        ],
+        "order": 1,
+        "cval": 0,
+        "mode": "constant",
+        "fit_output": false
+    },
+    "sometimes": null,
+    "python": "iaa.ScaleX(scale=[0.5, 1.5], order=1, cval=0, mode='constant', fit_output=False)",
+    "icon": "zmdi zmdi-shape"
+},
+{
+    "category": "geometric",
+    "name": "ShearY",
+    "params": {
+        "shear": [
+            -30,
+            30
+        ],
+        "order": 1,
+        "cval": 0,
+        "mode": "constant",
+        "fit_output": false
+    },
+    "sometimes": null,
+    "python": "iaa.ShearY(shear=[-30, 30], order=1, cval=0, mode='constant', fit_output=False)",
+    "icon": "zmdi zmdi-shape"
+}
+</pre>
+</details>
+
+### Iaa.Piilike: Solarize + Equalize
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>Original image</strong></td>
+<td style="text-align:center; width:50%"><strong>Augmented</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/user-attachments/assets/c920ef8b-81a6-435c-b684-2a649fae378e" alt="Original image" /> </td>
+<td> <img src="https://github.com/user-attachments/assets/5e0cd31a-5395-4039-b2b3-e2e4394c42af" alt="Augmented" /> </td>
+</tr>
+</table>
+
+<details>
+  <summary>JSON view</summary>
+<pre>
+{
+    "category": "pillike",
+    "name": "Solarize",
+    "params": {
+        "p": 1,
+        "threshold": [
+            32,
+            128
+        ]
+    },
+    "sometimes": null,
+    "python": "iaa.Solarize(p=1, threshold=[32, 128])",
+    "icon": "zmdi zmdi-center-focus-strong"
+},
+{
+    "category": "pillike",
+    "name": "Equalize",
+    "params": {},
+    "sometimes": null,
+    "python": "iaa.Equalize()",
+    "icon": "zmdi zmdi-center-focus-strong"
 }
 </pre>
 </details>
