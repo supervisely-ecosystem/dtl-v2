@@ -154,7 +154,7 @@ At the current moment, layer only augments `Masks`, `Bounding Boxes` and `Polygo
 
 ## Example. Transform the image
 
-The ImgAug Studio allows for unlimited combinations of different augmentations, in the examples below you can see the combination of two augmentations per 3 categories
+The ImgAug Studio allows for unlimited combinations of different augmentations, in the examples below you can see the combination of two augmentation methods per 3 categories (the parameters can be seen in the JSON view)
 
 ### Iaa.Arithmetic: Add + ImpulseNoise
 
