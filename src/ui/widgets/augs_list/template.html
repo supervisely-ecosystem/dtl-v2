@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="./static/css/augs_list.css" />
+
+<div id="augs-research">
+    <sly-field class="mt15" title="Your custom augmentation pipeline"
+                description="Add transformations in a sequence, preview the results of individual aug or a whole pipeline">
+            <div v-show="data.{{{widget.widget_id}}}.pipeline.length === 0">
+                No augmentations in pipeline
+            </div>
+            <div v-show="data.{{{widget.widget_id}}}.pipeline.length > 0">
+                <table>
+                    <tbody>
+                    <tr v-for="(aug, index) in data.{{{widget.widget_id}}}.pipeline" :key="index">
+                        <td style="min-width: 30px; color: gray">
+                            # {{index}}
+                        </td>
+                        <td style="width: 100%;">
+                            <sly-copy-to-clipboard :data="aug">
+                                <sly-editor v-model="aug" :options="state.{{{widget.widget_id}}}.options"></sly-editor>
+                            </sly-copy-to-clipboard>
+                        </td>
+                        <td style="min-width: 130px;">
+                            <el-button size="small"
+                                    class="action-icon-btn ml10"
+                                    :disabled="index == 0"
+                                    @click="state.{{{widget.widget_id}}}.augIndex = index; post('/{{{widget.widget_id}}}/move_aug_up_cb');"
+                                    >
+                                <i class="zmdi zmdi-long-arrow-up"></i>
+                            </el-button>
+                            <el-button size="small"
+                                    class="action-icon-btn"
+                                    :disabled="index == data.{{{widget.widget_id}}}.pipeline.length - 1"
+                                    @click="state.{{{widget.widget_id}}}.augIndex = index; post('/{{{widget.widget_id}}}/move_aug_down_cb');"
+                                    >
+                                <i class="zmdi zmdi-long-arrow-down"></i>
+                            </el-button>
+                            <el-button size="small"
+                                    class="action-icon-btn"
+                                    @click="state.{{{widget.widget_id}}}.augIndex = index; post('/{{{widget.widget_id}}}/delete_aug_cb');"
+                                    >
+                                <i class="zmdi zmdi-close"></i>
+                            </el-button>
+                        </td>
+                    </tr>
+                    <tr v-show="data.{{{widget.widget_id}}}.pipeline.length > 1">
+                        <td></td>
+                        <td>
+                            <el-checkbox v-model="state.{{{widget.widget_id}}}.shuffle">
+                                Random order (i.e. shuffle) - whether to apply augmenters in random order
+                            </el-checkbox>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+    </sly-field>
+</div>

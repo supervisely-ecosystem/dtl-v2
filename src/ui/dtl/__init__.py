@@ -123,7 +123,7 @@ from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformatio
 from .actions.imgaug_augs.geometric.perspective_transform.perspective_transform import (
     PerspectiveTransformaAction,
 )
-
+from .actions.imgaug_augs.studio.imgaug_studio import ImgAugStudioAction
 from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
     ImgAugCorruptlikeNoiseAction,
     ImgAugCorruptlikeBlurAction,
@@ -174,6 +174,7 @@ image_actions_list = {
         SlidingWindowAction.name,
     ],
     IMGAUG_AUGMENTATIONS: [
+        ImgAugStudioAction.name,
         ImgAugCorruptlikeNoiseAction.name,
         ImgAugCorruptlikeBlurAction.name,
         ImgAugCorruptlikeWeatherAction.name,
@@ -251,6 +252,7 @@ image_actions_dict = {
     RotateAction.name: RotateAction,
     SlidingWindowAction.name: SlidingWindowAction,
     # ImgAug Augmentations
+    ImgAugStudioAction.name: ImgAugStudioAction,
     ImgAugCorruptlikeNoiseAction.name: ImgAugCorruptlikeNoiseAction,
     ImgAugCorruptlikeBlurAction.name: ImgAugCorruptlikeBlurAction,
     ImgAugCorruptlikeWeatherAction.name: ImgAugCorruptlikeWeatherAction,

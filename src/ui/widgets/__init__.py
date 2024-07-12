@@ -14,3 +14,6 @@ from .input_tag_list import InputTagList
 from .members_list import MembersList
 from .members_list_preview import MembersListPreview
 from .lj_info import LabelingJobInfoWidget
+from .augs_list import AugsList
+from .augs_list_preview import AugsListPreview
+from .augs_list_params_selector import AugsListParamsSelector
