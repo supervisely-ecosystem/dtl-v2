@@ -10,14 +10,23 @@ class AugsList(Widget):
         DELETE_AUG = "delete_aug_cb"
 
     class AugItem:
-        def __init__(self, category: str, name: str, params: dict, sometimes: float = None) -> None:
+        def __init__(
+            self,
+            category: str,
+            name: str,
+            params: dict,
+            sometimes: float = None,
+            python: str = None,
+        ) -> None:
             self.category = category
             self.name = name
             self.params = params
             self.sometimes = sometimes
 
-            # self.default_py = AugsList._augs_config[category][name]["py"]
-            self.python = self._generate_py()
+            if python is None:
+                self.python = self._generate_py()
+            else:
+                self.python = python
 
         def _generate_py(self):
             py = f"iaa.{self.name}({', '.join([f'{k}={repr(v)}' if isinstance(v, str) else f'{k}={v}' for k, v in self.params.items()])})"
@@ -128,8 +137,10 @@ class AugsList(Widget):
         DataJson()[self.widget_id]["pipeline"] = self._pipeline_json
         DataJson().send_changes()
 
-    def append_aug(self, category: str, name: str, params: dict, sometimes: float = None):
-        aug = AugsList.AugItem(category, name, params, sometimes)
+    def append_aug(
+        self, category: str, name: str, params: dict, sometimes: float = None, python: str = None
+    ):
+        aug = AugsList.AugItem(category, name, params, sometimes, python)
         self._pipeline.append(aug)
         self._pipeline_json = [aug.get_py() for aug in self._pipeline]
         DataJson()[self.widget_id]["pipeline"] = self._pipeline_json

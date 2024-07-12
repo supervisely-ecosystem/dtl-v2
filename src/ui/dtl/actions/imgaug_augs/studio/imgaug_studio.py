@@ -30,6 +30,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
+        custom_pipeline_file_info = []
         saved_settings = {
             "pipeline": [],
             "shuffle": False,
@@ -52,9 +53,10 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             # sidebar_init_new_button,
             # sidebar_init_selector_container,
             sidebar_init_input,
-            sidebar_init_input_button,
+            sidebar_init_load_button,
             sidebar_init_input_container,
             sidebar_init_input_filethumb,
+            sidebar_init_warning_text,
             sidebar_init_container,
             sidebar_init_field,
             # Sidebar create Aug
@@ -65,6 +67,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             # Sidebar layout widgets
             sidebar_layout_pipeline,
             sidebar_layout_add_aug_button,
+            sidebar_layout_reset_aug_button,
             sidebar_layout_save_btn,
             sidebar_layout_buttons_container,
             pipeline_sidebar_container,
@@ -76,18 +79,28 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             method = sidebar_params_widget.get_method()
             params = sidebar_params_widget.get_params()
             sometimes = sidebar_params_widget.get_probability()
-
-            # sidebar_layout_pipeline.append_aug(**aug_info)
             sidebar_layout_pipeline.append_aug(category, method, params, sometimes)
 
             sidebar_add_container.hide()
+            sidebar_init_selector.enable()
             sidebar_layout_add_aug_button.enable()
+            sidebar_layout_reset_aug_button.enable()
             sidebar_layout_save_btn.enable()
+
+        @sidebar_layout_reset_aug_button.click
+        def sidebar_reset_aug_button_cb():
+            sidebar_layout_pipeline.set_pipeline([])
+            sidebar_init_input.set_value("")
+            sidebar_init_input_filethumb.set(None)
+            sidebar_init_load_button.enable()
+            sidebar_init_input.enable()
 
         @sidebar_cancel_add_to_pipeline_button.click
         def sidebar_cancel_add_to_pipeline_button_cb():
             sidebar_add_container.hide()
+            sidebar_init_selector.enable()
             sidebar_layout_add_aug_button.enable()
+            sidebar_layout_reset_aug_button.enable()
             sidebar_layout_save_btn.enable()
 
         @sidebar_layout_save_btn.click
@@ -106,41 +119,49 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         @sidebar_layout_add_aug_button.click
         def sidebar_add_aug_button_cb():
             sidebar_add_container.show()
+            sidebar_init_selector.disable()
             sidebar_layout_add_aug_button.disable()
+            sidebar_layout_reset_aug_button.disable()
             sidebar_layout_save_btn.disable()
 
         @sidebar_init_selector.value_changed
-        def sidebar_init_selecor_cb(value):
+        def sidebar_init_selector_cb(value):
             if value == 0:
                 sidebar_init_input_container.hide()
-                sidebar_layout_pipeline.show()
-                sidebar_layout_buttons_container.show()
             elif value == 1:
                 sidebar_init_input_container.show()
-                sidebar_layout_pipeline.hide()
-                sidebar_layout_buttons_container.hide()
 
         @sidebar_init_input.value_changed
-        def sidebar_init_input_cb(value):
-            file_info = None
-            if len(value) > 0 and value != "":
+        def sidebar_init_input_cb(path_to_pipeline):
+            nonlocal custom_pipeline_file_info
+            sidebar_init_warning_text.hide()
+            custom_pipeline_file_info = None
+            if len(path_to_pipeline) > 0 and path_to_pipeline != "":
                 sidebar_init_input_filethumb.show()
-                file_info = FileApi(g.api).get_info_by_path(g.TEAM_ID, value)
+                custom_pipeline_file_info = g.api.file.get_info_by_path(g.TEAM_ID, path_to_pipeline)
             else:
                 sidebar_init_input_filethumb.hide()
 
-            sidebar_init_input_filethumb.set(file_info)
-            if file_info is not None:
-                sidebar_init_input_button.enable()
+            sidebar_init_input_filethumb.set(custom_pipeline_file_info)
+            if custom_pipeline_file_info is not None:
+                if custom_pipeline_file_info.ext == "json":
+                    sidebar_init_load_button.enable()
+                else:
+                    sidebar_init_warning_text.set(
+                        "Invalid file format. Please select a JSON file.", "error"
+                    )
+                    sidebar_init_warning_text.show()
             else:
-                sidebar_init_input_button.disable()
+                sidebar_init_load_button.disable()
 
-        @sidebar_init_input_button.click
-        def sidebar_init_input_button_cb():
+        @sidebar_init_load_button.click
+        def sidebar_init_load_button_cb():
+            nonlocal custom_pipeline_file_info
             sidebar_init_input.disable()
-            sidebar_init_input_button.disable()
-            file_info = sidebar_init_input_filethumb.get_json_data()
-            pipeline = aug_utils.get_pipeline_from_fileinfo(file_info)
+            sidebar_init_load_button.disable()
+            pipeline = aug_utils.get_pipeline_from_fileinfo(
+                custom_pipeline_file_info, sidebar_init_warning_text
+            )
             sidebar_layout_pipeline.set_pipeline(pipeline)
             sidebar_layout_pipeline.show()
             sidebar_layout_buttons_container.show()
@@ -181,9 +202,3 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             get_settings=get_settings,
             need_preview=True,
         )
-
-
-# @TODO: value previews for slider (like in app) - slider - (-4.50, 3.30)
-# @TODO: add batch processing to compute
-
-# @TODO: [LOW PRIORITY] create one widget of each param type, hide, show, change values based on the selected method (? use reloadable for now)

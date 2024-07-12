@@ -7,12 +7,12 @@ aug_icon_map = {
     "blur": "zmdi zmdi-blur",
     "color": "zmdi zmdi-palette",
     "contrast": "zmdi zmdi-brightness-4",
-    "convolution": "zmdi zmdi-memory",
+    "convolutional": "zmdi zmdi-memory",
     "flip": "zmdi zmdi-flip-to-front",
     "geometric": "zmdi zmdi-shape",
     "imgcorruptlike": "zmdi zmdi-broken-image",
-    "pillike": "zmdi zmdi-format-valign-center",
-    "segmentation": "zmdi zmdi-male-alt",
+    "pillike": "zmdi zmdi-center-focus-strong",
+    "segmentation": "zmdi zmdi-filter-b-and-w",
     "size": "zmdi zmdi-photo-size-select-large",
 }
 

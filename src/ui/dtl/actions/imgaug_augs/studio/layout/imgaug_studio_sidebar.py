@@ -3,10 +3,8 @@ from supervisely.app.widgets import (
     Button,
     Field,
     Select,
-    Checkbox,
-    InputNumber,
-    ReloadableArea,
     Input,
+    Text,
     FileThumbnail,
 )
 from src.ui.widgets.augs_list import AugsList
@@ -28,16 +26,24 @@ def create_sidebar_widgets():
     # )
 
     sidebar_init_input = Input(placeholder="Please input path to json configuration in Team Files")
-    sidebar_init_input_button = Button("LOAD", button_size="small")
-    sidebar_init_input_button.disable()
+    sidebar_init_load_button = Button("LOAD", button_size="small")
+    sidebar_init_load_button.disable()
     sidebar_init_input_container = Container(
-        [sidebar_init_input, sidebar_init_input_button], "horizontal"
+        [sidebar_init_input, sidebar_init_load_button], "horizontal"
     )
     sidebar_init_input_container.hide()
     sidebar_init_input_filethumb = FileThumbnail()
     sidebar_init_input_filethumb.hide()
+    sidebar_init_warning_text = Text("")
+    sidebar_init_warning_text.hide()
+
     sidebar_init_container = Container(
-        [sidebar_init_selector, sidebar_init_input_container, sidebar_init_input_filethumb]
+        [
+            sidebar_init_selector,
+            sidebar_init_input_container,
+            sidebar_init_input_filethumb,
+            sidebar_init_warning_text,
+        ]
     )
     sidebar_init_field = Field(
         sidebar_init_container,
@@ -71,15 +77,23 @@ def create_sidebar_widgets():
     # Sidebar layout widgets
     sidebar_layout_pipeline = AugsList()
     sidebar_layout_add_aug_button = Button(
-        "ADD", icon="zmdi zmdi-playlist-plus mr5", button_size="small"
+        "Add", icon="zmdi zmdi-playlist-plus mr5", button_size="small"
+    )
+
+    sidebar_layout_reset_aug_button = Button(
+        "Reset", button_type="danger", icon="zmdi zmdi-replay mr5", button_size="small"
     )
 
     sidebar_layout_save_btn = create_save_btn()
     sidebar_layout_buttons_container = Container(
-        widgets=[sidebar_layout_add_aug_button, sidebar_layout_save_btn],
+        widgets=[
+            sidebar_layout_add_aug_button,
+            sidebar_layout_reset_aug_button,
+            sidebar_layout_save_btn,
+        ],
         direction="horizontal",
         gap=15,
-        fractions=[0, 0],
+        fractions=[0, 0, 0],
     )
 
     pipeline_sidebar_container = Container(
@@ -98,9 +112,10 @@ def create_sidebar_widgets():
         # sidebar_init_new_button,
         # sidebar_init_selector_container,
         sidebar_init_input,
-        sidebar_init_input_button,
+        sidebar_init_load_button,
         sidebar_init_input_container,
         sidebar_init_input_filethumb,
+        sidebar_init_warning_text,
         sidebar_init_container,
         sidebar_init_field,
         # Sidebar create Aug
@@ -111,6 +126,7 @@ def create_sidebar_widgets():
         # Sidebar layout widgets
         sidebar_layout_pipeline,
         sidebar_layout_add_aug_button,
+        sidebar_layout_reset_aug_button,
         sidebar_layout_save_btn,
         sidebar_layout_buttons_container,
         pipeline_sidebar_container,

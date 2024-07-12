@@ -2,6 +2,7 @@ import os
 from typing import List, Dict
 from supervisely.app.widgets import (
     Select,
+    Text,
     Checkbox,
     Input,
     InputNumber,
@@ -9,8 +10,11 @@ from supervisely.app.widgets import (
     Widget,
     Field,
 )
+from src.ui.widgets.augs_list import AugsList
 from supervisely.io.json import load_json_file
-
+from supervisely.api.file_api import FileInfo
+from supervisely import logger
+import src.globals as g
 
 json_path = os.path.join(os.getcwd(), "src/ui/dtl/actions/imgaug_augs/studio/layout/augs.json")
 augs_json = load_json_file(json_path)
@@ -65,8 +69,22 @@ def get_params_widget(category, func):
     return fields
 
 
-def get_pipeline_from_fileinfo(file_info):
+def get_pipeline_from_fileinfo(file_info: FileInfo, sidebar_init_warning_text: Text):
+    custom_aug_path = os.path.join(g.DATA_DIR, file_info.name)
+    g.api.file.download(g.TEAM_ID, file_info.path, custom_aug_path)
+    logger.debug(f"Downloaded file to {custom_aug_path}")
+    pipeline_json = load_json_file(custom_aug_path)
+    pipeline_json = pipeline_json.get("pipeline", None)
+
     pipeline = []
+    if pipeline_json is None:
+        sidebar_init_warning_text.set(
+            "Invalid pipeline format. Please load a valid pipeline json file.", "error"
+        )
+        sidebar_init_warning_text.show()
+        return pipeline
+    else:
+        pipeline = [AugsList.AugItem(**aug) for aug in pipeline_json]
     return pipeline
 
 
