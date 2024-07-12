@@ -173,36 +173,37 @@ The ImgAug Studio allows for unlimited combinations of different augmentations, 
   <summary>JSON view</summary>
 <pre>
 {
-    "category": "arithmetic",
-    "name": "Add",
-    "params": {
-        "value": [
-            111,
-            138
+    "action": "imgaug_studio",
+    "src": {"source": ["$images_project_1"]},
+    "dst": "$imgaug_studio_2",
+    "settings": {
+        "pipeline": [
+            {
+                "category": "arithmetic",
+                "name": "Add",
+                "params": {"value": [111, 138], "per_channel": false},
+                "sometimes": null,
+                "python": "iaa.Add(value=[111, 138], per_channel=False)"
+            },
+            {
+                "category": "arithmetic",
+                "name": "ImpulseNoise",
+                "params": {"p": [0, 0.03]},
+                "sometimes": null,
+                "python": "iaa.ImpulseNoise(p=[0, 0.03])",
+            }
         ],
-        "per_channel": false
+        "shuffle": false
     },
-    "sometimes": null,
-    "python": "iaa.Add(value=[111, 138], per_channel=False)",
-    "icon": "zmdi zmdi-plus-1"
-},
-{
-    "category": "arithmetic",
-    "name": "ImpulseNoise",
-    "params": {
-        "p": [
-            0,
-            0.03
-        ]
-    },
-    "sometimes": null,
-    "python": "iaa.ImpulseNoise(p=[0, 0.03])",
-    "icon": "zmdi zmdi-plus-1"
+    "scene_location": {
+        "order_idx": 1,
+        "position": {"x": 540, "y": 140}
+    }
 }
 </pre>
 </details>
 
-### Iaa.Geometric: TranslateX + ShearY
+### Iaa.Geometric: ScaleX + ShearY
 
 <table>
 <tr>
@@ -219,38 +220,47 @@ The ImgAug Studio allows for unlimited combinations of different augmentations, 
   <summary>JSON view</summary>
 <pre>
 {
-    "category": "geometric",
-    "name": "ScaleX",
-    "params": {
-        "scale": [
-            0.5,
-            1.5
+    "action": "imgaug_studio",
+    "src": {"source": ["$images_project_1"]},
+    "dst": "$imgaug_studio_2",
+    "settings": {
+        "pipeline": [
+            {
+                "category": "geometric",
+                "name": "ScaleX",
+                "params": {
+                    "scale": [
+                        0.5,
+                        1.5
+                    ],
+                    "order": 1,
+                    "cval": 0,
+                    "mode": "constant",
+                    "fit_output": false
+                },
+                "sometimes": null,
+                "python": "iaa.ScaleX(scale=[0.5, 1.5], order=1, cval=0, mode='constant', fit_output=False)",
+            },
+            {
+                "category": "geometric",
+                "name": "ShearY",
+                "params": {
+                    "shear": [-30, 30],
+                    "order": 1,
+                    "cval": 0,
+                    "mode": "constant",
+                    "fit_output": false
+                },
+                "sometimes": null,
+                "python": "iaa.ShearY(shear=[-30, 30], order=1, cval=0, mode='constant', fit_output=False)",
+            }
         ],
-        "order": 1,
-        "cval": 0,
-        "mode": "constant",
-        "fit_output": false
+        "shuffle": false
     },
-    "sometimes": null,
-    "python": "iaa.ScaleX(scale=[0.5, 1.5], order=1, cval=0, mode='constant', fit_output=False)",
-    "icon": "zmdi zmdi-shape"
-},
-{
-    "category": "geometric",
-    "name": "ShearY",
-    "params": {
-        "shear": [
-            -30,
-            30
-        ],
-        "order": 1,
-        "cval": 0,
-        "mode": "constant",
-        "fit_output": false
-    },
-    "sometimes": null,
-    "python": "iaa.ShearY(shear=[-30, 30], order=1, cval=0, mode='constant', fit_output=False)",
-    "icon": "zmdi zmdi-shape"
+    "scene_location": {
+        "order_idx": 1,
+        "position": {"x": 540, "y": 140}
+    }
 }
 </pre>
 </details>
@@ -272,26 +282,32 @@ The ImgAug Studio allows for unlimited combinations of different augmentations, 
   <summary>JSON view</summary>
 <pre>
 {
-    "category": "pillike",
-    "name": "Solarize",
-    "params": {
-        "p": 1,
-        "threshold": [
-            32,
-            128
-        ]
+    "action": "imgaug_studio",
+    "src": {"source": ["$images_project_1"]},
+    "dst": "$imgaug_studio_2",
+    "settings": {
+        "pipeline": [
+            {
+                "category": "pillike",
+                "name": "Solarize",
+                "params": {"p": 1, "threshold": [32, 128]},
+                "sometimes": null,
+                "python": "iaa.Solarize(p=1, threshold=[32, 128])",
+            },
+            {
+                "category": "pillike",
+                "name": "Equalize",
+                "params": {},
+                "sometimes": null,
+                "python": "iaa.Equalize()",
+            }
+        ],
+        "shuffle": false
     },
-    "sometimes": null,
-    "python": "iaa.Solarize(p=1, threshold=[32, 128])",
-    "icon": "zmdi zmdi-center-focus-strong"
-},
-{
-    "category": "pillike",
-    "name": "Equalize",
-    "params": {},
-    "sometimes": null,
-    "python": "iaa.Equalize()",
-    "icon": "zmdi zmdi-center-focus-strong"
+    "scene_location": {
+        "order_idx": 1,
+        "position": {"x": 540, "y": 140}
+    }
 }
 </pre>
 </details>
