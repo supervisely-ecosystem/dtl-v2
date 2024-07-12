@@ -7,6 +7,7 @@ from supervisely.app.widgets import (
     Text,
     FileThumbnail,
 )
+from supervisely import env
 from src.ui.widgets.augs_list import AugsList
 from src.ui.widgets.augs_list_params_selector import AugsListParamsSelector
 from src.ui.dtl.utils import create_save_btn
@@ -20,11 +21,15 @@ def create_sidebar_widgets():
         Select.Item(1, "load augs from existing pipeline"),
     ]
     sidebar_init_selector = Select(sidebar_init_items)
-    # sidebar_init_new_button = Button("NEW", button_size="small")
-    # sidebar_init_selector_container = Container(
-    #     [sidebar_init_selector, sidebar_init_new_button], "horizontal"
-    # )
-
+    team_files_url = f"{env.server_address().rstrip('/')}/files/"
+    sidebar_team_files_link_btn = Button(
+        text="Open Team Files",
+        button_type="info",
+        plain=True,
+        icon="zmdi zmdi-folder",
+        link=team_files_url,
+    )
+    sidebar_team_files_link_btn.hide()
     sidebar_init_input = Input(placeholder="Please input path to json configuration in Team Files")
     sidebar_init_load_button = Button("LOAD", button_size="small")
     sidebar_init_load_button.disable()
@@ -40,6 +45,7 @@ def create_sidebar_widgets():
     sidebar_init_container = Container(
         [
             sidebar_init_selector,
+            sidebar_team_files_link_btn,
             sidebar_init_input_container,
             sidebar_init_input_filethumb,
             sidebar_init_warning_text,
@@ -109,8 +115,7 @@ def create_sidebar_widgets():
     return (
         # Sidebar Initialization widgets
         sidebar_init_selector,
-        # sidebar_init_new_button,
-        # sidebar_init_selector_container,
+        sidebar_team_files_link_btn,
         sidebar_init_input,
         sidebar_init_load_button,
         sidebar_init_input_container,

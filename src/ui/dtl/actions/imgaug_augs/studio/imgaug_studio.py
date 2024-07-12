@@ -5,10 +5,7 @@ from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
 
 
-from supervisely.app.widgets import (
-    NodesFlow,
-    Select,
-)
+from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import ImgAugAugmentationsAction
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
@@ -17,7 +14,6 @@ from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
 
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_layout import create_layout_widgets
 import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as aug_utils
-from supervisely.api.file_api import FileApi
 import src.globals as g
 
 
@@ -50,8 +46,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         (
             # Sidebar Initialization widgets
             sidebar_init_selector,
-            # sidebar_init_new_button,
-            # sidebar_init_selector_container,
+            sidebar_team_files_link_btn,
             sidebar_init_input,
             sidebar_init_load_button,
             sidebar_init_input_container,
@@ -127,9 +122,11 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
         @sidebar_init_selector.value_changed
         def sidebar_init_selector_cb(value):
             if value == 0:
+                sidebar_team_files_link_btn.hide()
                 sidebar_init_input_container.hide()
             elif value == 1:
                 sidebar_init_input_container.show()
+                sidebar_team_files_link_btn.show()
 
         @sidebar_init_input.value_changed
         def sidebar_init_input_cb(path_to_pipeline):
