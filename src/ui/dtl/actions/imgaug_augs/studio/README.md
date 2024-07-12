@@ -145,12 +145,12 @@ Only labels of types `Polygon`, `Rectangle` and `Bitmap` in supervisely format c
 
 At the current moment, layer only augments `Masks`, `Bounding Boxes` and `Polygons`. `Polygons` are being converted to `Masks` for better annotation precision. We plan on adding support for those labels in the following versions.
 
-
 ### Settings:
 
 - **Category** - Augmentation category. Select one of the aug categories: `arithmetic`, `blur`, `color`, `contrast`, `convolutional`, `flip`, `geometric`, `imgcorruptlike`, `pillike`, `segmentation`.
 - **Method** - Augmentation method. Select one of the methods from the selected category.
 - **Parameters** - Augmentation parameters. Each method has its own set of parameters. You can find the full list of parameters in the [ImgAug documentation](https://imgaug.readthedocs.io/en/latest/source/overview_of_augmenters.html).
+- **Random order** - If enabled, the augmentations will be applied in a random order. If disabled, the augmentations will be applied in the order they are listed in the pipeline.
 
 ## Example. Transform the image
 
