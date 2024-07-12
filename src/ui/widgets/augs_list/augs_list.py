@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from supervisely.app.widgets import Widget
 from supervisely.app import StateJson, DataJson
 
@@ -148,3 +148,13 @@ class AugsList(Widget):
 
     def is_shuffled(self) -> bool:
         return StateJson()[self.widget_id]["shuffle"]
+
+    def set_shuffle(self, shuffle: bool):
+        self._shuffle = shuffle
+        StateJson()[self.widget_id]["shuffle"] = shuffle
+        StateJson().send_changes()
+
+    def from_json(self, data: List[Dict], shuffle: bool = False):
+        pipeline = [AugsList.AugItem(**aug) for aug in data]
+        self.set_pipeline(pipeline)
+        self.set_shuffle(shuffle)

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Dict
 from supervisely.app.widgets import Widget
 from supervisely.app import StateJson, DataJson
@@ -27,14 +28,15 @@ class AugsListPreview(Widget):
         show_icons: bool = True,
         widget_id: str = None,
     ):
+        pipeline_json = deepcopy(pipeline)
         if show_icons:
             self._pipeline = []
-            for aug in pipeline:
+            for aug in pipeline_json:
                 aug["icon"] = aug_icon_map.get(aug["category"], "")
                 self._pipeline.append(aug)
 
         else:
-            self._pipeline = pipeline
+            self._pipeline = pipeline_json
         self._max_height = max_height
         self._empty_text = empty_text
         self._show_icons = show_icons
@@ -49,13 +51,14 @@ class AugsListPreview(Widget):
         return {"pipeline": self._pipeline}
 
     def set(self, pipeline: List[Dict]):
+        pipeline_json = deepcopy(pipeline)
         if self._show_icons:
             self._pipeline = []
-            for aug in pipeline:
+            for aug in pipeline_json:
                 aug["icon"] = aug_icon_map.get(aug["category"], "")
                 self._pipeline.append(aug)
         else:
-            self._pipeline = pipeline
+            self._pipeline = pipeline_json
         StateJson()[self.widget_id] = self.get_json_state()
         StateJson().send_changes()
 

@@ -103,13 +103,13 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             nonlocal saved_settings
             pipeline = sidebar_layout_pipeline.get_pipeline()
             shuffle = sidebar_layout_pipeline.is_shuffled()
-
-            layout_pipeline_preview.set(pipeline)
-            layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
             saved_settings = {
                 "pipeline": pipeline,
                 "shuffle": shuffle,
             }
+            layout_pipeline_preview.set(pipeline)
+            layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
+            g.updater(("nodes", layer_id))
 
         @sidebar_layout_add_aug_button.click
         def sidebar_add_aug_button_cb():
@@ -167,7 +167,17 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             nonlocal saved_settings
             return saved_settings
 
+        def _set_settings_from_json(settings: dict):
+            nonlocal saved_settings
+            pipeline_json = settings.get("pipeline", [])
+            shuffle = settings.get("shuffle", False)
+            sidebar_layout_pipeline.from_json(pipeline_json, shuffle)
+            saved_settings = {"pipeline": pipeline_json, "shuffle": shuffle}
+            layout_pipeline_preview.set(pipeline_json)
+            layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Layout",
