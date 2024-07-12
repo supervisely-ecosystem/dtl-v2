@@ -7,7 +7,7 @@ from supervisely.app.widgets import (
     Text,
     FileThumbnail,
 )
-from supervisely import env
+from supervisely._utils import abs_url, is_development
 from src.ui.widgets.augs_list import AugsList
 from src.ui.widgets.augs_list_params_selector import AugsListParamsSelector
 from src.ui.dtl.utils import create_save_btn
@@ -21,7 +21,12 @@ def create_sidebar_widgets():
         Select.Item(1, "load augs from existing pipeline"),
     ]
     sidebar_init_selector = Select(sidebar_init_items)
-    team_files_url = f"{env.server_address().rstrip('/')}/files/"
+
+    if is_development():
+        team_files_url = abs_url("/files/")
+    else:
+        team_files_url = f"/files/"
+
     sidebar_team_files_link_btn = Button(
         text="Open Team Files",
         button_type="info",
