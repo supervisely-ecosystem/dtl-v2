@@ -504,11 +504,13 @@ class Net:
                             if item_info.id in g.FILTERED_ENTITIES
                         ]
                         images_ids = [item_info.id for item_info in images_list]
-
-                        filters = [{"field": "imageId", "operator": "in", "value": images_ids}]
-                        annotations = g.api.annotation.get_list(
-                            dataset_id=dataset_id, filters=filters
-                        )
+                        annotations = []
+                        for batch_ids in batched(images_ids, batch_size):
+                            filters = [{"field": "imageId", "operator": "in", "value": batch_ids}]
+                            ann_batch = g.api.annotation.get_list(
+                                dataset_id=dataset_id, filters=filters
+                            )
+                            annotations.extend(ann_batch)
                     else:
                         annotations = g.api.annotation.get_list(dataset_id=dataset_id)
 
