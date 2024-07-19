@@ -1,46 +1,12 @@
-import copy
-from os.path import dirname, realpath
-from typing import List, Optional
-
 import src.globals as g
-import src.utils as utils
-from src.ui.dtl import SourceAction
-from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     create_save_btn,
     get_text_font_size,
-    get_layer_docs,
-    mapping_to_list,
     get_set_settings_button_style,
     get_set_settings_container,
-    # classes
-    classes_list_to_mapping,
-    get_classes_list_value,
-    set_classes_list_preview,
-    set_classes_list_settings_from_json,
-    classes_list_settings_changed_meta,
-    # tags
-    tags_list_to_mapping,
-    get_tags_list_value,
-    set_tags_list_preview,
-    set_tags_list_settings_from_json,
-    tags_list_settings_changed_meta,
 )
-from src.ui.widgets import ClassesListPreview, TagsListPreview
-from supervisely import ProjectMeta, ProjectType
-from supervisely.app.content import StateJson
-from supervisely.app.widgets import (
-    Button,
-    Container,
-    NodesFlow,
-    NotificationBox,
-    SelectDataset,
-    Text,
-    ClassesTable,
-    TagsTable,
-    ProjectThumbnail,
-    Field,
-)
+from src.ui.widgets import ClassesListPreview
+from supervisely.app.widgets import Button, Container, Text, ClassesTable, Field
 
 
 def create_classes_selector_widgets():
@@ -96,6 +62,15 @@ def create_classes_selector_widgets():
 
     return (
         # Sidebar
+        src_classes_widget,
+        src_classes_save_btn,
+        src_classes_set_default_btn,
+        src_classes_field,
+        src_classes_widgets_container,
         # Preview
+        src_classes_preview,
         # Layout
+        src_classes_edit_text,
+        src_classes_edit_btn,
+        src_classes_edit_contaniner,
     )

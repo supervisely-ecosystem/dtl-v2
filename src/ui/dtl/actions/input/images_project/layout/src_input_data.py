@@ -12,33 +12,27 @@ from supervisely.app.widgets import (
     Container,
     NotificationBox,
     SelectDataset,
+    SelectDatasetTree,
     Text,
     ProjectThumbnail,
     DatasetThumbnail,
 )
 
 
-def set_current_src_context(dataset_selector_widget: SelectDataset):
-    # fix team and workspace for SelectDataset widget
-    StateJson()[dataset_selector_widget._project_selector._ws_selector._team_selector.widget_id][
-        "teamId"
-    ] = g.TEAM_ID
-    StateJson()[dataset_selector_widget._project_selector._ws_selector.widget_id][
-        "workspaceId"
-    ] = g.WORKSPACE_ID
-    dataset_selector_widget._project_selector._ws_selector.disable()
-    StateJson().send_changes()
-
-
 def create_input_data_selector_widgets():
     # Sidebar
-    src_input_data_sidebar_dataset_selector = SelectDataset(
+    src_input_data_sidebar_dataset_selector = SelectDatasetTree(
         multiselect=True,
+        flat=True,
         select_all_datasets=True,
         allowed_project_types=[ProjectType.IMAGES],
+        always_open=False,
         compact=False,
+        team_is_selectable=False,
+        workspace_is_selectable=False,
+        append_to_body=False,
     )
-    set_current_src_context(src_input_data_sidebar_dataset_selector)
+
     src_input_data_sidebar_save_btn = create_save_btn()
     src_input_data_sidebar_empty_ds_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"
@@ -62,7 +56,7 @@ def create_input_data_selector_widgets():
     src_input_data_sidebar_preview_widget_pr_thumbnail = ProjectThumbnail(remove_margins=True)
     src_input_data_sidebar_preview_widget_pr_thumbnail.hide()
     # If Single dataset
-    src_input_data_sidebar_preview_widget_ds_thumbnail = DatasetThumbnail(remove_margins=True)
+    src_input_data_sidebar_preview_widget_ds_thumbnail = DatasetThumbnail()
     src_input_data_sidebar_preview_widget_ds_thumbnail.hide()
 
     src_input_data_sidebar_preview_widget = Container(

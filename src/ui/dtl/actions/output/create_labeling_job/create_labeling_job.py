@@ -378,7 +378,7 @@ class CreateLabelingJobAction(OutputAction):
                 meta_change_cb(project_meta)
 
             _save_settings()
-            g.updater("metas")
+            # g.updater("metas")
 
         def _save_settings():
             nonlocal saved_settings, saved_classes_settings, saved_tags_settings

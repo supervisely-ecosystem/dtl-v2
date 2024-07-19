@@ -10,6 +10,7 @@ import supervisely as sly
 from src.utils import (
     LegacyProjectItem,
     get_project_by_name,
+    get_dataset_by_name,
     get_project_meta,
     download_preview,
     update_project_info,
@@ -357,6 +358,7 @@ def load_preview_for_data_layer(layer: Layer):
     project_name, dataset_name = src[0].split("/")
     try:
         project_info = get_project_by_name(project_name)
+        # dataset_info = get_dataset_by_name(dataset_name, project_info.id)
         project_meta = get_project_meta(project_info.id)
     except Exception as e:
         raise CustomException(
@@ -394,6 +396,7 @@ def load_preview_for_data_layer(layer: Layer):
         LegacyProjectItem(
             project_name=project_name,
             ds_name=dataset_name,
+            ds_info=None,  # dataset_info
             item_name="preview_image",
             item_info=item_info,
             ia_data={"item_ext": ".jpg"},
@@ -541,6 +544,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
         project_name, dataset_name = src[0].split("/")
         try:
             project_info = get_project_by_name(project_name)
+            # dataset_info = get_dataset_by_name(dataset_name, project_info.id)
             project_meta = get_project_meta(project_info.id)
         except Exception as e:
             raise CustomException(
@@ -572,6 +576,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
             LegacyProjectItem(
                 project_name=project_name,
                 ds_name=dataset_name,
+                ds_info=None,  # dataset_info
                 item_name="preview_image",
                 item_info=item_info,
                 ia_data={"item_ext": ".jpg"},

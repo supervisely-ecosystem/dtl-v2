@@ -35,7 +35,7 @@ def _get_source_projects_ids_from_dtl():
 
             ds_name = action["src"][0].split("/")[1]
             if ds_name == "*":
-                datasets = g.api.dataset.get_list(project.id)
+                datasets = g.api.dataset.get_list(project.id, recursive=True)
                 for ds in datasets:
                     source_project_id_ds_map[project.id].append(ds)
                 continue
@@ -69,7 +69,9 @@ def backup_destination_project(project_info: ProjectInfo) -> SessionInfo:
     return session
 
 
-def match_properties(input_image: ImageInfo, destination_image: ImageInfo) -> bool:
+def match_properties(
+    input_image: ImageInfo, destination_image: ImageInfo, strict_match: bool = False
+) -> bool:
     if (destination_image.height, destination_image.width) != (
         input_image.height,
         input_image.width,
@@ -83,26 +85,27 @@ def match_properties(input_image: ImageInfo, destination_image: ImageInfo) -> bo
             )
         )
         return False
-    if destination_image.link != input_image.link:
-        sly.logger.warn(
-            (
-                f"Image: '{destination_image.name}' (ID: '{destination_image.id}') link mismatch. "
-                f"Original image link: '{input_image.link}'. "
-                f"Destination image link: '{destination_image.link}'. "
-                "Skipping..."
+    if strict_match:
+        if destination_image.link != input_image.link:
+            sly.logger.warn(
+                (
+                    f"Image: '{destination_image.name}' (ID: '{destination_image.id}') link mismatch. "
+                    f"Original image link: '{input_image.link}'. "
+                    f"Destination image link: '{destination_image.link}'. "
+                    "Skipping..."
+                )
             )
-        )
-        return False
-    elif destination_image.hash != input_image.hash:
-        sly.logger.warn(
-            (
-                f"Image: '{destination_image.name}' (ID: '{destination_image.id}') hash mismatch. "
-                f"Original image hash: '{input_image.hash}'."
-                f"Destination image hash: '{destination_image.hash}'. "
-                "Skipping..."
+            return False
+        elif destination_image.hash != input_image.hash:
+            sly.logger.warn(
+                (
+                    f"Image: '{destination_image.name}' (ID: '{destination_image.id}') hash mismatch. "
+                    f"Original image hash: '{input_image.hash}'."
+                    f"Destination image hash: '{destination_image.hash}'. "
+                    "Skipping..."
+                )
             )
-        )
-        return False
+            return False
     return True
 
 
@@ -111,7 +114,9 @@ def map_matching_images_by_name(input_ds_images, destination_ds_images):
     matched_mapping = {}
     for image in destination_ds_images:
         image_name = get_file_name(image.name)
-        if image_name in name_to_id_map and match_properties(name_to_id_map[image_name], image):
+        if image_name in name_to_id_map and match_properties(
+            name_to_id_map[image_name], image, strict_match=False
+        ):
             matched_mapping[name_to_id_map[image_name].id] = image.id
     return matched_mapping
 
@@ -304,50 +309,6 @@ class CopyAnnotationsLayer(Layer):
                 "No matching images found. Please check input and destination projects"
             )
 
-    def get_or_create_dataset(self, dataset_name):
-        return self.ds_map[dataset_name]
-
-    def get_dataset_by_id(self, dataset_id) -> DatasetInfo:
-        return self.ds_map.setdefault(dataset_id, g.api.dataset.get_info_by_id(dataset_id))
-
-    def process(
-        self,
-        data_el: Tuple[ImageDescriptor, Annotation],
-    ):
-        item_desc, ann = data_el
-        if not self.net.preview_mode:
-            local_item_size = item_desc.item_data.shape[:2]
-            dataset_id = item_desc.info.item_info.dataset_id
-            image_id = item_desc.info.item_info.id
-            destination_images_ids = self.ds_map.get(dataset_id)
-            if destination_images_ids is not None:
-                destination_image_id = destination_images_ids.get(image_id)
-                if destination_image_id is not None:
-                    original_image_size = (
-                        item_desc.info.item_info.height,
-                        item_desc.info.item_info.width,
-                    )
-                    # check image size was modified
-                    if local_item_size != original_image_size:
-                        sly.logger.warn(
-                            (
-                                f"Image: '{item_desc.info.item_info.name}' size was modified in the pipeline. "
-                                f"Original size: '{item_desc.info.item_info.height}x{item_desc.info.item_info.width}'. "
-                                f"Modified image size: '{local_item_size[0]}x{local_item_size[1]}' "
-                                "Skipping..."
-                            )
-                        )
-                    else:
-                        add_option = self.settings["add_option"]
-                        if add_option == "merge":
-                            ann_json = g.api.annotation.download_json(destination_image_id)
-                            destination_ann = sly.Annotation.from_json(ann_json, self.output_meta)
-                            ann = ann.merge(destination_ann)
-                            g.api.annotation.upload_ann(destination_image_id, ann)
-                        else:
-                            g.api.annotation.upload_ann(destination_image_id, ann)
-        yield ([item_desc, ann])
-
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         if self.net.preview_mode:
             yield data_els
@@ -357,7 +318,13 @@ class CopyAnnotationsLayer(Layer):
             dst_item_id_map = defaultdict(list)
             dst_item_ann_map = defaultdict(list)
             for item_desc, ann in zip(item_descs, anns):
-                local_item_size = item_desc.item_data.shape[:2]
+                if item_desc.item_data is None:
+                    local_item_size = (
+                        item_desc.info.item_info.height,
+                        item_desc.info.item_info.width,
+                    )
+                else:
+                    local_item_size = item_desc.item_data.shape[:2]
                 dataset_id = item_desc.info.item_info.dataset_id
                 image_id = item_desc.info.item_info.id
                 destination_images_ids = self.ds_map.get(dataset_id)

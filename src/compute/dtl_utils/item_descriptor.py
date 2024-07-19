@@ -11,7 +11,6 @@ class ItemDescriptor:
     def __init__(self, info: NamedTuple, modify_ds_name: bool = True):
         self.info = info
         self.item_data = None  # can be changed in comp graph
-        self.info = info
         if modify_ds_name:
             self.res_ds_name = "{}__{}".format(self.info.project_name, self.info.ds_name)
         else:
@@ -45,6 +44,9 @@ class ItemDescriptor:
 
     def get_ds_name(self) -> str:
         return self.info.ds_name
+
+    def get_ds_info(self) -> str:
+        return self.info.ds_info
 
     def get_item_name(self) -> str:
         return self.info.item_name
