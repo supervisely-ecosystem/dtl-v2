@@ -146,62 +146,88 @@ class AddToExistingProjectLayer(Layer):
                     existing_names
                 )
 
-    def get_or_create_dataset(self, dataset_name):
-        if dataset_name not in self.ds_map:
-            dataset_info = g.api.dataset.create(
-                self.out_project_id, dataset_name, change_name_if_conflict=True
-            )
-            self.ds_map[dataset_name] = dataset_info
-            return dataset_info
+    def get_ds_parents(self, dataset_info: DatasetInfo):
+        ds_parents = None
+        for parents, dataset in g.api.dataset.tree(dataset_info.project_id):
+            if dataset.name == dataset_info.name:
+                ds_parents = parents
+                break
+        if len(ds_parents) == 0:
+            return None
         else:
-            return self.ds_map[dataset_name]
+            return ds_parents
+
+    def get_or_create_nested_dataset(self, dataset_name, ds_parents):
+        # @TODO: create project with change_name_if_conflict=True
+        parent_id = self.sly_project_info.id
+        for parent_name in ds_parents:
+            if parent_id == self.sly_project_info.id:
+                # parent_ds_info = g.api.dataset.get_or_create(self.sly_project_info.id, parent_name)
+                parent_ds_info = g.api.dataset.get_info_by_name(
+                    self.sly_project_info.id, parent_name
+                )
+                if parent_ds_info is None:
+                    parent_ds_info = g.api.dataset.create(
+                        self.sly_project_info.id, parent_name, change_name_if_conflict=True
+                    )
+            else:
+                # parent_ds_info = g.api.dataset.get_or_create(self.sly_project_info.id, parent_name, parent_id=parent_id)
+                parent_ds_info = g.api.dataset.get_info_by_name(
+                    self.sly_project_info.id, parent_name, parent_id=parent_id
+                )
+                if parent_ds_info is None:
+                    parent_ds_info = g.api.dataset.create(
+                        self.sly_project_info.id,
+                        parent_name,
+                        parent_id=parent_id,
+                        change_name_if_conflict=True,
+                    )
+            parent_id = parent_ds_info.id
+
+        dataset_info = g.api.dataset.get_info_by_name(
+            self.sly_project_info.id, parent_name, parent_id=parent_id
+        )
+        if dataset_info is None:
+
+            def get_free_name(name):
+                res_title = name
+                suffix = 1
+                while g.api.dataset.exists(
+                    self.sly_project_info.id, res_title, parent_id=parent_id
+                ):
+                    res_title = "{}_{:03d}".format(name, suffix)
+                    suffix += 1
+                return res_title
+
+            dataset_name = get_free_name(dataset_name)
+            dataset_info = g.api.dataset.create(
+                self.sly_project_info.id,
+                dataset_name,
+                parent_id=parent_id,
+                change_name_if_conflict=True,
+            )
+        return dataset_info
+
+    def get_or_create_dataset(self, dataset_name, ds_parents=None):
+        if ds_parents is None:
+            if dataset_name not in self.ds_map:
+                dataset_info = g.api.dataset.create(
+                    self.out_project_id, dataset_name, change_name_if_conflict=True
+                )
+                self.ds_map[dataset_name] = dataset_info
+                return dataset_info
+            else:
+                return self.ds_map[dataset_name]
+        else:
+            if dataset_name not in self.ds_map:
+                dataset_info = self.get_or_create_nested_dataset(dataset_name, ds_parents)
+                self.ds_map[dataset_name] = dataset_info
+                return dataset_info
+            else:
+                return self.ds_map[dataset_name]
 
     def get_dataset_by_id(self, dataset_id) -> DatasetInfo:
         return self.ds_map.setdefault(dataset_id, g.api.dataset.get_info_by_id(dataset_id))
-
-    def process(
-        self,
-        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
-    ):
-        item_desc, ann = data_el
-        dataset_option = self.settings["dataset_option"]
-        if not self.net.preview_mode:
-            if dataset_option == "new":
-                dataset_name = self.settings["dataset_name"]
-                dataset_info = self.get_or_create_dataset(dataset_name)
-            elif dataset_option == "existing":
-                dataset_info = self.get_dataset_by_id(self.settings["dataset_id"])
-            else:
-                dataset_name = item_desc.get_ds_name()
-                dataset_info = self.get_or_create_dataset(dataset_name)
-            out_item_name = (
-                self.get_free_name(
-                    item_desc.get_item_name(),
-                    dataset_info.name,
-                    self.sly_project_info.name,
-                )
-                + item_desc.get_item_ext()
-            )
-            if self.net.modality == "images":
-                if self.net.may_require_items():
-                    image_info = g.api.image.upload_np(
-                        dataset_info.id, out_item_name, item_desc.read_image()
-                    )
-                else:
-                    image_info = g.api.image.upload_id(
-                        dataset_info.id, out_item_name, item_desc.info.item_info.id
-                    )
-                g.api.annotation.upload_ann(image_info.id, ann)
-            elif self.net.modality == "videos":
-                video_info = g.api.video.upload_path(
-                    dataset_info.id, out_item_name, item_desc.item_data
-                )
-                ann_path = f"{item_desc.item_data}.json"
-                if not sly_fs.file_exists(ann_path):
-                    ann_json = ann.to_json(KeyIdMap())
-                    sly_json.dump_json_file(ann_json, ann_path)
-                g.api.video.annotation.upload_paths([video_info.id], [ann_path], self.output_meta)
-        yield ([item_desc, ann])
 
     def process_batch(
         self,
@@ -268,7 +294,11 @@ class AddToExistingProjectLayer(Layer):
 
                 else:
                     for ds_name in ds_item_map:
-                        dataset_info = self.get_or_create_dataset(ds_name)
+                        orig_ds_info = ds_item_map[ds_name][0][
+                            0
+                        ].info.ds_info  # @TODO: not safe, fix later
+                        ds_parents = self.get_ds_parents(orig_ds_info)
+                        dataset_info = self.get_or_create_dataset(ds_name, ds_parents)
                         dataset_name = dataset_info.name
 
                         out_item_names = [

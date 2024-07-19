@@ -18,6 +18,7 @@ LegacyProjectItem = namedtuple(
     [
         "project_name",
         "ds_name",
+        "ds_info",
         "item_name",
         "item_info",
         "ia_data",
@@ -212,7 +213,7 @@ def merge_input_metas(input_metas: List[sly.ProjectMeta]) -> sly.ProjectMeta:
 
 def get_all_datasets(project_id: int) -> List[sly.DatasetInfo]:
     if project_id not in g.cache["all_datasets"]:
-        datasets = g.api.dataset.get_list(project_id)
+        datasets = g.api.dataset.get_list(project_id, recursive=True)
         g.cache["all_datasets"][project_id] = [dataset.id for dataset in datasets]
         g.cache["dataset_info"].update(
             {
@@ -221,7 +222,21 @@ def get_all_datasets(project_id: int) -> List[sly.DatasetInfo]:
                 if dataset.id not in g.cache["dataset_info"]
             }
         )
-    return [get_dataset_by_id(ds_id) for ds_id in g.cache["all_datasets"][project_id]]
+    dataset_infos = [get_dataset_by_id(ds_id) for ds_id in g.cache["all_datasets"][project_id]]
+    return dataset_infos
+
+
+def generate_src_ds_preview(saved_src, all_ds_map):
+    src_preview_text = ""
+    # total_img_cnt = 0
+    for src in saved_src:
+        src_preview_text += f"<li>{src.replace('/', ' / ')}</li>"
+        # src_preview_text += f"<li>{src.replace('/', ' / ')} (items: {all_ds_map[src].images_count})</li>"
+        # total_img_cnt += all_ds_map[src].items_count
+
+    src_preview_text = f'<ul style="margin: 1px; padding: 0px 0px 0px 18px">{src_preview_text}</ul>'
+    # src_preview_text += '<div class="field-description text-muted" bis_skin_checked="1">{total_img_cnt} images in selected datasets</div>'
+    return src_preview_text
 
 
 def ensure_dir(dir_path):

@@ -423,6 +423,7 @@ class Net:
                                 LegacyProjectItem(
                                     project_name=project_info.name,
                                     ds_name=dataset_info.name,
+                                    ds_info=dataset_info,
                                     item_name=".".join(img_info.name.split(".")[:-1]),
                                     item_info=img_info,
                                     ia_data={"item_ext": "." + img_info.ext},
@@ -447,6 +448,7 @@ class Net:
                                 LegacyProjectItem(
                                     project_name=project_info.name,
                                     ds_name=dataset_info.name,
+                                    ds_info=dataset_info,
                                     item_name=".".join(vid_info.name.split(".")[:-1]),
                                     item_info=vid_info,
                                     ia_data={"item_ext": vid_ext},
@@ -480,7 +482,8 @@ class Net:
                 project = get_project_by_name(project_name)
                 if dataset_name == "*":
                     project_datasets.setdefault(project.id, [])
-                    for dataset in get_all_datasets(project.id):
+                    datasets = get_all_datasets(project.id)
+                    for dataset in datasets:
                         if dataset.id not in added:
                             project_datasets[project.id].append(dataset.id)
                             added.add(dataset.id)
@@ -525,6 +528,7 @@ class Net:
                                 LegacyProjectItem(
                                     project_name=project_info.name,
                                     ds_name=dataset_info.name,
+                                    ds_info=dataset_info,
                                     item_name=".".join(img_info.name.split(".")[:-1]),
                                     item_info=img_info,
                                     ia_data={"item_ext": "." + img_info.ext},
@@ -563,6 +567,7 @@ class Net:
                                 LegacyProjectItem(
                                     project_name=project_info.name,
                                     ds_name=dataset_info.name,
+                                    ds_info=dataset_info,
                                     item_name=".".join(vid_info.name.split(".")[:-1]),
                                     item_info=vid_info,
                                     ia_data={"item_ext": vid_ext},

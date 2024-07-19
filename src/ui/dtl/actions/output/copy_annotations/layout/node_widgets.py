@@ -11,7 +11,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     NotificationBox,
-    SelectDataset,
+    SelectDatasetTree,
     Text,
     ProjectThumbnail,
     Field,
@@ -23,11 +23,16 @@ from supervisely.app.widgets import (
 def create_node_widgets():
     # PROJECT SELECTOR
     # SIDEBAR
-    select_project_sidebar_dataset_selector = SelectDataset(
+    select_project_sidebar_dataset_selector = SelectDatasetTree(
         multiselect=True,
+        flat=True,
         select_all_datasets=True,
         allowed_project_types=[ProjectType.IMAGES],
+        always_open=False,
         compact=False,
+        team_is_selectable=False,
+        workspace_is_selectable=False,
+        append_to_body=False,
     )
 
     select_project_sidebar_dataset_selector_field = Field(
@@ -35,16 +40,6 @@ def create_node_widgets():
         description="If multiple datasets are selected, only annotations from the datasets with the same names from the input project will be added",
         content=select_project_sidebar_dataset_selector,
     )
-
-    # fix team and workspace for SelectDataset widget
-    StateJson()[
-        select_project_sidebar_dataset_selector._project_selector._ws_selector._team_selector.widget_id
-    ]["teamId"] = g.TEAM_ID
-    StateJson()[select_project_sidebar_dataset_selector._project_selector._ws_selector.widget_id][
-        "workspaceId"
-    ] = g.WORKSPACE_ID
-    select_project_sidebar_dataset_selector._project_selector._ws_selector.disable()
-    StateJson().send_changes()
 
     select_project_sidebar_empty_dataset_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"

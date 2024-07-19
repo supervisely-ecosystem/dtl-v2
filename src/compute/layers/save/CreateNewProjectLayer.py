@@ -1,7 +1,7 @@
 # coding: utf-8
 from typing import Tuple, Union, List
 
-from supervisely import Annotation, VideoAnnotation, KeyIdMap
+from supervisely import Annotation, VideoAnnotation, KeyIdMap, DatasetInfo
 import supervisely.io.fs as sly_fs
 import supervisely.io.json as sly_json
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
@@ -82,51 +82,41 @@ class CreateNewProjectLayer(Layer):
         }
         g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
 
-    def get_or_create_dataset(self, dataset_name):
-        if not g.api.dataset.exists(self.sly_project_info.id, dataset_name):
-            return g.api.dataset.create(self.sly_project_info.id, dataset_name)
+    def get_ds_parents(self, dataset_info: DatasetInfo):
+        ds_parents = None
+        for parents, dataset in g.api.dataset.tree(dataset_info.project_id):
+            if dataset.name == dataset_info.name:
+                ds_parents = parents
+                break
+        if len(ds_parents) == 0:
+            return None
         else:
-            return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
+            return ds_parents
 
-    def process(
-        self,
-        data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
-    ):
-        item_desc, ann = data_el
+    def get_or_create_nested_dataset(self, dataset_name, ds_parents):
+        parent_id = self.sly_project_info.id
+        for parent_name in ds_parents:
+            if parent_id == self.sly_project_info.id:
+                parent_ds_info = g.api.dataset.get_or_create(self.sly_project_info.id, parent_name)
+            else:
+                parent_ds_info = g.api.dataset.get_or_create(
+                    self.sly_project_info.id, parent_name, parent_id=parent_id
+                )
+            parent_id = parent_ds_info.id
 
-        if not self.net.preview_mode:
-            dataset_name = item_desc.get_res_ds_name()
-            out_item_name = (
-                self.get_free_name(item_desc.get_item_name(), dataset_name, self.out_project_name)
-                + item_desc.get_item_ext()
-            )
-            if self.sly_project_info is not None:
-                dataset_info = self.get_or_create_dataset(dataset_name)
-                if self.net.modality == "images":
-                    if self.net.may_require_items():
-                        item_info = g.api.image.upload_np(
-                            dataset_info.id, out_item_name, item_desc.read_image()
-                        )
-                    else:
-                        item_info = g.api.image.upload_id(
-                            dataset_info.id, out_item_name, item_desc.info.item_info.id
-                        )
-                    g.api.annotation.upload_ann(item_info.id, ann)
-                elif self.net.modality == "videos":
-                    video_info = g.api.video.upload_path(
-                        dataset_info.id, out_item_name, item_desc.item_data
-                    )
-                    ann_path = f"{item_desc.item_data}.json"
-                    if not sly_fs.file_exists(ann_path):
-                        ann_json = ann.to_json(KeyIdMap())
-                        sly_json.dump_json_file(ann_json, ann_path)
-                    g.api.video.annotation.upload_paths(
-                        [video_info.id], [ann_path], self.output_meta
-                    )
-                    # sly_fs.silent_remove(item_desc.item_data)
-                    # sly_fs.silent_remove(ann_path)
+        dataset_info = g.api.dataset.get_or_create(
+            self.sly_project_info.id, dataset_name, parent_id=parent_id
+        )
+        return dataset_info
 
-        yield ([item_desc, ann])
+    def get_or_create_dataset(self, dataset_name, ds_parents=None):
+        if ds_parents is None:
+            if not g.api.dataset.exists(self.sly_project_info.id, dataset_name):
+                return g.api.dataset.create(self.sly_project_info.id, dataset_name)
+            else:
+                return g.api.dataset.get_info_by_name(self.sly_project_info.id, dataset_name)
+        else:
+            return self.get_or_create_nested_dataset(dataset_name, ds_parents)
 
     def process_batch(self, data_els: List[Tuple[ImageDescriptor, Annotation]]):
         if self.net.preview_mode:
@@ -149,7 +139,10 @@ class CreateNewProjectLayer(Layer):
                     for item_desc, _ in ds_item_map[ds_name]
                 ]
                 if self.sly_project_info is not None:
-                    dataset_info = self.get_or_create_dataset(ds_name)
+                    # @TODO: not safe, fix later
+                    orig_ds_info = ds_item_map[ds_name][0][0].info.ds_info
+                    ds_parents = self.get_ds_parents(orig_ds_info)
+                    dataset_info = self.get_or_create_dataset(ds_name, ds_parents)
                     if self.net.modality == "images":
                         if self.net.may_require_items():
                             item_infos = g.api.image.upload_nps(

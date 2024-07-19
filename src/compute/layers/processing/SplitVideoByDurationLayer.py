@@ -191,6 +191,7 @@ def process_splits(
         LegacyProjectItem(
             project_name=vid_desc.get_pr_name(),
             ds_name=vid_desc.get_ds_name(),
+            ds_info=vid_desc.get_ds_info(),
             item_name=video_name,
             item_info=video_info,
             ia_data={"item_ext": item_ext},

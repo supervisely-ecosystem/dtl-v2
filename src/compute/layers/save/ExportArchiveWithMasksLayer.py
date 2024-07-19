@@ -7,11 +7,13 @@ import os.path as osp
 import cv2
 import numpy as np
 
-import supervisely as sly
+from supervisely import Annotation, DatasetInfo, Project, Dataset, logger, OpenMode
 
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError, BadSettingsError
+
+import src.globals as g
 
 
 # save to archive, with GTs and checks
@@ -50,7 +52,7 @@ class ExportArchiveWithMasksLayer(Layer):
     }
 
     @classmethod
-    def draw_colored_mask(cls, ann: sly.Annotation, cls_mapping):
+    def draw_colored_mask(cls, ann: Annotation, cls_mapping):
         h, w = ann.img_size
         res_img = np.zeros((h, w, 3), dtype=np.uint8)
         for label in ann.labels:
@@ -116,6 +118,17 @@ class ExportArchiveWithMasksLayer(Layer):
     def modifies_data(self):
         return False
 
+    def get_ds_parents(self, dataset_info: DatasetInfo):
+        ds_parents = None
+        for parents, dataset in g.api.dataset.tree(dataset_info.project_id):
+            if dataset.name == dataset_info.name:
+                ds_parents = parents
+                break
+        if len(ds_parents) == 0:
+            return None
+        else:
+            return ds_parents
+
     def preprocess(self):
         if self.net.preview_mode:
             return
@@ -131,26 +144,32 @@ class ExportArchiveWithMasksLayer(Layer):
             # raise GraphError(
             # "Destination is not set", extra={"layer_config": self.config, "layer": self.action}
             # )
-        self.out_project = sly.Project(
-            directory=f"{self.output_folder}/{dst}", mode=sly.OpenMode.CREATE
-        )
+        self.out_project = Project(directory=f"{self.output_folder}/{dst}", mode=OpenMode.CREATE)
         with open(self.out_project.directory + "/meta.json", "w") as f:
             json.dump(self.output_meta.to_json(), f)
 
         # Deprecate warning
         for param in ["images", "annotations"]:
             if param in self.settings:
-                sly.logger.warning(
+                logger.warning(
                     "'save_masks' layer: '{}' parameter is deprecated. Skipped.".format(param)
                 )
 
-    def process(self, data_el: Tuple[ImageDescriptor, sly.Annotation]):
+    def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         item_desc, ann = data_el
         if not self.net.preview_mode:
             free_name = self.get_free_name(
                 item_desc.get_item_name(), item_desc.get_ds_name(), self.out_project.name
             )
+
+            orig_ds_info = item_desc.info.ds_info
             new_dataset_name = item_desc.get_res_ds_name()
+            ds_parents = self.get_ds_parents(orig_ds_info)
+            if ds_parents is None:
+                nested_path = ""
+            else:
+                ds_parents_modified = [parent + "/datasets" for parent in ds_parents]
+                nested_path = osp.join(*ds_parents_modified)
 
             for out_dir, flag_name, mapping_name in self.odir_flag_mapping:
                 if not self.settings[flag_name]:
@@ -174,7 +193,11 @@ class ExportArchiveWithMasksLayer(Layer):
 
                 img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
                 output_img_path = osp.join(
-                    self.out_project.directory, new_dataset_name, out_dir, free_name + ".png"
+                    self.out_project.directory,
+                    nested_path,
+                    new_dataset_name,
+                    out_dir,
+                    free_name + ".png",
                 )
 
                 dst_dir = osp.split(output_img_path)[0]
@@ -189,15 +212,21 @@ class ExportArchiveWithMasksLayer(Layer):
 
                 cv2.imwrite(output_img_path, img)
 
-            dataset_name = item_desc.get_res_ds_name()
-            if not self.out_project.datasets.has_key(dataset_name):
-                self.out_project.create_dataset(dataset_name)
-            out_dataset = self.out_project.datasets.get(dataset_name)
+            out_dataset = None
+            if not self.out_project.datasets.has_key(new_dataset_name):
+                if ds_parents is not None:
+                    nested_path = osp.join(nested_path, new_dataset_name)
+                    out_dataset = self.out_project.create_dataset(new_dataset_name, nested_path)
+                else:
+                    out_dataset = self.out_project.create_dataset(new_dataset_name)
+
+            if out_dataset is None:
+                out_dataset = self.out_project.datasets.get(new_dataset_name)
             out_item_name = free_name + item_desc.get_item_ext()
 
             # net _always_ downloads images
             if item_desc.need_write() and item_desc.item_data is not None:
-                out_dataset: sly.Dataset
+                out_dataset: Dataset
                 out_dataset.add_item_np(out_item_name, item_desc.item_data, ann=ann)
             else:
                 out_dataset.add_item_file(out_item_name, item_desc.get_item_path(), ann=ann)

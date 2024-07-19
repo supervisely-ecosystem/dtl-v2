@@ -23,7 +23,7 @@ from src.ui.utils import create_new_layer
 from src.ui.widgets import ApplyCss
 from supervisely.app.widgets import ImageAnnotationPreview, FastTable
 
-# init widget scripts
+# init widgets that use javascript
 ImageAnnotationPreview()
 FastTable()
 
@@ -83,7 +83,7 @@ def generate_preview_for_project(layer: Layer):
     elif g.DATASET_ID:
         items = g.api.image.get_list(g.DATASET_ID)
     else:
-        dss = g.api.dataset.get_list(g.PROJECT_ID)
+        dss = g.api.dataset.get_list(g.PROJECT_ID, recursive=True)
         if len(dss) > 0:
             ds = dss[0]
             items = g.api.image.get_list(dss[0].id)
@@ -92,7 +92,8 @@ def generate_preview_for_project(layer: Layer):
     if len(items) > 0 and pr.type == "images":
         project_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
         item_info = items[0]
-        dataset_name = g.api.dataset.get_info_by_id(item_info.dataset_id).name
+        dataset_info = g.api.dataset.get_info_by_id(item_info.dataset_id)
+        dataset_name = dataset_info.name
         image_path = f"{g.PREVIEW_DIR}/{layer.id}/preview_image.{item_info.ext}"
         g.api.image.download_path(item_info.id, image_path)
         ann_json = g.api.annotation.download_json(item_info.id)
@@ -101,6 +102,7 @@ def generate_preview_for_project(layer: Layer):
             LegacyProjectItem(
                 project_name=pr.name,
                 ds_name=dataset_name,
+                ds_info=dataset_info,
                 item_name=".".join(item_info.name.split(".")[:-1]),
                 item_info=item_info,
                 ia_data={"item_ext": "." + item_info.ext},

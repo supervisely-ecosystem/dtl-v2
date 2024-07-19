@@ -10,7 +10,16 @@ from supervisely.project.project import Dataset, Project, OpenMode
 from supervisely.project.video_project import VideoProject, OpenMode
 
 
-from supervisely import Annotation, VideoAnnotation, ProjectMeta, Bitmap, Polygon, logger, KeyIdMap
+from supervisely import (
+    Annotation,
+    VideoAnnotation,
+    ProjectMeta,
+    Bitmap,
+    Polygon,
+    KeyIdMap,
+    DatasetInfo,
+    logger,
+)
 from src.compute.utils import imaging
 from src.compute.utils import os_utils
 from supervisely.imaging.color import random_rgb
@@ -20,6 +29,7 @@ import supervisely.io.fs as sly_fs
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 from src.compute.Layer import Layer
 from src.exceptions import GraphError, BadSettingsError
+import src.globals as g
 
 
 # save to archive
@@ -110,6 +120,17 @@ class ExportArchiveLayer(Layer):
             with open(self.out_project.directory + "/meta.json", "w") as f:
                 json.dump(self.output_meta.to_json(), f)
 
+    def get_ds_parents(self, dataset_info: DatasetInfo):
+        ds_parents = None
+        for parents, dataset in g.api.dataset.tree(dataset_info.project_id):
+            if dataset.name == dataset_info.name:
+                ds_parents = parents
+                break
+        if len(ds_parents) == 0:
+            return None
+        else:
+            return ds_parents
+
     def process(
         self,
         data_el: Tuple[Union[ImageDescriptor, VideoDescriptor], Union[Annotation, VideoAnnotation]],
@@ -121,7 +142,16 @@ class ExportArchiveLayer(Layer):
                 free_name = self.get_free_name(
                     item_desc.get_item_name(), item_desc.get_ds_name(), self.out_project.name
                 )
+
+                orig_ds_info = item_desc.info.ds_info
                 new_dataset_name = item_desc.get_res_ds_name()
+
+                ds_parents = self.get_ds_parents(orig_ds_info)
+                if ds_parents is None:
+                    nested_path = ""
+                else:
+                    ds_parents_modified = [parent + "/datasets" for parent in ds_parents]
+                    nested_path = osp.join(*ds_parents_modified)
 
                 if self.settings.get("visualize"):
                     out_meta = self.output_meta
@@ -146,9 +176,12 @@ class ExportArchiveLayer(Layer):
                     img = np.hstack((orig_img, sep, comb_img))
 
                     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                    # ds_parents_path = osp.join(*ds_parents) if ds_parents else ""
+
                     output_img_path = osp.join(
                         self.output_folder,
                         self.out_project.name,
+                        nested_path,
                         new_dataset_name,
                         "visualize",
                         free_name + ".png",
@@ -156,10 +189,16 @@ class ExportArchiveLayer(Layer):
                     os_utils.ensure_base_path(output_img_path)
                     cv2.imwrite(output_img_path, img)
 
-                dataset_name = item_desc.get_res_ds_name()
-                if not self.out_project.datasets.has_key(dataset_name):
-                    self.out_project.create_dataset(dataset_name)
-                out_dataset = self.out_project.datasets.get(dataset_name)
+                out_dataset = None
+                if not self.out_project.datasets.has_key(new_dataset_name):
+                    if ds_parents is not None:
+                        nested_path = osp.join(nested_path, new_dataset_name)
+                        out_dataset = self.out_project.create_dataset(new_dataset_name, nested_path)
+                    else:
+                        out_dataset = self.out_project.create_dataset(new_dataset_name)
+
+                if out_dataset is None:
+                    out_dataset = self.out_project.datasets.get(new_dataset_name)
                 out_item_name = free_name + item_desc.get_item_ext()
 
                 # net _always_ downloads images
