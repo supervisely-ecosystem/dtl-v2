@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 from os.path import dirname, realpath
 from typing import List, Optional
 
@@ -269,12 +269,12 @@ class ImagesProjectAction(SourceAction):
         def _set_default_classes_mapping_setting():
             # save setting to var
             nonlocal saved_classes_mapping_settings
-            saved_classes_mapping_settings = copy.deepcopy(default_classes_mapping_settings)
+            saved_classes_mapping_settings = deepcopy(default_classes_mapping_settings)
 
         def _set_default_tags_mapping_setting():
             # save setting to var
             nonlocal saved_tags_mapping_settings
-            saved_tags_mapping_settings = copy.deepcopy(default_tags_mapping_settings)
+            saved_tags_mapping_settings = deepcopy(default_tags_mapping_settings)
 
         def data_changed_cb(**kwargs):
             project_meta = kwargs.get("project_meta", None)
