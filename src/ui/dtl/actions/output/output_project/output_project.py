@@ -8,7 +8,6 @@ from supervisely.project.project_meta import ProjectMeta
 from src.ui.dtl.utils import get_layer_docs
 from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import get_layer_docs
 import src.ui.dtl.actions.output.output_project.layout.new_project as new_project
 import src.ui.dtl.actions.output.output_project.layout.existing_project as existing_project
 
