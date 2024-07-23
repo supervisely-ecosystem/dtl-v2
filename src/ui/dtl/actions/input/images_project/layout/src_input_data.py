@@ -34,10 +34,10 @@ def create_input_data_selector_widgets():
     )
 
     src_input_data_sidebar_save_btn = create_save_btn()
+    src_input_data_sidebar_save_btn.disable()
     src_input_data_sidebar_empty_ds_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"
     )
-    src_input_data_sidebar_empty_ds_notification.hide()
     src_input_data_sidebar_widgets_container = Container(
         widgets=[
             src_input_data_sidebar_dataset_selector,

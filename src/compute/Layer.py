@@ -316,9 +316,15 @@ class Layer:
                 # smth -> new name
                 elif type(dst_class) is str:
                     obj_cls = res_meta.get_obj_class(src_class_title)
-                    obj_cls = obj_cls.clone(name=dst_class)
-                    res_meta = res_meta.delete_obj_class(src_class_title)
-                    res_meta = res_meta.add_obj_class(obj_cls)
+                    if obj_cls is None:
+                        logger.debug(
+                            "Class not found in input meta",
+                            extra={"class_name": src_class_title, "dst_class": dst_class},
+                        )
+                    else:
+                        obj_cls = obj_cls.clone(name=dst_class)
+                        res_meta = res_meta.delete_obj_class(src_class_title)
+                        res_meta = res_meta.add_obj_class(obj_cls)
 
                 # smth -> new cls description
                 elif type(dst_class) is dict:

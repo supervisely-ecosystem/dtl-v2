@@ -3,7 +3,7 @@ from supervisely.app.widgets import (
     Text,
     Select,
     SelectProject,
-    SelectDataset,
+    SelectDatasetTree,
     Button,
     Container,
     Input,
@@ -45,11 +45,18 @@ def create_existing_project_widgets():
         content=dst_project_selector,
     )
 
-    dst_dataset_options_existing_dataset_selector = SelectDataset(
-        compact=True,
-        size="small",
+    dst_dataset_options_existing_dataset_selector = SelectDatasetTree(
+        multiselect=False,
+        flat=True,
+        select_all_datasets=False,
         allowed_project_types=[g.SUPPORTED_MODALITIES_MAP[g.MODALITY_TYPE]],
+        always_open=False,
+        compact=True,
+        team_is_selectable=False,
+        workspace_is_selectable=False,
+        append_to_body=False,
     )
+
     dst_dataset_options_new_dataset_input = Input(placeholder="Enter dataset name", size="small")
 
     dst_dataset_options_selector_items = [
@@ -127,8 +134,16 @@ def create_existing_project_widgets():
 
     # PREVIEW
     dst_project_preview = ProjectThumbnail()
+    dst_project_preview_warning = Text(
+        f"Project does not exist in the current workspace (ID: '{g.WORKSPACE_ID}')",
+        "error",
+        font_size=get_text_font_size(),
+    )
+    dst_project_preview_warning.hide()
     dst_dataset_preview = Text("", "text", font_size=get_text_font_size())
-    dst_preview_container = Container([dst_project_preview, dst_dataset_preview])
+    dst_preview_container = Container(
+        [dst_project_preview, dst_project_preview_warning, dst_dataset_preview]
+    )
     dst_preview_container.hide()
 
     return (
@@ -145,6 +160,7 @@ def create_existing_project_widgets():
         select_project_container,
         # PREVIEW
         dst_project_preview,
+        dst_project_preview_warning,
         dst_dataset_preview,
         dst_preview_container,
     )

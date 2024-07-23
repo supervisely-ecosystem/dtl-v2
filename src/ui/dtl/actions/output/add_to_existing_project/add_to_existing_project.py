@@ -7,7 +7,7 @@ from supervisely.app.widgets import (
     Text,
     Select,
     SelectProject,
-    SelectDataset,
+    SelectDatasetTree,
     Button,
     Container,
     Input,
@@ -67,11 +67,18 @@ class AddToExistingProjectAction(OutputAction):
             content=dst_project_selector,
         )
 
-        dst_dataset_options_existing_dataset_selector = SelectDataset(
-            compact=True,
-            size="small",
+        dst_dataset_options_existing_dataset_selector = SelectDatasetTree(
+            multiselect=False,
+            flat=True,
+            select_all_datasets=False,
             allowed_project_types=[g.SUPPORTED_MODALITIES_MAP[g.MODALITY_TYPE]],
+            always_open=False,
+            compact=True,
+            team_is_selectable=False,
+            workspace_is_selectable=False,
+            append_to_body=False,
         )
+
         dst_dataset_options_new_dataset_input = Input(
             placeholder="Enter dataset name", size="small"
         )

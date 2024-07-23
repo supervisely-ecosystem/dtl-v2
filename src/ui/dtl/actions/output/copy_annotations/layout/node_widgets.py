@@ -17,6 +17,7 @@ from supervisely.app.widgets import (
     Field,
     Select,
     Checkbox,
+    CheckboxField,
 )
 
 
@@ -87,11 +88,18 @@ def create_node_widgets():
         Select.Item("replace", "Replace Annotations"),
     ]
     select_option = Select(items=select_option_items, size="small")
+    select_option_strict_math_checkbox = CheckboxField(
+        title="Strict match",
+        description="If checked, item link and hash will be used to match items",
+        checked=False,
+    )
+    select_options_container = Container([select_option, select_option_strict_math_checkbox])
     select_option_field = Field(
         title="Select how to copy",
         description="Option 'Merge Annotations' will add annotations to the existing ones, option 'Replace Annotations' will remove the existing annotations and add new ones",
-        content=select_option,
+        content=select_options_container,
     )
+
     # -----------------------------
 
     # BACKUP DESTINATION
@@ -123,6 +131,8 @@ def create_node_widgets():
         select_project_edit_container,
         # select option
         select_option,
+        select_option_strict_math_checkbox,
+        select_options_container,
         select_option_field,
         # backup destination
         backup_destination_project_checkbox,

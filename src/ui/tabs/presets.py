@@ -168,10 +168,10 @@ def load_json():
     load_preset_btn.loading = True
     load_file_selector.disable()
     load_notification_select.set_value("empty")
-    # if g.FILE is not None:
-    #     path = g.FILE
-    # else:
+    preset_loaded = True
+
     filename = load_file_selector.get_value()
+    logger.info(f"Loading preset: {filename}")
     if filename is None:
         load_notification_select.set_value("not selected")
         load_preset_btn.loading = False
@@ -190,12 +190,13 @@ def load_json():
     except Exception as e:
         load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
         load_notification_select.set_value("error")
-        raise
+        preset_loaded = False
     finally:
         load_preset_btn.loading = False
         load_file_selector.enable()
-    load_notification_select.set_value("loaded")
-    load_dialog.hide()
+    if preset_loaded:
+        load_notification_select.set_value("loaded")
+        load_dialog.hide()
 
 
 def apply_json(dtl_json):

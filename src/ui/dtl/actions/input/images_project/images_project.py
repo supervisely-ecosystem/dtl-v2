@@ -364,7 +364,7 @@ class ImagesProjectAction(SourceAction):
                 if len(_current_meta.obj_classes) > 0:
                     src_classes_edit_btn.enable()
                 if len(_current_meta.tag_metas) > 0:
-                    src_tags_widget.enable()
+                    src_tags_edit_btn.enable()
                 update_preview_btn.enable()
 
             src_classes_widget.loading = False
@@ -410,7 +410,6 @@ class ImagesProjectAction(SourceAction):
                         datasets.extend(utils.get_all_datasets(project_info.id))
                     else:
                         datasets.append(utils.get_dataset_by_name(dataset_name, project_info.id))
-
                 if project_not_found is False:
                     # set datasets to widget
                     src_input_data_sidebar_dataset_selector.set_project_id(project_info.id)
@@ -431,6 +430,14 @@ class ImagesProjectAction(SourceAction):
                     src_input_data_sidebar_dataset_selector.set_project_id(None)
                     src_input_data_sidebar_dataset_selector.set_dataset_ids([])
                     project_meta = ProjectMeta()
+
+            selected_datasets = src_input_data_sidebar_dataset_selector.get_selected_ids()
+            if selected_datasets:
+                src_input_data_sidebar_save_btn.enable()
+                src_input_data_sidebar_empty_ds_notification.hide()
+            else:
+                src_input_data_sidebar_save_btn.disable()
+                src_input_data_sidebar_empty_ds_notification.show()
 
             # save src
             _save_src()
@@ -532,7 +539,7 @@ class ImagesProjectAction(SourceAction):
             g.updater("metas")
 
         @src_input_data_sidebar_dataset_selector.value_changed
-        def select_dataset_changed_handler(args):
+        def select_dataset_changed_handler(dataset_ids):
             selected = src_input_data_sidebar_dataset_selector.get_selected_ids()
             if selected is None or len(selected) == 0:
                 src_input_data_sidebar_save_btn.disable()

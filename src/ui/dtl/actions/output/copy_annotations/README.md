@@ -7,8 +7,8 @@
 1. Take the input and the destination projects.
 2. Match the images from datasets in the input and the destination projects.
    1. :white_check_mark: Matched by names
-   2. :white_check_mark: Matched by links
-   3. :white_check_mark: Matched by hashes
+   2. :white_check_mark: Matched by links (if strict match is enabled)
+   3. :white_check_mark: Matched by hashes (if strict match is enabled)
    4. :white_check_mark: Matched by sizes (height and width)
 3. Copy the annotations from the input project to the destination project by matching the image names.
 
@@ -46,6 +46,7 @@
     - `Select all datasets` - if this option is enabled, all datasets from the selected project will be used
     - `Dataset` - select one or more datasets from the selected project
 - **Select how to copy** - select how to add annotations to the project. Option `Replace Annotations` will replace the annotations in the destination project with the annotations from the input project. Option `Merge Annotations` will merge the annotations from the input project and the destination project.
+- **Strict match** - if enabled, items will be also matched by links and hashes
 - **Backup selected project** - if this option is enabled, the destination project will be backed up before the transformation process starts
 
 ### JSON views
