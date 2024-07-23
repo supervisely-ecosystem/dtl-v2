@@ -211,8 +211,10 @@ def set_settings_from_json(
     lj_members_labelers_preview: MembersListPreview,
     lj_settings_classes_list_widget: ClassesList,
     lj_settings_classes_list_preview: ClassesListPreview,
+    lj_settings_classes_list_edit_text: Text,
     lj_settings_tags_list_widget: TagsList,
     lj_settings_tags_list_preview: TagsListPreview,
+    lj_settings_tags_list_edit_text: Text,
     lj_output_project_name_input: Input,
     lj_output_dataset_keep_checkbox: Checkbox,
     lj_output_dataset_name_input: Input,
@@ -244,7 +246,10 @@ def set_settings_from_json(
     classes_settings = settings.get("classes_to_label", [])
     set_classes_list_settings_from_json(lj_settings_classes_list_widget, classes_settings)
     set_classes_list_preview(
-        lj_settings_classes_list_widget, lj_settings_classes_list_preview, classes_settings
+        lj_settings_classes_list_widget,
+        lj_settings_classes_list_preview,
+        classes_settings,
+        lj_settings_classes_list_edit_text,
     )
     # ----------------------------
 
@@ -252,7 +257,10 @@ def set_settings_from_json(
     tags_settings = settings.get("tags_to_label", [])
     set_tags_list_settings_from_json(lj_settings_tags_list_widget, tags_settings)
     set_tags_list_preview(
-        lj_settings_tags_list_widget, lj_settings_tags_list_preview, tags_settings
+        lj_settings_tags_list_widget,
+        lj_settings_tags_list_preview,
+        tags_settings,
+        lj_settings_tags_list_edit_text,
     )
     # ----------------------------
 
