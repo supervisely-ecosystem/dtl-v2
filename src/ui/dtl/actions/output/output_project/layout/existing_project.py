@@ -135,7 +135,7 @@ def create_existing_project_widgets():
     # PREVIEW
     dst_project_preview = ProjectThumbnail()
     dst_project_preview_warning = Text(
-        f"Project does not exist in the current workspace (ID: {g.WORKSPACE_ID})",
+        f"Project does not exist in the current workspace (ID: '{g.WORKSPACE_ID}')",
         "error",
         font_size=get_text_font_size(),
     )

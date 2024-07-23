@@ -2,7 +2,7 @@ from typing import Optional
 from os.path import realpath, dirname
 import json
 
-import src.globals as g
+from supervisely import logger
 from supervisely.app.widgets import NodesFlow, Checkbox
 from supervisely.project.project_meta import ProjectMeta
 from src.ui.dtl.utils import get_layer_docs
@@ -10,6 +10,7 @@ from src.ui.dtl import OutputAction
 from src.ui.dtl.Layer import Layer
 import src.ui.dtl.actions.output.output_project.layout.new_project as new_project
 import src.ui.dtl.actions.output.output_project.layout.existing_project as existing_project
+import src.globals as g
 
 
 class OutputProjectAction(OutputAction):
@@ -57,6 +58,8 @@ class OutputProjectAction(OutputAction):
 
         @sidebar_save_button.click
         def on_save_btn_click():
+            dst_project_preview.show()
+            dst_dataset_preview.show()
             _save_settings()
 
         # SWITCH PROJECT MODE
@@ -85,10 +88,11 @@ class OutputProjectAction(OutputAction):
                     project_info = g.api.project.get_info_by_id(selected_project_id)
                     if project_info.workspace_id != g.WORKSPACE_ID:
                         dst_project_preview.hide()
+                        dst_dataset_preview.hide()
                         dst_project_preview_warning.set(
                             text=(
-                                f"Project {project_info.name} (ID: {project_info.id}) "
-                                f"does not exist in the current workspace (ID: {g.WORKSPACE_ID}). "
+                                f"Project '{project_info.name}' (ID: '{project_info.id}') "
+                                f"does not exist in the current workspace (ID: '{g.WORKSPACE_ID}'). "
                                 "Please select a project from the current workspace."
                             ),
                             status="error",
@@ -97,6 +101,8 @@ class OutputProjectAction(OutputAction):
                     else:
                         dst_project_preview.set(project_info)
                         dst_project_preview_warning.hide()
+                        dst_project_preview.show()
+                        dst_dataset_preview.show()
 
                     dataset_option = dst_dataset_options_selector.get_value()
                     if dataset_option == "new":
@@ -218,10 +224,7 @@ class OutputProjectAction(OutputAction):
                 project_info = g.api.project.get_info_by_id(propject_id)
                 dst_project_preview.set(project_info)
 
-        def create_options(src: list, dst: list, settings: dict) -> dict:
-            nonlocal project_meta, _saved_meta
-            _set_settings_from_json(settings)
-
+        def _set_preview_from_json(dst):
             if is_existing_project.is_checked():
                 if isinstance(dst, list):
                     if len(dst) != 0:
@@ -230,13 +233,39 @@ class OutputProjectAction(OutputAction):
                         project_id = None
                 else:
                     project_id = int(dst)
-                dst_project_selector.set_project_id(project_id)
-                dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
-                if project_id:
-                    _saved_meta = g.api.project.get_meta(project_id)
-                    _saved_meta = ProjectMeta.from_json(_saved_meta)
-                _update_preview()
-                data_changed_cb(project_meta=project_meta)
+                try:
+                    dst_project_selector.set_project_id(project_id)
+                    dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
+                    if project_id:
+                        _saved_meta = g.api.project.get_meta(project_id)
+                        _saved_meta = ProjectMeta.from_json(_saved_meta)
+                    _update_preview()
+                    data_changed_cb(project_meta=project_meta)
+                except:
+                    logger.debug(
+                        f"Project does not exist in current workspace. Project id: '{project_id}', workspace id: '{g.WORKSPACE_ID}'"
+                    )
+                    dst_project_selector.set_project_id(None)
+                    dst_dataset_options_existing_dataset_selector.set_project_id(None)
+                    dst_project_preview.hide()
+                    dst_project_preview_warning.set(
+                        text=(
+                            f"Project (ID: '{project_id}') "
+                            f"does not exist in the current workspace (ID: '{g.WORKSPACE_ID}'). "
+                            "Please select a project from the current workspace."
+                        ),
+                        status="error",
+                    )
+                    dst_dataset_preview.hide()
+                    select_project_container.show()
+                    dst_project_preview_warning.show()
+                    dst_preview_container.show()
+                    # _update_preview()
+
+        def create_options(src: list, dst: list, settings: dict) -> dict:
+            nonlocal project_meta, _saved_meta
+            _set_settings_from_json(settings)
+            _set_preview_from_json(dst)
 
             settings_options = [
                 NodesFlow.Node.Option(
@@ -260,7 +289,7 @@ class OutputProjectAction(OutputAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="classes_mapping_preview",
+                    name="Destination Preview",
                     option_component=NodesFlow.WidgetOptionComponent(dst_preview_container),
                 ),
                 NodesFlow.Node.Option(
