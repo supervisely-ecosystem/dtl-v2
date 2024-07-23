@@ -109,13 +109,13 @@ def match_properties(
     return True
 
 
-def map_matching_images_by_name(input_ds_images, destination_ds_images):
+def map_matching_images_by_name(input_ds_images, destination_ds_images, strict_match):
     name_to_id_map = {get_file_name(image.name): image for image in input_ds_images}
     matched_mapping = {}
     for image in destination_ds_images:
         image_name = get_file_name(image.name)
         if image_name in name_to_id_map and match_properties(
-            name_to_id_map[image_name], image, strict_match=False
+            name_to_id_map[image_name], image, strict_match=strict_match
         ):
             matched_mapping[name_to_id_map[image_name].id] = image.id
     return matched_mapping
@@ -144,6 +144,7 @@ class CopyAnnotationsLayer(Layer):
                         "type": "string",
                         "enum": ["merge", "replace", "keep"],
                     },
+                    "strict_match": {"type": "boolean"},
                     "backup_destination_project": {"type": "boolean"},
                 },
             },
@@ -276,7 +277,11 @@ class CopyAnnotationsLayer(Layer):
                                 f"Destination project does not have dataset '{dataset.name}'. Skipping..."
                             )
                             continue
-                    matched_images = map_matching_images_by_name(input_images, destination_images)
+
+                    strict_match = self.settings.get("strict_match", False)
+                    matched_images = map_matching_images_by_name(
+                        input_images, destination_images, strict_match
+                    )
                     if len(matched_images) == 0:
                         sly.logger.warn(
                             f"Dataset '{dataset.name}' (ID '{dataset.id}') has no matching images. Skipping..."

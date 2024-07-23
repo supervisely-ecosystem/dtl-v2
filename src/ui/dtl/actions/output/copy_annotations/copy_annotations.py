@@ -49,6 +49,8 @@ class CopyAnnotationsAction(OutputAction):
             select_project_edit_container,
             # select option
             select_option,
+            select_option_strict_math_checkbox,
+            select_options_container,
             select_option_field,
             # backup destination
             backup_destination_project_checkbox,
@@ -102,6 +104,12 @@ class CopyAnnotationsAction(OutputAction):
             add_option = settings.get("add_option", "merge")
             select_option.set_value(add_option)
 
+            strict_match = settings.get("strict_match", False)
+            if strict_match:
+                select_option_strict_math_checkbox.check()
+            else:
+                select_option_strict_math_checkbox.uncheck()
+
             backup_destination_project = settings.get("backup_destination_project", True)
             if backup_destination_project:
                 backup_destination_project_checkbox.check()
@@ -124,12 +132,14 @@ class CopyAnnotationsAction(OutputAction):
             project_id = select_project_sidebar_dataset_selector.get_selected_project_id()
             dataset_ids = select_project_sidebar_dataset_selector.get_selected_ids()
             add_option = select_option.get_value()
+            strict_match = select_option_strict_math_checkbox.is_checked()
             backup_destination_project = backup_destination_project_checkbox.is_checked()
 
             settings = {
                 "project_id": project_id,
                 "dataset_ids": dataset_ids,
                 "add_option": add_option,
+                "strict_match": strict_match,
                 "backup_destination_project": backup_destination_project,
             }
             if project_id:
