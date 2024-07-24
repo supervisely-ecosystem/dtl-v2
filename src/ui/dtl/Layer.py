@@ -68,9 +68,7 @@ class Layer:
         if self.id is None:
             self.id = action.name + "_" + "".join(random.choice("0123456789") for _ in range(8))
 
-        self._create_options = create_options
-        if self._create_options is None:
-            self._create_options = create_placeholder_options
+        self._create_options = create_placeholder_options
         self._get_settings = get_settings
         self._get_src = get_src
         self._get_dst = get_dst
@@ -87,6 +85,12 @@ class Layer:
         self.postprocess_cb = postprocess_cb
         self.update_sources_cb = update_sources_cb
         self._init_widgets = init_widgets
+
+        def __change_create_options(self):
+            self._create_options = create_options
+
+        if self._init_widgets is None:
+            self._init_widgets = __change_create_options
 
         md_description = self.action.md_description.replace(
             r"../../assets", r"https://raw.githubusercontent.com/supervisely/docs/master/assets"
