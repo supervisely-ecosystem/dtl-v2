@@ -266,6 +266,7 @@ def apply_json(dtl_json):
                 )
 
             layer = ui_utils.create_new_layer(action_name)
+            layer.init_widgets()
             ids.append(layer.id)
             if action_name in actions_list[SOURCE_ACTIONS] or action_name == "filtered_project":
                 data_layers_ids.append(layer.id)
