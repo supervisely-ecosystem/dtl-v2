@@ -49,7 +49,9 @@ def find_children(parent: Layer, all_layers_ids: list):
     children = []
     parent_dst = parent.get_dst()
     for layer_id in all_layers_ids:
-        layer = g.layers.get(layer_id)
+        layer = g.layers.get(layer_id, None)
+        if layer is None:
+            continue
 
         layer_sources = []
         if isinstance(layer.get_src(), dict):
