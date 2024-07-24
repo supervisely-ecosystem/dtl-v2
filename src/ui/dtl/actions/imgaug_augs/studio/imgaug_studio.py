@@ -4,13 +4,14 @@ from os.path import realpath, dirname
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import get_layer_docs
 
-
+from supervisely import ProjectMeta, Polygon
 from supervisely.app.widgets import NodesFlow
 
 from src.ui.dtl import ImgAugAugmentationsAction
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_sidebar import (
     create_sidebar_widgets,
 )
+from src.ui.dtl.utils import classes_list_to_mapping
 
 from src.ui.dtl.actions.imgaug_augs.studio.layout.imgaug_studio_layout import create_layout_widgets
 import src.ui.dtl.actions.imgaug_augs.studio.layout.utils as aug_utils
@@ -27,9 +28,15 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
         custom_pipeline_file_info = []
+        _current_meta = ProjectMeta()
+        classes_to_convert = classes_list_to_mapping(
+            [], [oc.name for oc in _current_meta.obj_classes], other="skip"
+        )
+
         saved_settings = {
             "pipeline": [],
             "shuffle": False,
+            "classes_to_convert": classes_to_convert,
         }
 
         (
@@ -100,12 +107,13 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
 
         @sidebar_layout_save_btn.click
         def sidebar_layout_save_btn_cb():
-            nonlocal saved_settings
+            nonlocal saved_settings, classes_to_convert
             pipeline = sidebar_layout_pipeline.get_pipeline()
             shuffle = sidebar_layout_pipeline.is_shuffled()
             saved_settings = {
                 "pipeline": pipeline,
                 "shuffle": shuffle,
+                "classes_to_convert": classes_to_convert,
             }
             layout_pipeline_preview.set(pipeline)
             layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
@@ -163,6 +171,26 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             sidebar_layout_pipeline.show()
             sidebar_layout_buttons_container.show()
 
+        def data_changed_cb(**kwargs):
+            project_meta = kwargs.get("project_meta", None)
+            if project_meta is None:
+                return
+
+            nonlocal _current_meta
+            if project_meta == _current_meta:
+                return
+            _current_meta = project_meta
+
+            # update settings according to new meta
+            nonlocal saved_settings, classes_to_convert
+            obj_classes = [cls for cls in project_meta.obj_classes if cls.geometry_type is Polygon]
+            classes_to_convert = {obj_class.name: obj_class.name for obj_class in obj_classes}
+
+            classes_to_convert = classes_list_to_mapping(
+                classes_to_convert, [oc.name for oc in _current_meta.obj_classes], other="skip"
+            )
+            saved_settings["classes_to_convert"] = classes_to_convert
+
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
             return saved_settings
@@ -172,7 +200,11 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             pipeline_json = settings.get("pipeline", [])
             shuffle = settings.get("shuffle", False)
             sidebar_layout_pipeline.from_json(pipeline_json, shuffle)
-            saved_settings = {"pipeline": pipeline_json, "shuffle": shuffle}
+            saved_settings = {
+                "pipeline": pipeline_json,
+                "shuffle": shuffle,
+                "classes_to_convert": classes_to_convert,
+            }
             layout_pipeline_preview.set(pipeline_json)
             layout_shuffle_preview.set(f"Randomize order: {shuffle}", "text")
 
@@ -207,5 +239,6 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             id=layer_id,
             create_options=create_options,
             get_settings=get_settings,
+            data_changed_cb=data_changed_cb,
             need_preview=True,
         )
