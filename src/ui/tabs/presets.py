@@ -188,7 +188,8 @@ def load_json():
             dtl_json = json.load(f)
         apply_json(dtl_json)
     except Exception as e:
-        load_notification_error.description = f'Error loading preset from "{path}". {str(e)}'
+        logger.error(f"Error loading preset from {path}: {str(e)}")
+        load_notification_error.set(f'Error loading preset from "{path}". {str(e)}', status="error")
         load_notification_select.set_value("error")
         preset_loaded = False
     finally:
