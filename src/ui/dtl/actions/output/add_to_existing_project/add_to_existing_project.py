@@ -286,8 +286,12 @@ class AddToExistingProjectAction(OutputAction):
             else:
                 project_id = int(dst)
 
-            dst_project_selector.set_project_id(project_id)
-            dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
+            try:
+                dst_project_selector.set_project_id(project_id)
+                dst_dataset_options_existing_dataset_selector.set_project_id(project_id)
+            except:
+                # dst_project_selector.set_project_id(project_id)
+                dst_dataset_options_existing_dataset_selector.set_project_id(None)
 
             _update_preview()
 

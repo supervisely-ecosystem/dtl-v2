@@ -199,6 +199,7 @@ class ImgAugStudioAction(ImgAugAugmentationsAction):
             nonlocal saved_settings
             pipeline_json = settings.get("pipeline", [])
             shuffle = settings.get("shuffle", False)
+            classes_to_convert = settings.get("classes_to_convert", {})
             sidebar_layout_pipeline.from_json(pipeline_json, shuffle)
             saved_settings = {
                 "pipeline": pipeline_json,
