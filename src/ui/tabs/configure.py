@@ -276,7 +276,14 @@ def add_layer(action_name: str, position: dict = None, autoconnect: bool = False
             logger.debug(
                 "nodes_json", extra={"nodes_json len": len(nodes_json), "node_idx": node_idx}
             )
-            position = nodes_json[node_idx].get("position", None)
+            try:
+                position = nodes_json[node_idx].get("position", None)
+            except:
+                logger.error(
+                    f"[DEV] node is not found in nodes_json. node_idx: {node_idx}. nodes_json: {nodes_json}"
+                )
+                raise IndexError("Node is not found in nodes_json")
+
             node = ui_utils.create_node(layer, position)
             # nodes_flow.replace_node(node_idx, node)
             nodes_flow.pop_node(node_idx)
