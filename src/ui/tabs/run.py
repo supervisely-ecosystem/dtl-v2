@@ -270,10 +270,17 @@ def run_pipeline(run_dialog: Dialog = None):
 
 
 def start_pipeline(run_dialog: Dialog = None):
-    if g.pipeline_thread is not None:
-        raise RuntimeError("Pipeline is already running")
-    g.pipeline_thread = threading.Thread(target=run_pipeline, args=(run_dialog,), daemon=True)
-    g.pipeline_thread.start()
+    if g.pipeline_thread is not None or g.pipeline_running is True:
+        error_notification.set(
+            title="Pipeline is already running",
+            description="Please wait for it to finish or press Stop",
+        )
+        error_notification.show()
+        sly.logger.warn("Pipeline is already running. Please wait for it to finish or press Stop")
+        # raise RuntimeError("Pipeline is already running")
+    else:
+        g.pipeline_thread = threading.Thread(target=run_pipeline, args=(run_dialog,), daemon=True)
+        g.pipeline_thread.start()
 
 
 @run_btn.click
