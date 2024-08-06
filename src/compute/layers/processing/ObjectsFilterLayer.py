@@ -62,6 +62,13 @@ class ObjectsFilterLayer(Layer):
                                                     },
                                                     {
                                                         "type": "object",
+                                                        "required": ["pixels"],
+                                                        "properties": {
+                                                            "pixels": {"type": "integer"}
+                                                        },
+                                                    },
+                                                    {
+                                                        "type": "object",
                                                         "required": ["height", "width"],
                                                         "properties": {
                                                             "width": {"type": "integer"},
@@ -116,7 +123,7 @@ class ObjectsFilterLayer(Layer):
                 return []  # action 'delete'
             return [label]
 
-        def filter_delete_percent(label: Label):
+        def filter_delete_area_percent(label: Label):
             if self.settings["filter_by"]["polygon_sizes"]["comparator"] == "less":
                 compar = lambda x: x < area_set["percent"]
             else:
@@ -132,7 +139,22 @@ class ObjectsFilterLayer(Layer):
                     return []  # action 'delete'
             return [label]
 
-        def filter_delete_size(label: Label):
+        def filter_delete_area_pixels(label: Label):
+            if self.settings["filter_by"]["polygon_sizes"]["comparator"] == "less":
+                compar = lambda x: x < area_set["pixels"]
+            else:
+                compar = lambda x: x > area_set["pixels"]
+
+            if (
+                label.obj_class.name
+                in self.settings["filter_by"]["polygon_sizes"]["filtering_classes"]
+            ):
+                label_area = label.area
+                if compar(label_area):  # satisfied condition
+                    return []  # action 'delete'
+            return [label]
+
+        def filter_delete_bbox_size(label: Label):
             if self.settings["filter_by"]["polygon_sizes"]["comparator"] == "less":
                 compar = lambda x: x.width < area_set["width"] or x.height < area_set["height"]
             else:
@@ -153,8 +175,10 @@ class ObjectsFilterLayer(Layer):
         else:
             area_set = self.settings["filter_by"]["polygon_sizes"]["area_size"]
             if "percent" in area_set:
-                ann = apply_to_labels(ann, filter_delete_percent)
+                ann = apply_to_labels(ann, filter_delete_area_percent)
+            elif "pixels" in area_set:
+                ann = apply_to_labels(ann, filter_delete_area_pixels)
             else:
-                ann = apply_to_labels(ann, filter_delete_size)
+                ann = apply_to_labels(ann, filter_delete_bbox_size)
 
             yield img_desc, ann
