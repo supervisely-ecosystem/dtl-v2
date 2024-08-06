@@ -22,5 +22,5 @@
 			"videos_dataset"
 		]
 	},
-	"min_instance_version": "6.9.4"
+	"instance_version": "6.9.4"
 }
