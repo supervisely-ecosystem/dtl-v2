@@ -64,6 +64,14 @@ class ObjectsFilterAction(AnnotationAction):
             description="Filter annotations that have some side (determined by the annotation bounding box) less/more than specified value of width or height correspondingly.",
             content=size_input,
         )
+
+        area_px_input = InputNumber(min=0, value=100)
+        area_px_input_field = Field(
+            title="Input size",
+            description="Filter annotations by area size in pixels.",
+            content=area_px_input,
+        )
+
         comparator_select = Select(
             items=[Select.Item("less", "Less"), Select.Item("greater", "Greater")],
             size="small",
@@ -84,6 +92,18 @@ class ObjectsFilterAction(AnnotationAction):
                     widgets=[
                         classes_field,
                         percent_input_field,
+                        comparator_select_field,
+                        action_select_field,
+                    ]
+                ),
+            ),
+            Select.Item(
+                "area_pixels",
+                "Area pixels",
+                Container(
+                    widgets=[
+                        classes_field,
+                        area_px_input_field,
                         comparator_select_field,
                         action_select_field,
                     ]
@@ -182,6 +202,8 @@ class ObjectsFilterAction(AnnotationAction):
                 )
                 if "percent" in filter_by["polygon_sizes"]["area_size"]:
                     area_size_preview.text = f"Area size: {saved_settings['filter_by']['polygon_sizes']['area_size']['percent']}%"
+                elif "pixels" in filter_by["polygon_sizes"]["area_size"]:
+                    area_size_preview.text = f"Area size: {saved_settings['filter_by']['polygon_sizes']['area_size']['pixels']} px"
                 else:
                     area_size_preview.text = f"Area size: width = {saved_settings['filter_by']['polygon_sizes']['area_size']['width']} x height = {saved_settings['filter_by']['polygon_sizes']['area_size']['height']}"
             filter_preview_classes_text.set(
@@ -208,6 +230,10 @@ class ObjectsFilterAction(AnnotationAction):
                 if filter_by == "area_percent":
                     settings["filter_by"]["polygon_sizes"]["area_size"] = {
                         "percent": percent_input.get_value(),
+                    }
+                elif filter_by == "area_pixels":
+                    settings["filter_by"]["polygon_sizes"]["area_size"] = {
+                        "pixels": area_px_input.get_value()
                     }
                 elif filter_by == "bbox_size":
                     settings["filter_by"]["polygon_sizes"]["area_size"] = {
@@ -242,6 +268,12 @@ class ObjectsFilterAction(AnnotationAction):
                     percent_input.value = settings["filter_by"]["polygon_sizes"]["area_size"][
                         "percent"
                     ]
+                elif "pixels" in settings["filter_by"]["polygon_sizes"]["area_size"]:
+                    area_px_input.loading = True
+                    filter_by_select.set_value("area_pixels")
+                    area_px_input.value = settings["filter_by"]["polygon_sizes"]["area_size"][
+                        "pixels"
+                    ]
                 else:
                     size_input.loading = True
                     filter_by_select.set_value("bbox_size")
@@ -255,6 +287,7 @@ class ObjectsFilterAction(AnnotationAction):
                 filter_by_select.loading = False
                 size_input.loading = False
                 percent_input.loading = False
+                area_px_input.loading = False
                 classes.loading = False
                 comparator_select.loading = False
             _save_settings()

@@ -12,6 +12,10 @@
     - **Classes** - Select classes to filter by area percentage
     - **Input %** - Specify area percentage of image area
     - **Comparator** - Select comparison type: `less` or `greater`. If `less` is selected, objects with area less than specified percentage of image area will be deleted. If `greater` is selected, objects with area greater than specified percentage of image area will be deleted.
+  - **Area pixels** - filter by area size:
+    - **Classes** - Select classes to filter by area percentage
+    - **Input size** - Specify area in pixels of image area
+    - **Comparator** - Select comparison type: `less` or `greater`. If `less` is selected, objects with area less than specified percentage of image area will be deleted. If `greater` is selected, objects with area greater than specified percentage of image area will be deleted.
   - **Bounding box size** - filter by bounding box size:
     - **Classes** - Select classes to filter by bounding box size
     - **Input size** - Specify bounding box size in pixels:
