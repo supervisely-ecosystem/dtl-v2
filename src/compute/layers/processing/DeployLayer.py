@@ -104,7 +104,7 @@ class DeployLayer(Layer):
                     )
                 )
             check_model_is_deployed(settings["session_id"], self.title)
-            return super().validate()
+            super().validate()
 
     def postprocess(self):
         if self.settings["stop_model_session"]:

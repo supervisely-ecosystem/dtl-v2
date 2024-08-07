@@ -132,6 +132,10 @@ from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
     ImgAugCorruptlikeCompressionAction,
 )
 
+from .actions.annotation_transforms.objects_filter_by_area.objects_filter_by_area import (
+    ObjectsFilterByAreaAction,
+)
+
 
 from .actions.output.output_project.output_project import OutputProjectAction
 
@@ -199,6 +203,7 @@ image_actions_list = {
         LineToMaskAction.name,
         MergeMasksAction.name,
         ObjectsFilterAction.name,
+        ObjectsFilterByAreaAction.name,
         PolygonToMaskAction.name,
         RasterizeAction.name,
         RenameClassesAction.name,
@@ -276,6 +281,7 @@ image_actions_dict = {
     LineToMaskAction.name: LineToMaskAction,
     MergeMasksAction.name: MergeMasksAction,
     ObjectsFilterAction.name: ObjectsFilterAction,
+    ObjectsFilterByAreaAction.name: ObjectsFilterByAreaAction,
     PolygonToMaskAction.name: PolygonToMaskAction,
     RasterizeAction.name: RasterizeAction,
     RenameClassesAction.name: RenameClassesAction,
