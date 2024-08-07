@@ -299,7 +299,7 @@ class ApplyNNInferenceLayer(Layer):
             if self.settings["session_id"] is None:
                 raise GraphError("Apply NN layer requires model to be connected")
             check_model_is_deployed(self.settings["session_id"], self.net.preview_mode)
-            return super().validate()
+            super().validate()
 
     def requires_item(self):
         return True
