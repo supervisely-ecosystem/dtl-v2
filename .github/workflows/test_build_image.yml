@@ -1,0 +1,37 @@
+name: Docker Image Build
+
+on: 
+  workflow_dispatch:
+    inputs:
+      tag_version:
+        description: 'Docker Image Tag (without "v")'     
+        required: true
+        type: string
+        default: ''
+      dockerfile_path:
+        description: 'Path to Dockerfile (optional)'
+        required: true
+        type: string
+        default: 'docker/Dockerfile'
+      image_name:
+        description: 'Docker Image Name (optional)'
+        required: false
+        type: string
+        default: ''
+      sdk_version:
+        description: 'Supervisely SDK version (optional) - only needed if SDK is installed from branch'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build-and-push:
+    uses: supervisely-ecosystem/workflows/.github/workflows/build_image.yml@test
+    secrets:
+      DOCKERHUB_USERNAME: "${{  secrets.DOCKERHUB_USERNAME  }}"
+      DOCKERHUB_TOKEN:  "${{  secrets.DOCKERHUB_TOKEN  }}"
+    with:
+      tag_version: ${{ github.event.inputs.tag_version }}
+      dockerfile_path: ${{ github.event.inputs.dockerfile_path }}
+      image_name: ${{ github.event.inputs.image_name }}
+      sdk_version: ${{ github.event.inputs.sdk_version }}
