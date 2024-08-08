@@ -3,12 +3,12 @@ from typing import Tuple, Union
 
 from supervisely import (
     Annotation,
-    Label,
     ProjectMeta,
     Frame,
     VideoFigure,
     VideoObject,
     VideoAnnotation,
+    VideoTagCollection,
 )
 
 from src.compute.Layer import Layer
@@ -28,14 +28,20 @@ class VideosProjectLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["classes_mapping"],
+                "required": ["classes_mapping", "tags_mapping"],
                 "properties": {
                     "classes_mapping": {
                         "oneOf": [
                             {"type": "object", "patternProperties": {".*": {"type": "string"}}},
                             {"type": "string", "enum": ["default"]},
                         ]
-                    }
+                    },
+                    "tags_mapping": {
+                        "oneOf": [
+                            {"type": "object", "patternProperties": {".*": {"type": "string"}}},
+                            {"type": "string", "enum": ["default"]},
+                        ]
+                    },
                 },
             }
         },
@@ -89,51 +95,50 @@ class VideosProjectLayer(Layer):
         else:
             Layer.define_classes_mapping(self)
 
-    def class_mapper(self, map_item: Union[Label, Frame]):
-        # for preview
-        if isinstance(map_item, Label):  # if self.net.preview_mode
-            # map_item = label
-            curr_class = map_item.obj_class.name
-            if curr_class in self.cls_mapping:
-                new_class = self.cls_mapping[curr_class]
+    def define_tags_mapping(self):
+        if self.settings.get("tags_mapping", "default") != "default":
+            self.tag_mapping = self.settings["tags_mapping"]
+        else:
+            Layer.define_tags_mapping(self)
+
+    def class_mapper(self, map_item: Frame):
+        curr_frame_figures = map_item.figures
+        figures = []
+        for figure in curr_frame_figures:
+            figure: VideoFigure
+            curr_class: VideoObject = figure.video_object
+            new_tags = self.process_tags(curr_class.tags)
+            curr_class = curr_class.clone(tags=new_tags)
+            curr_class_name = curr_class._obj_class.name
+            if curr_class_name in self.cls_mapping:
+                new_class = self.cls_mapping[curr_class_name]
             else:
                 raise BadSettingsError(
-                    "Can not find mapping for class", extra={"class": curr_class}
+                    "Can not find mapping for class", extra={"class": curr_class_name}
                 )
+
             if new_class == ClassConstants.IGNORE:
                 return []  # drop the figure
             elif new_class != ClassConstants.DEFAULT:
-                obj_class = map_item.obj_class.clone(name=new_class)  # rename class
-                map_item = map_item.clone(obj_class=obj_class)
+                obj_class = figure.video_object._obj_class.clone(name=new_class)  # rename class
+                video_object = VideoObject(obj_class)
+                figure = figure.clone(video_object=video_object)
+                figures.append(figure)
             else:
                 pass  # don't change
-            return [map_item]
-        else:
-            # map_item = frame
-            curr_frame_figures = map_item.figures
-            figures = []
-            for figure in curr_frame_figures:
-                figure: VideoFigure
-                curr_class: VideoObject = figure.video_object
-                curr_class_name = curr_class._obj_class.name
-                if curr_class_name in self.cls_mapping:
-                    new_class = self.cls_mapping[curr_class_name]
-                else:
-                    raise BadSettingsError(
-                        "Can not find mapping for class", extra={"class": curr_class_name}
-                    )
-                if new_class == ClassConstants.IGNORE:
-                    return []  # drop the figure
-                elif new_class != ClassConstants.DEFAULT:
-                    obj_class = figure.video_object._obj_class.clone(name=new_class)  # rename class
-                    video_object = VideoObject(obj_class)
-                    figure = figure.clone(video_object=video_object)
-                    figures.append(figure)
-                else:
-                    pass  # don't change
-            if len(figures) > 0:
-                map_item = map_item.clone(figures=[figures])
-            return [map_item]
+        if len(figures) > 0:
+            map_item = map_item.clone(figures=[figures])
+        return [map_item]
+
+    def process_tags(self, tags: VideoTagCollection):
+        new_tags = []
+        curr_tags = tags
+        for tag in curr_tags:
+            if tag.name in self.tag_mapping:
+                if self.tag_mapping[tag.name] == ClassConstants.IGNORE:
+                    continue
+                new_tags.append(tag)
+        return new_tags
 
     def validate_source_connections(self):
         pass

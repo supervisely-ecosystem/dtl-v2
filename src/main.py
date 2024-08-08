@@ -169,7 +169,8 @@ update_loop.start()
 
 app.call_before_shutdown(u.on_app_shutdown)
 if layer is not None:
-    generate_preview_for_project(layer)
+    if g.MODALITY_TYPE == "images":
+        generate_preview_for_project(layer)
 
 g.PROJECT_ID = None
 g.DATASET_ID = None
