@@ -1,4 +1,4 @@
-# Objects Filter
+# Objects Filter by Area
 
 `Objects Filter by Area` layer allows filtering objects by area size. You can compare area size in pixels by `less` or `greater` comparison and apply one of the following actions: `delete`, `keep` or `add tags`.
 
