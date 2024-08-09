@@ -13,9 +13,28 @@
   - **add tags** - Objects that meet the filter criteria will be tagged with the specified tags, no objects will be deleted.
 - **Tags** - If `add tags` action is selected, you can select tags that will added to filtered objects.
 
-### Example
+### Example 1. Area pixel filter
 
-Example will be added soon.
+In this example, we apply the `large_area` and `small_area` tags to objects in an image based on the pixel size of their bounding boxes. Specifically, we tag objects with bounding box areas greater than 10,000 pixels as `large_area` and those with areas less than or equal to 10,000 pixels as `small_area`.
+
+- area_size: `10000px`
+- comparator: `greater`
+- action: `add_tags` -> `large-area`
+>
+- area_size: `10000px`
+- comparator: `less`
+- action: `add_tags` -> `small-area`
+
+<table>
+<tr>
+<td style="text-align:center; width:50%"><strong>All objects</strong></td>
+<td style="text-align:center; width:50%"><strong>Objects with tags by area that are less or greater 10000px</strong></td>
+</tr>
+<tr>
+<td> <img src="https://github.com/user-attachments/assets/4654e696-8e99-4959-a025-f4b7c54c0e1f" alt="Original image" /> </td>
+<td> <img src="https://github.com/user-attachments/assets/b67559da-dc7c-4e85-9596-9cb32b04d0b1" alt="Filtered objects" /> </td>
+</tr>
+</table>
 
 ### JSON views
 
