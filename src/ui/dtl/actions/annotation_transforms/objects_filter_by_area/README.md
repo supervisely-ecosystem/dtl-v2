@@ -19,11 +19,11 @@ In this example, we apply the `large_area` and `small_area` tags to objects in a
 
 - area_size: `10000px`
 - comparator: `greater`
-- action: `add_tags` -> `large-area`
+- action: `add_tags` -> `large_area`
 >
 - area_size: `10000px`
 - comparator: `less`
-- action: `add_tags` -> `small-area`
+- action: `add_tags` -> `small_area`
 
 <table>
 <tr>
