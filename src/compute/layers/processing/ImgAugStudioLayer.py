@@ -83,6 +83,8 @@ class ImgAugStudioLayer(Layer):
             if self.original_meta != self.output_meta:
                 self.original_meta = self.modify_original_meta()
             augs = sly.imgaug_utils.build_pipeline(pipeline, shuffle)
-            _, res_img, res_ann = sly.imgaug_utils.apply(augs, self.original_meta, img, ann)
+            _, res_img, res_ann = sly.imgaug_utils.apply(
+                augs, self.original_meta, img, ann, "instance"
+            )
             new_img_desc = img_desc.clone_with_item(res_img)
             yield (new_img_desc, res_ann)
