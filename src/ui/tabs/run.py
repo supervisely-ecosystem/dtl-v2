@@ -275,17 +275,16 @@ def _run():
         global_timer.dump()
 
         # ---------------------------------------- Workflow Input ---------------------------------------- #
-        data_layers
-        input_project_names = [layer.project_name for layer in data_layers]
-        input_project_infos = [
-            g.api.project.get_info_by_name(g.TEAM_ID, name) for name in input_project_names
-        ]
-        w.workflow_input()
+        w.workflow_input(g.api, data_layers)
         # ----------------------------------------------- - ---------------------------------------------- #
 
         # ---------------------------------------- Workflow Output --------------------------------------- #
-        preset_file_info = w.upload_workflow_preset()
-        w.workflow_output(preset=preset_file_info)
+        w.workflow_output(
+            g.api,
+            project_layers=supervisely_layers,
+            job_layers=labeling_job_layers,
+            file_infos=file_infos,
+        )
         # ----------------------------------------------- - ---------------------------------------------- #
 
 
