@@ -23,13 +23,22 @@ if sly.is_development():
 
 api = sly.Api()
 
+TASK_ID = sly.env.task_id(raise_not_found=False)
 TEAM_ID = sly.env.team_id()
 WORKSPACE_ID = sly.env.workspace_id()
 USER_ID = sly.env.user_id()
 DATA_DIR = "sly_task_data/data"
 RESULTS_DIR = "sly_task_data/results"
 PREVIEW_DIR = "sly_task_data/preview"
+WORKFLOW_DIR = "sly_task_data/workflow"
 STATIC_DIR = "static"
+
+if TASK_ID is not None:
+    OFFLINE_SESSION_PATH = f"/offline-sessions/{TASK_ID}/workflows"
+else:
+    OFFLINE_SESSION_PATH = f"/TEST_WORKFLOW/task_id/workflows"
+WORKFLOW_ID = 1
+
 
 sly.fs.mkdir(DATA_DIR, True)
 sly.fs.mkdir(RESULTS_DIR, True)

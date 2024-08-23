@@ -15,8 +15,16 @@ from supervisely.app.widgets import (
 )
 from supervisely.io.fs import get_file_size
 import supervisely as sly
+import src.workflow as w
 
 from src.compute.main import main as compute_dtls
+
+from src.compute.layers.data.FilteredProjectLayer import FilteredProjectLayer
+from src.compute.layers.data.ImagesProjectLayer import ImagesProjectLayer
+from src.compute.layers.data.InputLabelingJobLayer import InputLabelingJobLayer
+from src.compute.layers.data.VideosProjectLayer import VideosProjectLayer
+
+
 from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
@@ -192,6 +200,18 @@ def _run():
             if not g.pipeline_running:
                 return
 
+        data_layers = [
+            l
+            for l in net.layers
+            if isinstance(
+                l,
+                FilteredProjectLayer,
+                ImagesProjectLayer,
+                InputLabelingJobLayer,
+                VideosProjectLayer,
+            )
+        ]
+
         supervisely_layers = [
             l
             for l in net.layers
@@ -211,6 +231,7 @@ def _run():
 
         labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
 
+        # Outputs
         results.set_content(
             ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
         )
@@ -252,6 +273,20 @@ def _run():
         show_run_dialog_btn.show()
         g.pipeline_thread = None
         global_timer.dump()
+
+        # ---------------------------------------- Workflow Input ---------------------------------------- #
+        data_layers
+        input_project_names = [layer.project_name for layer in data_layers]
+        input_project_infos = [
+            g.api.project.get_info_by_name(g.TEAM_ID, name) for name in input_project_names
+        ]
+        w.workflow_input()
+        # ----------------------------------------------- - ---------------------------------------------- #
+
+        # ---------------------------------------- Workflow Output --------------------------------------- #
+        preset_file_info = w.upload_workflow_preset()
+        w.workflow_output(preset=preset_file_info)
+        # ----------------------------------------------- - ---------------------------------------------- #
 
 
 def run_pipeline(run_dialog: Dialog = None):
