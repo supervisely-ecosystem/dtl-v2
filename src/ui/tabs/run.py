@@ -205,10 +205,12 @@ def _run():
             for l in net.layers
             if isinstance(
                 l,
-                FilteredProjectLayer,
-                ImagesProjectLayer,
-                InputLabelingJobLayer,
-                VideosProjectLayer,
+                (
+                    FilteredProjectLayer,
+                    ImagesProjectLayer,
+                    InputLabelingJobLayer,
+                    VideosProjectLayer,
+                ),
             )
         ]
 
