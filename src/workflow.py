@@ -33,7 +33,7 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
             api.app.workflow.add_input_project(info.id)
             sly.logger.debug(f"Workflow: Input project - {info.id}")
     except Exception as e:
-        sly.logger.debug(f"Failed to add output to the workflow: {repr(e)}")
+        sly.logger.debug(f"Workflow: Failed to add output to the workflow: {repr(e)}")
 
 
 def upload_workflow_preset():
@@ -84,15 +84,26 @@ def workflow_output(
         job_infos: Optional[List[LabelingJobInfo]] = [
             job for layer in job_layers for job in layer.created_labeling_jobs
         ]
+    except Exception as e:
+        sly.logger.debug(
+            f"Workflow: Input data is not valid. Failed to add output to the workflow: {repr(e)}"
+        )
 
+    try:
         if project_infos is not None and len(project_infos) > 0:
             for p_info in project_infos:
                 api.app.workflow.add_output_project(p_info.id)
                 sly.logger.debug(f"Workflow: Output project - {p_info.id}")
+    except Exception as e:
+        sly.logger.debug(f"Workflow: Failed to add output projects to the workflow: {repr(e)}")
+    try:
         if job_infos is not None and len(job_infos) > 0:
             for j_info in job_infos:
                 api.app.workflow.add_output_job(j_info.id)
                 sly.logger.debug(f"Workflow: Output job - {j_info.id}")
+    except Exception as e:
+        sly.logger.debug(f"Workflow: Failed to add output labeling jobs to the workflow: {repr(e)}")
+    try:
         if file_infos is not None and len(file_infos) > 0:
             n = len(file_infos)
             folder_path = dirname(file_infos[0].path)
@@ -105,6 +116,11 @@ def workflow_output(
             meta = sly.WorkflowMeta(relation_settings=relation_settings)
             api.app.workflow.add_output_folder(folder_path, meta=meta)
             sly.logger.debug(f"Workflow: Output folder with project archives - {file_infos[0]}")
+    except Exception as e:
+        sly.logger.debug(
+            f"Workflow: Failed to add output folder with project archives to the workflow: {repr(e)}"
+        )
+    try:
         if preset_file is not None:
             relation_settings = sly.WorkflowSettings(
                 title=f"Workflow Preset #{g.WORKFLOW_ID}",
@@ -118,4 +134,4 @@ def workflow_output(
             api.app.workflow.add_output_file(preset_file, meta=meta)
             sly.logger.debug(f"Workflow: Preset file - {preset_file}")
     except Exception as e:
-        sly.logger.debug(f"Failed to add output to the workflow: {repr(e)}")
+        sly.logger.debug(f"Workflow: Failed to add output preset file to the workflow: {repr(e)}")
