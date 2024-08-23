@@ -240,6 +240,19 @@ def _run():
         results.show()
         circle_progress.set_status("success")
 
+        # ---------------------------------------- Workflow Input ---------------------------------------- #
+        w.workflow_input(g.api, data_layers)
+        # ----------------------------------------------- - ---------------------------------------------- #
+
+        # ---------------------------------------- Workflow Output --------------------------------------- #
+        w.workflow_output(
+            g.api,
+            project_layers=supervisely_layers,
+            job_layers=labeling_job_layers,
+            file_infos=file_infos,
+        )
+        # ----------------------------------------------- - ---------------------------------------------- #
+
     except CustomException as e:
         error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
@@ -273,19 +286,6 @@ def _run():
         show_run_dialog_btn.show()
         g.pipeline_thread = None
         global_timer.dump()
-
-        # ---------------------------------------- Workflow Input ---------------------------------------- #
-        w.workflow_input(g.api, data_layers)
-        # ----------------------------------------------- - ---------------------------------------------- #
-
-        # ---------------------------------------- Workflow Output --------------------------------------- #
-        w.workflow_output(
-            g.api,
-            project_layers=supervisely_layers,
-            job_layers=labeling_job_layers,
-            file_infos=file_infos,
-        )
-        # ----------------------------------------------- - ---------------------------------------------- #
 
 
 def run_pipeline(run_dialog: Dialog = None):
