@@ -124,7 +124,7 @@ def workflow_output(
         if preset_file is not None:
             relation_settings = sly.WorkflowSettings(
                 title=f"Workflow Preset #{g.WORKFLOW_ID}",
-                icon="dashboard",
+                icon="view-dashboard",
                 icon_color="##ffffff",
                 icon_bg_color="#cdcce3",
                 url=f"/files/{preset_file.id}/true/?teamId={preset_file.team_id}",
