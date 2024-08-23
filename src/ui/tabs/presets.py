@@ -1,7 +1,7 @@
 import random
 import json
 from time import sleep
-
+from typing import Optional
 from supervisely.app.widgets import (
     Button,
     Container,
@@ -17,6 +17,7 @@ from supervisely.app.widgets import (
 )
 from supervisely.app import show_dialog
 from supervisely import logger
+from supervisely.io.fs import get_file_name_with_ext
 from src.compute.Net import Net
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.Action import SourceAction
@@ -164,21 +165,27 @@ def preset_name_input_cb(value):
         save_preset_btn.enable()
 
 
-def load_json():
+def load_json(remote_file_path: Optional[str] = None):
     load_preset_btn.loading = True
     load_file_selector.disable()
     load_notification_select.set_value("empty")
     preset_loaded = True
 
-    filename = load_file_selector.get_value()
+    if remote_file_path is not None:
+        filename = get_file_name_with_ext(remote_file_path)
+    else:
+        filename = load_file_selector.get_value()
     logger.info(f"Loading preset: {filename}")
     if filename is None:
         load_notification_select.set_value("not selected")
         load_preset_btn.loading = False
         load_file_selector.enable()
         return
-    # path =f"/{g.TEAM_FILES_PATH}/presets/{filename}.json"
-    path = f"{g.PRESETS_PATH}/{filename}.json"
+
+    if remote_file_path is not None:
+        path = remote_file_path
+    else:
+        path = f"{g.PRESETS_PATH}/{filename}.json"
     nodes_flow.clear()
     g.layers.clear()
     try:

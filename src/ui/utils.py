@@ -693,7 +693,7 @@ def create_new_layer(
     register_layer(layer)
     StateJson().send_changes()
     DataJson().send_changes()
-    layer.init_widgets()
+    # layer.init_widgets()
     return layer
 
 

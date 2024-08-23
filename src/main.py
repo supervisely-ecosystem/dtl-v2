@@ -121,7 +121,10 @@ def generate_preview_for_project(layer: Layer):
 
 
 layer = None
-if g.PIPELINE_TEMPLATE is not None:
+
+if g.FILE is not None:
+    load_json(g.FILE)
+elif g.PIPELINE_TEMPLATE is not None:
     template = templates[g.MODALITY_TYPE].get(g.PIPELINE_TEMPLATE, None)
     if template is not None:
         load_template(template)
@@ -146,8 +149,10 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) == 0:
 
     if pr.type == "images":
         layer = create_new_layer(ImagesProjectAction.name)
+        layer.init_widgets()
     elif pr.type == "videos":
         layer = create_new_layer(VideosProjectAction.name)
+        layer.init_widgets()
     else:
         raise NotImplementedError(f"Project type {pr.type} is not supported")
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
@@ -158,14 +163,12 @@ elif g.PROJECT_ID and len(g.FILTERED_ENTITIES) > 0:
     pr: ProjectInfo = g.api.project.get_info_by_id(g.PROJECT_ID)
     src = [f"{pr.name}/*"]
     layer = create_new_layer(FilteredProjectAction.name)
+    layer.init_widgets()
     layer.from_json({"src": src, "settings": {"classes_mapping": "default"}})
     node = layer.create_node()
     nodes_flow.add_node(node)
 
 update_loop.start()
-
-# if g.FILE:
-#     g.updater("load_json")
 
 app.call_before_shutdown(u.on_app_shutdown)
 if layer is not None:
