@@ -19,7 +19,8 @@
 			"images_project",
 			"images_dataset",
 			"videos_project",
-			"videos_dataset"
+			"videos_dataset",
+			"files_file"
 		]
 	},
 	"instance_version": "6.11.8"
