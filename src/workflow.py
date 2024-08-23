@@ -68,7 +68,6 @@ def upload_workflow_preset():
     return file_info
 
 
-
 def workflow_output(
     api: sly.Api,
     project_layers: Optional[List[Layer]] = None,
@@ -78,12 +77,12 @@ def workflow_output(
 
     try:
         preset_file = upload_workflow_preset()
-        
+
         project_infos: Optional[List[ProjectInfo]] = [
             layer.sly_project_info for layer in project_layers
         ]
         job_infos: Optional[List[LabelingJobInfo]] = [
-            layer.created_labeling_jobs for layer in job_layers
+            job for layer in job_layers for job in layer.created_labeling_jobs
         ]
 
         if project_infos is not None and len(project_infos) > 0:
