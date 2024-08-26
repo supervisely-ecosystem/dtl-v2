@@ -171,7 +171,12 @@ def _run():
                 if not g.pipeline_running:
                     return
 
-                dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{Path(tar_path).name}"
+                if g.TASK_ID is not None:  # is production
+                    dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{g.TASK_ID}/{Path(tar_path).name}"
+                else:  # is development
+                    dst = (
+                        f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/DEV/{Path(tar_path).name}"
+                    )
                 if g.api.file.exists(g.TEAM_ID, dst):
                     dst = g.api.file.get_free_name(g.TEAM_ID, dst)
 
