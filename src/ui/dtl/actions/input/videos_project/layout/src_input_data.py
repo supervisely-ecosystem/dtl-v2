@@ -11,7 +11,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     NotificationBox,
-    SelectDataset,
+    Flexbox,
     SelectDatasetTree,
     Text,
     ProjectThumbnail,
@@ -34,6 +34,9 @@ def create_input_data_selector_widgets():
     )
 
     src_input_data_sidebar_save_btn = create_save_btn()
+    src_input_data_sidebar_refresh_btn = Button(
+        text="Refresh projects", button_type="info", plain=True, icon="zmdi zmdi-refresh"
+    )
     src_input_data_sidebar_save_btn.disable()
     src_input_data_sidebar_empty_ds_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"
@@ -42,7 +45,13 @@ def create_input_data_selector_widgets():
         widgets=[
             src_input_data_sidebar_dataset_selector,
             src_input_data_sidebar_empty_ds_notification,
-            src_input_data_sidebar_save_btn,
+            Flexbox(
+                widgets=[
+                    src_input_data_sidebar_save_btn,
+                    src_input_data_sidebar_refresh_btn,
+                ],
+                gap=10,
+            ),
         ]
     )
     # Preview
@@ -87,6 +96,7 @@ def create_input_data_selector_widgets():
         # Sidebar
         src_input_data_sidebar_dataset_selector,
         src_input_data_sidebar_save_btn,
+        src_input_data_sidebar_refresh_btn,
         src_input_data_sidebar_empty_ds_notification,
         src_input_data_sidebar_widgets_container,
         # Preview

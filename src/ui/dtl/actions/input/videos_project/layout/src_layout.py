@@ -14,7 +14,7 @@ def create_src_options(
                 sidebar_component=NodesFlow.WidgetOptionComponent(
                     src_input_data_sidebar_widgets_container
                 ),
-                sidebar_width=300,
+                sidebar_width=325,
             ),
         ),
         NodesFlow.Node.Option(
