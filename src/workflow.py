@@ -71,7 +71,9 @@ def upload_workflow_preset():
     with open(src_path, "w") as f:
         json.dump(dtl_json, f, indent=4)
 
+    sly.logger.info(f"Uploading workflow preset file to: '{dst_path}'")
     file_info = g.api.file.upload(g.TEAM_ID, src_path, dst_path)
+    sly.logger.info("Workflow preset file uploaded successfully")
     g.WORKFLOW_ID += 1
     return file_info
 

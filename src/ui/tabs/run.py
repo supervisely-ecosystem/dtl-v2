@@ -247,6 +247,8 @@ def _run():
         results.show()
         circle_progress.set_status("success")
 
+        # ---------------------------------------- Workflow ---------------------------------------------- #
+        sly.logger.info(f"Workflow started. Workflow ID: {g.WORKFLOW_ID}")
         # ---------------------------------------- Workflow Input ---------------------------------------- #
         w.workflow_input(g.api, data_layers)
         # ----------------------------------------------- - ---------------------------------------------- #
@@ -258,6 +260,7 @@ def _run():
             job_layers=labeling_job_layers,
             file_infos=file_infos,
         )
+        sly.logger.info(f"Workflow finished. Next workflow ID: {g.WORKFLOW_ID}")
         # ----------------------------------------------- - ---------------------------------------------- #
 
     except CustomException as e:

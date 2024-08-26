@@ -73,7 +73,7 @@ def main(
     if not g.pipeline_running:
         return
 
-    logger.info("DTL started")
+    logger.info("Pipeline started")
     helper = DtlHelper()
 
     try:
@@ -113,12 +113,12 @@ def main(
 
     except CustomException as e:
         circle_progress.hide()
-        # logger.error("Error occurred on DTL-graph initialization step!")
+        # logger.error("Error occurred on Pipeline graph initialization step!")
         # e.log()
         raise e
     except Exception as e:
         circle_progress.hide()
-        # logger.error("Error occurred on DTL-graph initialization step!", exc_info=str(e))
+        # logger.error("Error occurred on Pipeline graph initialization step!", exc_info=str(e))
         raise e
 
     total = net.get_total_elements()
@@ -187,7 +187,7 @@ def main(
         return
 
     logger.info(
-        "DTL finished",
+        "Pipeline finished",
         extra={"event_type": EventType.DTL_APPLIED, "new_proj_size": results_counter},
     )
     total_pipeline_time_end = time()
@@ -200,4 +200,4 @@ def main(
 if __name__ == "__main__":
     if os.getenv("DEBUG_LOG_TO_FILE", None):
         sly_logger.add_default_logging_into_file(logger, DtlPaths().debug_dir)
-    logging_utils.main_wrapper("DTL", main)
+    logging_utils.main_wrapper("Pipeline", main)
