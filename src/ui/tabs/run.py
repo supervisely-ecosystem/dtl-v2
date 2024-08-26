@@ -260,7 +260,8 @@ def _run():
             job_layers=labeling_job_layers,
             file_infos=file_infos,
         )
-        sly.logger.info(f"Workflow finished. Next workflow ID: {g.WORKFLOW_ID}")
+        sly.logger.info(f"Workflow finished.")
+        # sly.logger.info(f"Workflow finished. Next workflow ID: {g.WORKFLOW_ID}")
         # ----------------------------------------------- - ---------------------------------------------- #
 
     except CustomException as e:
