@@ -70,6 +70,7 @@ class ImagesProjectAction(SourceAction):
             # Sidebar
             src_input_data_sidebar_dataset_selector,
             src_input_data_sidebar_save_btn,
+            src_input_data_sidebar_refresh_btn,
             src_input_data_sidebar_empty_ds_notification,
             src_input_data_sidebar_widgets_container,
             # Preview
@@ -127,6 +128,18 @@ class ImagesProjectAction(SourceAction):
             style=get_set_settings_button_style(),
         )
         update_preview_btn.disable()
+
+        # Refresh project on SELECT
+        @src_input_data_sidebar_refresh_btn.click
+        def src_input_data_sidebar_refresh_btn_btn_cb():
+            # Get currently selected project and datasets
+            current_project = src_input_data_sidebar_dataset_selector.get_selected_project_id()
+            current_datasets = src_input_data_sidebar_dataset_selector.get_selected_ids()
+
+            # Refresh project list and set current project and datasets if any
+            src_input_data_sidebar_dataset_selector.set_workspace_id(g.WORKSPACE_ID)
+            src_input_data_sidebar_dataset_selector.set_project_id(current_project)
+            src_input_data_sidebar_dataset_selector.set_dataset_ids(current_datasets)
 
         def _set_src_preview():
             src_preview_text = ""
