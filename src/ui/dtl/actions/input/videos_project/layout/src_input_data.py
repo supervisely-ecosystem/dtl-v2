@@ -1,6 +1,7 @@
 import src.globals as g
 from src.ui.dtl.utils import (
     create_save_btn,
+    create_refresh_projects_btn,
     get_text_font_size,
     get_set_settings_button_style,
     get_set_settings_container,
@@ -34,9 +35,7 @@ def create_input_data_selector_widgets():
     )
 
     src_input_data_sidebar_save_btn = create_save_btn()
-    src_input_data_sidebar_refresh_btn = Button(
-        text="Refresh projects", button_type="info", plain=True, icon="zmdi zmdi-refresh"
-    )
+    src_input_data_sidebar_refresh_btn = create_refresh_projects_btn()
     src_input_data_sidebar_save_btn.disable()
     src_input_data_sidebar_empty_ds_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"

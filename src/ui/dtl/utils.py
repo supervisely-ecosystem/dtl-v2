@@ -638,6 +638,10 @@ def create_set_default_btn() -> Button:
     return Button("Set Default", button_type="info", plain=True, icon="zmdi zmdi-refresh")
 
 
+def create_refresh_projects_btn() -> Button:
+    return Button("Refresh Projects", button_type="info", plain=True, icon="zmdi zmdi-refresh")
+
+
 def create_sidebar_btn_container(
     save_btn: Button, default_btn: Button = None, need_separator: bool = True
 ):
