@@ -38,7 +38,7 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
                 api.app.workflow.add_input_project(info.id)
                 sly.logger.debug(f"Workflow: Input project - {info.id}")
         except Exception as e:
-            sly.logger.debug(f"Workflow: Failed to add output to the workflow: {repr(e)}")
+            sly.logger.debug(f"Workflow: Failed to add input to the workflow: {repr(e)}")
         is_input_processed = True
     else:
         sly.logger.debug("Workflow: Input data has already been processed. Skipping.")
@@ -98,7 +98,7 @@ def workflow_output(
             ]
         except Exception as e:
             sly.logger.debug(
-                f"Workflow: Input data is not valid. Failed to add output to the workflow: {repr(e)}"
+                f"Workflow: Provided data is not valid. Failed to add output to the workflow: {repr(e)}"
             )
 
         try:
@@ -112,7 +112,7 @@ def workflow_output(
             if job_infos is not None and len(job_infos) > 0:
                 for j_info in job_infos:
                     api.app.workflow.add_output_job(j_info.id)
-                    sly.logger.debug(f"Workflow: Output job - {j_info.id}")
+                    sly.logger.debug(f"Workflow: Output labeling job - {j_info.id}")
         except Exception as e:
             sly.logger.debug(
                 f"Workflow: Failed to add output labeling jobs to the workflow: {repr(e)}"
@@ -146,7 +146,7 @@ def workflow_output(
                 )
                 meta = sly.WorkflowMeta(relation_settings=relation_settings)
                 api.app.workflow.add_output_file(preset_file, meta=meta)
-                sly.logger.debug(f"Workflow: Preset file - {preset_file}")
+                sly.logger.debug(f"Workflow: Output preset file - {preset_file}")
         except Exception as e:
             sly.logger.debug(
                 f"Workflow: Failed to add output preset file to the workflow: {repr(e)}"
