@@ -122,13 +122,16 @@ def workflow_output(
                 layer.sly_project_info for layer in job_layers
             ]
             project_infos.extend(job_project_infos)
-            project_infos = list(set(project_infos))
+            # --------------------------------------- Remove Duplicates -------------------------------------- #
+            unique_project_infos = {project_info.id: project_info for project_info in project_infos}
+            project_infos = list(unique_project_infos.values())
+            # ------------------------------------- Remove Duplicates End ------------------------------------ #
             job_infos: Optional[List[LabelingJobInfo]] = [
                 job for layer in job_layers for job in layer.created_labeling_jobs
             ]
         except Exception as e:
             sly.logger.debug(
-                f"Workflow: Provided data is not valid. Failed to add output to the workflow: {repr(e)}"
+                f"Workflow: Provided data for output is not valid or processed with errors: {repr(e)}"
             )
 
         try:
