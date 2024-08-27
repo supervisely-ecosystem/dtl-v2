@@ -18,21 +18,18 @@ from supervisely.api.module_api import ApiField
 
 is_input_processed = False
 is_output_processed = False
+input_project_infos = []
 
 
 def workflow_input(api: sly.Api, data_layers: List[Layer]):
     global is_input_processed
+    global input_project_infos
     if is_input_processed is False:
         try:
             input_project_names = [
                 layer.project_name
                 for layer in data_layers
                 if not isinstance(layer, InputLabelingJobLayer)
-            ]
-            input_job_ids = [
-                layer.settings.get("job_id", None)
-                for layer in data_layers
-                if isinstance(layer, InputLabelingJobLayer)
             ]
             input_project_infos = g.api.project.get_list(
                 g.WORKSPACE_ID,
@@ -44,6 +41,11 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
                     }
                 ],
             )
+            input_job_ids = [
+                layer.settings.get("job_id", None)
+                for layer in data_layers
+                if isinstance(layer, InputLabelingJobLayer)
+            ]
         except Exception as e:
             sly.logger.debug(f"Workflow: Failed to collect input data {repr(e)}")
         try:
@@ -107,6 +109,7 @@ def workflow_output(
     file_infos: Optional[List[FileInfo]] = None,
 ):
     global is_output_processed
+    global input_project_infos
 
     if is_output_processed is False:
         try:
@@ -115,6 +118,11 @@ def workflow_output(
             project_infos: Optional[List[ProjectInfo]] = [
                 layer.sly_project_info for layer in project_layers
             ]
+            job_project_infos: Optional[List[ProjectInfo]] = [
+                job.project_name for layer in job_layers for job in layer.sly_project_info
+            ]
+            project_infos.extend(job_project_infos)
+            project_infos = list(set(project_infos))
             job_infos: Optional[List[LabelingJobInfo]] = [
                 job for layer in job_layers for job in layer.created_labeling_jobs
             ]
@@ -126,6 +134,11 @@ def workflow_output(
         try:
             if project_infos is not None and len(project_infos) > 0:
                 for p_info in project_infos:
+                    if p_info in input_project_infos:
+                        sly.logger.debug(
+                            f"Workflow: Skipping input project for output - {p_info.id}"
+                        )
+                        continue
                     api.app.workflow.add_output_project(p_info.id)
                     sly.logger.debug(f"Workflow: Output project - {p_info.id}")
         except Exception as e:
@@ -159,7 +172,7 @@ def workflow_output(
         try:
             if preset_file is not None:
                 relation_settings = sly.WorkflowSettings(
-                    title=f"Workflow Preset #{g.WORKFLOW_ID - 1}",
+                    title=f"Workflow Preset",
                     icon="view-dashboard",
                     icon_color="#ffffff",
                     icon_bg_color="#cdcce3",
