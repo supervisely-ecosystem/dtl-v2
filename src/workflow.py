@@ -30,7 +30,7 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
                 if not isinstance(layer, InputLabelingJobLayer)
             ]
             input_job_ids = [
-                layer.setting.get("job_id", None)
+                layer.settings.get("job_id", None)
                 for layer in data_layers
                 if isinstance(layer, InputLabelingJobLayer)
             ]
@@ -93,9 +93,9 @@ def upload_workflow_preset():
     with open(src_path, "w") as f:
         json.dump(dtl_json, f, indent=4)
 
-    sly.logger.info(f"Uploading workflow preset file to: '{dst_path}'")
+    sly.logger.info(f"Workflow: Uploading preset file to: '{dst_path}'")
     file_info = g.api.file.upload(g.TEAM_ID, src_path, dst_path)
-    sly.logger.info("Workflow preset file uploaded successfully")
+    sly.logger.info("Workflow: Preset file uploaded successfully")
     g.WORKFLOW_ID += 1
     return file_info
 
