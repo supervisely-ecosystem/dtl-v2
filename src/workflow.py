@@ -119,7 +119,7 @@ def workflow_output(
                 layer.sly_project_info for layer in project_layers
             ]
             job_project_infos: Optional[List[ProjectInfo]] = [
-                job.project_name for layer in job_layers for job in layer.sly_project_info
+                layer.sly_project_info for layer in job_layers
             ]
             project_infos.extend(job_project_infos)
             project_infos = list(set(project_infos))
