@@ -6,12 +6,13 @@ from src.ui.tabs.configure import nodes_flow
 import src.ui.utils as ui_utils
 import src.utils as utils
 import src.globals as g
-from typing import Union, Optional, List
+from typing import Optional, List
 import supervisely as sly
 
 from supervisely.api.file_api import FileInfo
 from supervisely.api.project_api import ProjectInfo
 from supervisely.api.labeling_job_api import LabelingJobInfo
+from src.compute.layers.data.InputLabelingJobLayer import InputLabelingJobLayer
 from src.compute.layers import Layer
 from supervisely.api.module_api import ApiField
 
@@ -23,7 +24,16 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
     global is_input_processed
     if is_input_processed is False:
         try:
-            input_project_names = [layer.project_name for layer in data_layers]
+            input_project_names = [
+                layer.project_name
+                for layer in data_layers
+                if not isinstance(layer, InputLabelingJobLayer)
+            ]
+            input_job_ids = [
+                layer.setting.get("job_id", None)
+                for layer in data_layers
+                if isinstance(layer, InputLabelingJobLayer)
+            ]
             input_project_infos = g.api.project.get_list(
                 g.WORKSPACE_ID,
                 filters=[
@@ -34,11 +44,23 @@ def workflow_input(api: sly.Api, data_layers: List[Layer]):
                     }
                 ],
             )
+        except Exception as e:
+            sly.logger.debug(f"Workflow: Failed to collect input data {repr(e)}")
+        try:
             for info in input_project_infos:
                 api.app.workflow.add_input_project(info.id)
                 sly.logger.debug(f"Workflow: Input project - {info.id}")
         except Exception as e:
-            sly.logger.debug(f"Workflow: Failed to add input to the workflow: {repr(e)}")
+            sly.logger.debug(f"Workflow: Failed to add input projects to the workflow: {repr(e)}")
+        try:
+            for job_id in input_job_ids:
+                if job_id is not None:
+                    api.app.workflow.add_input_job(job_id)
+                    sly.logger.debug(f"Workflow: Input labeling job - {job_id}")
+        except Exception as e:
+            sly.logger.debug(
+                f"Workflow: Failed to add input labeling jobs to the workflow: {repr(e)}"
+            )
         is_input_processed = True
     else:
         sly.logger.debug("Workflow: Input data has already been processed. Skipping.")
