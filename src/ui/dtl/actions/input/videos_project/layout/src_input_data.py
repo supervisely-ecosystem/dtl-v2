@@ -25,13 +25,14 @@ def create_input_data_selector_widgets():
     src_input_data_sidebar_dataset_selector = SelectDatasetTree(
         multiselect=True,
         flat=True,
-        select_all_datasets=True,
+        select_all_datasets=False,
         allowed_project_types=[ProjectType.VIDEOS],
         always_open=False,
         compact=False,
         team_is_selectable=False,
         workspace_is_selectable=False,
         append_to_body=False,
+        show_select_all_datasets_checkbox=True,
     )
 
     src_input_data_sidebar_save_btn = create_save_btn()
