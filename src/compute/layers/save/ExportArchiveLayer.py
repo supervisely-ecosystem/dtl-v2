@@ -43,6 +43,7 @@ class ExportArchiveLayer(Layer):
             "settings": {
                 "type": "object",
                 "properties": {
+                    "archive_name": {"type": "string"},
                     "images": {"type": "boolean"},  # Deprecated
                     "annotations": {"type": "boolean"},  # Deprecated
                     "visualize": {"type": "boolean"},

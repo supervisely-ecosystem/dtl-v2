@@ -122,6 +122,15 @@ class OutputProjectAction(OutputAction):
 
         def get_settings(options_json: dict):
             nonlocal saved_settings
+            if not is_existing_project.is_checked():
+                settings = {
+                    "project_name": new_project_name_input.get_value(),
+                    "dataset_option": None,
+                    "dataset_name": None,
+                    "dataset_id": None,
+                    "merge_different_meta": False,
+                }
+                saved_settings = settings
             return {
                 **saved_settings,
                 "is_existing_project": is_existing_project.is_checked(),

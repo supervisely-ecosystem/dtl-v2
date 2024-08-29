@@ -20,7 +20,9 @@ class ExportArchiveAction(OutputAction):
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None) -> Layer:
         save_path_text = Text("Archive name", status="text", font_size=get_text_font_size())
-        save_path_input = Input(value="", placeholder="Enter archive name", size="small")
+        save_path_input = Input(
+            value="", placeholder="Enter archive name (without extension)", size="small"
+        )
         visualize_checkbox = Checkbox("Visualize")
         if g.MODALITY_TYPE == "videos":
             visualize_checkbox.hide()
@@ -28,6 +30,7 @@ class ExportArchiveAction(OutputAction):
         def get_settings(options_json: dict) -> dict:
             """This function is used to get settings from options json we get from NodesFlow widget"""
             return {
+                "archive_name": save_path_input.get_value(),
                 "visualize": visualize_checkbox.is_checked(),
             }
 
@@ -48,6 +51,9 @@ class ExportArchiveAction(OutputAction):
                 visualize_checkbox.check()
             else:
                 visualize_checkbox.uncheck()
+
+            archive_name = settings.get("archive_name", "")
+            save_path_input.set_value(archive_name)
 
         def create_options(src: list, dst: list, settings: dict) -> dict:
             _set_settings_from_json(settings)

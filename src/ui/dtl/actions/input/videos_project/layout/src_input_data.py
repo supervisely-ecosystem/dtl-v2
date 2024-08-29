@@ -1,6 +1,7 @@
 import src.globals as g
 from src.ui.dtl.utils import (
     create_save_btn,
+    create_refresh_projects_btn,
     get_text_font_size,
     get_set_settings_button_style,
     get_set_settings_container,
@@ -11,7 +12,7 @@ from supervisely.app.widgets import (
     Button,
     Container,
     NotificationBox,
-    SelectDataset,
+    Flexbox,
     SelectDatasetTree,
     Text,
     ProjectThumbnail,
@@ -24,16 +25,18 @@ def create_input_data_selector_widgets():
     src_input_data_sidebar_dataset_selector = SelectDatasetTree(
         multiselect=True,
         flat=True,
-        select_all_datasets=True,
+        select_all_datasets=False,
         allowed_project_types=[ProjectType.VIDEOS],
         always_open=False,
         compact=False,
         team_is_selectable=False,
         workspace_is_selectable=False,
         append_to_body=False,
+        show_select_all_datasets_checkbox=True,
     )
 
     src_input_data_sidebar_save_btn = create_save_btn()
+    src_input_data_sidebar_refresh_btn = create_refresh_projects_btn()
     src_input_data_sidebar_save_btn.disable()
     src_input_data_sidebar_empty_ds_notification = NotificationBox(
         title="No datasets selected", description="Select at lease one dataset"
@@ -42,7 +45,13 @@ def create_input_data_selector_widgets():
         widgets=[
             src_input_data_sidebar_dataset_selector,
             src_input_data_sidebar_empty_ds_notification,
-            src_input_data_sidebar_save_btn,
+            Flexbox(
+                widgets=[
+                    src_input_data_sidebar_save_btn,
+                    src_input_data_sidebar_refresh_btn,
+                ],
+                gap=10,
+            ),
         ]
     )
     # Preview
@@ -87,6 +96,7 @@ def create_input_data_selector_widgets():
         # Sidebar
         src_input_data_sidebar_dataset_selector,
         src_input_data_sidebar_save_btn,
+        src_input_data_sidebar_refresh_btn,
         src_input_data_sidebar_empty_ds_notification,
         src_input_data_sidebar_widgets_container,
         # Preview

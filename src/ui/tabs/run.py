@@ -15,8 +15,16 @@ from supervisely.app.widgets import (
 )
 from supervisely.io.fs import get_file_size
 import supervisely as sly
+import src.workflow as w
 
 from src.compute.main import main as compute_dtls
+
+from src.compute.layers.data.FilteredProjectLayer import FilteredProjectLayer
+from src.compute.layers.data.ImagesProjectLayer import ImagesProjectLayer
+from src.compute.layers.data.InputLabelingJobLayer import InputLabelingJobLayer
+from src.compute.layers.data.VideosProjectLayer import VideosProjectLayer
+
+
 from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
@@ -163,7 +171,12 @@ def _run():
                 if not g.pipeline_running:
                     return
 
-                dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{Path(tar_path).name}"
+                if g.TASK_ID is not None:  # is production
+                    dst = f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/{g.TASK_ID}/{Path(tar_path).name}"
+                else:  # is development
+                    dst = (
+                        f"/{g.TEAM_FILES_PATH}/archives/{g.MODALITY_TYPE}/DEV/{Path(tar_path).name}"
+                    )
                 if g.api.file.exists(g.TEAM_ID, dst):
                     dst = g.api.file.get_free_name(g.TEAM_ID, dst)
 
@@ -192,6 +205,20 @@ def _run():
             if not g.pipeline_running:
                 return
 
+        data_layers = [
+            l
+            for l in net.layers
+            if isinstance(
+                l,
+                (
+                    FilteredProjectLayer,
+                    ImagesProjectLayer,
+                    InputLabelingJobLayer,
+                    VideosProjectLayer,
+                ),
+            )
+        ]
+
         supervisely_layers = [
             l
             for l in net.layers
@@ -211,6 +238,7 @@ def _run():
 
         labeling_job_layers = [l for l in net.layers if isinstance(l, CreateLabelingJobLayer)]
 
+        # Outputs
         results.set_content(
             ui_utils.create_results_widget(file_infos, supervisely_layers, labeling_job_layers)
         )
@@ -218,6 +246,23 @@ def _run():
         results.reload()
         results.show()
         circle_progress.set_status("success")
+
+        # ---------------------------------------- Workflow ---------------------------------------------- #
+        sly.logger.info(f"Workflow started. Workflow ID: {g.WORKFLOW_ID}")
+        # ---------------------------------------- Workflow Input ---------------------------------------- #
+        w.workflow_input(g.api, data_layers)
+        # ----------------------------------------------- - ---------------------------------------------- #
+
+        # ---------------------------------------- Workflow Output --------------------------------------- #
+        w.workflow_output(
+            g.api,
+            project_layers=supervisely_layers,
+            job_layers=labeling_job_layers,
+            file_infos=file_infos,
+        )
+        sly.logger.info(f"Workflow finished.")
+        # sly.logger.info(f"Workflow finished. Next workflow ID: {g.WORKFLOW_ID}")
+        # ----------------------------------------------- - ---------------------------------------------- #
 
     except CustomException as e:
         error_notification.set(title="Error", description=str(e.args[0]))

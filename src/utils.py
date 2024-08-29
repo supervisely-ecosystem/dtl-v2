@@ -271,6 +271,10 @@ def create_data_dir():
     ensure_dir(g.DATA_DIR)
 
 
+def create_workflow_dir():
+    ensure_dir(g.WORKFLOW_DIR)
+
+
 def delete_preview_dir():
     delete_dir(g.PREVIEW_DIR)
 

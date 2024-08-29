@@ -32,8 +32,9 @@ class ExportArchiveWithMasksLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["masks_machine", "masks_human"],
+                "required": ["archive_name", "masks_machine", "masks_human"],
                 "properties": {
+                    "archive_name": {"type": "string"},
                     "gt_machine_color": {
                         "type": "object",
                         "patternProperties": {".*": {"$ref": "#/definitions/color"}},

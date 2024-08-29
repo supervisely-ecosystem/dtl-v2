@@ -31,7 +31,9 @@ class ExportArchiveWithMasksAction(OutputAction):
         _current_meta = ProjectMeta()
 
         destination_text = Text("Destination", status="text", font_size=get_text_font_size())
-        destination_input = Input(value="", placeholder="Enter Team Files path", size="small")
+        destination_input = Input(
+            value="", placeholder="Enter archive name (without extension)", size="small"
+        )
 
         add_human_masks_checkbox = Checkbox("Add human masks")
         add_machine_masks_checkbox = Checkbox("Add machine masks")
@@ -177,6 +179,7 @@ class ExportArchiveWithMasksAction(OutputAction):
                 gt_machine_color = saved_machine_classes_colors_settings
 
             return {
+                "archive_name": destination_input.get_value(),
                 "masks_human": masks_human,
                 "masks_machine": masks_machine,
                 "gt_human_color": gt_human_color,
@@ -252,6 +255,9 @@ class ExportArchiveWithMasksAction(OutputAction):
             else:
                 add_machine_masks_checkbox.uncheck()
                 machine_masks_edit_container.hide()
+
+            archive_name = settings.get("archive_name", "")
+            destination_input.set_value(archive_name)
 
         @human_classes_colors_save_btn.click
         def human_classes_saved():
