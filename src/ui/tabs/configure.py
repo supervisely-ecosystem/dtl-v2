@@ -34,8 +34,11 @@ import src.globals as g
 from src.compute.Net import Net
 from src.ui.widgets import LayerCard
 
+import threading
 from supervisely.app.content import StateJson
 
+
+nodes_flow_lock = threading.Lock()
 
 # context menu "select" option dialog
 select_action_name = Select(
@@ -260,48 +263,52 @@ def maybe_add_edges(layer: Layer):
     return
 
 
+# @ui_utils.debounce(0.1)
 @handle_exception
 def add_layer(action_name: str, position: dict = None, autoconnect: bool = False):
-    g.stop_updates = True
-    try:
-        layer = ui_utils.create_new_layer(action_name)
-        node = ui_utils.create_node(layer, position)
-
-        node_idx = nodes_flow.add_node(node)
-
-        if autoconnect:
-            maybe_add_edges(layer)
-        if layer.init_widgets():
-            nodes_json = nodes_flow.get_nodes_json()
-            logger.debug(
-                "nodes_json", extra={"nodes_json len": len(nodes_json), "node_idx": node_idx}
-            )
-            try:
-                position = nodes_json[node_idx].get("position", None)
-            except:
-                position = None
-                # raise IndexError("Node is not found in nodes_json")
-
+    with nodes_flow_lock:
+        g.stop_updates = True
+        try:
+            layer = ui_utils.create_new_layer(action_name)
             node = ui_utils.create_node(layer, position)
-            # nodes_flow.replace_node(node_idx, node)
-            nodes_flow.pop_node(node_idx)
-            nodes_flow.add_node(node)
+
+            node_idx = nodes_flow.add_node(node)
+
             if autoconnect:
                 maybe_add_edges(layer)
-        g.stop_updates = False
-        logger.info(f"Layer with ID: '{layer.id}' have been added")
-        # g.updater(("nodes", layer.id))
-    except CustomException as e:
-        ui_utils.show_error("Error adding layer", e)
-        raise
-    except Exception as e:
-        show_dialog(
-            title="Error adding layer", description=f"Unexpected Error: {str(e)}", status="error"
-        )
-        raise
-    finally:
-        g.stop_updates = False
-        g.updater("metas")
+            if layer.init_widgets():
+                nodes_json = nodes_flow.get_nodes_json()
+                logger.debug(
+                    "nodes_json", extra={"nodes_json len": len(nodes_json), "node_idx": node_idx}
+                )
+                try:
+                    position = nodes_json[node_idx].get("position", None)
+                except:
+                    position = None
+                    # raise IndexError("Node is not found in nodes_json")
+
+                node = ui_utils.create_node(layer, position)
+                # nodes_flow.replace_node(node_idx, node)
+                nodes_flow.pop_node(node_idx)
+                nodes_flow.add_node(node)
+                if autoconnect:
+                    maybe_add_edges(layer)
+            g.stop_updates = False
+            logger.info(f"Layer with ID: '{layer.id}' have been added")
+            # g.updater(("nodes", layer.id))
+        except CustomException as e:
+            ui_utils.show_error("Error adding layer", e)
+            raise
+        except Exception as e:
+            show_dialog(
+                title="Error adding layer",
+                description=f"Unexpected Error: {str(e)}",
+                status="error",
+            )
+            raise
+        finally:
+            g.stop_updates = False
+            g.updater("metas")
 
 
 @nodes_flow.context_menu_clicked

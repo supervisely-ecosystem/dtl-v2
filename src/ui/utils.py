@@ -1,5 +1,6 @@
 import json
-
+import time
+from functools import wraps
 from supervisely.app.widgets import Container, Flexbox, FileThumbnail, ProjectThumbnail, Text
 from supervisely import ProjectMeta
 from supervisely.app.content import StateJson, DataJson
@@ -721,3 +722,22 @@ def show_error(message: str, error: CustomException):
     g.error_description.text = description
     g.error_extra.set_text(extra_text)
     g.error_dialog.show()
+
+
+def debounce(wait):
+    """
+    Decorator to debounce a function so it only executes after `wait` seconds of inactivity.
+    """
+
+    def decorator(fn):
+        last_call = [0]
+
+        @wraps(fn)
+        def debounced(*args, **kwargs):
+            if time.time() - last_call[0] >= wait:
+                last_call[0] = time.time()
+                return fn(*args, **kwargs)
+
+        return debounced
+
+    return decorator
