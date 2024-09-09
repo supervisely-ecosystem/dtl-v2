@@ -1,5 +1,6 @@
 import random
 import time
+import threading
 from collections import defaultdict
 from typing import List
 
@@ -34,7 +35,6 @@ import src.globals as g
 from src.compute.Net import Net
 from src.ui.widgets import LayerCard
 
-import threading
 from supervisely.app.content import StateJson
 
 
