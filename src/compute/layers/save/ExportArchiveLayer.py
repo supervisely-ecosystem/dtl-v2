@@ -80,6 +80,16 @@ class ExportArchiveLayer(Layer):
     def validate_dest_connections(self):
         pass
 
+    def validate(self):
+        if self.net.preview_mode:
+            return
+
+        if len(self.dsts) == 0:
+            raise ValueError(
+                "Enter name for the output archive to the input field in the 'Export Archive' layer"
+            )
+        super().validate()
+
     def modifies_data(self):
         return False
 

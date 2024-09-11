@@ -89,6 +89,11 @@ class ExportArchiveWithMasksLayer(Layer):
         if self.net.preview_mode:
             return
 
+        if len(self.dsts) == 0:
+            raise ValueError(
+                "Enter name for the output archive to the input field in the 'Export Archive with Masks' layer"
+            )
+
         super().validate()
         if "gt_machine_color" in self.settings:
             for cls in self.settings["gt_machine_color"]:
