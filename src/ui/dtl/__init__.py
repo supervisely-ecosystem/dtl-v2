@@ -27,6 +27,7 @@ from .actions.pixel_level_transformations.contrast_brightness.contrast_brightnes
 )
 from .actions.spatial_level_transforms.crop.crop import CropAction
 from .actions.other.dataset.dataset import DatasetAction
+from .actions.other.split_data.split_data import SplitDataAction
 from .actions.annotation_transforms.drop_object_by_class.drop_object_by_class import (
     DropObjectByClassAction,
 )
@@ -224,7 +225,7 @@ image_actions_list = {
         DeployMMSegmentationAction.name,
         ApplyNNInferenceAction.name,
     ],
-    OTHER: [DatasetAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
+    OTHER: [DatasetAction.name, SplitDataAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
     SAVE_ACTIONS: [
         OutputProjectAction.name,
         CreateNewProjectAction.name,
@@ -301,6 +302,7 @@ image_actions_dict = {
     ApplyNNInferenceAction.name: ApplyNNInferenceAction,
     # Other layers
     DatasetAction.name: DatasetAction,
+    SplitDataAction.name: SplitDataAction,
     DummyAction.name: DummyAction,
     CopyAction.name: CopyAction,
     MoveAction.name: MoveAction,
