@@ -147,9 +147,11 @@ class Layer:
         return []
 
     def requires_item(self):
+        """Defines if Layer require that data have to be downloaded"""
         return False
 
     def modifies_data(self):
+        """Defines if data or it's annotation is modified by the Layer"""
         return False
 
     def validate_source_connections(self):
@@ -618,7 +620,10 @@ class Layer:
             # )
             for data_el, ann in data_batch:
                 for layer_output in self.process((data_el, ann)):
-                    layer_outputs.append(layer_output)
+                    if isinstance(layer_output, tuple):
+                        layer_outputs.append(layer_output)
+                    elif isinstance(layer_output, list):
+                        layer_outputs.extend(layer_output)
             global_timer.add_value(
                 {
                     "action_name": self.__class__.action,

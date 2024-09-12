@@ -388,6 +388,7 @@ class Net:
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         project_datasets = {}
         added = set()
+        item_idx = 0
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
             for src in data_layer.srcs:
@@ -419,6 +420,7 @@ class Net:
                             )
                             if require_items:
                                 img_data = g.api.image.download_np(img_info.id)
+                            item_idx += 1
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(
                                     project_name=project_info.name,
@@ -430,6 +432,7 @@ class Net:
                                     item_path="",
                                     ann_path="",
                                 ),
+                                item_idx,
                                 False,
                             )
                             img_desc.update_item(img_data)
@@ -444,6 +447,7 @@ class Net:
                     ):
                         for vid_info in batch:
                             vid_ext = get_file_ext(vid_info.name)
+                            item_idx += 1
                             vid_desc = VideoDescriptor(
                                 LegacyProjectItem(
                                     project_name=project_info.name,
@@ -455,6 +459,7 @@ class Net:
                                     item_path="",
                                     ann_path="",
                                 ),
+                                item_idx,
                                 False,
                             )
 
@@ -475,6 +480,7 @@ class Net:
         data_layers_idxs = [idx for idx, layer in enumerate(self.layers) if layer.type == "data"]
         project_datasets = {}
         added = set()
+        item_idx = 0
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
             for src in data_layer.srcs:
@@ -524,6 +530,7 @@ class Net:
 
                         items_batch = []
                         for img_info, ann_info in zip(batch, ann_batch):
+                            item_idx += 1
                             img_desc = ImageDescriptor(
                                 LegacyProjectItem(
                                     project_name=project_info.name,
@@ -535,6 +542,7 @@ class Net:
                                     item_path="",
                                     ann_path="",
                                 ),
+                                item_idx,
                                 False,
                             )
 
@@ -562,6 +570,7 @@ class Net:
                     ):
                         items_batch = []
                         for vid_info in batch:
+                            item_idx += 1
                             vid_ext = get_file_ext(vid_info.name)
                             vid_desc = VideoDescriptor(
                                 LegacyProjectItem(
@@ -574,6 +583,7 @@ class Net:
                                     item_path="",
                                     ann_path="",
                                 ),
+                                item_idx,
                                 False,
                             )
 

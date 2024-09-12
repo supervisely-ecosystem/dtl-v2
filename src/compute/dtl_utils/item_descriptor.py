@@ -8,9 +8,11 @@ from src.compute.utils.os_utils import ensure_base_path
 
 
 class ItemDescriptor:
-    def __init__(self, info: NamedTuple, modify_ds_name: bool = True):
+
+    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True):
         self.info = info
         self.item_data = None  # can be changed in comp graph
+        self.item_idx = item_idx
         if modify_ds_name:
             self.res_ds_name = "{}__{}".format(self.info.project_name, self.info.ds_name)
         else:
@@ -27,6 +29,9 @@ class ItemDescriptor:
 
     # def encode_item(self) -> None:
     #     raise NotImplementedError
+
+    def get_item_idx(self) -> int:
+        return self.item_idx
 
     def update_item_info(self, item_info: NamedTuple) -> None:
         self.info.item_info = item_info
@@ -61,7 +66,7 @@ class ItemDescriptor:
         self.info.item_name = new_name
 
     def clone_with_item(self, new_item):
-        new_obj = self.__class__(self.info)
+        new_obj = self.__class__(self.info, self.item_idx)
         new_obj.item_data = new_item
         new_obj.res_ds_name = self.res_ds_name
         return new_obj
@@ -76,8 +81,9 @@ class ItemDescriptor:
 
 
 class ImageDescriptor(ItemDescriptor):
-    def __init__(self, info: NamedTuple, modify_ds_name: bool = True) -> None:
-        super().__init__(info, modify_ds_name)
+
+    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True) -> None:
+        super().__init__(info, item_idx, modify_ds_name)
 
     def read_image(self) -> np.ndarray:
         if self.item_data is not None:
@@ -109,8 +115,9 @@ class ImageDescriptor(ItemDescriptor):
 
 
 class VideoDescriptor(ItemDescriptor):
-    def __init__(self, info: NamedTuple, modify_ds_name: bool = True):
-        super().__init__(info, modify_ds_name)
+
+    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True):
+        super().__init__(info, item_idx, modify_ds_name)
 
     def read_video(self) -> cv2.VideoCapture:
         if self.item_data is not None:

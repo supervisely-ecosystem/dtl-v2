@@ -198,6 +198,7 @@ def process_splits(
             item_path=video_path,
             ann_path="",
         ),
+        vid_desc.item_idx,  # @TODO: set appropriate item_idx
         False,
     )
     vid_desc.update_item(video_path)
