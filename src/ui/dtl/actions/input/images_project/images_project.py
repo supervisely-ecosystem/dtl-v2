@@ -458,6 +458,8 @@ class ImagesProjectAction(SourceAction):
             _set_src_preview()
             # update meta
             data_changed_cb(**{"project_meta": project_meta})
+            if project_info is not None:
+                update_preview_btn.enable()
 
         def _set_settings_from_json(settings: dict):
             # if settings are empty, set default
