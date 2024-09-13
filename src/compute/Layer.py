@@ -620,10 +620,7 @@ class Layer:
             # )
             for data_el, ann in data_batch:
                 for layer_output in self.process((data_el, ann)):
-                    if isinstance(layer_output, tuple):
-                        layer_outputs.append(layer_output)
-                    elif isinstance(layer_output, list):
-                        layer_outputs.extend(layer_output)
+                    layer_outputs.append(layer_output)
             global_timer.add_value(
                 {
                     "action_name": self.__class__.action,

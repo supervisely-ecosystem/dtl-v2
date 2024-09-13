@@ -17,11 +17,13 @@ class SplitDataLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["method"],
+                "required": ["split_method", "split_ratio", "split_num"],
                 "properties": {
-                    "method": {
-                        "type": "number",
-                    }
+                    "split_method": {
+                        "type": "string",
+                    },
+                    "split_ratio": {"type": "number"},
+                    "split_num": {"type": "number"},
                 },
             }
         },
@@ -42,69 +44,73 @@ class SplitDataLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         item_desc, ann = data_el
-        new_item_desc = deepcopy(item_desc)
-
-        split_method = self.settings.get("split_method", 0)
         # Use to split data by percentage or number
         total_items_cnt = self.net.get_total_elements()
         item_idx = item_desc.get_item_idx()
 
-        def _split_by_percent() -> List[ImageDescriptor]:
-            # change split_ratio to actual name
+        def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
+            new_item_desc = deepcopy(item_desc)
             split_ratio = self.settings.get("split_ratio", 0.8)
             split_index = int(item_idx / (total_items_cnt * split_ratio))
             dataset = f"split_{split_index}"
             new_item_desc.res_ds_name = dataset
             return [(new_item_desc, ann)]
 
-        def _split_by_num() -> List[ImageDescriptor]:
-            # change split_num to actual name
+        def _split_by_num() -> List[Tuple[ImageDescriptor, Annotation]]:
+            new_item_desc = deepcopy(item_desc)
             split_num = self.settings.get("split_num", total_items_cnt // 2)
             split_index = int(item_idx / split_num)
             dataset = f"split_{split_index}"
             new_item_desc.res_ds_name = dataset
             return [(new_item_desc, ann)]
 
-        def _split_by_class() -> List[ImageDescriptor]:
+        def _split_by_class() -> List[Tuple[ImageDescriptor, Annotation]]:
+            new_item_desc = deepcopy(item_desc)
+
             image_labels = ann.labels
             if len(image_labels) > 0:
-                classes = [label.obj_class.name for label in image_labels]
-                classes = set(classes)
+                classes = list({label.obj_class.name for label in image_labels})
+                items = []
                 for class_name in classes:
-                    # create new new_item_desc for each iteration (not implemented)
-                    new_item_desc.res_ds_name = class_name
-            return  # list of tuples of ImageDescriptor and Annotation
+                    curr_item_desc = deepcopy(item_desc)
+                    curr_item_desc.res_ds_name = class_name
+                    items.append((curr_item_desc, ann))
+                return items
+            return [(new_item_desc, ann)]
 
-        def _split_by_tags() -> List[ImageDescriptor]:
+        def _split_by_tags() -> List[Tuple[ImageDescriptor, Annotation]]:
             image_tags = ann.img_tags
             if len(image_tags) > 0:
-                img_tag_names = [tag.name for tag in image_tags]
-                img_tag_names = set(img_tag_names)
-                for img_tag_name in img_tag_names:
-                    # create new new_item_desc for each iteration (not implemented)
-                    new_item_desc.res_ds_name = img_tag_name
-                for label in orig_ann.labels:
-                    label_tags_names = [tag.name for tag in label.tags]
-                    label_tags_names = set(label_tags_names)
-                    for label_tag_name in label_tags_names:
-                        # create new new_item_desc for each iteration (not implemented)
-                        new_item_desc.res_ds_name = label_tag_name
+                img_tag_names = list({tag.name for tag in image_tags})
+                label_tags_names = list({tag.name for label in ann.labels for tag in label.tags})
+                # Check if tag is present on both image and object to avoid image duplication
 
-            # !!!Check if tag is present on both image and object to avoid image duplication!!!
-            return  # list of tuples of ImageDescriptor and Annotation
+                tag_names = set()
+                items = []
+                for img_tag_name in img_tag_names:
+                    if img_tag_name not in tag_names:
+                        tag_names.add(img_tag_name)
+                        new_img_item_desc = deepcopy(item_desc)
+                        new_img_item_desc.res_ds_name = img_tag_name
+                        items.append((new_img_item_desc, ann))
+                for label_tag_name in label_tags_names:
+                    if label_tag_name not in tag_names:
+                        tag_names.add(label_tag_name)
+                        new_label_item_desc = deepcopy(item_desc)
+                        new_label_item_desc.res_ds_name = label_tag_name
+                        items.append((new_label_item_desc, ann))
+                return items
+            else:
+                return [(item_desc, ann)]
 
         idx_to_func = {
-            0: _split_by_percent,
-            1: _split_by_num,
-            3: _split_by_class,
-            4: _split_by_tags,
+            "percent": _split_by_percent,
+            "number": _split_by_num,
+            "classes": _split_by_class,
+            "tags": _split_by_tags,
         }
-        img_desc, orig_ann = data_el
-        method_idx = self.settings.get("method", 0)
-        meta = self.output_meta
-
-        func = idx_to_func.get(method_idx)
-        new_img_desc = func(orig_ann)
-
-        # Must yield output of split method
-        yield (new_img_desc, orig_ann)
+        split_method = self.settings.get("split_method", "percent")
+        func = idx_to_func.get(split_method)
+        items = func()
+        for item in items:
+            yield item
