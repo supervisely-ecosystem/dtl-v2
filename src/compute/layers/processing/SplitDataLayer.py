@@ -44,8 +44,7 @@ class SplitDataLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         item_desc, ann = data_el
-        # Use to split data by percentage or number
-        total_items_cnt = self.net.get_total_elements()
+        total_items_cnt = self.net.get_total_elements()  # to split by num/percent
         item_idx = item_desc.get_item_idx()
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
@@ -79,38 +78,35 @@ class SplitDataLayer(Layer):
             return [(new_item_desc, ann)]
 
         def _split_by_tags() -> List[Tuple[ImageDescriptor, Annotation]]:
-            image_tags = ann.img_tags
-            if len(image_tags) > 0:
-                img_tag_names = list({tag.name for tag in image_tags})
-                label_tags_names = list({tag.name for label in ann.labels for tag in label.tags})
-                # Check if tag is present on both image and object to avoid image duplication
-
-                tag_names = set()
-                items = []
-                for img_tag_name in img_tag_names:
-                    if img_tag_name not in tag_names:
-                        tag_names.add(img_tag_name)
-                        new_img_item_desc = deepcopy(item_desc)
-                        new_img_item_desc.res_ds_name = img_tag_name
-                        items.append((new_img_item_desc, ann))
-                for label_tag_name in label_tags_names:
-                    if label_tag_name not in tag_names:
-                        tag_names.add(label_tag_name)
-                        new_label_item_desc = deepcopy(item_desc)
-                        new_label_item_desc.res_ds_name = label_tag_name
-                        items.append((new_label_item_desc, ann))
-                return items
-            else:
+            image_tags = list(set(ann.img_tags.keys()))
+            label_tags = list(set([tag for label in ann.labels for tag in label.tags.keys()]))
+            if len(image_tags) == 0 and len(label_tags) == 0:
                 return [(item_desc, ann)]
 
-        idx_to_func = {
+            tag_names = set()
+            items = []
+            for img_tag_name in image_tags:
+                if img_tag_name not in tag_names:
+                    tag_names.add(img_tag_name)
+                    new_img_item_desc = deepcopy(item_desc)
+                    new_img_item_desc.res_ds_name = img_tag_name
+                    items.append((new_img_item_desc, ann))
+            for tag_name in label_tags:
+                if tag_name not in tag_names:
+                    tag_names.add(tag_name)
+                    new_label_item_desc = deepcopy(item_desc)
+                    new_label_item_desc.res_ds_name = tag_name
+                    items.append((new_label_item_desc, ann))
+            return items
+
+        split_func_map = {
             "percent": _split_by_percent,
             "number": _split_by_num,
             "classes": _split_by_class,
             "tags": _split_by_tags,
         }
         split_method = self.settings.get("split_method", "percent")
-        func = idx_to_func.get(split_method)
+        func = split_func_map.get(split_method)
         items = func()
         for item in items:
             yield item
