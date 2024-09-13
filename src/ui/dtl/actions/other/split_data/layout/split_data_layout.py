@@ -29,9 +29,9 @@ def create_layout_widgets():
     # --------------------------
 
     # Preview
-    layout_current_method = Text(
-        "Current method: None", status="text", font_size=get_text_font_size()
-    )
+    layout_current_method = Text("", status="text", font_size=get_text_font_size())
+    layout_current_value = Text("", status="text", font_size=get_text_font_size())
+    layout_texts_container = Container([layout_current_method, layout_current_value])
     # --------------------------
 
     return (
@@ -41,4 +41,6 @@ def create_layout_widgets():
         layout_container,
         # Preview
         layout_current_method,
+        layout_current_value,
+        layout_texts_container,
     )

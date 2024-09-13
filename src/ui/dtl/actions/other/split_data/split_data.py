@@ -29,9 +29,15 @@ class SplitDataAction(OtherAction):
             sidebar_save_button,
         ) = create_sidebar_widgets()
 
-        layout_text, layout_edit_button, layout_container, layout_current_method = (
-            create_layout_widgets()
-        )
+        (
+            layout_text,
+            layout_edit_button,
+            layout_container,
+            layout_current_method,
+            layout_current_value,
+            layout_texts_container,
+        ) = create_layout_widgets()
+
         saved_settings = {
             "split_method": sidebar_selector.get_value(),
             "split_ratio": sidebar_percent_slider.get_value(),
@@ -39,6 +45,10 @@ class SplitDataAction(OtherAction):
         }
 
         layout_current_method.set(f"Current method: {sidebar_selector.get_label()}", "text")
+        layout_current_value.set(
+            f'Value for "{sidebar_selector.get_label()}" method: {sidebar_percent_slider.get_value()}',
+            "text",
+        )
 
         @sidebar_selector.value_changed
         def selector_cb(value):
@@ -55,6 +65,21 @@ class SplitDataAction(OtherAction):
         @sidebar_save_button.click
         def save_cb():
             layout_current_method.set(f"Current method: {sidebar_selector.get_label()}", "text")
+            curr_method = sidebar_selector.get_value()
+            if curr_method == "percent":
+                layout_current_value.show()
+                layout_current_value.set(
+                    f'Value for "{sidebar_selector.get_label()}" split method: {sidebar_percent_slider.get_value()}',
+                    "text",
+                )
+            elif curr_method == "number":
+                layout_current_value.show()
+                layout_current_value.set(
+                    f'Value for "{sidebar_selector.get_label()}" split method: {sidebar_number_input.get_value()}',
+                    "text",
+                )
+            else:
+                layout_current_value.hide()
             nonlocal saved_settings
             method = sidebar_selector.get_value()
             ratio = sidebar_percent_slider.get_value()
@@ -76,8 +101,8 @@ class SplitDataAction(OtherAction):
                     ),
                 ),
                 NodesFlow.Node.Option(
-                    name="Method preview",
-                    option_component=NodesFlow.WidgetOptionComponent(widget=layout_current_method),
+                    name="Texts",
+                    option_component=NodesFlow.WidgetOptionComponent(widget=layout_texts_container),
                 ),
             ]
             return {
