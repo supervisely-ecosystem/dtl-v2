@@ -21,7 +21,7 @@ def create_sidebar_widgets():
         "Select percentage by which to distribute images across datasets",
     )
 
-    sidebar_number_input = InputNumber(min=1, max=100, value=50)
+    sidebar_number_input = InputNumber(min=1, max=10000, value=50)
     sidebar_number_field = Field(
         sidebar_number_input,
         "Select number of images",
