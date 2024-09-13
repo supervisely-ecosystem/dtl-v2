@@ -4,6 +4,7 @@ import numpy as np
 from typing import Tuple
 from supervisely import Annotation
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+from src.exceptions import BadSettingsError
 import supervisely as sly
 from copy import deepcopy
 from typing import List
@@ -33,8 +34,19 @@ class SplitDataLayer(Layer):
         Layer.__init__(self, config, net=net)
 
     def validate(self):
-        # Check if the selected split method is valid
-        return super().validate()
+        split_method = self.settings["split_method"]
+        split_ratio = self.settings["split_ratio"]
+        split_num = self.settings["split_num"]
+
+        allowed_methods = ["percent", "number", "classes", "tags"]
+
+        if split_method not in allowed_methods:
+            raise BadSettingsError(f"Unknown split method selected: {split_method}")
+        if split_ratio < 1 or split_ratio > 0:
+            raise BadSettingsError(f"Split percentage can not be equal to {split_ratio}")
+        if split_num < 1 or split_num > 10000:
+            raise BadSettingsError(f"Split number can not be equal to {split_num}")
+        super().validate()
 
     def requires_item(self):
         return False
@@ -49,7 +61,7 @@ class SplitDataLayer(Layer):
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
             new_item_desc = deepcopy(item_desc)
-            split_ratio = self.settings.get("split_ratio", 50)
+            split_ratio = self.settings["split_ratio"]
             split_num = total_items_cnt * split_ratio / 100
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
             dataset = f"split_{split_index}"
@@ -58,7 +70,7 @@ class SplitDataLayer(Layer):
 
         def _split_by_num() -> List[Tuple[ImageDescriptor, Annotation]]:
             new_item_desc = deepcopy(item_desc)
-            split_num = self.settings.get("split_num", total_items_cnt // 2)
+            split_num = self.settings["split_num"]
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
             print(f"ITEM INDEX: {item_idx}, SPLIT INDEX: {split_index}")
             dataset = f"split_{split_index}"
@@ -111,7 +123,7 @@ class SplitDataLayer(Layer):
             "classes": _split_by_class,
             "tags": _split_by_tags,
         }
-        split_method = self.settings.get("split_method", "percent")
+        split_method = self.settings["split_method"]
         func = split_func_map.get(split_method)
         items = func()
         for item in items:
