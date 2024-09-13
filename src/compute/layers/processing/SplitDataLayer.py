@@ -49,7 +49,7 @@ class SplitDataLayer(Layer):
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
             new_item_desc = deepcopy(item_desc)
-            split_ratio = self.settings.get("split_ratio", 0.8)
+            split_ratio = self.settings.get("split_ratio", 0.5)
             split_num = total_items_cnt * split_ratio
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
             dataset = f"split_{split_index}"
@@ -77,13 +77,17 @@ class SplitDataLayer(Layer):
                     curr_item_desc.res_ds_name = class_name
                     items.append((curr_item_desc, ann))
                 return items
+            else:
+                new_item_desc.res_ds_name = "unlabeled"
             return [(new_item_desc, ann)]
 
         def _split_by_tags() -> List[Tuple[ImageDescriptor, Annotation]]:
             image_tags = list(set(ann.img_tags.keys()))
             label_tags = list(set([tag for label in ann.labels for tag in label.tags.keys()]))
             if len(image_tags) == 0 and len(label_tags) == 0:
-                return [(item_desc, ann)]
+                new_item_desc = deepcopy(item_desc)
+                new_item_desc.res_ds_name = "no tags"
+                return [(new_item_desc, ann)]
 
             tag_names = set()
             items = []

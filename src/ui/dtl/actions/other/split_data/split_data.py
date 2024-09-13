@@ -19,7 +19,6 @@ class SplitDataAction(OtherAction):
 
     @classmethod
     def create_new_layer(cls, layer_id: Optional[str] = None):
-        saved_settings = {"split_method": "", "split_ratio": 0, "split_num": 0}
         (
             sidebar_selector,
             sidebar_selector_field,
@@ -33,6 +32,11 @@ class SplitDataAction(OtherAction):
         layout_text, layout_edit_button, layout_container, layout_current_method = (
             create_layout_widgets()
         )
+        saved_settings = {
+            "split_method": sidebar_selector.get_value(),
+            "split_ratio": sidebar_percent_slider.get_value(),
+            "split_num": sidebar_number_input.get_value(),
+        }
 
         layout_current_method.set(f"Current method: {sidebar_selector.get_label()}", "text")
 
