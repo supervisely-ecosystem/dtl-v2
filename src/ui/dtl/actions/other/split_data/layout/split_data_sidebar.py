@@ -12,7 +12,9 @@ from src.ui.dtl.utils import create_save_btn
 def create_sidebar_widgets():
     # Sidebar Initialization widgets
 
-    sidebar_percent_slider = Slider(show_input=True, show_input_controls=True, min=1)
+    sidebar_percent_slider = Slider(
+        show_input=True, show_input_controls=True, min=0.01, max=1, step=0.01
+    )
     sidebar_percent_field = Field(
         sidebar_percent_slider,
         "Select percentage",
