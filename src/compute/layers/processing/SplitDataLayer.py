@@ -49,8 +49,8 @@ class SplitDataLayer(Layer):
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
             new_item_desc = deepcopy(item_desc)
-            split_ratio = self.settings.get("split_ratio", 0.5)
-            split_num = total_items_cnt * split_ratio
+            split_ratio = self.settings.get("split_ratio", 50)
+            split_num = total_items_cnt * split_ratio / 100
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
             dataset = f"split_{split_index}"
             new_item_desc.res_ds_name = dataset

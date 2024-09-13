@@ -9,9 +9,10 @@ from src.ui.dtl.utils import (
     get_text_font_size,
 )
 
+
 def create_layout_widgets():
     # Layout
-    layout_text = Text("Change split method", status="text", font_size=get_text_font_size())
+    layout_text = Text("Select split method", status="text", font_size=get_text_font_size())
     layout_edit_button = Button(
         text="EDIT",
         icon="zmdi zmdi-edit",
