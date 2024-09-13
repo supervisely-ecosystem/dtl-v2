@@ -69,13 +69,13 @@ class SplitDataAction(OtherAction):
             if curr_method == "percent":
                 layout_current_value.show()
                 layout_current_value.set(
-                    f'Value for "{sidebar_selector.get_label()}" split method: {sidebar_percent_slider.get_value()}',
+                    f"Split value: {sidebar_percent_slider.get_value()} %",
                     "text",
                 )
             elif curr_method == "number":
                 layout_current_value.show()
                 layout_current_value.set(
-                    f'Value for "{sidebar_selector.get_label()}" split method: {sidebar_number_input.get_value()}',
+                    f"Split value: {sidebar_number_input.get_value()} items per dataset",
                     "text",
                 )
             else:
