@@ -22,12 +22,12 @@ There are 4 ways of splitting the data:
 <td style="text-align:center; width:50%"><strong>Result: new datasets structure</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original datasets"/> </td>
-<td> <img src="xxx" alt="Result datasets"/> </td>
+<td> <img src="https://github.com/user-attachments/assets/648e3b4e-a532-4b53-bec5-c51c89ea5474" alt="Original datasets"/> </td>
+<td> <img src="https://github.com/user-attachments/assets/7085afee-a0ef-4ea1-bcec-bfb578d0265f" alt="Result datasets"/> </td>
 </tr>
 </table>
 
-### Example 2. Instance crop & Split Data by classes
+### Example 2. Split Data by classes
 
 <table>
 <tr>
@@ -35,8 +35,8 @@ There are 4 ways of splitting the data:
 <td style="text-align:center; width:50%"><strong>Result: new datasets structure</strong></td>
 </tr>
 <tr>
-<td> <img src="xxx" alt="Original datasets"/> </td>
-<td> <img src="xxx" alt="Result datasets"/> </td>
+<td> <img src="https://github.com/user-attachments/assets/b373cc3b-f288-46d3-a40e-b1ea3173935b" alt="Original datasets"/> </td>
+<td> <img src="https://github.com/user-attachments/assets/4b44ec7b-e25a-43db-bde1-eada8561548c" alt="Result datasets"/> </td>
 </tr>
 </table>
 
