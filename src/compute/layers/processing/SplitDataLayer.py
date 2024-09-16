@@ -109,16 +109,19 @@ class SplitDataLayer(Layer):
                     items.append((new_label_item_desc, ann))
             return items
 
-        item_desc, ann = data_el
-        item_idx = item_desc.get_item_idx()
+        if self.net.preview_mode:
+            yield data_el
+        else:
+            item_desc, ann = data_el
+            item_idx = item_desc.get_item_idx()
 
-        split_func_map = {
-            "percent": _split_by_percent,
-            "number": _split_by_num,
-            "classes": _split_by_class,
-            "tags": _split_by_tags,
-        }
-        split_method = self.settings["split_method"]
-        func = split_func_map.get(split_method)
-        items = func()
-        yield from items
+            split_func_map = {
+                "percent": _split_by_percent,
+                "number": _split_by_num,
+                "classes": _split_by_class,
+                "tags": _split_by_tags,
+            }
+            split_method = self.settings["split_method"]
+            func = split_func_map.get(split_method)
+            items = func()
+            yield from items
