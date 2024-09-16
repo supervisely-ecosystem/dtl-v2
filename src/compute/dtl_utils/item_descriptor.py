@@ -74,7 +74,7 @@ class ItemDescriptor:
     def clone_with_name(self, new_name) -> None:
         self.info: NamedTuple
         new_info = self.info._replace(item_name=new_name)
-        new_obj = self.__class__(new_info)
+        new_obj = self.__class__(new_info, self.item_idx)
         new_obj.item_data = self.item_data
         new_obj.res_ds_name = self.res_ds_name
         return new_obj
