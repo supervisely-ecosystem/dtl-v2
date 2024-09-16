@@ -14,7 +14,7 @@ class SplitDataAction(OtherAction):
     name = "split_data"
     title = "Split Data"
     docs_url = ""
-    description = ""
+    description = "Splits the data into datasets based on condition"
     md_description = get_layer_docs(dirname(realpath(__file__)))
 
     @classmethod
