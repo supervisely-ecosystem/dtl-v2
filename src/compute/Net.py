@@ -37,6 +37,7 @@ class Net:
         self.layers = []
         self.preview_mode = False
         self.modality = modality
+        self.total_elements_cnt = None
 
         if type(graph_desc) is str:
             graph_path = graph_desc
@@ -381,6 +382,7 @@ class Net:
                         added.add(dataset.id)
         for dataset in datasets:
             total += dataset.items_count
+        self.total_elements_cnt = total
         return total
 
     def get_elements_generator(self):
