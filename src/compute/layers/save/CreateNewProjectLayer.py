@@ -131,18 +131,19 @@ class CreateNewProjectLayer(Layer):
                 ds_item_map[dataset_name].append((item_desc, ann))
 
             for ds_name in ds_item_map:
-                out_item_names = [
-                    self.get_free_name(
-                        item_desc.get_item_name(), dataset_name, self.out_project_name
-                    )
-                    + get_file_ext(item_desc.info.item_info.name)
-                    for item_desc, _ in ds_item_map[ds_name]
-                ]
                 if self.sly_project_info is not None:
                     # @TODO: not safe, fix later
                     orig_ds_info = ds_item_map[ds_name][0][0].info.ds_info
                     ds_parents = self.get_ds_parents(orig_ds_info)
                     dataset_info = self.get_or_create_dataset(ds_name, ds_parents)
+
+                    out_item_names = [
+                        self.get_free_name(
+                            item_desc.get_item_name(), ds_name, self.out_project_name
+                        )
+                        + get_file_ext(item_desc.info.item_info.name)
+                        for item_desc, _ in ds_item_map[ds_name]
+                    ]
                     if self.net.modality == "images":
                         if self.net.may_require_items():
                             item_infos = g.api.image.upload_nps(
@@ -151,14 +152,17 @@ class CreateNewProjectLayer(Layer):
                                 [item_desc.read_image() for item_desc, _ in ds_item_map[ds_name]],
                             )
                         else:
-                            item_infos = g.api.image.upload_ids(
-                                dataset_info.id,
-                                out_item_names,
-                                [
-                                    item_desc.info.item_info.id
-                                    for item_desc, _ in ds_item_map[ds_name]
-                                ],
-                            )
+                            try:
+                                item_infos = g.api.image.upload_ids(
+                                    dataset_info.id,
+                                    out_item_names,
+                                    [
+                                        item_desc.info.item_info.id
+                                        for item_desc, _ in ds_item_map[ds_name]
+                                    ],
+                                )
+                            except:
+                                pass
                         g.api.annotation.upload_anns(
                             [item_info.id for item_info in item_infos],
                             [ann for _, ann in ds_item_map[ds_name]],
