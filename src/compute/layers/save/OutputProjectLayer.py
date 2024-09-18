@@ -394,12 +394,15 @@ class OutputProjectLayer(Layer):
                                     )
                                 else:
                                     item_ids = [
-                                        item_desc.info.item_info.id for item_desc in item_descs
+                                        item_desc.info.item_info.id
+                                        for item_desc in ds_item_map[ds_name]
                                     ]
                                     image_info = g.api.image.upload_ids(
                                         dataset_info.id, out_item_names, item_ids
                                     )
-                                g.api.annotation.upload_anns(item_ids, anns)
+                                anns = [ann for _, ann in ds_item_map[ds_name]]
+                                upload_ids = [info.id for info in image_info]
+                                g.api.annotation.upload_anns(upload_ids, anns)
                             elif self.net.modality == "videos":
                                 video_datas = [
                                     item_desc.item_data
