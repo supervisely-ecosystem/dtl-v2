@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import NamedTuple
+from src.utils import LegacyProjectItem
 import cv2
 import numpy as np
 
@@ -9,7 +9,7 @@ from src.compute.utils.os_utils import ensure_base_path
 
 class ItemDescriptor:
 
-    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True):
+    def __init__(self, info: LegacyProjectItem, item_idx: int, modify_ds_name: bool = True):
         self.info = info
         self.item_data = None  # can be changed in comp graph
         self.item_idx = item_idx
@@ -33,7 +33,7 @@ class ItemDescriptor:
     def get_item_idx(self) -> int:
         return self.item_idx
 
-    def update_item_info(self, item_info: NamedTuple) -> None:
+    def update_item_info(self, item_info: LegacyProjectItem) -> None:
         self.info.item_info = item_info
 
     def need_write(self) -> bool:
@@ -52,6 +52,9 @@ class ItemDescriptor:
 
     def get_ds_info(self) -> str:
         return self.info.ds_info
+
+    def set_ds_info(self, new_ds_info) -> None:
+        self.info.ds_info = new_ds_info
 
     def get_item_name(self) -> str:
         return self.info.item_name
@@ -72,7 +75,7 @@ class ItemDescriptor:
         return new_obj
 
     def clone_with_name(self, new_name) -> None:
-        self.info: NamedTuple
+        self.info: LegacyProjectItem
         new_info = self.info._replace(item_name=new_name)
         new_obj = self.__class__(new_info, self.item_idx)
         new_obj.item_data = self.item_data
@@ -82,7 +85,7 @@ class ItemDescriptor:
 
 class ImageDescriptor(ItemDescriptor):
 
-    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True) -> None:
+    def __init__(self, info: LegacyProjectItem, item_idx: int, modify_ds_name: bool = True) -> None:
         super().__init__(info, item_idx, modify_ds_name)
 
     def read_image(self) -> np.ndarray:
@@ -116,7 +119,7 @@ class ImageDescriptor(ItemDescriptor):
 
 class VideoDescriptor(ItemDescriptor):
 
-    def __init__(self, info: NamedTuple, item_idx: int, modify_ds_name: bool = True):
+    def __init__(self, info: LegacyProjectItem, item_idx: int, modify_ds_name: bool = True):
         super().__init__(info, item_idx, modify_ds_name)
 
     def read_video(self) -> cv2.VideoCapture:

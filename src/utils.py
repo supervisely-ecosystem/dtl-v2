@@ -1,31 +1,29 @@
 import random
 from typing import Callable, List, Optional, Tuple, Union
-from collections import namedtuple
+from dataclasses import dataclass
 import json
 import os
 from tqdm import tqdm
+import numpy as np
 
 import supervisely as sly
-from supervisely import ProjectMeta, KeyIdMap, ImageInfo, logger
+from supervisely import ProjectMeta, KeyIdMap, ImageInfo, logger, DatasetInfo
 from supervisely.io.fs import remove_dir
 
 
 import src.globals as g
 
 
-LegacyProjectItem = namedtuple(
-    "LegacyProjectItem",
-    [
-        "project_name",
-        "ds_name",
-        "ds_info",
-        "item_name",
-        "item_info",
-        "ia_data",
-        "item_path",
-        "ann_path",
-    ],
-)
+@dataclass
+class LegacyProjectItem:
+    project_name: str
+    ds_name: str
+    ds_info: DatasetInfo
+    item_name: str
+    item_info: ImageInfo
+    ia_data: np.ndarray
+    item_path: str
+    ann_path: str
 
 
 def get_random_image(dataset_id: int, images_ids: List[int] = None) -> ImageInfo:

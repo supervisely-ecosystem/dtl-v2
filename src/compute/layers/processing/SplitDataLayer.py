@@ -55,6 +55,7 @@ class SplitDataLayer(Layer):
         def replace_ds_name(item_desc, new_ds_name):
             new_item_desc = deepcopy(item_desc)
             new_item_desc.res_ds_name = new_ds_name
+            new_item_desc.set_ds_info(None)
             return new_item_desc
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
@@ -83,7 +84,7 @@ class SplitDataLayer(Layer):
             image_tags = list(set(ann.img_tags.keys()))
             label_tags = list(set([tag for label in ann.labels for tag in label.tags.keys()]))
             if len(image_tags) == 0 and len(label_tags) == 0:
-                return [(replace_ds_name(item_desc, "no tags"), ann)]
+                return [(replace_ds_name(item_desc, "unlabeled"), ann)]
 
             tag_names = set()
             items = []
