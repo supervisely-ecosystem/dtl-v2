@@ -154,17 +154,14 @@ class CreateNewProjectLayer(Layer):
                                 [item_desc.read_image() for item_desc, _ in ds_item_map[ds_name]],
                             )
                         else:
-                            try:
-                                item_infos = g.api.image.upload_ids(
-                                    dataset_info.id,
-                                    out_item_names,
-                                    [
-                                        item_desc.info.item_info.id
-                                        for item_desc, _ in ds_item_map[ds_name]
-                                    ],
-                                )
-                            except:
-                                pass
+                            item_infos = g.api.image.upload_ids(
+                                dataset_info.id,
+                                out_item_names,
+                                [
+                                    item_desc.info.item_info.id
+                                    for item_desc, _ in ds_item_map[ds_name]
+                                ],
+                            )
                         g.api.annotation.upload_anns(
                             [item_info.id for item_info in item_infos],
                             [ann for _, ann in ds_item_map[ds_name]],

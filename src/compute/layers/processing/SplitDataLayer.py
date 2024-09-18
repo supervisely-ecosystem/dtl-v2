@@ -52,46 +52,42 @@ class SplitDataLayer(Layer):
         return False
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
-        def replace_ds_name(item_desc, new_ds_name):
+        def replace_ds_name(new_ds_name):
             new_item_desc = deepcopy(item_desc)
             new_item_desc.res_ds_name = new_ds_name
             new_item_desc.set_ds_info(None)
             return new_item_desc
 
         def _split_by_percent() -> List[Tuple[ImageDescriptor, Annotation]]:
-            total_items_cnt = self.net.total_elements_cnt
             split_ratio = self.settings["split_ratio"]
-            split_num = total_items_cnt * split_ratio / 100
+            split_num = self.net.total_elements_cnt * (split_ratio / 100)
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
-            dataset = f"split_{split_index}"
-            return [(replace_ds_name(item_desc, dataset), ann)]
+            return [(replace_ds_name(f"split_{split_index}"), ann)]
 
         def _split_by_num() -> List[Tuple[ImageDescriptor, Annotation]]:
             split_num = self.settings["split_num"]
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
-            dataset = f"split_{split_index}"
-            return [(replace_ds_name(item_desc, dataset), ann)]
+            return [(replace_ds_name(f"split_{split_index}"), ann)]
 
         def _split_by_class() -> List[Tuple[ImageDescriptor, Annotation]]:
             image_labels = ann.labels
-            if len(image_labels) > 0:
-                classes = list({label.obj_class.name for label in image_labels})
-                return [(replace_ds_name(item_desc, class_name), ann) for class_name in classes]
-            else:
-                return [(replace_ds_name(item_desc, "unlabeled"), ann)]
+            if len(image_labels) == 0:
+                return [(replace_ds_name("unlabeled"), ann)]
+            classes = list({label.obj_class.name for label in image_labels})
+            return [(replace_ds_name(class_name), ann) for class_name in classes]
 
         def _split_by_tags() -> List[Tuple[ImageDescriptor, Annotation]]:
-            image_tags = list(set(ann.img_tags.keys()))
-            label_tags = list(set([tag for label in ann.labels for tag in label.tags.keys()]))
+            image_tags = list({ann.img_tags.keys()})
+            label_tags = list({tag for label in ann.labels for tag in label.tags.keys()})
             if len(image_tags) == 0 and len(label_tags) == 0:
-                return [(replace_ds_name(item_desc, "unlabeled"), ann)]
+                return [(replace_ds_name("unlabeled"), ann)]
 
             tag_names = set()
             items = []
             for tag in image_tags + label_tags:
                 if tag not in tag_names:
                     tag_names.add(tag)
-                    items.append((replace_ds_name(item_desc, tag), ann))
+                    items.append((replace_ds_name(tag), ann))
             return items
 
         if self.net.preview_mode:
