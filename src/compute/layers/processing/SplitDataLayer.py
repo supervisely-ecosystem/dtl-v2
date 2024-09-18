@@ -77,14 +77,15 @@ class SplitDataLayer(Layer):
             return [(replace_ds_name(class_name), ann) for class_name in classes]
 
         def _split_by_tags() -> List[Tuple[ImageDescriptor, Annotation]]:
-            image_tags = list({ann.img_tags.keys()})
+            image_tags = list(set(ann.img_tags.keys()))
             label_tags = list({tag for label in ann.labels for tag in label.tags.keys()})
-            if len(image_tags) == 0 and len(label_tags) == 0:
+            all_tags_list = image_tags + label_tags
+            if len(all_tags_list) == 0:
                 return [(replace_ds_name("unlabeled"), ann)]
 
             tag_names = set()
             items = []
-            for tag in image_tags + label_tags:
+            for tag in all_tags_list:
                 if tag not in tag_names:
                     tag_names.add(tag)
                     items.append((replace_ds_name(tag), ann))
