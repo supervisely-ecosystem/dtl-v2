@@ -183,6 +183,8 @@ class OutputProjectLayer(Layer):
             g.api.project.update_custom_data(self.sly_project_info.id, custom_data)
 
     def get_ds_parents(self, dataset_info: DatasetInfo):
+        if dataset_info is None:
+            return None
         ds_parents = None
         for parents, dataset in g.api.dataset.tree(dataset_info.project_id):
             if dataset.name == dataset_info.name:
