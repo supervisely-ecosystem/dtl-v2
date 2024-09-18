@@ -2,6 +2,8 @@
 
 `Split Data` splits the input data into datasets based on condition.
 
+If input project/dataset contains nested datasets data from them will be distributed across splits, and the final project will not include nested datasets.
+
 ### Settings
 
 There are 4 ways of splitting the data:
