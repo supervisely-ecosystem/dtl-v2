@@ -11,6 +11,8 @@ from src.compute.classes_utils import ClassConstants
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor
 from src.exceptions import BadSettingsError
 
+from copy import deepcopy
+
 
 class InstancesCropLayer(Layer):
     action = "instances_crop"
@@ -77,10 +79,18 @@ class InstancesCropLayer(Layer):
         return True
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
+        def create_new_desc() -> ImageDescriptor:
+            new_img_desc = deepcopy(img_desc)
+            new_img_desc.item_data = new_img
+            new_img_desc.info.item_name = (
+                img_desc.get_item_name() + "_crop_" + obj_class_name + str(idx)
+            )
+            return new_img_desc
+
         img_desc, ann = data_el
         padding_dct = self.settings["pad"]["sides"]
 
-        all_results = []
+        all_results = {}
         for obj_class_name in self.classes_to_crop:
             results = instance_crop(
                 img=img_desc.read_image(),
@@ -89,15 +99,14 @@ class InstancesCropLayer(Layer):
                 save_other_classes_in_crop=False,
                 padding_config=padding_dct,
             )
-
-            all_results.extend(results)
+            if all_results.get(obj_class_name) is None:
+                all_results[obj_class_name] = []
+            all_results[obj_class_name].extend(results)
 
         if self.net.preview_mode:
-            random.shuffle(all_results)
+            random.shuffle(list(all_results.values()))
 
-        for idx, (new_img, new_ann) in enumerate(all_results):
-            new_img_desc = img_desc.clone_with_item(new_img).clone_with_name(
-                img_desc.get_item_name() + "_crop_" + obj_class_name + str(idx)
-            )
-            new_img_desc = new_img_desc
-            yield new_img_desc, new_ann
+        for idx, (obj_class_name, crops) in enumerate(all_results.items()):
+            for new_img, new_ann in crops:
+                new_img_desc = create_new_desc()
+                yield new_img_desc, new_ann
