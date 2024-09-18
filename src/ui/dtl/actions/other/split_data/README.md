@@ -6,13 +6,13 @@
 
 There are 4 ways of splitting the data:
 
-- **percent**: data will be split by the percentage of total images count.
+- **percent**: data will be spread across datasets divided by the percentage of total images count.
 
-- **number**: data will be split by amount of images.
+- **number**: Each dataset will contain selected number of images. The last split will contain fewer images if the total number of images isn't evenly divisible by the selected number of images per split.
 
-- **classes**: data will be split based on the presence of objects of annotation classes. Please note that when using this method the final project will likely include more images than the input project.
+- **classes**: data will be split based on the presence of objects of annotation classes. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique annotation class on it. Images with no annotations will be placed in the "unlabeled" dataset. 
 
-- **tags**: data will be split based on the presence of image and object tags on the image. Please note that when using this method the final project will likely include more images than the input project.
+- **tags**: data will be split based on the presence of image and object tags on the image. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique image/object tag on it. Images with no tags on them will be placed in the "unlabeled" dataset. 
 
 ### Example 1. Split Data by percentage
 
@@ -40,7 +40,7 @@ There are 4 ways of splitting the data:
 </tr>
 </table>
 
-*in this instance, the amount of images more than doubled: the input project contained 953 images, and the output project contains 2213 images*
+*in this instance, the amount of images more than doubled: the input project contained 953 images, and the output project contains 2213 images, because on average each image contained more than 2 unique annotation classes on it*
 
 <details>
   <summary>JSON view</summary>

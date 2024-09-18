@@ -40,9 +40,13 @@ class SplitDataLayer(Layer):
         if split_method not in allowed_methods:
             raise BadSettingsError(f"Unknown split method selected: {split_method}")
         if split_ratio < 1 or split_ratio > 100:
-            raise BadSettingsError(f"Split percentage can not be equal to {split_ratio}")
+            raise BadSettingsError(
+                f"Invalid percentage value: {split_ratio}. Split percentage must be between 1 and 100"
+            )
         if split_num < 1 or split_num > 10000:
-            raise BadSettingsError(f"Split number can not be equal to {split_num}")
+            raise BadSettingsError(
+                f"Invalid split value: {split_num}. Split value must be between 1 and 10000"
+            )
         super().validate()
 
     def requires_item(self):
