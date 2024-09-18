@@ -38,17 +38,7 @@ class SplitDataAction(OtherAction):
             layout_texts_container,
         ) = create_layout_widgets()
 
-        saved_settings = {
-            "split_method": sidebar_selector.get_value(),
-            "split_ratio": sidebar_percent_slider.get_value(),
-            "split_num": sidebar_number_input.get_value(),
-        }
-
-        layout_current_method.set(f"Current method: {sidebar_selector.get_label()}", "text")
-        layout_current_value.set(
-            f"Split value: {sidebar_percent_slider.get_value()}%",
-            "text",
-        )
+        saved_settings = {}
 
         @sidebar_selector.value_changed
         def selector_cb(value):
@@ -64,33 +54,47 @@ class SplitDataAction(OtherAction):
 
         @sidebar_save_button.click
         def save_cb():
-            layout_current_method.set(f"Current method: {sidebar_selector.get_label()}", "text")
-            curr_method = sidebar_selector.get_value()
-            if curr_method == "percent":
-                layout_current_value.show()
-                layout_current_value.set(
-                    f"Split value: {sidebar_percent_slider.get_value()}%",
-                    "text",
-                )
-            elif curr_method == "number":
-                layout_current_value.show()
-                layout_current_value.set(
-                    f"Split value: {sidebar_number_input.get_value()} items per dataset",
-                    "text",
-                )
-            else:
-                layout_current_value.hide()
-            nonlocal saved_settings
-            method = sidebar_selector.get_value()
-            ratio = sidebar_percent_slider.get_value()
-            num = sidebar_number_input.get_value()
-            saved_settings = {"split_method": method, "split_ratio": ratio, "split_num": num}
+            saved_settings = {
+                "split_method": sidebar_selector.get_value(),
+                "split_ratio": sidebar_percent_slider.get_value(),
+                "split_num": sidebar_number_input.get_value(),
+            }
+            _set_settings_from_json(saved_settings)
 
         def get_settings(options_json: dict) -> dict:
             nonlocal saved_settings
             return saved_settings
 
+        def _set_settings_from_json(settings: dict):
+            nonlocal saved_settings
+            method = settings.get("split_method", "percent")
+            ratio = settings.get("split_ratio", 50)
+            num = settings.get("split_num", 50)
+
+            saved_settings = {
+                "split_method": method,
+                "split_ratio": ratio,
+                "split_num": num,
+            }
+
+            layout_current_method.set(f"Current method: {method}", "text")
+            if method == "percent":
+                layout_current_value.show()
+                layout_current_value.set(
+                    f"Split value: {ratio}%",
+                    "text",
+                )
+            elif method == "number":
+                layout_current_value.show()
+                layout_current_value.set(
+                    f"Split value: {num} items per dataset",
+                    "text",
+                )
+            else:
+                layout_current_value.hide()
+
         def create_options(src: list, dst: list, settings: dict) -> dict:
+            _set_settings_from_json(settings)
             settings_options = [
                 NodesFlow.Node.Option(
                     name="Layout",
