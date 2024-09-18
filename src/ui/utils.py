@@ -408,6 +408,7 @@ def load_preview_for_data_layer(layer: Layer):
             item_path=f"{preview_path}/preview_image.jpg",
             ann_path=f"{preview_path}/preview_ann.json",
         ),
+        0,
         False,
     )
     img_desc = img_desc.clone_with_item(preview_img)
@@ -588,6 +589,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
                 item_path=f"{preview_path}/preview_image.jpg",
                 ann_path=f"{preview_path}/preview_ann.json",
             ),
+            0,
             False,
         )
         img_desc = img_desc.clone_with_item(preview_img)

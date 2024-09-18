@@ -122,6 +122,7 @@ def main(
         raise e
 
     total = net.get_total_elements()
+    net.total_elements_cnt = total
     if total == 0:
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project and it's not empty"

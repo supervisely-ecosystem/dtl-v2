@@ -109,6 +109,7 @@ def generate_preview_for_project(layer: Layer):
                 item_path=image_path,
                 ann_path="",
             ),
+            0,
             False,
         )
         img = item_desc.read_image()

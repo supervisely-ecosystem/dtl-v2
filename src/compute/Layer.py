@@ -147,9 +147,11 @@ class Layer:
         return []
 
     def requires_item(self):
+        """Defines if Layer require that data have to be downloaded"""
         return False
 
     def modifies_data(self):
+        """Defines if data or it's annotation is modified by the Layer"""
         return False
 
     def validate_source_connections(self):
