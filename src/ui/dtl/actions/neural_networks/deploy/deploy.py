@@ -41,6 +41,7 @@ class DeployBaseAction(DeployNNAction):
     title = "Deploy Base"
     description = "Base layer for deployment of neural networks"
     model_params = {}
+    need_runtime_selector = False
 
     @classmethod
     def create_inputs(self):
@@ -127,6 +128,7 @@ class DeployBaseAction(DeployNNAction):
             # public options
             model_selector_sidebar_public_model_table,
             model_selector_runtime_selector_sidebar,
+            model_selector_runtime_field,
             # sidebar
             model_selector_sidebar_model_source_tabs,
             model_selector_sidebar_save_btn,
@@ -142,6 +144,9 @@ class DeployBaseAction(DeployNNAction):
         ) = create_model_selector_widgets(
             cls.framework_name, cls.pretrained_models, custom_models, cls.custom_task_types
         )
+        if cls.need_runtime_selector is False:
+            model_selector_runtime_field.hide()
+            model_selector_runtime_selector_sidebar.set_value(None)
 
         # MODEL SELECTOR CBs
         @model_selector_sidebar_save_btn.click
@@ -348,6 +353,7 @@ class DeployYOLOV8Action(DeployBaseAction):
     title = "Deploy YOLO v8 | v9 | v10"
     description = "Deploy YOLO v8 | v9 | v10 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
+    need_runtime_selector = True
 
     # Framework settings
     framework = "yolov8"

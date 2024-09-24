@@ -125,6 +125,7 @@ def create_model_selector_widgets(
         # public options
         model_selector_sidebar_public_model_table,
         model_selector_runtime_selector_sidebar,
+        model_selector_runtime_field,
         # sidebar
         model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_save_btn,

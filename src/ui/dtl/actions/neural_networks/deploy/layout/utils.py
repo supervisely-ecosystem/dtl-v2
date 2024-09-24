@@ -73,7 +73,6 @@ def save_model_settings(
     if model_source == "Pretrained public models":
         model_source = "Pretrained models"
         model_params = model_selector_sidebar_public_model_table.get_selected_model_params()
-        model_params["runtime"] = model_selector_runtime_selector_sidebar.get_value()
 
     elif model_source == "Custom models":
         model_source = "Custom models"
@@ -95,7 +94,7 @@ def save_model_settings(
     arch_type = model_params.get("arch_type", None)
     if arch_type is not None:
         settings["arch_type"] = arch_type
-    runtime = model_params.get("runtime", None)
+    runtime = model_selector_runtime_selector_sidebar.get_value()
     if runtime is not None:
         settings["runtime"] = runtime
 
