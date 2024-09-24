@@ -21,7 +21,7 @@ from src.ui.dtl.utils import (
 
 
 def get_available_runtimes():
-    return [RuntimeType.ONNXRUNTIME, RuntimeType.PYTORCH, RuntimeType.TENSORRT]
+    return [RuntimeType.PYTORCH, RuntimeType.ONNXRUNTIME, RuntimeType.TENSORRT]
 
 
 def create_model_selector_widgets(
