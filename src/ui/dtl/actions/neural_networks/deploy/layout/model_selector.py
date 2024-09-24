@@ -7,6 +7,7 @@ from supervisely.app.widgets import (
     PretrainedModelsSelector,
     Checkbox,
     Select,
+    Field,
 )
 
 
@@ -47,12 +48,20 @@ def create_model_selector_widgets(
     )
     if "object detection" in pretrained_model_selector_task_types:
         model_selector_sidebar_public_model_table.set_active_task_type("object detection")
+
+    # runtime selector
     available_runtimes = ["PyTorch", "ONNXRuntime", "TensorRT"]
     model_selector_runtime_selector_sidebar = Select(
         [Select.Item(runtime, runtime) for runtime in available_runtimes]
     )
+    model_selector_runtime_field = Field(
+        model_selector_runtime_selector_sidebar,
+        "Runtime",
+        "The model will be exported to the selected runtime for efficient inference (exporting to TensorRT may take about a minute).",
+    )
+
     model_selector_sidebar_public_container = Container(
-        [model_selector_sidebar_public_model_table, model_selector_runtime_selector_sidebar]
+        [model_selector_sidebar_public_model_table, model_selector_runtime_field]
     )
     # ------------------------------
 
