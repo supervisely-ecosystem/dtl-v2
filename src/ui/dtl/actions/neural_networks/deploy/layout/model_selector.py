@@ -52,7 +52,7 @@ def create_model_selector_widgets(
         [Select.Item(runtime, runtime) for runtime in available_runtimes]
     )
     model_selector_sidebar_public_container = Container(
-        model_selector_sidebar_public_model_table, model_selector_runtime_selector_sidebar
+        [model_selector_sidebar_public_model_table, model_selector_runtime_selector_sidebar]
     )
     # ------------------------------
 
