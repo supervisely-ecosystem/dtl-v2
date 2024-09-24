@@ -6,9 +6,10 @@ from supervisely.app.widgets import (
     CustomModelsSelector,
     PretrainedModelsSelector,
     Checkbox,
+    Select,
+    Field,
 )
-
-
+from supervisely.nn.inference import RuntimeType
 import src.globals as g
 from src.ui.dtl.utils import (
     get_text_font_size,
@@ -17,6 +18,10 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
+
+
+def get_available_runtimes():
+    return [RuntimeType.PYTORCH, RuntimeType.ONNXRUNTIME, RuntimeType.TENSORRT]
 
 
 def create_model_selector_widgets(
@@ -46,6 +51,17 @@ def create_model_selector_widgets(
     )
     if "object detection" in pretrained_model_selector_task_types:
         model_selector_sidebar_public_model_table.set_active_task_type("object detection")
+
+    # runtime selector
+    model_selector_runtime_selector_sidebar = Select(
+        [Select.Item(runtime, runtime) for runtime in get_available_runtimes()]
+    )
+    model_selector_runtime_field = Field(
+        model_selector_runtime_selector_sidebar,
+        "Runtime",
+        "The model will be exported to the selected runtime for efficient inference (exporting to TensorRT may take about a minute).",
+    )
+
     # ------------------------------
 
     # CUSTOM /PUBLIC TABS
@@ -65,6 +81,7 @@ def create_model_selector_widgets(
     model_selector_sidebar_container = Container(
         [
             model_selector_sidebar_model_source_tabs,
+            model_selector_runtime_field,
             model_selector_sidebar_save_btn,
         ]
     )
@@ -107,6 +124,8 @@ def create_model_selector_widgets(
         model_selector_sidebar_custom_model_table,
         # public options
         model_selector_sidebar_public_model_table,
+        model_selector_runtime_selector_sidebar,
+        model_selector_runtime_field,
         # sidebar
         model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_save_btn,
