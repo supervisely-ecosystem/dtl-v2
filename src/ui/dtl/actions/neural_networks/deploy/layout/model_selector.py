@@ -6,6 +6,7 @@ from supervisely.app.widgets import (
     CustomModelsSelector,
     PretrainedModelsSelector,
     Checkbox,
+    Select,
 )
 
 
@@ -46,6 +47,13 @@ def create_model_selector_widgets(
     )
     if "object detection" in pretrained_model_selector_task_types:
         model_selector_sidebar_public_model_table.set_active_task_type("object detection")
+    available_runtimes = ["PyTorch", "ONNXRuntime", "TensorRT"]
+    model_selector_runtime_selector_sidebar = Select(
+        [Select.Item(runtime, runtime) for runtime in available_runtimes]
+    )
+    model_selector_sidebar_public_container = Container(
+        model_selector_sidebar_public_model_table, model_selector_runtime_selector_sidebar
+    )
     # ------------------------------
 
     # CUSTOM /PUBLIC TABS
@@ -54,7 +62,7 @@ def create_model_selector_widgets(
         descriptions=["Models trained by you", f"Models trained by {framework_name} team"],
         contents=[
             model_selector_sidebar_custom_model_table,
-            model_selector_sidebar_public_model_table,
+            model_selector_sidebar_public_container,
         ],
     )
     if len(custom_models) == 0:
@@ -107,6 +115,8 @@ def create_model_selector_widgets(
         model_selector_sidebar_custom_model_table,
         # public options
         model_selector_sidebar_public_model_table,
+        model_selector_runtime_selector_sidebar,
+        model_selector_sidebar_public_container,
         # sidebar
         model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_save_btn,

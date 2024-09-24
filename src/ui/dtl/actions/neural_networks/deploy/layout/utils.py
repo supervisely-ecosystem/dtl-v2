@@ -64,6 +64,7 @@ def save_model_settings(
     settings: dict,
     model_selector_sidebar_model_source_tabs: RadioGroup,
     model_selector_sidebar_public_model_table: PretrainedModelsSelector,
+    model_selector_runtime_selector_sidebar: Select,
     model_selector_sidebar_custom_model_table: CustomModelsSelector,
     model_selector_stop_model_after_pipeline_checkbox: Checkbox,
 ):
@@ -72,6 +73,7 @@ def save_model_settings(
     if model_source == "Pretrained public models":
         model_source = "Pretrained models"
         model_params = model_selector_sidebar_public_model_table.get_selected_model_params()
+        model_params["runtime"] = model_selector_runtime_selector_sidebar.get_value()
 
     elif model_source == "Custom models":
         model_source = "Custom models"
@@ -93,6 +95,9 @@ def save_model_settings(
     arch_type = model_params.get("arch_type", None)
     if arch_type is not None:
         settings["arch_type"] = arch_type
+    runtime = model_params.get("runtime", None)
+    if runtime is not None:
+        settings["runtime"] = runtime
 
     return settings
 
@@ -108,6 +113,7 @@ def save_settings(
     agent_selector_sidebar_device_selector: Select,
     model_selector_sidebar_model_source_tabs: RadioTabs,
     model_selector_sidebar_public_model_table: PretrainedModelsSelector,
+    model_selector_runtime_selector_sidebar: Select,
     model_selector_sidebar_custom_model_table: CustomModelsSelector,
     model_selector_stop_model_after_pipeline_checkbox: Checkbox,
 ):
@@ -118,6 +124,7 @@ def save_settings(
         settings,
         model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_public_model_table,
+        model_selector_runtime_selector_sidebar,
         model_selector_sidebar_custom_model_table,
         model_selector_stop_model_after_pipeline_checkbox,
     )
@@ -195,6 +202,9 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
     arch_type = saved_settings.get("arch_type", None)
     if arch_type is not None:
         deploy_params["arch_type"] = arch_type
+    runtime = saved_settings.get("runtime", None)
+    if runtime is not None:
+        deploy_params["runtime"] = runtime
 
     api.task.send_request(session_id, "deploy_from_api", data={"deploy_params": {**deploy_params}})
 
