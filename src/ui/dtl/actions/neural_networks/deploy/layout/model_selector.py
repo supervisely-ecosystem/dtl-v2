@@ -9,8 +9,7 @@ from supervisely.app.widgets import (
     Select,
     Field,
 )
-
-
+from supervisely.nn.inference import RuntimeType
 import src.globals as g
 from src.ui.dtl.utils import (
     get_text_font_size,
@@ -19,6 +18,10 @@ from src.ui.dtl.utils import (
     get_set_settings_container,
     get_text_font_size,
 )
+
+
+def get_available_runtimes():
+    return [RuntimeType.ONNXRUNTIME, RuntimeType.PYTORCH, RuntimeType.TENSORRT]
 
 
 def create_model_selector_widgets(
@@ -50,9 +53,8 @@ def create_model_selector_widgets(
         model_selector_sidebar_public_model_table.set_active_task_type("object detection")
 
     # runtime selector
-    available_runtimes = ["PyTorch", "ONNXRuntime", "TensorRT"]
     model_selector_runtime_selector_sidebar = Select(
-        [Select.Item(runtime, runtime) for runtime in available_runtimes]
+        [Select.Item(runtime, runtime) for runtime in get_available_runtimes()]
     )
     model_selector_runtime_field = Field(
         model_selector_runtime_selector_sidebar,
@@ -60,9 +62,6 @@ def create_model_selector_widgets(
         "The model will be exported to the selected runtime for efficient inference (exporting to TensorRT may take about a minute).",
     )
 
-    model_selector_sidebar_public_container = Container(
-        [model_selector_sidebar_public_model_table, model_selector_runtime_field]
-    )
     # ------------------------------
 
     # CUSTOM /PUBLIC TABS
@@ -71,7 +70,7 @@ def create_model_selector_widgets(
         descriptions=["Models trained by you", f"Models trained by {framework_name} team"],
         contents=[
             model_selector_sidebar_custom_model_table,
-            model_selector_sidebar_public_container,
+            model_selector_sidebar_public_model_table,
         ],
     )
     if len(custom_models) == 0:
@@ -82,6 +81,7 @@ def create_model_selector_widgets(
     model_selector_sidebar_container = Container(
         [
             model_selector_sidebar_model_source_tabs,
+            model_selector_runtime_field,
             model_selector_sidebar_save_btn,
         ]
     )
@@ -125,7 +125,6 @@ def create_model_selector_widgets(
         # public options
         model_selector_sidebar_public_model_table,
         model_selector_runtime_selector_sidebar,
-        model_selector_sidebar_public_container,
         # sidebar
         model_selector_sidebar_model_source_tabs,
         model_selector_sidebar_save_btn,

@@ -127,7 +127,6 @@ class DeployBaseAction(DeployNNAction):
             # public options
             model_selector_sidebar_public_model_table,
             model_selector_runtime_selector_sidebar,
-            model_selector_sidebar_public_container,
             # sidebar
             model_selector_sidebar_model_source_tabs,
             model_selector_sidebar_save_btn,
