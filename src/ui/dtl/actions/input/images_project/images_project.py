@@ -162,11 +162,7 @@ class ImagesProjectAction(SourceAction):
                         src_input_data_sidebar_preview_widget_pr_thumbnail.show()
                         src_input_data_sidebar_preview_widget_pr_thumbnail.set(_current_info)
                     else:
-                        selected_ds_name = saved_src[0].split("/")[-1]
-                        parent_id = all_ds_map[saved_src[0]].parent_id
-                        current_ds_info = utils.get_dataset_by_name(
-                            selected_ds_name, _current_info.id, parent_id
-                        )
+                        current_ds_info = all_ds_map[saved_src[0]]
 
                         src_input_data_sidebar_preview_widget_pr_thumbnail.hide()
                         src_input_data_sidebar_preview_widget_ds_thumbnail.show()
@@ -181,21 +177,54 @@ class ImagesProjectAction(SourceAction):
 
         def _save_src():
             def read_src_from_widget():
+                def _count_all_datasets(data):
+                    count = len(data)
+                    for ds_info, children in data.items():
+                        if children:
+                            count += _count_all_datasets(children)
+                    return count
+
+                def _get_selected_ds_paths(data, ids: List[int], current_path=None) -> List[str]:
+                    if current_path is None:
+                        current_path = [project_info.name]
+
+                    paths = []
+                    for ds_info, children in data.items():
+                        new_path = current_path + [ds_info.name]
+                        full_path_str = "/".join(new_path)
+
+                        if ds_info.id in ids:
+                            paths.append(full_path_str)
+                        if children:
+                            paths.extend(_get_selected_ds_paths(children, ids, new_path))
+
+                    return paths
+
+                def _get_all_ds_mapping(data, current_path=None):
+                    if current_path is None:
+                        current_path = [project_info.name]
+
+                    mapping = {}
+                    for ds_info, children in data.items():
+                        new_path = current_path + [ds_info.name]
+                        full_path_str = "/".join(new_path)
+
+                        mapping[full_path_str] = ds_info
+                        if children:
+                            mapping.update(_get_all_ds_mapping(children, new_path))
+                    return mapping
+
                 nonlocal all_ds_map
                 # get_list and compare ids
                 project_id = src_input_data_sidebar_dataset_selector.get_selected_project_id()
                 selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
                 if project_id is None:
-                    all_datasets = []
-                    datasets = []
+                    dataset_tree = []
                 else:
-                    all_datasets = g.api.dataset.get_list(project_id, recursive=True)
-                    datasets = g.api.dataset.get_list(project_id, recursive=True)
-
-                all_datasets_cnt = len(all_datasets)
-                all_ds_map = {}
-
-                project_info = None
+                    project_info = g.api.project.get_info_by_id(project_id)
+                    if project_info is None:
+                        return None, []
+                    dataset_tree = g.api.dataset.get_tree(project_id)
                 if (
                     selected_dataset_ids is None
                     or len(selected_dataset_ids) == 0
@@ -203,21 +232,15 @@ class ImagesProjectAction(SourceAction):
                 ):
                     selected_dataset_ids = []
 
-                if project_id is not None:
-                    project_info = g.api.project.get_info_by_id(project_id)
+                all_ds_map = {}
+                all_ds_count = _count_all_datasets(dataset_tree)
+                selected_ds_paths = _get_selected_ds_paths(dataset_tree, selected_dataset_ids)
 
-                dataset_names = []
-                for ds in datasets:
-                    if ds.id in selected_dataset_ids:
-                        dataset_names.append(ds.name)
-
-                if project_info is None:
-                    return None, []
-                if all_datasets_cnt == len(dataset_names):
+                if all_ds_count == len(selected_ds_paths):
                     return project_info, [f"{project_info.name}/*"]
 
-                all_ds_map = {f"{project_info.name}/{ds.name}": ds for ds in all_datasets}
-                return project_info, [f"{project_info.name}/{name}" for name in dataset_names]
+                all_ds_map = _get_all_ds_mapping(dataset_tree)
+                return project_info, selected_ds_paths
 
             nonlocal _current_info, saved_src
             _current_info, saved_src = read_src_from_widget()
