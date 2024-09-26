@@ -163,11 +163,17 @@ def get_dataset_by_id(id: int = None) -> sly.DatasetInfo:
     return g.cache["dataset_info"][id]
 
 
-def get_dataset_by_name(dataset_name: str, project_id: int) -> sly.DatasetInfo:
+def get_dataset_by_name(
+    dataset_name: str, project_id: int, parent_id: Optional[int] = None
+) -> sly.DatasetInfo:
     key = (project_id, dataset_name)
     if key not in g.cache["dataset_id"]:
         try:
-            dataset_info = g.api.dataset.get_info_by_name(project_id, dataset_name)
+            dataset_info = g.api.dataset.get_info_by_name(
+                project_id, dataset_name, parent_id=parent_id
+            )
+            if dataset_info is None:
+                raise RuntimeError
         except:
             raise RuntimeError(f"Dataset {dataset_name} not found")
         g.cache["dataset_info"][dataset_info.id] = dataset_info

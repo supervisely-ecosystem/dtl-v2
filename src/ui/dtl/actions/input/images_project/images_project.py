@@ -163,8 +163,9 @@ class ImagesProjectAction(SourceAction):
                         src_input_data_sidebar_preview_widget_pr_thumbnail.set(_current_info)
                     else:
                         selected_ds_name = saved_src[0].split("/")[-1]
+                        parent_id = all_ds_map[saved_src[0]].parent_id
                         current_ds_info = utils.get_dataset_by_name(
-                            selected_ds_name, _current_info.id
+                            selected_ds_name, _current_info.id, parent_id
                         )
 
                         src_input_data_sidebar_preview_widget_pr_thumbnail.hide()
