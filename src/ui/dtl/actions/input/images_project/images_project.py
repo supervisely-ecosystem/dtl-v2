@@ -219,7 +219,7 @@ class ImagesProjectAction(SourceAction):
                 project_id = src_input_data_sidebar_dataset_selector.get_selected_project_id()
                 selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
                 if project_id is None:
-                    dataset_tree = []
+                    dataset_tree = {}
                 else:
                     project_info = g.api.project.get_info_by_id(project_id)
                     if project_info is None:
