@@ -97,6 +97,8 @@ def download_preview(
         dataset_info = get_dataset_by_name(dataset_name, project_info.id)
     if dataset_info is None:
         raise RuntimeError(f"Dataset {dataset_name} not found in project {project_name}")
+    elif dataset_info.items_count == 0:
+        logger.error("Dataset contains no items.")  # disable preview?
     preview_project_path = f"{g.PREVIEW_DIR}/{project_name}"
     preview_dataset_path = f"{preview_project_path}/{dataset_name}"
     ensure_dir(preview_dataset_path)
