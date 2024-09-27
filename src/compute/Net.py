@@ -368,7 +368,8 @@ class Net:
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
             for src in data_layer.srcs:
-                project_name, dataset_name = src.split("/")
+                src_parts = src.split("/")
+                project_name, dataset_name = src_parts[0], src_parts[-1]
                 project = get_project_by_name(project_name)
                 if dataset_name == "*":
                     for dataset in get_all_datasets(project.id):
@@ -486,7 +487,8 @@ class Net:
         for data_layer_idx in data_layers_idxs:
             data_layer = self.layers[data_layer_idx]
             for src in data_layer.srcs:
-                project_name, dataset_name = src.split("/")
+                src_parts = src.split("/")
+                project_name, dataset_name = src_parts[0], src_parts[-1]
                 project = get_project_by_name(project_name)
                 if dataset_name == "*":
                     project_datasets.setdefault(project.id, [])

@@ -147,7 +147,7 @@ def init_nodes_state(
             src = layer.get_src()
             layer_input_meta = ProjectMeta()
             if src:
-                project_name, _ = src[0].split("/")
+                project_name = src[0].split("/")[0]
                 layer_input_meta = utils.get_project_meta(
                     utils.get_project_by_name(project_name).id
                 )
@@ -360,7 +360,9 @@ def load_preview_for_data_layer(layer: Layer):
     if src is None or len(src) == 0:
         return None, None
 
-    project_name, dataset_name = src[0].split("/")
+    src_components = src[0].split("/")
+    project_name = src_components[0]
+    dataset_name = src_components[-1]
     try:
         project_info = get_project_by_name(project_name)
         # dataset_info = get_dataset_by_name(dataset_name, project_info.id)

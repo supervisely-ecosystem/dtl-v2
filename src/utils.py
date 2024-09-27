@@ -97,6 +97,8 @@ def download_preview(
         dataset_info = get_dataset_by_name(dataset_name, project_info.id)
     if dataset_info is None:
         raise RuntimeError(f"Dataset {dataset_name} not found in project {project_name}")
+    elif dataset_info.items_count == 0:
+        logger.error("Dataset contains no items.")  # disable preview?
     preview_project_path = f"{g.PREVIEW_DIR}/{project_name}"
     preview_dataset_path = f"{preview_project_path}/{dataset_name}"
     ensure_dir(preview_dataset_path)
@@ -164,10 +166,23 @@ def get_dataset_by_id(id: int = None) -> sly.DatasetInfo:
 
 
 def get_dataset_by_name(dataset_name: str, project_id: int) -> sly.DatasetInfo:
+    def _get_info_by_name_tree(data, name: str):
+        for ds_info, children in data.items():
+            if ds_info.name == name:
+                return ds_info
+            if children:
+                result = _get_info_by_name_tree(children, name)
+                if result:
+                    return result
+        return None
+
     key = (project_id, dataset_name)
     if key not in g.cache["dataset_id"]:
         try:
-            dataset_info = g.api.dataset.get_info_by_name(project_id, dataset_name)
+            dataset_tree = g.api.dataset.get_tree(project_id)
+            dataset_info = _get_info_by_name_tree(dataset_tree, dataset_name)
+            if dataset_info is None:
+                raise RuntimeError
         except:
             raise RuntimeError(f"Dataset {dataset_name} not found")
         g.cache["dataset_info"][dataset_info.id] = dataset_info
