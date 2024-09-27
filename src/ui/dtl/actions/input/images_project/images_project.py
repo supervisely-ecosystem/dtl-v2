@@ -184,10 +184,7 @@ class ImagesProjectAction(SourceAction):
                             count += _count_all_datasets(children)
                     return count
 
-                def _get_selected_ds_paths(data, ids: List[int], current_path=None) -> List[str]:
-                    if current_path is None:
-                        current_path = [project_info.name]
-
+                def _get_selected_ds_paths(data, ids: List[int], current_path) -> List[str]:
                     paths = []
                     for ds_info, children in data.items():
                         new_path = current_path + [ds_info.name]
@@ -200,10 +197,7 @@ class ImagesProjectAction(SourceAction):
 
                     return paths
 
-                def _get_all_ds_mapping(data, current_path=None):
-                    if current_path is None:
-                        current_path = [project_info.name]
-
+                def _get_all_ds_mapping(data, current_path):
                     mapping = {}
                     for ds_info, children in data.items():
                         new_path = current_path + [ds_info.name]
@@ -217,29 +211,29 @@ class ImagesProjectAction(SourceAction):
                 nonlocal all_ds_map
                 # get_list and compare ids
                 project_id = src_input_data_sidebar_dataset_selector.get_selected_project_id()
-                selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
                 if project_id is None:
-                    dataset_tree = {}
-                else:
-                    project_info = g.api.project.get_info_by_id(project_id)
-                    if project_info is None:
-                        return None, []
-                    dataset_tree = g.api.dataset.get_tree(project_id)
-                if (
-                    selected_dataset_ids is None
-                    or len(selected_dataset_ids) == 0
-                    or selected_dataset_ids[0] is None  # ?
-                ):
+                    return None, []
+
+                project_info = g.api.project.get_info_by_id(project_id)
+                if project_info is None:
+                    return None, []
+                project_name = project_info.name
+                dataset_tree = g.api.dataset.get_tree(project_id)
+
+                selected_dataset_ids = src_input_data_sidebar_dataset_selector.get_selected_ids()
+                if not selected_dataset_ids:
                     selected_dataset_ids = []
 
                 all_ds_map = {}
                 all_ds_count = _count_all_datasets(dataset_tree)
-                selected_ds_paths = _get_selected_ds_paths(dataset_tree, selected_dataset_ids)
+                selected_ds_paths = _get_selected_ds_paths(
+                    dataset_tree, selected_dataset_ids, [project_name]
+                )
 
                 if all_ds_count == len(selected_ds_paths):
-                    return project_info, [f"{project_info.name}/*"]
+                    return project_info, [f"{project_name}/*"]
 
-                all_ds_map = _get_all_ds_mapping(dataset_tree)
+                all_ds_map = _get_all_ds_mapping(dataset_tree, [project_name])
                 return project_info, selected_ds_paths
 
             nonlocal _current_info, saved_src
