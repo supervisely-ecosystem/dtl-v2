@@ -362,7 +362,7 @@ def load_preview_for_data_layer(layer: Layer):
 
     src_components = src[0].split("/")
     project_name = src_components[0]
-    dataset_name = src_components[-1]  # affects preview
+    dataset_name = src_components[-1]
     try:
         project_info = get_project_by_name(project_name)
         # dataset_info = get_dataset_by_name(dataset_name, project_info.id)

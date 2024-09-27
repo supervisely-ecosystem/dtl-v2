@@ -56,7 +56,7 @@ class ImagesProjectLayer(Layer):
     def _split_data_src(cls, src):
         src_components = src.strip("/").split("/")
         if src_components == [""]:
-            # Empty name or too many components.
+            # Empty name
             raise BadSettingsError(
                 'Wrong "data" layer source path. Use "project_name/dataset_name" or "project_name/*"',
                 extra={"layer_config": cls.config},
