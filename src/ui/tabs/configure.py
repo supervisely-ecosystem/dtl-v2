@@ -322,7 +322,7 @@ def context_menu_clicked_cb(item):
     if action_name == "__clear__":
         nodes_flow.clear()
         return
-    time.sleep(0.2)
+    time.sleep(0.5)
     add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     g.context_menu_position = None
 
@@ -332,7 +332,7 @@ def item_dropped_cb(item):
     position = item["position"]
     g.context_menu_position = position
     action_name = item["item"]["key"]
-    time.sleep(0.2)
+    time.sleep(0.5)
     add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     g.context_menu_position = None
 
@@ -356,7 +356,7 @@ def node_removed(layer_id: str):
 def add_layer_from_dialog_btn_cb():
     position = g.context_menu_position
     action_name = select_action_name.get_value()
-    time.sleep(0.2)
+    time.sleep(0.5)
     add_layer(action_name, position, autoconnect=g.connect_node_checkbox.is_checked())
     add_layer_dialog.hide()
     g.context_menu_position = None
@@ -365,7 +365,7 @@ def add_layer_from_dialog_btn_cb():
 @filter_actions_input.value_changed
 def filter(value):
     g.cache["last_search"] = value
-    time.sleep(0.4)
+    time.sleep(0.5)
     if g.cache["last_search"] != value:
         return
 
