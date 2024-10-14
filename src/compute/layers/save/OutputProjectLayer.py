@@ -395,7 +395,7 @@ class OutputProjectLayer(Layer):
                                 else:
                                     item_ids = [
                                         item_desc.info.item_info.id
-                                        for item_desc in ds_item_map[ds_name]
+                                        for item_desc, _ in ds_item_map[ds_name]
                                     ]
                                     image_info = g.api.image.upload_ids(
                                         dataset_info.id, out_item_names, item_ids
