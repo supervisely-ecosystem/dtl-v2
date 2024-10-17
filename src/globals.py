@@ -185,3 +185,4 @@ def on_error_close():
 
 
 running_sessions_ids = []
+disable_move = False

@@ -92,6 +92,7 @@ def _run():
     if not g.pipeline_running:
         return
 
+    g.disable_move = False
     edges = nodes_flow.get_edges_json()
     nodes_state = nodes_flow.get_nodes_state_json()
 
@@ -265,11 +266,13 @@ def _run():
         # ----------------------------------------------- - ---------------------------------------------- #
 
     except CustomException as e:
+        g.disable_move = True
         error_notification.set(title="Error", description=str(e.args[0]))
         error_notification.show()
         circle_progress.set_status("exception")
         raise e
     except Exception as e:
+        g.disable_move = True
         error_notification.set("Error", description=str(e))
         error_notification.show()
         circle_progress.set_status("exception")

@@ -91,8 +91,15 @@ def generate_preview_for_project(layer: Layer):
             items = []
     if len(items) > 0 and pr.type == "images":
         project_meta = ProjectMeta.from_json(g.api.project.get_meta(g.PROJECT_ID))
-        item_info = items[0]
-        dataset_info = g.api.dataset.get_info_by_id(item_info.dataset_id)
+        for item in items:
+            if item is not None:
+                item_info = item
+                break
+
+        dataset_info = None
+        if item_info is not None:
+            dataset_info = g.api.dataset.get_info_by_id(item_info.dataset_id)
+
         dataset_name = dataset_info.name
         image_path = f"{g.PREVIEW_DIR}/{layer.id}/preview_image.{item_info.ext}"
         g.api.image.download_path(item_info.id, image_path)

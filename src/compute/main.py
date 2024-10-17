@@ -112,11 +112,13 @@ def main(
             return
 
     except CustomException as e:
+        g.disable_move = True
         circle_progress.hide()
         # logger.error("Error occurred on Pipeline graph initialization step!")
         # e.log()
         raise e
     except Exception as e:
+        g.disable_move = True
         circle_progress.hide()
         # logger.error("Error occurred on Pipeline graph initialization step!", exc_info=str(e))
         raise e
@@ -124,6 +126,7 @@ def main(
     total = net.get_total_elements()
     net.total_elements_cnt = total
     if total == 0:
+        g.disable_move = True
         raise GraphError(
             "There are no elements to process. Make sure that you selected input project and it's not empty"
         )
@@ -163,6 +166,7 @@ def main(
                     )
                     results_counter += 1
             except Exception as e:
+                g.disable_move = True
                 logger.warn(
                     f"Item was skipped because some error occurred. Error: {e}",
                     exc_info=True,

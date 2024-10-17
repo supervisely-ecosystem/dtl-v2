@@ -47,9 +47,10 @@ class MoveLayer(Layer):
             yield tuple(zip(item_descs, anns))
 
     def postprocess(self):
-        g.api.image.remove_batch(list(self.entity_ids_to_remove))
-        self.entity_ids_to_remove = set()
-        g.FILTERED_ENTITIES = []
+        if not g.disable_move:
+            g.api.image.remove_batch(list(self.entity_ids_to_remove))
+            self.entity_ids_to_remove = set()
+            g.FILTERED_ENTITIES = []
 
     def has_batch_processing(self) -> bool:
         return True
