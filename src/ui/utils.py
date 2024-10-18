@@ -391,7 +391,7 @@ def load_preview_for_data_layer(layer: Layer):
         )
     except Exception as e:
         raise CustomException(
-            f"Error downloading image and annotation for preview",
+            f"Error downloading image and annotation for preview. Please check if the selected project or dataset is not empty.",
             error=e,
             extra={"project_name": project_name, "dataset_name": dataset_name},
         )
@@ -572,7 +572,7 @@ def update_all_previews(net: Net, data_layers_ids: list, all_layers_ids: list):
                 raise NotImplementedError(f"Modality {net.modality} is not supported yet")
         except Exception as e:
             raise CustomException(
-                f"Error downloading image and annotation for preview",
+                f"Error downloading image and annotation for preview. Please check if the selected project or dataset is not empty.",
                 error=e,
                 extra={"project_name": project_name, "dataset_name": dataset_name},
             )
