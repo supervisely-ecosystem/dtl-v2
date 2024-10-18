@@ -62,11 +62,12 @@ class RotateLayer(Layer):
         if src_im_rect.contains(req_rect):
             return img, (0, 0)
 
-        src_ct = [int(x + 0.5) for x in src_im_rect.center]
+        src_ct = [int(src_im_rect.center.col + 0.5), int(src_im_rect.center.row + 0.5)]
         new_w2 = max(src_ct[0] - req_rect.left, req_rect.right - src_ct[0])
         new_h2 = max(src_ct[1] - req_rect.top, req_rect.bottom - src_ct[1])
         exp_w = max(src_im_rect.width, 2 * new_w2)
         exp_h = max(src_im_rect.height, 2 * new_h2)
+
         delta_x = (exp_w - src_im_rect.width) // 2
         delta_y = (exp_h - src_im_rect.height) // 2
 
@@ -83,7 +84,7 @@ class RotateLayer(Layer):
 
         angle_dct = self.settings["rotate_angles"]
         min_degrees, max_degrees = angle_dct["min_degrees"], angle_dct["max_degrees"]
-        rotate_degrees = np.random.uniform(min_degrees, max_degrees)
+        rotate_degrees = np.random.randint(min_degrees, max_degrees + 1)
 
         if rotate_degrees == 0:
             return img_desc, ann
@@ -106,20 +107,21 @@ class RotateLayer(Layer):
         if black_reg_mode == "preserve_size":
             rect_to_crop = Rectangle.from_array(img)
             new_img, (delta_x, delta_y) = self.expand_image_with_rect(new_img, rect_to_crop)
+            new_ann = new_ann.clone(img_size=new_img.shape[:2])
 
             top_pad = max((new_img.shape[0] - ann.img_size[0]) // 2, 0)
-            lefet_pad = max((new_img.shape[1] - ann.img_size[1]) // 2, 0)
+            left_pad = max((new_img.shape[1] - ann.img_size[1]) // 2, 0)
             new_img, new_ann = aug.crop(
                 new_img,
                 new_ann,
                 top_pad=top_pad,
                 bottom_pad=new_img.shape[0] - top_pad - ann.img_size[0],
-                left_pad=lefet_pad,
-                right_pad=new_img.shape[1] - lefet_pad - ann.img_size[1],
+                left_pad=left_pad,
+                right_pad=new_img.shape[1] - left_pad - ann.img_size[1],
             )
-            new_ann.clone(img_size=new_img.shape[:2])
 
-            new_ann = apply_to_labels(new_ann, lambda x: [x.translate(delta_x, delta_y)])
+            new_ann = new_ann.clone(img_size=new_img.shape[:2])
+            # new_ann = apply_to_labels(new_ann, lambda x: [x.translate(delta_x, delta_y)])
 
         if new_img is None:
             return  # no yield
