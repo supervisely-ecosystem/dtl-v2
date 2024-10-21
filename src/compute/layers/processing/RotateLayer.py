@@ -119,9 +119,11 @@ class RotateLayer(Layer):
                 left_pad=left_pad,
                 right_pad=new_img.shape[1] - left_pad - ann.img_size[1],
             )
+            def translate(label):
+                return [label.translate(delta_x, delta_y)]
 
             new_ann = new_ann.clone(img_size=new_img.shape[:2])
-            # new_ann = apply_to_labels(new_ann, lambda x: [x.translate(delta_x, delta_y)])
+            new_ann = apply_to_labels(new_ann, translate)
 
         if new_img is None:
             return  # no yield
