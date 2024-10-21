@@ -107,7 +107,9 @@ class RotateLayer(Layer):
         if black_reg_mode == "preserve_size":
             rect_to_crop = Rectangle.from_array(img)
             new_img, (delta_x, delta_y) = self.expand_image_with_rect(new_img, rect_to_crop)
-            new_ann = new_ann.clone(img_size=new_img.shape[:2])
+            new_ann = new_ann.transform_labels(
+                lambda x: [x.translate(delta_y, delta_x)], new_img.shape[:2]
+            )
 
             top_pad = max((new_img.shape[0] - ann.img_size[0]) // 2, 0)
             left_pad = max((new_img.shape[1] - ann.img_size[1]) // 2, 0)
@@ -119,11 +121,8 @@ class RotateLayer(Layer):
                 left_pad=left_pad,
                 right_pad=new_img.shape[1] - left_pad - ann.img_size[1],
             )
-            def translate(label):
-                return [label.translate(delta_x, delta_y)]
 
             new_ann = new_ann.clone(img_size=new_img.shape[:2])
-            new_ann = apply_to_labels(new_ann, translate)
 
         if new_img is None:
             return  # no yield
