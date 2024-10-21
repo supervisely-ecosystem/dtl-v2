@@ -382,8 +382,27 @@ def load_preview_for_data_layer(layer: Layer):
             items_ids = layer_settings.get("filtered_entities_ids", [])
             if len(items_ids) == 0:
                 items_ids = None
+    elif layer.action.name == "images_project":
+        if dataset_name == "*":
+            images = g.api.image.get_list(project_id=project_info.id)
+            items_ids = [image.id for image in images]
+        else:
+            dataset = get_dataset_by_name(dataset_name, project_info.id)
+            images = g.api.image.get_list(dataset_id=dataset.id)
+            items_ids = [image.id for image in images]
     else:
         items_ids = None
+
+    if items_ids is None or len(items_ids) == 0:
+        sly.app.show_dialog(
+            "Error updating preview",
+            "Couldn't get items ids for preview. Please check if the selected project or dataset is not empty.",
+            status="error",
+        )
+        raise CustomException(
+            f"Error getting items ids for preview. Please check if the selected project or dataset is not empty.",
+            extra={"project_name": project_name, "dataset_name": dataset_name},
+        )
 
     try:
         item_info, preview_img_path, preview_ann_path = download_preview(
@@ -448,34 +467,39 @@ def update_preview(net: Net, data_layers_ids: list, all_layers_ids: list, layer_
             g.layers[l_id].clear_preview()
 
     layers_id_chain = None  # parents chain
-    if issubclass(layer.action, SourceAction):
-        img_desc, preview_ann = load_preview_for_data_layer(layer)
-    # if layer has no sources, clean preview
-    elif not layer.get_src():
-        return
-    else:
-        img_desc = layer.get_src_img_desc()
-        preview_ann = layer.get_src_ann()
-        if img_desc is None:
-            # try previous layer
-            layers_id_chain = get_layer_parents_chain(layer.id)
-            if len(layers_id_chain) == 0:
-                return
-            if len(layers_id_chain) == 1:
-                start_layer_id = layers_id_chain[0]
-            else:
-                start_layer_id = layers_id_chain[-2]
-            layer_idx = all_layers_ids.index(start_layer_id)
-            source_layer_id = layers_id_chain[-1]
-            source_layer = g.layers[source_layer_id]
-            if (
-                issubclass(source_layer.action, SourceAction)
-                and source_layer.get_preview_img_desc() is None
-            ):
-                img_desc, preview_ann = load_preview_for_data_layer(source_layer)
-            else:
-                img_desc = source_layer.get_preview_img_desc()
-                preview_ann = source_layer.get_ann()
+    try:
+        if issubclass(layer.action, SourceAction):
+            img_desc, preview_ann = load_preview_for_data_layer(layer)
+        # if layer has no sources, clean preview
+        elif not layer.get_src():
+            return
+        else:
+            img_desc = layer.get_src_img_desc()
+            preview_ann = layer.get_src_ann()
+            if img_desc is None:
+                # try previous layer
+                layers_id_chain = get_layer_parents_chain(layer.id)
+                if len(layers_id_chain) == 0:
+                    return
+                if len(layers_id_chain) == 1:
+                    start_layer_id = layers_id_chain[0]
+                else:
+                    start_layer_id = layers_id_chain[-2]
+                layer_idx = all_layers_ids.index(start_layer_id)
+                source_layer_id = layers_id_chain[-1]
+                source_layer = g.layers[source_layer_id]
+                if (
+                    issubclass(source_layer.action, SourceAction)
+                    and source_layer.get_preview_img_desc() is None
+                ):
+                    img_desc, preview_ann = load_preview_for_data_layer(source_layer)
+                else:
+                    img_desc = source_layer.get_preview_img_desc()
+                    preview_ann = source_layer.get_ann()
+    except:
+        img_desc = None
+        preview_ann = None
+
     if img_desc is None:
         sly.logger.warn(
             "Cannot load preview image for input layer. Check that you selected input project and nodes are connected"
