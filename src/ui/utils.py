@@ -76,15 +76,8 @@ def init_layers(nodes_state: dict):
         try:
             layer: Layer = g.layers[node_id]
         except KeyError:
-            sly.logger.debug(f"Layer with id {node_id} not found")
-            return {
-                "data_layers_ids": [],
-                "save_layers_ids": [],
-                "transformation_layers_ids": [],
-                "all_layers_ids": [],
-            }
-
-            # raise LayerNotFoundError(node_id)
+            sly.logger.warning(f"Layer with id {node_id} not found")
+            break
 
         try:
             layer.parse_options(node_options)
