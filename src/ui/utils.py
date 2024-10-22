@@ -74,12 +74,10 @@ def init_layers(nodes_state: dict):
     all_layers_ids = []
     for node_id, node_options in nodes_state.items():
         try:
-            layer = g.layers[node_id]
-            layer: Layer
+            layer: Layer = g.layers[node_id]
         except KeyError:
-            sly.logger.debug(f"Layer with id {node_id} not found")
-            return
-            # raise LayerNotFoundError(node_id)
+            sly.logger.warning(f"Layer with id {node_id} not found")
+            break
 
         try:
             layer.parse_options(node_options)
