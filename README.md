@@ -1,6 +1,6 @@
 <div align="center" markdown>
 
-<img src="https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/73838fba-d57b-4405-9db5-80e3514f9983"/>
+<img src="https://github.com/user-attachments/assets/58d6d5d7-3c05-4c56-9661-90d0a76747aa"/>
 
 # ML Pipelines
   
