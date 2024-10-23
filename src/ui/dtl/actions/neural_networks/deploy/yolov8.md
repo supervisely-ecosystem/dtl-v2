@@ -1,14 +1,19 @@
-# YOLO v8 | v9 | v10
+# YOLO v8 | v9 | v10 | v11
 
-`Deploy YOLO v8 | v9 | v10` using [Serve YOLO v8 | v9 | v10](https://ecosystem.supervisely.com/apps/yolov8/serve) app to serve models and can be used to deploy custom and pretrained models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained YOLO v8 | v9 | v10 models in your Team Files. You can train your own model using [Train YOLO v8 | v9 | v10](https://ecosystem.supervisely.com/apps/yolov8/train) app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
+`Deploy YOLO v8 | v9 | v10 | v11` using [Serve YOLO v8 | v9 | v10 | v11](https://ecosystem.supervisely.com/apps/yolov8/serve) app to serve models and can be used to deploy custom and pretrained models that you can use via `Apply NN` layer. Custom models will appear in the custom tab of the table only if you have any trained YOLO v8 | v9 | v10 | v11 models in your Team Files. You can train your own model using [Train YOLO v8 | v9 | v10 | v11](https://ecosystem.supervisely.com/apps/yolov8/train) app. If you want to use pretrained models, simply select "Pretrained public models" tab in model selector.
 
 ![image](https://github.com/supervisely-ecosystem/data-nodes/assets/48913536/791a50bf-51b5-4bdb-8bda-0f4ed2a3d06b)
+
+- YOLOv8 is a powerful neural network architecture that provides both decent accuracy of predictions and high speed of inference. In comparison to YOLOv5, YOLOv8 uses an anchor-free head (allowing to speed up the non-max suppression (NMS) process), a new backbone, and new loss functions.
+- YOLOv9 builds on the advancements of YOLOv8 by further improving the model's performance and efficiency. It incorporates extended feature extraction techniques, advanced loss functions and optimized training processes for better accuracy and faster inference times.
+- YOLOv10 introduces consistent dual assignments for NMS-free training and adopts a holistic efficiency-accuracy-driven model design strategy.
+- YOLOv11, the latest iteration in the YOLO series, continues the trend of balancing accuracy and efficiency with significant advancements. It introduces a hybrid architecture that combines the strengths of anchor-free and anchor-based methods, allowing the model to adapt dynamically based on the characteristics of the input data.
 
 ### Settings:
 
 ### How to use:
 
-1. Add `Deploy YOLO v8 | v9 | v10` layer
+1. Add `Deploy YOLO v8 | v9 | v10 | v11` layer
 2. Open agent settings and select agent and device
 3. Open models selector and select one of the available models
 4. Press `SERVE`

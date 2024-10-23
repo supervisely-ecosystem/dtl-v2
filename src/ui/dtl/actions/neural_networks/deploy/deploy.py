@@ -350,8 +350,8 @@ class DeployYOLOV5Action(DeployBaseAction):
 
 class DeployYOLOV8Action(DeployBaseAction):
     name = "deploy_yolo_v8"
-    title = "Deploy YOLO v8 | v9 | v10"
-    description = "Deploy YOLO v8 | v9 | v10 models."
+    title = "Deploy YOLO v8 | v9 | v10 | v11"
+    description = "Deploy YOLO v8 | v9 | v10 | v11 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
     need_runtime_selector = True
 
