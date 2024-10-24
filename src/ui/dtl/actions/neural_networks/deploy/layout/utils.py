@@ -76,6 +76,8 @@ def save_model_settings(
 
     elif model_source == "Custom models":
         model_source = "Custom models"
+        if model_selector_sidebar_custom_model_table.get_selected_row() is None:
+            raise RuntimeError("Please, select a model before saving.")
         model_params = model_selector_sidebar_custom_model_table.get_selected_model_params()
 
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
