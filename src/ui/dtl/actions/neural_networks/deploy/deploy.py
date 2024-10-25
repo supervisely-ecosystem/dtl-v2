@@ -20,7 +20,7 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.node_layout import (
 import src.ui.dtl.actions.neural_networks.deploy.layout.utils as utils
 import src.globals as g
 from src.ui.dtl.Action import DeployNNAction
-from supervisely.nn.artifacts import YOLOv5v2, YOLOv8, MMDetection3, MMSegmentation
+from supervisely.nn.artifacts import YOLOv5v2, YOLOv8, MMDetection3, MMSegmentation, RTDETR
 
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     yolov5 as pretrained_yolov5,
@@ -33,6 +33,10 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
 )
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     mmsegmentation as pretrained_mmsegmentation,
+)
+
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    rtdetr as pretrained_rtdetr,
 )
 
 
@@ -394,3 +398,19 @@ class DeployMMSegmentationAction(DeployBaseAction):
     artifacts = MMSegmentation(g.TEAM_ID)
     custom_task_types = ["semantic segmentation"]
     pretrained_models = pretrained_mmsegmentation
+
+
+class DeployRTETRAction(DeployBaseAction):
+    name = "deploy_rtdetr"
+    title = "Deploy RT-DETR"
+    description = "Deploy RT-DETR models."
+    md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/rtdetr.md")
+
+    # Framework settings
+    framework = "rtdetr"
+    framework_name = "RT-DETR"
+    slug = "supervisely-ecosystem/rt-detr/supervisely_integration/serve"
+    artifacts = RTDETR(g.TEAM_ID)
+    custom_task_types = ["object detection"]
+    pretrained_models = pretrained_rtdetr
+    need_runtime_selector = True

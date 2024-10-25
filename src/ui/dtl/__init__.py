@@ -83,6 +83,7 @@ from .actions.neural_networks.deploy.deploy import (
     DeployYOLOV8Action,
     DeployMMDetectionAction,
     DeployMMSegmentationAction,
+    DeployRTETRAction,
 )
 from .actions.neural_networks.apply_nn_inference.apply_nn_inference import ApplyNNInferenceAction
 
@@ -223,9 +224,16 @@ image_actions_list = {
         DeployYOLOV8Action.name,
         DeployMMDetectionAction.name,
         DeployMMSegmentationAction.name,
+        DeployRTETRAction.name,
         ApplyNNInferenceAction.name,
     ],
-    OTHER: [DatasetAction.name, SplitDataAction.name, DummyAction.name, CopyAction.name, MoveAction.name],
+    OTHER: [
+        DatasetAction.name,
+        SplitDataAction.name,
+        DummyAction.name,
+        CopyAction.name,
+        MoveAction.name,
+    ],
     SAVE_ACTIONS: [
         OutputProjectAction.name,
         CreateNewProjectAction.name,
@@ -299,6 +307,7 @@ image_actions_dict = {
     DeployYOLOV8Action.name: DeployYOLOV8Action,
     DeployMMDetectionAction.name: DeployMMDetectionAction,
     DeployMMSegmentationAction.name: DeployMMSegmentationAction,
+    DeployRTETRAction.name: DeployRTETRAction,
     ApplyNNInferenceAction.name: ApplyNNInferenceAction,
     # Other layers
     DatasetAction.name: DatasetAction,
