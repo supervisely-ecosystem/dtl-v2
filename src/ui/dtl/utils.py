@@ -125,6 +125,10 @@ def get_classes_mapping_value(
     default_allowed: bool = False,
 ):
     mapping = classes_mapping_widget.get_mapping()
+    existing_classes = classes_mapping_widget.get_classes()
+    if hasattr(existing_classes, "keys"):
+        existing_classes = existing_classes.keys()
+
     if default_allowed:
         default = [cls_name for cls_name, cls_values in mapping.items() if cls_values["default"]]
         classes = classes_mapping_widget.get_classes()
@@ -137,6 +141,11 @@ def get_classes_mapping_value(
         ignore_action=ignore_action,
         other_allowed=other_allowed,
     )
+
+    if any([object_class in existing_classes for object_class in result_mapping.values()]):
+        classes_mapping_widget.conflict_notification.show()
+    else:
+        classes_mapping_widget.conflict_notification.hide()
 
     return result_mapping
 

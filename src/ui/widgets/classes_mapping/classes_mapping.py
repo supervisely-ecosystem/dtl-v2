@@ -47,7 +47,14 @@ class ClassesMapping(Widget):
                 title="No classes",
                 description="Connect node and ensure that source node produces classes of type needed for this node.",
             )
+        self.conflict_notification = NotificationBox(
+            title="Conflicting names",
+            description="Some class names are conflicting. Please, resolve the conflicts before saving.",
+            box_type="warning",
+        )
+        self.conflict_notification.hide()
         self.empty_notification = empty_notification
+
         self._classes = classes
 
         self._select_all_btn = Button()
