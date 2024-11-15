@@ -2,7 +2,6 @@ import os
 import ast
 
 from queue import Queue
-
 from dotenv import load_dotenv
 from distutils.util import strtobool
 import supervisely as sly
@@ -21,7 +20,7 @@ if sly.is_development():
     load_dotenv("local.env")
     load_dotenv(os.path.expanduser("~/supervisely.env"))
 
-api = sly.Api()
+api: sly.Api = sly.Api()
 
 TASK_ID = sly.env.task_id(raise_not_found=False)
 TEAM_ID = sly.env.team_id()
@@ -186,3 +185,6 @@ def on_error_close():
 
 running_sessions_ids = []
 disable_move = False
+
+current = 0
+total = 0

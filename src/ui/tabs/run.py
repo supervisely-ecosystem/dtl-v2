@@ -38,6 +38,7 @@ from src.exceptions import CustomException, handle_exception
 from src.ui.widgets import CircleProgress
 import threading
 
+
 show_run_dialog_btn = Button(
     "Run",
     icon="zmdi zmdi-play",
@@ -318,6 +319,8 @@ def run_pipeline(run_dialog: Dialog = None):
 
 
 def start_pipeline(run_dialog: Dialog = None):
+    g.current = 0
+    g.total = 0
     if g.pipeline_thread is not None or g.pipeline_running is True:
         error_notification.set(
             title="Pipeline is already running",

@@ -124,6 +124,7 @@ def main(
         raise e
 
     total = net.get_total_elements()
+    g.total = total
     net.total_elements_cnt = total
     if total == 0:
         g.disable_move = True
@@ -173,6 +174,7 @@ def main(
                 )
             finally:
                 pbar.update(len(data_batch))
+                g.current = pbar.n
 
     processing_time_end = time()
     logger.debug(
