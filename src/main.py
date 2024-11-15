@@ -200,6 +200,8 @@ def run_pipeline_from_api(response: Response, request: Request):
         # pipeline_preset = state["pipeline_preset"]
         if g.pipeline_running:
             return {"result": "pipeline is already running. Please wait until it's finished."}
+
+        time.sleep(5)  # delay to init layers
         run_btn_clicked()
         return {"result": "pipeline was successfully processed"}
     except Exception as e:
