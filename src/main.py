@@ -6,7 +6,7 @@ from fastapi import Request, Response
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
 from src.ui.tabs.presets import load_json
-from src.ui.tabs.run import run_btn_clicked, progress, circle_progress
+from src.ui.tabs.run import run_btn_clicked, error_notification, circle_progress
 
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
@@ -205,6 +205,9 @@ def run_pipeline_from_api(response: Response, request: Request):
         run_btn_clicked()
         return {"result": "pipeline was successfully processed"}
     except Exception as e:
+        error_notification.set("Error", description=str(e))
+        error_notification.show()
+        circle_progress.set_status("exception")
         raise e
 
 

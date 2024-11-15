@@ -319,6 +319,7 @@ def run_pipeline(run_dialog: Dialog = None):
 
 
 def start_pipeline(run_dialog: Dialog = None):
+    g.current = 0
     g.total = 0
     if g.pipeline_thread is not None or g.pipeline_running is True:
         error_notification.set(
