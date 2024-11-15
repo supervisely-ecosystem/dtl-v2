@@ -1,10 +1,12 @@
 import threading
 import time
 from supervisely import Application, ProjectInfo, DatasetInfo, Annotation, ProjectMeta, logger
+from fastapi import Request, Response
 
 from src.ui.ui import layout, header
 from src.ui.tabs.configure import update_state, update_nodes, nodes_flow
 from src.ui.tabs.presets import load_json
+from src.ui.tabs.run import run_btn_clicked, progress, circle_progress
 
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.actions.input.images_project.images_project import ImagesProjectAction
@@ -34,6 +36,8 @@ app = Application(
     session_info_extra_content=header,
     session_info_solid=True,
 )
+
+server = app.get_server()
 
 
 def _update_f():
@@ -185,3 +189,32 @@ if layer is not None:
 
 g.PROJECT_ID = None
 g.DATASET_ID = None
+
+
+@server.post("/run_pipeline")
+def run_pipeline_from_api(response: Response, request: Request):
+    try:
+        # @TODO: add validation
+        # @TODO: apply preset from request
+        # state = request.state.state
+        # pipeline_preset = state["pipeline_preset"]
+        if g.pipeline_running:
+            return {"result": "pipeline is already running. Please wait until it's finished."}
+        run_btn_clicked()
+        return {"result": "pipeline was successfully processed"}
+    except Exception as e:
+        raise e
+
+
+@server.post("/get_pipeline_status")
+def run_pipeline_from_api(response: Response, request: Request):
+    try:
+        # @TODO: improve stats
+        if not g.pipeline_running:
+            return {"result": "pipeline is not running"}
+
+        current = g.current
+        total = g.total
+        return {"result": f"Pipeline status is {current}/{total}"}
+    except Exception as e:
+        raise e
