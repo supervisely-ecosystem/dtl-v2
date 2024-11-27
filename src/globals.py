@@ -188,3 +188,9 @@ disable_move = False
 
 current = 0
 total = 0
+
+import pkg_resources
+
+packages = {dist.project_name: dist.version for dist in pkg_resources.working_set}
+
+sly.logger.info("PACKAGES: {}".format(packages))
