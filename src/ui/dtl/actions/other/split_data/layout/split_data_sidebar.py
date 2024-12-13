@@ -21,7 +21,7 @@ def create_sidebar_widgets():
         "Select percentage by which to distribute images across datasets",
     )
 
-    sidebar_number_input = InputNumber(min=1, max=10000, value=50)
+    sidebar_number_input = InputNumber(min=1, max=None, value=50)
     sidebar_number_field = Field(
         sidebar_number_input,
         "Select number of images",
@@ -29,17 +29,32 @@ def create_sidebar_widgets():
     )
     sidebar_number_field.hide()
 
+    sidebar_parts_input = InputNumber(min=1, max=None, value=5)
+    sidebar_parts_field = Field(
+        sidebar_parts_input,
+        "Select number of parts",
+        "Select number of datasets to split data into. Resulting datasets will have equal number of images",
+    )
+    sidebar_parts_field.hide()
+
     sidebar_items = [
         Select.Item("percent", "by percent"),
         Select.Item("number", "by number"),
         Select.Item("classes", "by classes"),
         Select.Item("tags", "by tags"),
+        Select.Item("parts", "by parts"),
     ]
     sidebar_selector = Select(sidebar_items)
 
     sidebar_save_button = create_save_btn()
     sidebar_container = Container(
-        [sidebar_selector, sidebar_percent_field, sidebar_number_field, sidebar_save_button]
+        [
+            sidebar_selector,
+            sidebar_percent_field,
+            sidebar_number_field,
+            sidebar_parts_field,
+            sidebar_save_button,
+        ]
     )
     sidebar_selector_field = Field(
         sidebar_container,
@@ -54,5 +69,7 @@ def create_sidebar_widgets():
         sidebar_percent_field,
         sidebar_number_input,
         sidebar_number_field,
+        sidebar_parts_input,
+        sidebar_parts_field,
         sidebar_save_button,
     )

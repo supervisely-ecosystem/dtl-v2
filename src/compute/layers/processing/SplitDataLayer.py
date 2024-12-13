@@ -15,13 +15,14 @@ class SplitDataLayer(Layer):
         "properties": {
             "settings": {
                 "type": "object",
-                "required": ["split_method", "split_ratio", "split_num"],
+                "required": ["split_method", "split_ratio", "split_num", "split_parts"],
                 "properties": {
                     "split_method": {
                         "type": "string",
                     },
                     "split_ratio": {"type": "number"},
                     "split_num": {"type": "number"},
+                    "split_parts": {"type": "number"},
                 },
             }
         },
@@ -34,8 +35,9 @@ class SplitDataLayer(Layer):
         split_method = self.settings["split_method"]
         split_ratio = self.settings["split_ratio"]
         split_num = self.settings["split_num"]
+        split_parts = self.settings["split_parts"]
 
-        allowed_methods = ["percent", "number", "classes", "tags"]
+        allowed_methods = ["percent", "number", "classes", "tags", "parts"]
 
         if split_method not in allowed_methods:
             raise BadSettingsError(f"Unknown split method selected: {split_method}")
@@ -43,10 +45,15 @@ class SplitDataLayer(Layer):
             raise BadSettingsError(
                 f"Invalid percentage value: {split_ratio}. Split percentage must be between 1 and 100"
             )
-        if split_num < 1 or split_num > 10000:
+        if split_num < 1:
             raise BadSettingsError(
-                f"Invalid split value: {split_num}. Split value must be between 1 and 10000"
+                f"Invalid split value: {split_num}. Split value must be 1 or greater"
             )
+        if split_parts < 1:
+            raise BadSettingsError(
+                f"Invalid split value: {split_parts}. Split value must be 1 or greater"
+            )
+
         super().validate()
 
     def requires_item(self):
@@ -71,6 +78,11 @@ class SplitDataLayer(Layer):
         def _split_by_num() -> List[Tuple[ImageDescriptor, Annotation]]:
             split_num = self.settings["split_num"]
             split_index = int(item_idx / split_num) + (item_idx % split_num > 0)
+            return [(replace_ds_name(f"split_{split_index}"), ann)]
+
+        def _split_by_parts() -> List[Tuple[ImageDescriptor, Annotation]]:
+            split_parts = self.settings["split_parts"]
+            split_index = item_idx % split_parts
             return [(replace_ds_name(f"split_{split_index}"), ann)]
 
         def _split_by_class() -> List[Tuple[ImageDescriptor, Annotation]]:
@@ -106,7 +118,9 @@ class SplitDataLayer(Layer):
                 "number": _split_by_num,
                 "classes": _split_by_class,
                 "tags": _split_by_tags,
+                "parts": _split_by_parts,
             }
+
             split_method = self.settings["split_method"]
             func = split_func_map.get(split_method)
             items = func()
