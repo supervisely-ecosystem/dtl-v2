@@ -12,9 +12,11 @@ There are 4 ways of splitting the data:
 
 - **number**: Each dataset will contain selected number of images. The last split will contain fewer images if the total number of images isn't evenly divisible by the selected number of images per split.
 
-- **classes**: data will be split based on the presence of objects of annotation classes. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique annotation class on it. Images with no annotations will be placed in the "unlabeled" dataset. 
+- **classes**: data will be split based on the presence of objects of annotation classes. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique annotation class on it. Images with no annotations will be placed in the "unlabeled" dataset.
 
-- **tags**: data will be split based on the presence of image and object tags on the image. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique image/object tag on it. Images with no tags on them will be placed in the "unlabeled" dataset. 
+- **tags**: data will be split based on the presence of image and object tags on the image. Please note that when using this method the final project will likely include more images than the input project, as images are being duplicated into different datasets when there are more than one unique image/object tag on it. Images with no tags on them will be placed in the "unlabeled" dataset.
+
+- **parts**: data will be split to equal parts (datasets) based on the number of parts specified. The last split will contain fewer images if the total number of images isn't evenly divisible by the number of parts.
 
 ### Example 1. Split Data by percentage
 
