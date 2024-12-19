@@ -26,6 +26,8 @@ class SplitDataAction(OtherAction):
             sidebar_percent_field,
             sidebar_number_input,
             sidebar_number_field,
+            sidebar_parts_input,
+            sidebar_parts_field,
             sidebar_save_button,
         ) = create_sidebar_widgets()
 
@@ -43,14 +45,21 @@ class SplitDataAction(OtherAction):
         @sidebar_selector.value_changed
         def selector_cb(value):
             if value == "percent":
-                sidebar_percent_field.show()
                 sidebar_number_field.hide()
+                sidebar_parts_field.hide()
+                sidebar_percent_field.show()
             elif value == "number":
                 sidebar_percent_field.hide()
+                sidebar_parts_field.hide()
                 sidebar_number_field.show()
+            elif value == "parts":
+                sidebar_percent_field.hide()
+                sidebar_number_field.hide()
+                sidebar_parts_field.show()
             else:
                 sidebar_percent_field.hide()
                 sidebar_number_field.hide()
+                sidebar_parts_field.hide()
 
         @sidebar_save_button.click
         def save_cb():
@@ -58,6 +67,7 @@ class SplitDataAction(OtherAction):
                 "split_method": sidebar_selector.get_value(),
                 "split_ratio": sidebar_percent_slider.get_value(),
                 "split_num": sidebar_number_input.get_value(),
+                "split_parts": sidebar_parts_input.get_value(),
             }
             _set_settings_from_json(saved_settings)
 
@@ -70,11 +80,13 @@ class SplitDataAction(OtherAction):
             method = settings.get("split_method", "percent")
             ratio = settings.get("split_ratio", 50)
             num = settings.get("split_num", 50)
+            parts = settings.get("split_parts", 5)
 
             saved_settings = {
                 "split_method": method,
                 "split_ratio": ratio,
                 "split_num": num,
+                "split_parts": parts,
             }
 
             layout_current_method.set(f"Current method: {method}", "text")
@@ -88,6 +100,12 @@ class SplitDataAction(OtherAction):
                 layout_current_value.show()
                 layout_current_value.set(
                     f"Split value: {num} items per dataset",
+                    "text",
+                )
+            elif method == "parts":
+                layout_current_value.show()
+                layout_current_value.set(
+                    f"Split value: {parts} parts",
                     "text",
                 )
             else:
