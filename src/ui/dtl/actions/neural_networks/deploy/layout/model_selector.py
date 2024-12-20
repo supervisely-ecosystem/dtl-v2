@@ -3,13 +3,14 @@ from supervisely.app.widgets import (
     Button,
     Container,
     RadioTabs,
-    CustomModelsSelector,
+    ExperimentSelector,
     PretrainedModelsSelector,
     Checkbox,
     Select,
     Field,
 )
 from supervisely.nn.inference import RuntimeType
+from supervisely.nn.utils import ModelSource
 import src.globals as g
 from src.ui.dtl.utils import (
     get_text_font_size,
@@ -25,23 +26,14 @@ def get_available_runtimes():
 
 
 def create_model_selector_widgets(
-    framework_name: str, pretrained_models: list, custom_models: list, custom_task_types: list = []
+    framework_name: str,
+    pretrained_models: list,
+    custom_models: list,
 ):
     # SIDEBAR
 
     # CUSTOM MODEL OPTION SUPERVISELY
-    need_custom_task_types = len(custom_task_types) > 0
-
-    model_selector_sidebar_custom_model_table = CustomModelsSelector(
-        g.TEAM_ID,
-        custom_models,
-        need_custom_task_types,
-        custom_task_types,
-    )
-
-    custom_models_task_types = model_selector_sidebar_custom_model_table.get_available_task_types()
-    if "object detection" in custom_models_task_types:
-        model_selector_sidebar_custom_model_table.set_active_task_type("object detection")
+    model_selector_sidebar_custom_model_table = ExperimentSelector(g.TEAM_ID, custom_models)
     # ------------------------------
 
     # PUBLIC MODEL OPTIONS
@@ -66,7 +58,7 @@ def create_model_selector_widgets(
 
     # CUSTOM /PUBLIC TABS
     model_selector_sidebar_model_source_tabs = RadioTabs(
-        titles=["Custom models", "Pretrained public models"],
+        titles=[ModelSource.CUSTOM, ModelSource.PRETRAINED],
         descriptions=["Models trained by you", f"Models trained by {framework_name} team"],
         contents=[
             model_selector_sidebar_custom_model_table,

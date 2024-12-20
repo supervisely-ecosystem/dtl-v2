@@ -1,3 +1,4 @@
+from os.path import join
 from typing import List
 from supervisely.api.api import Api
 from supervisely.app.widgets import (
@@ -7,14 +8,16 @@ from supervisely.app.widgets import (
     Select,
     RadioTabs,
     RadioGroup,
-    CustomModelsSelector,
+    ExperimentSelector,
     PretrainedModelsSelector,
     Checkbox,
 )
 
 from supervisely.api.agent_api import AgentInfo
 from supervisely.api.app_api import SessionInfo
+from supervisely.nn.utils import ModelSource
 import src.globals as g
+from supervisely.io.fs import get_file_name_with_ext
 
 
 def set_agent_selector_preview(
@@ -34,13 +37,21 @@ def set_model_selector_preview(
     settings: dict,
     model_selector_preview: Text,
     model_selector_preview_type: Text,
+    train_version: str = "v1",
 ):
-    if settings["model_source"] == "Pretrained models":
+    if settings["model_source"] == ModelSource.PRETRAINED:
         model_source = "Pretrained"
-    elif settings["model_source"] == "Custom models":
+    elif settings["model_source"] == ModelSource.CUSTOM:
         model_source = "Custom"
 
-    model_selector_preview.set(f"Checkpoint: {settings['checkpoint_name']}", "text")
+    if train_version == "v1":
+        checkpoint_name = settings["checkpoint_name"]
+    elif train_version == "v2":
+        checkpoint_name = get_file_name_with_ext(
+            settings["model_params"]["model_files"]["checkpoint"]
+        )
+
+    model_selector_preview.set(f"Checkpoint: {checkpoint_name}", "text")
     model_selector_preview_type.set(f"Type: {model_source}", "text")
     model_selector_preview.show()
     model_selector_preview_type.show()
@@ -65,20 +76,38 @@ def save_model_settings(
     model_selector_sidebar_model_source_tabs: RadioGroup,
     model_selector_sidebar_public_model_table: PretrainedModelsSelector,
     model_selector_runtime_selector_sidebar: Select,
-    model_selector_sidebar_custom_model_table: CustomModelsSelector,
+    model_selector_sidebar_custom_model_table: ExperimentSelector,
     model_selector_stop_model_after_pipeline_checkbox: Checkbox,
+    train_version: str = "v1",
 ):
     # MODEL SELECTOR
     model_source = model_selector_sidebar_model_source_tabs.get_active_tab()
-    if model_source == "Pretrained public models":
-        model_source = "Pretrained models"
-        model_params = model_selector_sidebar_public_model_table.get_selected_model_params()
+    if model_source == ModelSource.PRETRAINED:
+        model_params = model_selector_sidebar_public_model_table.get_selected_model_params(
+            train_version=train_version
+        )
 
-    elif model_source == "Custom models":
-        model_source = "Custom models"
+    elif model_source == ModelSource.CUSTOM:
         if model_selector_sidebar_custom_model_table.get_selected_row() is None:
             raise RuntimeError("Please, select a model before saving it.")
-        model_params = model_selector_sidebar_custom_model_table.get_selected_model_params()
+        experiment_info = model_selector_sidebar_custom_model_table.get_selected_experiment_info()
+        selected_checkpoint = (
+            model_selector_sidebar_custom_model_table.get_selected_checkpoint_path()
+        )
+        if train_version == "v1":
+            model_params = {
+                "task_type": experiment_info["task_type"],
+                "checkpoint_name": get_file_name_with_ext(selected_checkpoint),
+                "checkpoint_url": selected_checkpoint,
+            }
+            model_files = experiment_info["model_files"]
+            config = model_files.get("config")
+            if config is not None:
+                model_params["config_url"] = join(
+                    experiment_info["artifacts_dir"], config.strip("/")
+                )
+        elif train_version == "v2":
+            model_params = model_selector_sidebar_custom_model_table.get_deploy_params()
 
     stop_model_session = model_selector_stop_model_after_pipeline_checkbox.is_checked()
 
@@ -99,7 +128,8 @@ def save_model_settings(
     runtime = model_selector_runtime_selector_sidebar.get_value()
     if runtime is not None:
         settings["runtime"] = runtime
-
+    if train_version == "v2":
+        settings["model_params"] = model_params
     return settings
 
 
@@ -115,8 +145,9 @@ def save_settings(
     model_selector_sidebar_model_source_tabs: RadioTabs,
     model_selector_sidebar_public_model_table: PretrainedModelsSelector,
     model_selector_runtime_selector_sidebar: Select,
-    model_selector_sidebar_custom_model_table: CustomModelsSelector,
+    model_selector_sidebar_custom_model_table: ExperimentSelector,
     model_selector_stop_model_after_pipeline_checkbox: Checkbox,
+    train_version: str = "v1",
 ):
     settings = save_agent_settings(
         settings, agent_selector_sidebar_selector, agent_selector_sidebar_device_selector
@@ -128,6 +159,7 @@ def save_settings(
         model_selector_runtime_selector_sidebar,
         model_selector_sidebar_custom_model_table,
         model_selector_stop_model_after_pipeline_checkbox,
+        train_version,
     )
     return settings
 
@@ -135,20 +167,27 @@ def save_settings(
 def validate_settings(
     settings: dict,
     model_serve_preview: Text,
+    train_version: str = "v2",
 ) -> bool:
-    if settings.get("agent_id", None) is None:
-        set_model_serve_preview("Please select agent", model_serve_preview, "warning")
-        return False
-    if settings.get("device", None) is None:
-        set_model_serve_preview("Please select device", model_serve_preview, "warning")
-        return False
-    if (
-        settings.get("model_source", None) is None
-        or settings.get("checkpoint_name", None) is None
-        or settings.get("task_type", None) is None
-    ):
-        set_model_serve_preview("Please select model", model_serve_preview, "warning")
-        return False
+    if train_version == "v1":
+        if settings.get("agent_id", None) is None:
+            set_model_serve_preview("Please select agent", model_serve_preview, "warning")
+            return False
+        if settings.get("device", None) is None:
+            set_model_serve_preview("Please select device", model_serve_preview, "warning")
+            return False
+        if (
+            settings.get("model_source", None) is None
+            or settings.get("checkpoint_name", None) is None
+            or settings.get("task_type", None) is None
+        ):
+            set_model_serve_preview("Please select model", model_serve_preview, "warning")
+            return False
+    elif train_version == "v2":
+        model_params = settings.get("model_params", None)
+        if model_params is None:
+            set_model_serve_preview("Please select model", model_serve_preview, "warning")
+            return False
     return True
 
 
@@ -188,21 +227,27 @@ def start_app(
     return session_info
 
 
-def deploy_model(api: Api, session_id: int, saved_settings: dict):
+def deploy_model(api: Api, session_id: int, saved_settings: dict, train_version: str = "v1"):
     deploy_params = {}
     # common
-    deploy_params["device"] = saved_settings["device"]
-    deploy_params["model_source"] = saved_settings["model_source"]
-    deploy_params["checkpoint_name"] = saved_settings["checkpoint_name"]
-    deploy_params["checkpoint_url"] = saved_settings["checkpoint_url"]
-    deploy_params["task_type"] = saved_settings["task_type"]
-    # specific
-    config_url = saved_settings.get("config_url", None)
-    if config_url is not None:
-        deploy_params["config_url"] = config_url
-    arch_type = saved_settings.get("arch_type", None)
-    if arch_type is not None:
-        deploy_params["arch_type"] = arch_type
+    if train_version == "v1":
+        deploy_params["device"] = saved_settings["device"]
+        deploy_params["model_source"] = saved_settings["model_source"]
+        deploy_params["checkpoint_name"] = saved_settings["checkpoint_name"]
+        deploy_params["checkpoint_url"] = saved_settings["checkpoint_url"]
+        deploy_params["task_type"] = saved_settings["task_type"]
+        # specific
+        config_url = saved_settings.get("config_url", None)
+        if config_url is not None:
+            deploy_params["config_url"] = config_url
+        arch_type = saved_settings.get("arch_type", None)
+        if arch_type is not None:
+            deploy_params["arch_type"] = arch_type
+
+    elif train_version == "v2":
+        deploy_params = saved_settings["model_params"]
+        deploy_params["device"] = saved_settings["device"]
+
     runtime = saved_settings.get("runtime", None)
     if runtime is not None:
         deploy_params["runtime"] = runtime
@@ -211,10 +256,8 @@ def deploy_model(api: Api, session_id: int, saved_settings: dict):
 
 
 # Check model
-
-
 def check_model_avaliability_by_task_type(
-    model_selector_sidebar_custom_model_table: CustomModelsSelector,
+    model_selector_sidebar_custom_model_table: ExperimentSelector,
     model_selector_sidebar_save_btn: Button,
 ):
     if len(model_selector_sidebar_custom_model_table.rows) == 0:
@@ -226,12 +269,12 @@ def check_model_avaliability_by_task_type(
 def check_model_avaliability_by_model_source(
     model_source: str,
     model_selector_sidebar_custom_model_option_selector: Select,
-    model_selector_sidebar_custom_model_table_segmentation: CustomModelsSelector,
-    model_selector_sidebar_custom_model_table_detection: CustomModelsSelector,
-    model_selector_sidebar_custom_model_table_pose_estimation: CustomModelsSelector,
+    model_selector_sidebar_custom_model_table_segmentation: ExperimentSelector,
+    model_selector_sidebar_custom_model_table_detection: ExperimentSelector,
+    model_selector_sidebar_custom_model_table_pose_estimation: ExperimentSelector,
     model_selector_sidebar_save_btn: Button,
 ):
-    if model_source == "Custom models":
+    if model_source == ModelSource.CUSTOM:
         if model_selector_sidebar_custom_model_option_selector.get_value() == "table":
             if (
                 len(model_selector_sidebar_custom_model_table_detection.rows) == 0
