@@ -2,6 +2,7 @@ from typing import Optional
 from os.path import realpath, dirname
 from supervisely import logger
 from supervisely.nn.inference.session import Session
+from supervisely.nn.experiments import get_experiment_infos
 
 from src.ui.dtl.Layer import Layer
 
@@ -37,6 +38,10 @@ from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
 
 from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
     rtdetr as pretrained_rtdetr,
+)
+
+from src.ui.dtl.actions.neural_networks.deploy.layout.pretrained_models import (
+    rtdetrv2 as pretrained_rtdetrv2,
 )
 
 
@@ -124,7 +129,11 @@ class DeployBaseAction(DeployNNAction):
         # -----------------------------
 
         # MODEL SELECTOR
-        custom_models = cls.artifacts.get_list()
+
+        if cls.train_version == "v2":
+            custom_models = get_experiment_infos(g.api, g.TEAM_ID, cls.framework_name)
+        else:
+            custom_models = cls.artifacts.get_list_experiment_info()
         (
             # sidebar
             # custom options
@@ -146,7 +155,9 @@ class DeployBaseAction(DeployNNAction):
             model_selector_layout_container,
             model_selector_stop_model_after_pipeline_checkbox,
         ) = create_model_selector_widgets(
-            cls.framework_name, cls.pretrained_models, custom_models, cls.custom_task_types
+            cls.framework_name,
+            cls.pretrained_models,
+            custom_models,
         )
         if cls.need_runtime_selector is False:
             model_selector_runtime_field.hide()
@@ -163,9 +174,13 @@ class DeployBaseAction(DeployNNAction):
                 model_selector_runtime_selector_sidebar,
                 model_selector_sidebar_custom_model_table,
                 model_selector_stop_model_after_pipeline_checkbox,
+                cls.train_version,
             )
             utils.set_model_selector_preview(
-                saved_settings, model_selector_preview, model_selector_preview_type
+                saved_settings,
+                model_selector_preview,
+                model_selector_preview_type,
+                cls.train_version,
             )
 
         # -----------------------------
@@ -211,8 +226,7 @@ class DeployBaseAction(DeployNNAction):
             utils.set_model_serve_preview("", model_serve_preview)
             # add validation
             success = utils.validate_settings(
-                saved_settings,
-                model_serve_preview,
+                saved_settings, model_serve_preview, cls.train_version
             )
             if not success:
                 agent_selector_layout_edit_btn.enable()
@@ -228,7 +242,7 @@ class DeployBaseAction(DeployNNAction):
             g.api.app.wait_until_ready_for_api_calls(session.task_id, 10, 10)
             try:
                 utils.set_model_serve_preview("Deploying model...", model_serve_preview)
-                utils.deploy_model(g.api, session.task_id, saved_settings)
+                utils.deploy_model(g.api, session.task_id, saved_settings, cls.train_version)
                 logger.info(f"Session ID: {session.task_id} has been deployed")
 
                 app_link_message = (
@@ -274,6 +288,7 @@ class DeployBaseAction(DeployNNAction):
                 model_selector_runtime_selector_sidebar,
                 model_selector_sidebar_custom_model_table,
                 model_selector_stop_model_after_pipeline_checkbox,
+                cls.train_version,
             )
 
         def get_settings(options_json: dict) -> dict:
@@ -342,13 +357,13 @@ class DeployYOLOV5Action(DeployBaseAction):
     title = "Deploy YOLOv5"
     description = "Deploy YOLOv5 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov5.md")
+    train_version = "v1"
 
     # Framework settings
     framework = "yolov5"
     framework_name = "YOLOv5"
     slug = "supervisely-ecosystem/yolov5_2.0/serve"
     artifacts = YOLOv5v2(g.TEAM_ID)
-    custom_task_types = ["object detection"]
     pretrained_models = pretrained_yolov5
 
 
@@ -358,13 +373,13 @@ class DeployYOLOV8Action(DeployBaseAction):
     description = "Deploy YOLO v8 | v9 | v10 | v11 models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/yolov8.md")
     need_runtime_selector = True
+    train_version = "v1"
 
     # Framework settings
     framework = "yolov8"
     framework_name = "YOLOv8"
     slug = "supervisely-ecosystem/yolov8/serve"
     artifacts = YOLOv8(g.TEAM_ID)
-    custom_task_types = ["object detection", "instance segmentation", "pose estimation"]
     pretrained_models = pretrained_yolov8
 
 
@@ -373,13 +388,13 @@ class DeployMMDetectionAction(DeployBaseAction):
     title = "Deploy MMDetection"
     description = "Deploy MMDetection models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/mmdetection.md")
+    train_version = "v1"
 
     # Framework settings
     framework = "mmdetection3"
     framework_name = "MMDetection"
     slug = "supervisely-ecosystem/serve-mmdetection-v3"
     artifacts = MMDetection3(g.TEAM_ID)
-    custom_task_types = ["object detection", "instance segmentation"]
     pretrained_models = pretrained_mmdetection3
 
 
@@ -390,27 +405,43 @@ class DeployMMSegmentationAction(DeployBaseAction):
     md_description = DeployBaseAction.read_md_file(
         dirname(realpath(__file__)) + "/mmsegmentation.md"
     )
+    train_version = "v1"
 
     # Framework settings
     framework = "mmsegmentation"
     framework_name = "MMSegmentation"
     slug = "supervisely-ecosystem/mmsegmentation/serve"
     artifacts = MMSegmentation(g.TEAM_ID)
-    custom_task_types = ["semantic segmentation"]
     pretrained_models = pretrained_mmsegmentation
 
 
-class DeployRTETRAction(DeployBaseAction):
+class DeployRTDETRAction(DeployBaseAction):
     name = "deploy_rtdetr"
     title = "Deploy RT-DETR"
     description = "Deploy RT-DETR models."
     md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/rtdetr.md")
+    train_version = "v1"
 
     # Framework settings
     framework = "rtdetr"
     framework_name = "RT-DETR"
     slug = "supervisely-ecosystem/rt-detr/supervisely_integration/serve"
     artifacts = RTDETR(g.TEAM_ID)
-    custom_task_types = ["object detection"]
     pretrained_models = pretrained_rtdetr
+    need_runtime_selector = True
+
+
+class DeployRTDETRv2Action(DeployBaseAction):
+    name = "deploy_rtdetrv2"
+    title = "Deploy RT-DETRv2"
+    description = "Deploy RT-DETRv2 models."
+    md_description = DeployBaseAction.read_md_file(dirname(realpath(__file__)) + "/rtdetrv2.md")
+    train_version = "v2"
+
+    # Framework settings
+    framework = "rtdetrv2"
+    framework_name = "RT-DETRv2"
+    slug = "supervisely-ecosystem/rt-detrv2/supervisely_integration/serve"
+    artifacts = None
+    pretrained_models = pretrained_rtdetrv2
     need_runtime_selector = True

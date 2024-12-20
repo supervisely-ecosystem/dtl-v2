@@ -237,3 +237,38 @@ class DeployRTDETRLayer(DeployLayer):
             },
         },
     }
+
+
+class DeployRTDETRv2Layer(DeployLayer):
+    action = "deploy_rtdetrv2"
+    title = "Deploy RT-DETRv2"
+
+    layer_settings = {
+        "required": ["settings"],
+        "properties": {
+            "settings": {
+                "type": "object",
+                "required": [
+                    "session_id",
+                    "agent_id",
+                    "device",
+                    "model_source",
+                    "checkpoint_name",
+                    "task_type",
+                    "checkpoint_url",
+                    "stop_model_session",
+                ],
+                "properties": {
+                    "session_id": {"type": "integer"},
+                    "agent_id": {"type": "integer"},
+                    "device": {"type": "string"},
+                    "model_source": {"type": "string"},
+                    "task_type": {"type": "string"},
+                    "checkpoint_name": {"type": "string"},
+                    "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "runtime": {"type": "string"},
+                    "stop_model_session": {"type": "boolean"},
+                },
+            },
+        },
+    }
