@@ -1,17 +1,16 @@
-import random
-from typing import Callable, List, Optional, Tuple, Union
-from dataclasses import dataclass
 import json
 import os
-from tqdm import tqdm
+import random
+from dataclasses import dataclass
+from typing import Callable, List, Optional, Tuple, Union
+
 import numpy as np
-
-import supervisely as sly
-from supervisely import ProjectMeta, KeyIdMap, ImageInfo, logger, DatasetInfo
-from supervisely.io.fs import remove_dir
-
+from tqdm import tqdm
 
 import src.globals as g
+import supervisely as sly
+from supervisely import DatasetInfo, ImageInfo, KeyIdMap, ProjectMeta, logger
+from supervisely.io.fs import remove_dir
 
 
 @dataclass
@@ -30,7 +29,11 @@ def get_random_image(dataset_id: int, images_ids: List[int] = None) -> ImageInfo
     if images_ids is None:
         images = g.api.image.get_list(dataset_id)
         if len(images) == 0:
-            raise RuntimeError('No images found in the dataset (id: {}). Unable to generate preview.'.format(dataset_id))
+            raise RuntimeError(
+                "No images found in the dataset (id: {}). Unable to generate preview.".format(
+                    dataset_id
+                )
+            )
         image = random.choice(images)
         return image
     else:
@@ -347,7 +350,9 @@ def kill_serving_app():
 
 
 def kill_deployed_app_by_layer_id(id: str):
-    layer = g.layers[id]
+    layer = g.layers.get(id, None)
+    if layer is None:
+        return
     settings = layer._settings
     session_id = settings.get("session_id", None)
     if session_id is not None:
