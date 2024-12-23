@@ -1,34 +1,40 @@
 # coding: utf-8
 
-import os
 import json
+import os
 from time import time
+
 import numpy as np
 
-from supervisely import Annotation, ProjectMeta, VideoAnnotation, KeyIdMap, logger, batched
-
-from src.compute.Layer import Layer
+import src.globals as g
 from src.compute import layers  # to register layers
 from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
-from src.utils import (
-    get_project_by_name,
-    get_dataset_by_name,
-    get_all_datasets,
-    get_project_meta,
-    get_dataset_by_id,
-    get_project_by_id,
-)
-from src.ui.widgets import CircleProgress
-import src.globals as g
-from src.utils import LegacyProjectItem
+from src.compute.Layer import Layer
 from src.exceptions import (
     ActionNotFoundError,
     BadSettingsError,
     CreateMetaError,
-    GraphError,
     CustomException,
+    GraphError,
 )
-
+from src.ui.widgets import CircleProgress
+from src.utils import (
+    LegacyProjectItem,
+    get_all_datasets,
+    get_dataset_by_id,
+    get_dataset_by_name,
+    get_project_by_id,
+    get_project_by_name,
+    get_project_meta,
+)
+from supervisely import (
+    Annotation,
+    KeyIdMap,
+    ProjectMeta,
+    VideoAnnotation,
+    batched,
+    logger,
+)
 from supervisely.io.fs import get_file_ext
 
 
@@ -619,6 +625,10 @@ class Net:
             if layer.action == "deploy_mmdetection":
                 datalevel_metas[layer.dsts[0]] = ProjectMeta()
             if layer.action == "deploy_mmsegmentation":
+                datalevel_metas[layer.dsts[0]] = ProjectMeta()
+            if layer.action == "deploy_rtdetr":
+                datalevel_metas[layer.dsts[0]] = ProjectMeta()
+            if layer.action == "deploy_rtdetrv2":
                 datalevel_metas[layer.dsts[0]] = ProjectMeta()
 
         for data_layer in cur_level_layers:
