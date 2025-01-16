@@ -533,7 +533,8 @@ class Net:
                             ann_batch = g.api.annotation.download_batch(dataset_id, ann_ids)
                             annotations.extend(ann_batch)
                     else:
-                        annotations = g.api.annotation.download_batch(dataset_id=dataset_id)
+                        images_ids = [item_info.id for item_info in images_list]
+                        annotations = g.api.annotation.download_batch(dataset_id, images_ids)
 
                     for batch, ann_batch in zip(
                         batched(images_list, batch_size), batched(annotations, batch_size)
