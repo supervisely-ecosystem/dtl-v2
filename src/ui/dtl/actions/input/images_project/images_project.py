@@ -5,6 +5,19 @@ from typing import List, Optional
 import src.globals as g
 import src.utils as utils
 from src.ui.dtl import SourceAction
+from src.ui.dtl.actions.input.images_project.layout.src_classes import (
+    create_classes_selector_widgets,
+)
+from src.ui.dtl.actions.input.images_project.layout.src_input_data import (
+    create_input_data_selector_widgets,
+)
+from src.ui.dtl.actions.input.images_project.layout.src_layout import (
+    create_settings_options,
+    create_src_options,
+)
+from src.ui.dtl.actions.input.images_project.layout.src_tags import (
+    create_tags_selector_widgets,
+)
 from src.ui.dtl.Layer import Layer
 from src.ui.dtl.utils import (
     classes_list_settings_changed_meta,
@@ -21,19 +34,8 @@ from src.ui.dtl.utils import (
     tags_list_settings_changed_meta,
     tags_list_to_mapping,
 )
-from supervisely.app.content import StateJson
-from src.ui.dtl.actions.input.images_project.layout.src_classes import (
-    create_classes_selector_widgets,
-)
-from src.ui.dtl.actions.input.images_project.layout.src_input_data import (
-    create_input_data_selector_widgets,
-)
-from src.ui.dtl.actions.input.images_project.layout.src_layout import (
-    create_settings_options,
-    create_src_options,
-)
-from src.ui.dtl.actions.input.images_project.layout.src_tags import create_tags_selector_widgets
 from supervisely import ProjectMeta
+from supervisely.app.content import StateJson
 from supervisely.app.widgets import Button
 
 
@@ -440,7 +442,12 @@ class ImagesProjectAction(SourceAction):
                     if dataset_name == "*":
                         datasets.extend(utils.get_all_datasets(project_info.id))
                     else:
-                        datasets.append(utils.get_dataset_by_name(dataset_name, project_info.id))
+                        if dataset_name.isdigit():
+                            datasets.append(utils.get_dataset_by_id(int(dataset_name)))
+                        else:
+                            datasets.append(
+                                utils.get_dataset_by_name(dataset_name, project_info.id)
+                            )
                 if project_not_found is False:
                     # set datasets to widget
                     src_input_data_sidebar_dataset_selector.set_project_id(project_info.id)

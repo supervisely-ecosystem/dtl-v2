@@ -1,19 +1,20 @@
-import os
 import ast
-
-from queue import Queue
-from dotenv import load_dotenv
+import os
 from distutils.util import strtobool
+from queue import Queue
+
+from dotenv import load_dotenv
+
 import supervisely as sly
 from supervisely.app.widgets import (
-    Dialog,
-    Text,
-    Editor,
-    Container,
     Button,
+    Checkbox,
+    Container,
+    Dialog,
+    Editor,
     Flexbox,
     NotificationBox,
-    Checkbox,
+    Text,
 )
 
 if sly.is_development():
@@ -89,6 +90,16 @@ if PROJECT_ID is not None:
         if FILTERED_ENTITIES != []:
             FILTERED_ENTITIES = [entity.id for entity in FILTERED_ENTITIES]
 
+
+FILTERED_DATASETS = []
+selected_datasets = os.getenv("modal.state.selectedDatasets", [])
+if selected_datasets != []:
+    selected_datasets = ast.literal_eval(selected_datasets)
+    nested_datasets = [
+        api.dataset.get_nested(PROJECT_ID, dataset_id) for dataset_id in selected_datasets
+    ]
+    unpacked_datasets = [dataset.id for sublist in nested_datasets for dataset in sublist]
+    FILTERED_DATASETS = selected_datasets + unpacked_datasets
 
 if MODALITY_TYPE == "images":
     BATCH_SIZE = 50
