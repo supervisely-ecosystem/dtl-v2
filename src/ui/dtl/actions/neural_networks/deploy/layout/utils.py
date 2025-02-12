@@ -1,23 +1,23 @@
 from os.path import join
 from typing import List
+
+import src.globals as g
+from supervisely.api.agent_api import AgentInfo
 from supervisely.api.api import Api
+from supervisely.api.app_api import SessionInfo
 from supervisely.app.widgets import (
     AgentSelector,
     Button,
-    Text,
-    Select,
-    RadioTabs,
-    RadioGroup,
+    Checkbox,
     ExperimentSelector,
     PretrainedModelsSelector,
-    Checkbox,
+    RadioGroup,
+    RadioTabs,
+    Select,
+    Text,
 )
-
-from supervisely.api.agent_api import AgentInfo
-from supervisely.api.app_api import SessionInfo
-from supervisely.nn.utils import ModelSource
-import src.globals as g
 from supervisely.io.fs import get_file_name_with_ext
+from supervisely.nn.utils import ModelSource
 
 
 def set_agent_selector_preview(
@@ -194,7 +194,10 @@ def validate_settings(
 # OTHER
 def get_agent_devices(agent_info: AgentInfo) -> List[Select.Item]:
     agent_selector_sidebar_device_selector_items = []
-    has_gpu = agent_info.gpu_info["is_available"]
+    has_gpu = False
+    gpu_info = agent_info.gpu_info
+    if gpu_info is not None:
+        has_gpu = agent_info.gpu_info.get("is_available", False)
     if has_gpu:
         for idx, device_name in enumerate(agent_info.gpu_info["device_names"]):
             agent_selector_sidebar_device_selector_items.append(
