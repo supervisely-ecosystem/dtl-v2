@@ -1,106 +1,77 @@
+import src.globals as g
+
 from .Action import (
     Action,
-    SourceAction,
-    PixelLevelAction,
-    SpatialLevelAction,
     AnnotationAction,
+    FilterAndConditionAction,
+    ImgAugAugmentationsAction,
+    NeuralNetworkAction,
     OtherAction,
     OutputAction,
-    FilterAndConditionAction,
-    NeuralNetworkAction,
-    ImgAugAugmentationsAction,
+    PixelLevelAction,
+    SourceAction,
+    SpatialLevelAction,
 )
-from .actions.input.images_project.images_project import ImagesProjectAction
-from .actions.pixel_level_transformations.anonymize.anonymize import AnonymizeAction
-from .actions.annotation_transforms.approx_vector.approx_vector import ApproxVectorAction
+from .actions.annotation_transforms.approx_vector.approx_vector import (
+    ApproxVectorAction,
+)
 from .actions.annotation_transforms.background.background import BackgroundAction
 from .actions.annotation_transforms.bbox.bbox import BBoxAction
-from .actions.annotation_transforms.bbox_to_polygon.bbox_to_polygon import BboxToPolygonAction
-from .actions.annotation_transforms.bitwise_masks.bitwise_masks import BitwiseMasksAction
-from .actions.pixel_level_transformations.blur.blur import BlurAction
-from .actions.annotation_transforms.mask_to_lines.mask_to_lines import MaskToLinesAction
+from .actions.annotation_transforms.bbox_to_polygon.bbox_to_polygon import (
+    BboxToPolygonAction,
+)
+from .actions.annotation_transforms.bitwise_masks.bitwise_masks import (
+    BitwiseMasksAction,
+)
 from .actions.annotation_transforms.change_class_color.change_class_color import (
     ChangeClassColorAction,
-)
-from .actions.pixel_level_transformations.contrast_brightness.contrast_brightness import (
-    ContrastBrightnessAction,
-)
-from .actions.spatial_level_transforms.crop.crop import CropAction
-from .actions.other.dataset.dataset import DatasetAction
-from .actions.other.split_data.split_data import SplitDataAction
-from .actions.annotation_transforms.drop_object_by_class.drop_object_by_class import (
-    DropObjectByClassAction,
 )
 from .actions.annotation_transforms.drop_lines_by_length.drop_lines_by_length import (
     DropLinesByLengthAction,
 )
 from .actions.annotation_transforms.drop_noise.drop_noise import DropNoiseAction
-from .actions.other.dummy.dummy import DummyAction
+from .actions.annotation_transforms.drop_object_by_class.drop_object_by_class import (
+    DropObjectByClassAction,
+)
 from .actions.annotation_transforms.duplicate_objects.duplicate_objects import (
     DuplicateObjectsAction,
+)
+from .actions.annotation_transforms.image_tag.image_tag import ImageTagAction
+from .actions.annotation_transforms.line_to_mask.line_to_mask import LineToMaskAction
+from .actions.annotation_transforms.mask_to_lines.mask_to_lines import MaskToLinesAction
+from .actions.annotation_transforms.mask_to_polygon.mask_to_polygon import (
+    MaskToPolygonAction,
+)
+from .actions.annotation_transforms.merge_masks.merge_masks import MergeMasksAction
+from .actions.annotation_transforms.objects_filter.objects_filter import (
+    ObjectsFilterAction,
+)
+from .actions.annotation_transforms.objects_filter_by_area.objects_filter_by_area import (
+    ObjectsFilterByAreaAction,
+)
+from .actions.annotation_transforms.polygon_to_mask.polygon_to_mask import (
+    PolygonToMaskAction,
+)
+from .actions.annotation_transforms.rasterize.rasterize import RasterizeAction
+from .actions.annotation_transforms.rename_classes.rename_classes import (
+    RenameClassesAction,
+)
+from .actions.annotation_transforms.skeletonize.skeletonize import SkeletonizeAction
+from .actions.annotation_transforms.split_masks.split_masks import SplitMasksAction
+from .actions.annotation_transforms.split_videos_by_duration.split_videos_by_duration import (
+    SplitVideoByDuration,
 )
 from .actions.filters_and_conditions.filter_image_by_object.filter_image_by_object import (
     FilterImageByObject,
 )
-from .actions.filters_and_conditions.filter_image_by_tag.filter_image_by_tag import FilterImageByTag
-from .actions.annotation_transforms.mask_to_polygon.mask_to_polygon import MaskToPolygonAction
-from .actions.spatial_level_transforms.flip.flip import FlipAction
-from .actions.filters_and_conditions.if_action.if_action import IfAction
-from .actions.spatial_level_transforms.instances_crop.instances_crop import InstancesCropAction
-from .actions.annotation_transforms.line_to_mask.line_to_mask import LineToMaskAction
-from .actions.annotation_transforms.merge_masks.merge_masks import MergeMasksAction
-from .actions.spatial_level_transforms.multiply.multiply import MultiplyAction
-from .actions.pixel_level_transformations.noise.noise import NoiseAction
-from .actions.annotation_transforms.objects_filter.objects_filter import ObjectsFilterAction
-from .actions.annotation_transforms.polygon_to_mask.polygon_to_mask import PolygonToMaskAction
-from .actions.pixel_level_transformations.random_color.random_color import RandomColorsAction
-from .actions.annotation_transforms.rename_classes.rename_classes import RenameClassesAction
-from .actions.annotation_transforms.rasterize.rasterize import RasterizeAction
-from .actions.spatial_level_transforms.resize.resize import ResizeAction
-from .actions.spatial_level_transforms.rotate.rotate import RotateAction
-from .actions.annotation_transforms.skeletonize.skeletonize import SkeletonizeAction
-from .actions.spatial_level_transforms.sliding_window.sliding_window import SlidingWindowAction
-from .actions.annotation_transforms.split_masks.split_masks import SplitMasksAction
-from .actions.annotation_transforms.image_tag.image_tag import ImageTagAction
-from .actions.output.export_archive.export_archive import ExportArchiveAction
-from .actions.output.export_archive_with_masks.export_archive_with_masks import (
-    ExportArchiveWithMasksAction,
-)
-from .actions.output.create_new_project.create_new_project import CreateNewProjectAction
-from .actions.output.add_to_existing_project.add_to_existing_project import (
-    AddToExistingProjectAction,
+from .actions.filters_and_conditions.filter_image_by_tag.filter_image_by_tag import (
+    FilterImageByTag,
 )
 from .actions.filters_and_conditions.filter_images_without_objects.filter_images_without_objects import (
     FilterImageWithoutObjects,
 )
-from .actions.output.copy_annotations.copy_annotations import (
-    CopyAnnotationsAction,
-)
-
-# Neural networks
-from .actions.neural_networks.deploy.deploy import (
-    DeployYOLOV5Action,
-    DeployYOLOV8Action,
-    DeployMMDetectionAction,
-    DeployMMSegmentationAction,
-    DeployRTDETRAction,
-    DeployRTDETRv2Action,
-)
-from .actions.neural_networks.apply_nn_inference.apply_nn_inference import ApplyNNInferenceAction
-
-# Video
-from .actions.input.videos_project.videos_project import VideosProjectAction
-from .actions.filters_and_conditions.filter_videos_without_objects.filter_videos_without_objects import (
-    FilterVideoWithoutObjects,
-)
-from .actions.filters_and_conditions.filter_videos_without_annotation.filter_videos_without_annotation import (
-    FilterVideoWithoutAnnotation,
-)
 from .actions.filters_and_conditions.filter_videos_by_duration.filter_videos_by_duration import (
     FilterVideoByDuration,
-)
-from .actions.annotation_transforms.split_videos_by_duration.split_videos_by_duration import (
-    SplitVideoByDuration,
 )
 from .actions.filters_and_conditions.filter_videos_by_objects.filter_videos_by_objects import (
     FilterVideosByObject,
@@ -108,18 +79,20 @@ from .actions.filters_and_conditions.filter_videos_by_objects.filter_videos_by_o
 from .actions.filters_and_conditions.filter_videos_by_tags.filter_videos_by_tags import (
     FilterVideosByTag,
 )
-
-
-# ---
-
-# Labeling job
-from .actions.input.input_labeling_job.input_labeling_job import InputLabelingJobAction
-from .actions.output.create_labeling_job.create_labeling_job import CreateLabelingJobAction
-
-# New
-from .actions.input.filtered_project.filtered_project import FilteredProjectAction
-from .actions.other.move.move import MoveAction
-from .actions.other.copy.copy import CopyAction
+from .actions.filters_and_conditions.filter_videos_without_annotation.filter_videos_without_annotation import (
+    FilterVideoWithoutAnnotation,
+)
+from .actions.filters_and_conditions.filter_videos_without_objects.filter_videos_without_objects import (
+    FilterVideoWithoutObjects,
+)
+from .actions.filters_and_conditions.if_action.if_action import IfAction
+from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
+    ImgAugCorruptlikeBlurAction,
+    ImgAugCorruptlikeColorAction,
+    ImgAugCorruptlikeCompressionAction,
+    ImgAugCorruptlikeNoiseAction,
+    ImgAugCorruptlikeWeatherAction,
+)
 from .actions.imgaug_augs.geometric.elastic_transformation.elastic_transformation import (
     ElasticTransformationAction,
 )
@@ -127,22 +100,70 @@ from .actions.imgaug_augs.geometric.perspective_transform.perspective_transform 
     PerspectiveTransformaAction,
 )
 from .actions.imgaug_augs.studio.imgaug_studio import ImgAugStudioAction
-from .actions.imgaug_augs.corruptlike.imgaug_corruptlike import (
-    ImgAugCorruptlikeNoiseAction,
-    ImgAugCorruptlikeBlurAction,
-    ImgAugCorruptlikeWeatherAction,
-    ImgAugCorruptlikeColorAction,
-    ImgAugCorruptlikeCompressionAction,
+
+# New
+from .actions.input.filtered_project.filtered_project import FilteredProjectAction
+from .actions.input.images_project.images_project import ImagesProjectAction
+
+# Labeling job
+from .actions.input.input_labeling_job.input_labeling_job import InputLabelingJobAction
+
+# Video
+from .actions.input.videos_project.videos_project import VideosProjectAction
+from .actions.neural_networks.apply_nn_inference.apply_nn_inference import (
+    ApplyNNInferenceAction,
 )
 
-from .actions.annotation_transforms.objects_filter_by_area.objects_filter_by_area import (
-    ObjectsFilterByAreaAction,
+# Neural networks
+from .actions.neural_networks.deploy.deploy import (
+    DeployMMDetectionAction,
+    DeployMMSegmentationAction,
+    DeployRTDETRAction,
+    DeployRTDETRv2Action,
+    DeployYOLOV5Action,
+    DeployYOLOV8Action,
 )
-
-
+from .actions.other.copy.copy import CopyAction
+from .actions.other.dataset.dataset import DatasetAction
+from .actions.other.dummy.dummy import DummyAction
+from .actions.other.move.move import MoveAction
+from .actions.other.split_data.split_data import SplitDataAction
+from .actions.output.add_to_existing_project.add_to_existing_project import (
+    AddToExistingProjectAction,
+)
+from .actions.output.copy_annotations.copy_annotations import CopyAnnotationsAction
+from .actions.output.create_labeling_job.create_labeling_job import (
+    CreateLabelingJobAction,
+)
+from .actions.output.create_new_project.create_new_project import CreateNewProjectAction
+from .actions.output.export_archive.export_archive import ExportArchiveAction
+from .actions.output.export_archive_with_masks.export_archive_with_masks import (
+    ExportArchiveWithMasksAction,
+)
 from .actions.output.output_project.output_project import OutputProjectAction
+from .actions.pixel_level_transformations.anonymize.anonymize import AnonymizeAction
+from .actions.pixel_level_transformations.blur.blur import BlurAction
+from .actions.pixel_level_transformations.contrast_brightness.contrast_brightness import (
+    ContrastBrightnessAction,
+)
+from .actions.pixel_level_transformations.noise.noise import NoiseAction
+from .actions.pixel_level_transformations.random_color.random_color import (
+    RandomColorsAction,
+)
+from .actions.spatial_level_transforms.crop.crop import CropAction
+from .actions.spatial_level_transforms.flip.flip import FlipAction
+from .actions.spatial_level_transforms.instances_crop.instances_crop import (
+    InstancesCropAction,
+)
+from .actions.spatial_level_transforms.multiply.multiply import MultiplyAction
+from .actions.spatial_level_transforms.resize.resize import ResizeAction
+from .actions.spatial_level_transforms.rotate.rotate import RotateAction
+from .actions.spatial_level_transforms.sliding_window.sliding_window import (
+    SlidingWindowAction,
+)
 
-import src.globals as g
+# ---
+
 
 SOURCE_ACTIONS = "Input"
 # TRANSFORMATION_ACTIONS = "Transformation actions"
@@ -221,13 +242,13 @@ image_actions_list = {
         IfAction.name,
     ],
     NEURAL_NETWORKS: [
+        ApplyNNInferenceAction.name,
         DeployYOLOV5Action.name,
         DeployYOLOV8Action.name,
         DeployMMDetectionAction.name,
         DeployMMSegmentationAction.name,
         DeployRTDETRAction.name,
         DeployRTDETRv2Action.name,
-        ApplyNNInferenceAction.name,
     ],
     OTHER: [
         DatasetAction.name,
@@ -305,13 +326,13 @@ image_actions_dict = {
     FilterImageWithoutObjects.name: FilterImageWithoutObjects,
     IfAction.name: IfAction,
     # Neural Networks
+    ApplyNNInferenceAction.name: ApplyNNInferenceAction,
     DeployYOLOV5Action.name: DeployYOLOV5Action,
     DeployYOLOV8Action.name: DeployYOLOV8Action,
     DeployMMDetectionAction.name: DeployMMDetectionAction,
     DeployMMSegmentationAction.name: DeployMMSegmentationAction,
     DeployRTDETRAction.name: DeployRTDETRAction,
     DeployRTDETRv2Action.name: DeployRTDETRv2Action,
-    ApplyNNInferenceAction.name: ApplyNNInferenceAction,
     # Other layers
     DatasetAction.name: DatasetAction,
     SplitDataAction.name: SplitDataAction,

@@ -1,18 +1,13 @@
 # coding: utf-8
-from typing import Tuple, Union, List
 from time import sleep
-from supervisely import (
-    Annotation,
-    VideoAnnotation,
-    ProjectMeta,
-    logger,
-)
+from typing import List, Tuple, Union
 
-from supervisely.nn.inference.session import Session
-from src.compute.Layer import Layer
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
 import src.globals as g
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor, VideoDescriptor
+from src.compute.Layer import Layer
 from src.exceptions import BadSettingsError
+from supervisely import Annotation, ProjectMeta, VideoAnnotation, logger
+from supervisely.nn.inference.session import Session
 
 
 def wait_model_served(session: Session, wait_attemtps: int = 10, wait_delay_sec: int = 10):
@@ -59,9 +54,6 @@ class DeployLayer(Layer):
                     "agent_id",
                     "device",
                     "model_source",
-                    "checkpoint_name",
-                    "task_type",
-                    "checkpoint_url",
                     "stop_model_session",
                 ],
                 "properties": {
@@ -72,6 +64,8 @@ class DeployLayer(Layer):
                     "task_type": {"type": "string"},
                     "checkpoint_name": {"type": "string"},
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "model_params": {"type": "object"},
+                    "runtime": {"type": "string"},
                     "stop_model_session": {"type": "boolean"},
                 },
             },
@@ -192,6 +186,7 @@ class DeployMMDetectionLayer(DeployLayer):
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "arch_type": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "config_url": {"type": "string"},
+                    "runtime": {"type": "string"},
                     "stop_model_session": {"type": "boolean"},
                 },
             },
@@ -253,9 +248,7 @@ class DeployRTDETRv2Layer(DeployLayer):
                     "agent_id",
                     "device",
                     "model_source",
-                    "checkpoint_name",
-                    "task_type",
-                    "checkpoint_url",
+                    "model_params",
                     "stop_model_session",
                 ],
                 "properties": {
@@ -263,10 +256,11 @@ class DeployRTDETRv2Layer(DeployLayer):
                     "agent_id": {"type": "integer"},
                     "device": {"type": "string"},
                     "model_source": {"type": "string"},
-                    "task_type": {"type": "string"},
-                    "checkpoint_name": {"type": "string"},
+                    "task_type": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+                    "checkpoint_name": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "checkpoint_url": {"oneOf": [{"type": "string"}, {"type": "null"}]},
                     "runtime": {"type": "string"},
+                    "model_params": {"type": "object"},
                     "stop_model_session": {"type": "boolean"},
                 },
             },

@@ -273,7 +273,10 @@ class ApplyNNInferenceLayer(Layer):
                     "model_settings": {"type": "object"},
                     "model_suffix": {"type": "string"},
                     "use_model_suffix": {"type": "boolean"},
-                    "add_pred_ann_method": {"type": "string", "enum": ["merge", "replace"]},
+                    "add_pred_ann_method": {
+                        "type": "string",
+                        "enum": ["merge", "replace", "replace_keep_img_tags"],
+                    },
                     "apply_method": {"type": "string", "enum": ["image", "roi", "sliding_window"]},
                     "classes": {
                         "oneOf": [
