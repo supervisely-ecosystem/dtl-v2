@@ -1,20 +1,20 @@
-from supervisely.app.widgets import (
-    Button,
-    Container,
-    Flexbox,
-    Text,
-    Field,
-    Editor,
-    Select,
-    Input,
-    Checkbox,
-)
 from src.ui.dtl.utils import (
-    get_set_settings_button_style,
-    get_set_settings_container,
     create_save_btn,
     create_set_default_btn,
+    get_set_settings_button_style,
+    get_set_settings_container,
     get_text_font_size,
+)
+from supervisely.app.widgets import (
+    Button,
+    Checkbox,
+    Container,
+    Editor,
+    Field,
+    Flexbox,
+    Input,
+    Select,
+    Text,
 )
 
 
@@ -34,6 +34,7 @@ def create_inference_settings_widgets():
     resolve_conflict_methods = [
         Select.Item(value="merge", label="Merge"),
         Select.Item(value="replace", label="Replace"),
+        Select.Item(value="replace_keep_img_tags", label="Replace and keep image tags"),
     ]
     resolve_conflict_method_selector = Select(resolve_conflict_methods, size="small")
     resolve_conflict_method_field = Field(
