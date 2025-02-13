@@ -1,43 +1,37 @@
-from pathlib import Path
 import os
-from src.compute.utils.stat_timer import global_timer
+import threading
+from pathlib import Path
 
-
-from supervisely.app.widgets import (
-    Button,
-    Container,
-    Dialog,
-    Progress,
-    Text,
-    ReloadableArea,
-    Empty,
-    NotificationBox,
-)
-from supervisely.io.fs import get_file_size
-import supervisely as sly
+import src.globals as g
+import src.ui.utils as ui_utils
+import src.utils as utils
 import src.workflow as w
-
-from src.compute.main import main as compute_dtls
-
+import supervisely as sly
 from src.compute.layers.data.FilteredProjectLayer import FilteredProjectLayer
 from src.compute.layers.data.ImagesProjectLayer import ImagesProjectLayer
 from src.compute.layers.data.InputLabelingJobLayer import InputLabelingJobLayer
 from src.compute.layers.data.VideosProjectLayer import VideosProjectLayer
-
-
-from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.AddToExistingProjectLayer import AddToExistingProjectLayer
 from src.compute.layers.save.CopyAnnotationsLayer import CopyAnnotationsLayer
 from src.compute.layers.save.CreateLabelingJobLayer import CreateLabelingJobLayer
+from src.compute.layers.save.CreateNewProjectLayer import CreateNewProjectLayer
 from src.compute.layers.save.OutputProjectLayer import OutputProjectLayer
-from src.ui.tabs.configure import nodes_flow, nodes_flow_card
-import src.utils as utils
-import src.ui.utils as ui_utils
-import src.globals as g
+from src.compute.main import main as compute_dtls
+from src.compute.utils.stat_timer import global_timer
 from src.exceptions import CustomException, handle_exception
+from src.ui.tabs.configure import nodes_flow, nodes_flow_card
 from src.ui.widgets import CircleProgress
-import threading
-
+from supervisely.app.widgets import (
+    Button,
+    Container,
+    Dialog,
+    Empty,
+    NotificationBox,
+    Progress,
+    ReloadableArea,
+    Text,
+)
+from supervisely.io.fs import get_file_size
 
 show_run_dialog_btn = Button(
     "Run",
@@ -123,8 +117,15 @@ def _run():
             return
 
         # Run
-        dtl_json = [g.layers[node_id].to_json() for node_id in nodes_state]
-        postprocess_cb_list = [g.layers[node_id].postprocess_cb for node_id in nodes_state]
+        dtl_json = []
+        postprocess_cb_list = []
+        for node_id in nodes_state:
+            node = g.layers.get(node_id)
+            if node is None:
+                sly.logger.debug(f"Node with id {node_id} is not found. Skipping...")
+                continue
+            dtl_json.append(node.to_json())
+            postprocess_cb_list.append(node.postprocess_cb)
 
         g.current_dtl_json = dtl_json
         utils.save_dtl_json(dtl_json)

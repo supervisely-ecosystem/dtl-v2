@@ -1,21 +1,22 @@
 # coding: utf-8
-from supervisely import logger as sly_logger
-from typing import Tuple, List
-import numpy as np
 from os.path import join
+from typing import List, Tuple
 
-from src.compute.Layer import Layer
-from src.compute.dtl_utils.item_descriptor import ImageDescriptor
-from supervisely.nn.inference import Session
-from src.compute.classes_utils import ClassConstants
-from src.compute.tags_utils import TagConstants
-from supervisely.collection.key_indexed_collection import KeyIndexedCollection
-from supervisely import ProjectMeta, Annotation, ObjClass, TagMeta, TagCollection
-import supervisely.imaging.image as sly_image
-from supervisely.io.fs import silent_remove, file_exists
+import numpy as np
+
 import src.globals as g
-from supervisely.app import show_dialog
+import supervisely.imaging.image as sly_image
+from src.compute.classes_utils import ClassConstants
+from src.compute.dtl_utils.item_descriptor import ImageDescriptor
+from src.compute.Layer import Layer
+from src.compute.tags_utils import TagConstants
 from src.exceptions import GraphError
+from supervisely import Annotation, ObjClass, ProjectMeta, TagCollection, TagMeta
+from supervisely import logger as sly_logger
+from supervisely.app import show_dialog
+from supervisely.collection.key_indexed_collection import KeyIndexedCollection
+from supervisely.io.fs import file_exists, silent_remove
+from supervisely.nn.inference import Session
 
 # from src.ui.tabs.run import error_notification
 
@@ -272,7 +273,10 @@ class ApplyNNInferenceLayer(Layer):
                     "model_settings": {"type": "object"},
                     "model_suffix": {"type": "string"},
                     "use_model_suffix": {"type": "boolean"},
-                    "add_pred_ann_method": {"type": "string", "enum": ["merge", "replace"]},
+                    "add_pred_ann_method": {
+                        "type": "string",
+                        "enum": ["merge", "replace", "replace_keep_img_tags"],
+                    },
                     "apply_method": {"type": "string", "enum": ["image", "roi", "sliding_window"]},
                     "classes": {
                         "oneOf": [
@@ -561,6 +565,11 @@ class ApplyNNInferenceLayer(Layer):
                     new_anns.append(ann)
             elif add_pred_ann_method == "replace":
                 new_anns = pred_anns
+            elif add_pred_ann_method == "replace_keep_img_tags":
+                new_anns = []
+                for ann, pred_ann in zip(anns, pred_anns):
+                    new_ann = pred_ann.clone(img_tags=ann.img_tags)
+                    new_anns.append(new_ann)
             yield tuple(zip(new_item_descs, new_anns))
 
     def has_batch_processing(self):
