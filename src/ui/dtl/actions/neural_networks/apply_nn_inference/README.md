@@ -33,11 +33,12 @@ Supported models:
       - **Merge** - Merge predicted annotation with the existing one.
       - **Replace** - Replace the existing annotation with the one predicted by the model. All original labels will be removed.
       - **Replace and keep image tags** - Works as **Replace** method but keeps the image tags.
+  - **Skip already labeled images** - If enabled, the model will not be applied to the images that already have labels or image tags.
   - **Inference settings** - Model specific settings in `YAML` format
   - **Apply method** - Method that will be used to apply the model to the data.
     - Available methods:
-    	- **Full Image** - Model will be applied to the full image.
-    	- **ROI (Coming Soon)** - Model will be applied only for ROIs defined by object's bounding box.
+      - **Full Image** - Model will be applied to the full image.
+      - **ROI (Coming Soon)** - Model will be applied only for ROIs defined by object's bounding box.
       - **Sliding Window (Coming Soon)** - Model will be applied to image using sliding window approach.
 
 

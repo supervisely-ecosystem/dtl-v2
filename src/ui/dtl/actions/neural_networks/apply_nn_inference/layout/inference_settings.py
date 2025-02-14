@@ -8,6 +8,7 @@ from src.ui.dtl.utils import (
 from supervisely.app.widgets import (
     Button,
     Checkbox,
+    CheckboxField,
     Container,
     Editor,
     Field,
@@ -36,11 +37,23 @@ def create_inference_settings_widgets():
         Select.Item(value="replace", label="Replace"),
         Select.Item(value="replace_keep_img_tags", label="Replace and keep image tags"),
     ]
+
     resolve_conflict_method_selector = Select(resolve_conflict_methods, size="small")
+
+    ignore_labeled_checkbox = CheckboxField(
+        title="Skip already labeled images",
+        description="Skip images that already have labels or image tags",
+        checked=False,
+    )
+
+    resolve_conflict_method_container = Container(
+        [resolve_conflict_method_selector, ignore_labeled_checkbox]
+    )
+
     resolve_conflict_method_field = Field(
         title="How to add predictions",
         description="Select how to add prediction to existing image annotation",
-        content=resolve_conflict_method_selector,
+        content=resolve_conflict_method_container,
     )
 
     inf_settings_editor = Editor(
@@ -97,11 +110,15 @@ def create_inference_settings_widgets():
     conflict_method_preview = Text(
         "How to add predictions: ", "text", font_size=get_text_font_size()
     )
+    ignore_labeled_preview = Text(
+        "Skip already labeled images: ", "text", font_size=get_text_font_size()
+    )
     apply_method_preview = Text("Apply method: ", "text", font_size=get_text_font_size())
 
     suffix_preview.hide()
     use_suffix_preview.hide()
     conflict_method_preview.hide()
+    ignore_labeled_preview.hide()
     apply_method_preview.hide()
 
     inf_settings_preview_container = Container(
@@ -109,6 +126,7 @@ def create_inference_settings_widgets():
             suffix_preview,
             use_suffix_preview,
             conflict_method_preview,
+            ignore_labeled_preview,
             apply_method_preview,
         ]
     )
@@ -134,6 +152,7 @@ def create_inference_settings_widgets():
     return (
         model_suffix_input,
         always_add_suffix_checkbox,
+        ignore_labeled_checkbox,
         resolve_conflict_method_selector,
         inf_settings_editor,
         apply_nn_methods_selector,
@@ -142,6 +161,7 @@ def create_inference_settings_widgets():
         suffix_preview,
         use_suffix_preview,
         conflict_method_preview,
+        ignore_labeled_preview,
         apply_method_preview,
         inf_settings_edit_text,
         inf_settings_edit_container,

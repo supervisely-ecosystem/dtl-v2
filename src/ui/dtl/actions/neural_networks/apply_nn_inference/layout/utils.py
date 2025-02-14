@@ -1,25 +1,23 @@
 from typing import List
-from supervisely import ProjectMeta, ObjClass, TagMeta
-from supervisely.nn.inference.session import Session, SessionJSON
-from supervisely.app.widgets import (
-    Container,
-    Text,
-    Select,
-    Input,
-    Checkbox,
-    Editor,
-    ModelInfo,
-    SelectAppSession,
-    Button,
-    NotificationBox,
-)
-from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagsListPreview
 
-from src.ui.dtl.utils import (
-    set_classes_list_preview,
-    set_tags_list_preview,
-)
 import src.globals as g
+from src.ui.dtl.utils import set_classes_list_preview, set_tags_list_preview
+from src.ui.widgets import ClassesList, ClassesListPreview, TagsList, TagsListPreview
+from supervisely import ObjClass, ProjectMeta, TagMeta
+from supervisely.app.widgets import (
+    Button,
+    Checkbox,
+    CheckboxField,
+    Container,
+    Editor,
+    Input,
+    ModelInfo,
+    NotificationBox,
+    Select,
+    SelectAppSession,
+    Text,
+)
+from supervisely.nn.inference.session import Session, SessionJSON
 
 
 ### CONNECT MODEL AND MODEL INFO
@@ -263,26 +261,31 @@ def set_model_preview(model_info: dict, connect_nn_model_preview: Text) -> None:
 def set_model_settings_preview(
     model_suffix_input: Input,
     always_add_suffix_checkbox: Checkbox,
+    ignore_labeled_checkbox: CheckboxField,
     resolve_conflict_method_selector: Select,
     apply_nn_methods_selector: Select,
     suffix_preview: Text,
     use_suffix_preview: Text,
     conflict_method_preview: Text,
+    ignore_labeled_preview: Text,
     apply_method_preview: Text,
 ) -> None:
     model_suffix = model_suffix_input.get_value()
     model_use_suffix = always_add_suffix_checkbox.is_checked()
+    ignore_labeled = ignore_labeled_checkbox.is_checked()
     model_conflict = resolve_conflict_method_selector.get_label()
     apply_method = apply_nn_methods_selector.get_label()
 
     suffix_preview.set(f"Suffix: {model_suffix}", "text")
     use_suffix_preview.set(f"Always use suffix: {str(model_use_suffix)}", "text")
     conflict_method_preview.set(f"How to add prediction: {model_conflict}", "text")
+    ignore_labeled_preview.set(f"Skip already labeled images: {str(ignore_labeled)}", "text")
     apply_method_preview.set(f"Apply method: {apply_method}", "text")
 
     suffix_preview.show()
     use_suffix_preview.show()
     conflict_method_preview.show()
+    ignore_labeled_preview.show()
     apply_method_preview.show()
 
 
@@ -308,6 +311,7 @@ def reset_model(
     suffix_preview: Text,
     use_suffix_preview: Text,
     conflict_method_preview: Text,
+    ignore_labeled_preview: Text,
     apply_method_preview: Text,
     connect_notification: NotificationBox,
     update_preview_btn: Button,
@@ -355,6 +359,7 @@ def reset_model(
     suffix_preview.hide()
     use_suffix_preview.hide()
     conflict_method_preview.hide()
+    ignore_labeled_preview.hide()
     apply_method_preview.hide()
     model_separator.hide()
 
