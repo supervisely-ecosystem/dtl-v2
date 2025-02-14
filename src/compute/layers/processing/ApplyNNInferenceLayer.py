@@ -273,6 +273,7 @@ class ApplyNNInferenceLayer(Layer):
                     "model_settings": {"type": "object"},
                     "model_suffix": {"type": "string"},
                     "use_model_suffix": {"type": "boolean"},
+                    "ignore_labeled": {"type": "boolean"},
                     "add_pred_ann_method": {
                         "type": "string",
                         "enum": ["merge", "replace", "replace_keep_img_tags"],
@@ -370,6 +371,12 @@ class ApplyNNInferenceLayer(Layer):
 
     def process(self, data_el: Tuple[ImageDescriptor, Annotation]):
         img_desc, ann = data_el
+
+        if self.settings["ignore_labeled"] is True:
+            if len(ann.labels) > 0 and len(ann.img_tags) > 0:
+                new_img_desc = img_desc.clone_with_item(img_desc.read_image())
+                yield new_img_desc, ann
+
         img = img_desc.read_image()
         img = img.astype(np.uint8)
 
@@ -457,7 +464,8 @@ class ApplyNNInferenceLayer(Layer):
                 ann = ann.merge(pred_ann)
             elif add_pred_ann_method == "replace":
                 ann = pred_ann
-
+            elif add_pred_ann_method == "replace_keep_img_tags":
+                ann = pred_ann.clone(img_tags=ann.img_tags)
             new_img_desc = img_desc.clone_with_item(img)
             yield new_img_desc, ann
 
@@ -558,18 +566,39 @@ class ApplyNNInferenceLayer(Layer):
                 pass
 
             add_pred_ann_method = self.settings["add_pred_ann_method"]
+            ignore_labeled = self.settings["ignore_labeled"]
             if add_pred_ann_method == "merge":
                 new_anns = []
                 for ann, pred_ann in zip(anns, pred_anns):
-                    ann = ann.merge(pred_ann)
-                    new_anns.append(ann)
+                    if ignore_labeled is True:
+                        if len(ann.labels) > 0 and len(ann.img_tags) > 0:
+                            new_ann = ann
+                            new_anns.append(new_ann)
+                            continue
+                    new_ann = ann.merge(pred_ann)
+                    new_anns.append(new_ann)
             elif add_pred_ann_method == "replace":
-                new_anns = pred_anns
+                # new_anns = pred_anns
+                new_anns = []
+                for ann, pred_ann in zip(anns, pred_anns):
+                    if ignore_labeled is True:
+                        if len(ann.labels) > 0 and len(ann.img_tags) > 0:
+                            new_ann = ann
+                            new_anns.append(new_ann)
+                            continue
+                    new_anns.append(pred_ann)
+
             elif add_pred_ann_method == "replace_keep_img_tags":
                 new_anns = []
                 for ann, pred_ann in zip(anns, pred_anns):
+                    if ignore_labeled is True:
+                        if len(ann.labels) > 0 and len(ann.img_tags) > 0:
+                            new_ann = ann
+                            new_anns.append(new_ann)
+                            continue
                     new_ann = pred_ann.clone(img_tags=ann.img_tags)
                     new_anns.append(new_ann)
+
             yield tuple(zip(new_item_descs, new_anns))
 
     def has_batch_processing(self):

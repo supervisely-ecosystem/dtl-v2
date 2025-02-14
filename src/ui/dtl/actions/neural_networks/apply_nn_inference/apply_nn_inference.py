@@ -1,21 +1,19 @@
 import copy
+from os.path import dirname, realpath
 from typing import Optional
-from os.path import realpath, dirname
 
-from supervisely import ProjectMeta
-from supervisely.app.widgets import NodesFlow
-from src.ui.dtl.Layer import Layer
-from src.ui.dtl.utils import (
-    get_classes_list_value,
-    get_tags_list_value,
-    set_classes_list_settings_from_json,
-    set_tags_list_settings_from_json,
-    get_layer_docs,
-)
 import src.globals as g
-
+from src.ui.dtl.Action import ApplyNNAction
 from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.connect_model import (
     create_connect_to_model_widgets,
+)
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.inference_settings import (
+    create_inference_settings_widgets,
+)
+from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.node_layout import (
+    create_connect_notification_widget,
+    create_layout,
+    create_preview_button_widget,
 )
 from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.select_classes import (
     create_classes_selector_widgets,
@@ -23,18 +21,17 @@ from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.select_classes
 from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.select_tags import (
     create_tags_selector_widgets,
 )
-from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.inference_settings import (
-    create_inference_settings_widgets,
-)
-
-from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.node_layout import (
-    create_preview_button_widget,
-    create_connect_notification_widget,
-    create_layout,
-)
-
 from src.ui.dtl.actions.neural_networks.apply_nn_inference.layout.utils import *
-from src.ui.dtl.Action import ApplyNNAction
+from src.ui.dtl.Layer import Layer
+from src.ui.dtl.utils import (
+    get_classes_list_value,
+    get_layer_docs,
+    get_tags_list_value,
+    set_classes_list_settings_from_json,
+    set_tags_list_settings_from_json,
+)
+from supervisely import ProjectMeta
+from supervisely.app.widgets import NodesFlow
 
 
 class ApplyNNInferenceAction(ApplyNNAction):
@@ -89,6 +86,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
         (
             model_suffix_input,
             always_add_suffix_checkbox,
+            ignore_labeled_checkbox,
             resolve_conflict_method_selector,
             inf_settings_editor,
             apply_nn_methods_selector,
@@ -97,6 +95,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
             suffix_preview,
             use_suffix_preview,
             conflict_method_preview,
+            ignore_labeled_preview,
             apply_method_preview,
             inf_settings_edit_text,
             inf_settings_edit_container,
@@ -224,11 +223,13 @@ class ApplyNNInferenceAction(ApplyNNAction):
             set_model_settings_preview(
                 model_suffix_input,
                 always_add_suffix_checkbox,
+                ignore_labeled_checkbox,
                 resolve_conflict_method_selector,
                 apply_nn_methods_selector,
                 suffix_preview,
                 use_suffix_preview,
                 conflict_method_preview,
+                ignore_labeled_preview,
                 apply_method_preview,
             )
 
@@ -305,6 +306,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 suffix_preview,
                 use_suffix_preview,
                 conflict_method_preview,
+                ignore_labeled_preview,
                 apply_method_preview,
                 connect_notification,
                 update_preview_btn,
@@ -473,6 +475,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
             apply_method = apply_nn_methods_selector.get_value()
             model_suffix = model_suffix_input.get_value()
             use_model_suffix = always_add_suffix_checkbox.is_checked()
+            ignore_labeled = ignore_labeled_checkbox.is_checked()
             add_pred_ann_method = resolve_conflict_method_selector.get_value()
             model_settings_json = model_settings_from_yaml(_model_settings, inf_settings_editor)
 
@@ -485,6 +488,7 @@ class ApplyNNInferenceAction(ApplyNNAction):
                 "model_suffix": model_suffix,
                 "add_pred_ann_method": add_pred_ann_method,
                 "use_model_suffix": use_model_suffix,
+                "ignore_labeled": ignore_labeled,
                 "apply_method": apply_method,
                 "classes": saved_classes_settings,
                 "tags": saved_tags_settings,
@@ -562,11 +566,13 @@ class ApplyNNInferenceAction(ApplyNNAction):
             set_model_settings_preview(
                 model_suffix_input,
                 always_add_suffix_checkbox,
+                ignore_labeled_checkbox,
                 resolve_conflict_method_selector,
                 apply_nn_methods_selector,
                 suffix_preview,
                 use_suffix_preview,
                 conflict_method_preview,
+                ignore_labeled_preview,
                 apply_method_preview,
             )
             # -----------------------
@@ -629,11 +635,13 @@ class ApplyNNInferenceAction(ApplyNNAction):
             set_model_settings_preview(
                 model_suffix_input,
                 always_add_suffix_checkbox,
+                ignore_labeled_checkbox,
                 resolve_conflict_method_selector,
                 apply_nn_methods_selector,
                 suffix_preview,
                 use_suffix_preview,
                 conflict_method_preview,
+                ignore_labeled_preview,
                 apply_method_preview,
             )
             g.updater("metas")
